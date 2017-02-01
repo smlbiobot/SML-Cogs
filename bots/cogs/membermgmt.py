@@ -1,0 +1,121 @@
+# -*- coding: utf-8 -*-
+
+"""
+The MIT License (MIT)
+
+Copyright (c) 2017 SML
+
+Permission is hereby granted, free of charge, to any person obtaining a
+copy of this software and associated documentation files (the "Software"),
+to deal in the Software without restriction, including without limitation
+the rights to use, copy, modify, merge, publish, distribute, sublicense,
+and/or sell copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in
+all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+DEALINGS IN THE SOFTWARE.
+"""
+
+import discord
+from discord.ext import commands
+from .utils import checks
+from random import choice
+
+
+class MemberManagement:
+    """Member Management plugin for Red"""
+
+    def __init__(self, bot):
+        self.bot = bot
+
+    @commands.command(pass_context=True)
+    async def mm(self, ctx, *args):
+        """
+        Member management
+        Get a list of users that satisfy these roles
+        e.g.
+        !mm S M -L
+        !mm +S +M -L
+        fetches a list of users who has the roles S, M but not the role L.
+        S is the same as +S. + is an optional prefix for includes.
+
+        """
+
+        server = ctx.message.server
+        server_roles_names = [r.name for r in server.roles]
+
+        # get list of arguments which are valid server role names
+        # as dictionary {flag, name}
+
+        out=["**Member Management**"]
+
+        role_args = []
+        flags = ['+','-']
+        for arg in args:
+            has_flag = arg[0] in flags
+            flag = arg[0] if has_flag else '+'
+            name = arg[1:] if has_flag else arg
+
+            if name in server_roles_names:
+                role_args.append({'flag': flag, 'name': name})
+
+        plus  = set([r['name'] for r in role_args if r['flag'] == '+'])
+        minus = set([r['name'] for r in role_args if r['flag'] == '-'])
+
+        if len(plus) < 1:
+            out.append("You must include at least one role to display.")
+            out.append("Usage: !mm [+include_roles] [-exclude_roles]")
+            out.append("e.g. !mm +A +B -C")
+            out.append("will output members who have both role A and B but not C")
+        else:
+            out.append(f"Listing members who have these roles: {', '.join(plus)}")
+        if len(minus) != 0:
+            out.append(f"but not these roles: {', '.join(minus)}")
+
+        await self.bot.say('\n'.join(out))
+
+        # only output if argument is supplied
+        if len(plus):
+            # include roles with '+' flag
+            # exclude roles with '-' flag
+            out_members = set()
+            for m in server.members:
+                roles = set([r.name for r in m.roles])
+                exclude = len(roles & minus)
+                if not exclude and roles >= plus:
+                    out_members.add(m)
+
+            
+
+            # embed output
+            color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+            color = int(color, 16)
+
+            data = discord.Embed(
+                description='List',
+                color=discord.Colour(value=color))
+            
+            for m in out_members:
+                value = []
+                roles = [r.name for r in m.roles if r.name != "@everyone"]
+                value.append(f"Roles: {', '.join(roles)}")
+
+                data.add_field(name=str(m.name), value=str(' | '.join(value)))
+            
+            try:
+                await self.bot.say(embed=data)
+            except discord.HTTPException:
+                await self.bot.say("I need the `Embed links` permission "
+                                   "to send this")
+
+
+def setup(bot):
+    bot.add_cog(MemberManagement(bot))
