@@ -5,7 +5,7 @@ from random import choice
 
 
 class SML:
-    """Custom cog for SML Bot"""
+    """Cog / Plugin for RedDiscord-Bot"""
 
     def __init__(self, bot):
         self.bot = bot
