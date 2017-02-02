@@ -91,6 +91,7 @@ class MemberManagement:
             out.append("**Usage**: !mm [+include_roles] [-exclude_roles]")
             out.append("e.g. !mm +A +B -C")
             out.append("will output members who have both role A and B but not C")
+            out.append("For roles with space, enclose string with quotes. e.g. !mm \"Role with space\"")
         else:
             out.append(f"Listing members who have these roles: {', '.join(plus)}")
         if len(minus):
