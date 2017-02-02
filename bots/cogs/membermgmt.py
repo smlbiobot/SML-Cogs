@@ -28,19 +28,35 @@ import discord
 from discord.ext import commands
 from .utils import checks
 from random import choice
+import itertools
 
 
 class MemberManagement:
-    """Member Management plugin for Red"""
+    """
+    Member Management plugin for Red Discord bot
+    """
 
     def __init__(self, bot):
         self.bot = bot
 
+    def grouper(self, n, iterable, fillvalue=None):
+        """
+        Helper function to split lists
+
+        Example:
+        grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
+        """
+        args = [iter(iterable)] * n
+        # return itertools.zip_longest(*args, fillvalue=fillvalue)
+        return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
+
     @commands.command(pass_context=True)
     async def mm(self, ctx, *args):
         """
-        Member management
-        Get a list of users that satisfy these roles
+        Member management command.
+
+        Get a list of users that satisfy a list of roles supplied.
+
         e.g.
         !mm S M -L
         !mm +S +M -L
@@ -72,12 +88,12 @@ class MemberManagement:
 
         if len(plus) < 1:
             out.append("You must include at least one role to display.")
-            out.append("Usage: !mm [+include_roles] [-exclude_roles]")
+            out.append("**Usage**: !mm [+include_roles] [-exclude_roles]")
             out.append("e.g. !mm +A +B -C")
             out.append("will output members who have both role A and B but not C")
         else:
             out.append(f"Listing members who have these roles: {', '.join(plus)}")
-        if len(minus) != 0:
+        if len(minus):
             out.append(f"but not these roles: {', '.join(minus)}")
 
         await self.bot.say('\n'.join(out))
@@ -93,28 +109,41 @@ class MemberManagement:
                 if not exclude and roles >= plus:
                     out_members.add(m)
 
-            
+            suffix = 's' if len(out_members) > 1 else ''
+            await self.bot.say(f"**Found {len(out_members)} member{suffix}.**")
+            await self.bot.say("Member name format: Username [Nickname]")
+
 
             # embed output
             color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
             color = int(color, 16)
 
-            data = discord.Embed(
-                description='List',
-                color=discord.Colour(value=color))
-            
-            for m in out_members:
-                value = []
-                roles = [r.name for r in m.roles if r.name != "@everyone"]
-                value.append(f"Roles: {', '.join(roles)}")
+            # split embed output to multiples of 25 
+            # because embed only supports 25 max fields
 
-                data.add_field(name=str(m.name), value=str(' | '.join(value)))
-            
-            try:
-                await self.bot.say(embed=data)
-            except discord.HTTPException:
-                await self.bot.say("I need the `Embed links` permission "
-                                   "to send this")
+            out_members_group = self.grouper(25, out_members)
+
+            for out_members_list in out_members_group:
+
+                data = discord.Embed(
+                    color=discord.Colour(value=color))
+                
+                for m in out_members_list:
+                    value = []
+                    roles = [r.name for r in m.roles if r.name != "@everyone"]
+                    value.append(f"{', '.join(roles)}")
+
+                    name = m.name
+                    if m.nick is not None:
+                        name += f" [{m.nick}]"
+
+                    data.add_field(name=str(name), value=str(''.join(value)))
+                
+                try:
+                    await self.bot.say(embed=data)
+                except discord.HTTPException:
+                    await self.bot.say("I need the `Embed links` permission "
+                                       "to send this")
 
 
 def setup(bot):
