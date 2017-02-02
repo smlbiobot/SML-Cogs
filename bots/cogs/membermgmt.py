@@ -86,12 +86,23 @@ class MemberManagement:
         plus  = set([r['name'] for r in role_args if r['flag'] == '+'])
         minus = set([r['name'] for r in role_args if r['flag'] == '-'])
 
+        help_str = ['Syntax Error: You must include at least one role to display results.',
+                    '',
+                    '**Usage** ',
+                    '```!mm [+include_roles] [-exclude_roles]```',
+                    '**Example**',
+                    '```!mm +A +B -C```',
+                    'will output members who have both role A and B but not C.',
+                    '',
+                    '**Roles with space**',
+                    'For roles with space, surround text with quotes.',
+                    'e.g. ```!mm "Role with space"```',
+                    '**Flags**',
+                    'You may omit the + sign for roles to include.',
+                    'e.g. ```!mm +A +B -C -D``` is equivalent to ```!mm A B -C -D```']
+
         if len(plus) < 1:
-            out.append("You must include at least one role to display.")
-            out.append("**Usage**: !mm [+include_roles] [-exclude_roles]")
-            out.append("e.g. !mm +A +B -C")
-            out.append("will output members who have both role A and B but not C")
-            out.append("For roles with space, enclose string with quotes. e.g. !mm \"Role with space\"")
+            out.append('\n'.join(help_str))
         else:
             out.append(f"Listing members who have these roles: {', '.join(plus)}")
         if len(minus):
