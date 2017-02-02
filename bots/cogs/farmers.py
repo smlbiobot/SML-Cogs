@@ -75,7 +75,23 @@ class Farmers:
     @farmers.command(name="show", pass_context=True)
     async def farmers_show(self, ctx):
         """Display farmers"""
-        await self.bot.say(f"showing farmers:")
+
+        # Parse Data
+        server = ctx.message.server
+        # url = self.settings[server.id]["DATA_URL"]
+        url = "https://app.nuclino.com/p/Clan-Chest-Farmers-kZCL4FSBYPhSTgmIhDxGPD"
+        async with aiohttp.get(url) as response:
+            soupObject = BeautifulSoup(await response.text(), "html.parser")
+            # a = 0
+        try:
+            txt = soupObject.find(class_='ProseMirror').get_text()
+            await self.bot.type()
+            await self.bot.say(txt)
+
+
+            # await self.bot.say(txt)
+        except:
+            await self.bot.say("Can’t load data from given URL.")
 
 
 
