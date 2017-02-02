@@ -47,7 +47,6 @@ class MemberManagement:
         grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
         """
         args = [iter(iterable)] * n
-        # return itertools.zip_longest(*args, fillvalue=fillvalue)
         return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
 
     @commands.command(pass_context=True)
@@ -63,7 +62,16 @@ class MemberManagement:
         fetches a list of users who has the roles S, M but not the role L.
         S is the same as +S. + is an optional prefix for includes.
 
+        Optional arguments
+        --output-mentions
+          Append a string of user mentions for users displayed.
+
         """
+
+        # Extract optional arguments if exist
+        option_output_mentions = False
+        if "--output-mentions" in args:
+            option_output_mentions = True
 
         server = ctx.message.server
         server_roles_names = [r.name for r in server.roles]
@@ -99,7 +107,7 @@ class MemberManagement:
                     'e.g. ```!mm "Role with space"```',
                     '**Flags**',
                     'You may omit the + sign for roles to include.',
-                    'e.g. ```!mm +A +B -C -D``` is equivalent to ```!mm A B -C -D```']
+                    'e.g. `!mm +A +B -C -D` is equivalent to `!mm A B -C -D`']
 
         if len(plus) < 1:
             out.append('\n'.join(help_str))
@@ -145,9 +153,7 @@ class MemberManagement:
                     roles = [r.name for r in m.roles if r.name != "@everyone"]
                     value.append(f"{', '.join(roles)}")
 
-                    name = m.name
-                    if m.nick is not None:
-                        name += f" [{m.nick}]"
+                    name = m.display_name
 
                     data.add_field(name=str(name), value=str(''.join(value)))
                 
@@ -156,6 +162,14 @@ class MemberManagement:
                 except discord.HTTPException:
                     await self.bot.say("I need the `Embed links` permission "
                                        "to send this")
+
+            # Display a copy-and-pastable list
+            if option_output_mentions:
+                mention_list = [m.mention for m in out_members]
+                await self.bot.say("Copy and paste these in message to mention users listed:"
+                                   f"```{' '.join(mention_list)}```")
+
+
 
 
 def setup(bot):
