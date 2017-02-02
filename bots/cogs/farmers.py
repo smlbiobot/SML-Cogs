@@ -73,7 +73,7 @@ class Farmers:
             await send_cmd_help(ctx)
 
     @farmers.command(name="show", pass_context=True)
-    async def farmers_show(self, ctx):
+    async def farmers_show(self, ctx, week=None):
         """Display farmers"""
 
         # Parse Data
@@ -81,17 +81,47 @@ class Farmers:
         # url = self.settings[server.id]["DATA_URL"]
         url = "https://app.nuclino.com/p/Clan-Chest-Farmers-kZCL4FSBYPhSTgmIhDxGPD"
         async with aiohttp.get(url) as response:
-            soupObject = BeautifulSoup(await response.text(), "html.parser")
-            # a = 0
+            soup = BeautifulSoup(await response.text(), "html.parser")
+
+        # try:
+            root = soup.find(class_="ProseMirror")
+
+            header = root.find_all('h1')
+            # Parse HTML to find name and trophies
+            ul_db = []
+            for ul in root.find_all('ul'):
+                li_db = []
+                for li in ul.find_all('li'):
+                    li_db.append(li.get_text())
+                    # out.append(f"+ {li.get_text()})")
+                ul_db.append(li_db)
+
+            # embed output
+            color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+            color = int(color, 16)
+
+            data = discord.Embed(
+                color=discord.Color(value=color))
+
+            if week is None:
+                week = len(ul_db) - 1
+            else:
+                week = int(week) - 1
+
+            
+            for li in ul_db[week]:
+                field_data = li.split(': ')
+                name = field_data[0]
+                value = field_data[1]
+
+                data.add_field(name=str(name), value=str(value))
+
+             
         try:
-            txt = soupObject.find(class_='ProseMirror').get_text()
-            await self.bot.type()
-            await self.bot.say(txt)
-
-
-            # await self.bot.say(txt)
-        except:
-            await self.bot.say("Can’t load data from given URL.")
+            await self.bot.say(embed=data)
+        except discord.HTTPException:
+            await self.bot.say("I need the `Embed links` permission "
+                               "to send this")
 
 
 
