@@ -57,24 +57,11 @@ class Farmers:
         self.bot = bot
         self.settings = fileIO(settings_path, "load")
 
-    @commands.group(pass_context=True, no_pm=True, invoke_without_command=True)
-    async def farmers(self, ctx, *args):
-        """
+    @commands.command(pass_context=True)
+    async def farmers(self, ctx, week=None):
+        """"
         Fetches list of farmers from Nuclino doc
         """
-        server = ctx.message.server
-
-        # Sets farmers module settings
-        if server.id not in self.settings:
-            self.settings[server.id] = default_settings
-            self.settings[server.id]["CHANNEL"] = server.default_channel.id
-            fileIO(settings_path, "save", self.settings)
-        if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
-
-    @farmers.command(name="show", pass_context=True)
-    async def farmers_show(self, ctx, week=None):
-        """Display farmers"""
 
         # Parse Data
         server = ctx.message.server
@@ -87,28 +74,38 @@ class Farmers:
             root = soup.find(class_="ProseMirror")
 
             header = root.find_all('h1')
+            season = root.find_all('h2')
+
             # Parse HTML to find name and trophies
             ul_db = []
             for ul in root.find_all('ul'):
                 li_db = []
                 for li in ul.find_all('li'):
                     li_db.append(li.get_text())
-                    # out.append(f"+ {li.get_text()})")
                 ul_db.append(li_db)
+
+            if week is None:
+                # no arguments supplied, assume last week
+                week = len(ul_db) - 1
+            elif int(week) >= len(ul_db):
+                # argument larger than supplied, assume last week
+                week = len(ul_db) - 1
+            else:
+                week = int(week) - 1
 
             # embed output
             color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
             color = int(color, 16)
 
+            title = "Clan Chest Farmers"
+            description = f"""Members who have contributed 150+ crowns to their clan chests
+                             {season[week].get_text()} (Week {week+1})"""
+
             data = discord.Embed(
+                title=title,
+                description=description,
                 color=discord.Color(value=color))
 
-            if week is None:
-                week = len(ul_db) - 1
-            else:
-                week = int(week) - 1
-
-            
             for li in ul_db[week]:
                 field_data = li.split(': ')
                 name = field_data[0]
@@ -118,6 +115,7 @@ class Farmers:
 
              
         try:
+            await self.bot.type()
             await self.bot.say(embed=data)
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission "
