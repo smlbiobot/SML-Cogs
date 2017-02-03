@@ -80,32 +80,26 @@ class RoleHistory:
 
         if server.id in self.settings:
             for member_key, member_value in self.settings[server.id]["Members"].items():
-                # await self.bot.say(server.get_member(member_key).display_name)
-
-                member = server.get_member(member_key)
                 
+                member = server.get_member(member_key)
+
                 if username == member.display_name:
                     await self.bot.say("Found Member")
-
-                    # member_value_items = member_value.items()
-
-                    out = ''
-
-                    # ctx.invoke(General.userinfo, username)
-
                     await ctx.invoke(General.userinfo, user=member)
+                    out = []
 
-                    # ctx.invoke('userinfo', username)
-
-                    # s = ctx.invoke('!userinfo {}'.format(username))
-
-                    # await self.bot.say(s)
-
-                    hist = sorted(member_value.items())
+                    hist = sorted(member_value["History"].items())
 
                     for time_key, time_value in hist:
-                        await self.bot.say(time_key)
-                        await self.bot.say(time_value)
+                        out.append('**{}**'.format(time_key))
+                        out.append(', '.join(time_value["Roles"]))
+                        # out.append(', '.join(time_value))
+
+                        # roles = time_value["Roles"]
+                        # await self.bot.say(time_key)
+                        # await self.bot.say(time_value)
+
+                    await self.bot.say("\n".join(out))
 
                     # await self.bot.say(member_value)
                 # self.get_member(userid)
@@ -141,11 +135,14 @@ class RoleHistory:
             if before.id not in self.settings[server.id]["Members"]:
                 self.settings[server.id]["Members"][before.id] = { 
                     "MemberID" : before.id,
-                    f"{self.server_time()}" : self.get_member_data(before)
+                    "History": {
+                        f"{self.server_time()}" : self.get_member_data(before)
+                        }
+                    
                     }
 
             # create values for timestamp as unique key
-            self.settings[server.id]["Members"][after.id][self.server_time()] = self.get_member_data(after)
+            self.settings[server.id]["Members"][after.id]["History"][self.server_time()] = self.get_member_data(after)
 
             # save data
             dataIO.save_json(self.file_path, self.settings)
