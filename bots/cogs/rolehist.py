@@ -93,18 +93,9 @@ class RoleHistory:
                     for time_key, time_value in hist:
                         out.append('**{}**'.format(time_key))
                         out.append(', '.join(time_value["Roles"]))
-                        # out.append(', '.join(time_value))
-
-                        # roles = time_value["Roles"]
-                        # await self.bot.say(time_key)
-                        # await self.bot.say(time_value)
-
+ 
                     await self.bot.say("\n".join(out))
 
-                    # await self.bot.say(member_value)
-                # self.get_member(userid)
-                # await self.bot.say(member_key)
-                # await self.bot.say(member_value)
 
     async def member_update(self, before, after):
         server = before.server
