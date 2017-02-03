@@ -73,10 +73,19 @@ class RoleHistory:
 
         server = ctx.message.server
         if server.id in self.settings:
-            for server_key, server_value in self.settings[server.id].items():
+            for member_key, member_value in self.settings[server.id]["Members"].items():
+                # await self.bot.say(server.get_member(member_key).display_name)
+                if username == server.get_member(member_key).display_name:
+                    await self.bot.say("Found Member")
+
+                    for time_key, time_value in member_value.items():
+                        await self.bot.say(time_key)
+                        await self.bot.say(time_value)
+
+                    # await self.bot.say(member_value)
                 # self.get_member(userid)
-                await self.bot.say(server_key)
-                await self.bot.say(server_value)
+                # await self.bot.say(member_key)
+                # await self.bot.say(member_value)
 
     async def member_update(self, before, after):
         server = before.server
@@ -124,12 +133,8 @@ class RoleHistory:
         """Return data to be stored."""
         return { "MemberName": member.name,
                  "DisplayName": member.display_name,
-                 "Roles": [r.name for r in member.roles]
+                 "Roles": [r.name for r in member.roles if r.name != "@everyone"]
                  }
-
-
- 
-
 
 def check_folder():
     if not os.path.exists("data/rolehist"):
