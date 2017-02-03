@@ -29,6 +29,7 @@ from discord.ext import commands
 from .utils import checks
 from random import choice
 from .utils.dataIO import dataIO
+from .general import General
 from __main__ import send_cmd_help
 import os
 import datetime
@@ -70,15 +71,39 @@ class RoleHistory:
     async def _show_role_hist(self, ctx, username):
         """Display the role history of a user"""
 
-
+        author = ctx.message.author
         server = ctx.message.server
+
+        if not username:
+            username = author
+
+
         if server.id in self.settings:
             for member_key, member_value in self.settings[server.id]["Members"].items():
                 # await self.bot.say(server.get_member(member_key).display_name)
-                if username == server.get_member(member_key).display_name:
+
+                member = server.get_member(member_key)
+                
+                if username == member.display_name:
                     await self.bot.say("Found Member")
 
-                    for time_key, time_value in member_value.items():
+                    # member_value_items = member_value.items()
+
+                    out = ''
+
+                    # ctx.invoke(General.userinfo, username)
+
+                    await ctx.invoke(General.userinfo, user=member)
+
+                    # ctx.invoke('userinfo', username)
+
+                    # s = ctx.invoke('!userinfo {}'.format(username))
+
+                    # await self.bot.say(s)
+
+                    hist = sorted(member_value.items())
+
+                    for time_key, time_value in hist:
                         await self.bot.say(time_key)
                         await self.bot.say(time_value)
 
@@ -113,7 +138,7 @@ class RoleHistory:
             # add member settings if it does not exist 
             # initialize with before data
             # using server time as unique id for role changes
-            if before.id not in self.settings[server.id]:
+            if before.id not in self.settings[server.id]["Members"]:
                 self.settings[server.id]["Members"][before.id] = { 
                     "MemberID" : before.id,
                     f"{self.server_time()}" : self.get_member_data(before)
