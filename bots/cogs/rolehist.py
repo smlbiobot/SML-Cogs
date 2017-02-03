@@ -67,6 +67,8 @@ class RoleHistory:
         author = ctx.message.author
         server = ctx.message.server
 
+        print("rolehist: _show_role_hist")
+
         if not user:
             user = author
 
@@ -117,25 +119,51 @@ class RoleHistory:
                 member = user
 
                 if member is not None:  
-                
-                    
+ 
                     self.settings[server.id]["Members"][member.id] = { 
                         "MemberID" : member.id,
                         "History": {
                             f"{self.server_time()}" : self.get_member_data(member)
                             }
                         }
+
                     # save data
                     # await self.bot.say(str(self.get_member_data(member)))
-                    await self.bot.say("Added member.")
+
+                    await self.bot.say("Added member to database.")
                     dataIO.save_json(self.file_path, self.settings)
 
                 else:
-                   await self.bot.say("{} is not a valid user on this server.".format(user)) 
+                    await self.bot.say("{} is not a valid user on this server.".format(user))
 
                 # await self.bot.say("debug: {}".format(str(member)))
                 
                     
+    @rolehist.command(name="init", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_server=True)
+    async def _init_role_hist(self, ctx):
+        """(MOD) Popularize database with current role data"""
+
+        server = ctx.message.server
+        members = server.members
+
+        for member in members:
+
+            if not self.settings[server.id]["Members"][member.id]:
+
+                # init member only if not found
+                self.settings[server.id]["Members"][member.id] = { 
+                    "MemberID" : member.id,
+                    "History": {
+                        f"{self.server_time()}" : self.get_member_data(member)
+                        }
+                    }
+
+        await self.bot.say("Added all member roles to database.")
+        dataIO.save_json(self.file_path, self.settings)
+
+
+        
 
 
     async def member_update(self, before, after):
@@ -144,14 +172,6 @@ class RoleHistory:
         # process only on role changes
         if before.roles != after.roles:
  
-            # print('======')
-            # print(f"{self.server_time()}")
-            # print('Server: {}'.format(str(server)))
-            # print('Username: {}'.format(str(before.display_name)))
-            # print("Roles: ")
-            # print(str(', '.join([r.name for r in after.roles])))
-            
-
             if server.id not in self.settings:
                 self.settings[server.id] = { 
                     "ServerName": str(server),
@@ -189,6 +209,14 @@ class RoleHistory:
                  "DisplayName": member.display_name,
                  "Roles": [r.name for r in member.roles if r.name != "@everyone"]
                  }
+
+
+    def init_server_settings(self):
+        """Popularize settings file with roles of all existing members"""
+
+        pass
+
+
 
 def check_folder():
     if not os.path.exists("data/rolehist"):
