@@ -73,9 +73,10 @@ class RoleHistory:
 
         server = ctx.message.server
         if server.id in self.settings:
-            for member_id, value in self.settings[server.id].items():
+            for server_key, server_value in self.settings[server.id].items():
                 # self.get_member(userid)
-                await self.bot.say(member_id)
+                await self.bot.say(server_key)
+                await self.bot.say(server_value)
 
     async def member_update(self, before, after):
         server = before.server
@@ -94,7 +95,8 @@ class RoleHistory:
             if server.id not in self.settings:
                 self.settings[server.id] = { 
                     "ServerName": str(server),
-                    "ServerID": str(server.id)
+                    "ServerID": str(server.id),
+                    "Members": {}
                     }
             # Update server name in settings in case they have changed over time
             self.settings[server.id]["ServerName"] = str(server)
@@ -103,13 +105,13 @@ class RoleHistory:
             # initialize with before data
             # using server time as unique id for role changes
             if before.id not in self.settings[server.id]:
-                self.settings[server.id][before.id] = { 
+                self.settings[server.id]["Members"][before.id] = { 
                     "MemberID" : before.id,
                     f"{self.server_time()}" : self.get_member_data(before)
                     }
 
             # create values for timestamp as unique key
-            self.settings[server.id][after.id][self.server_time()] = self.get_member_data(after)
+            self.settings[server.id]["Members"][after.id][self.server_time()] = self.get_member_data(after)
 
             # save data
             dataIO.save_json(self.file_path, self.settings)
