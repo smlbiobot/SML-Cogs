@@ -34,13 +34,6 @@ from __main__ import send_cmd_help
 import os
 import datetime
 
-# try: # check if BeautifulSoup4 is installed
-#     from bs4 import BeautifulSoup
-#     soupAvailable = True
-# except:
-#     soupAvailable = False
-
-# import aiohttp
 
 settings_path = "data/rolehist/settings.json"
 
@@ -68,22 +61,26 @@ class RoleHistory:
             await send_cmd_help(ctx)
 
     @rolehist.command(name="show", pass_context=True, no_pm=True)
-    async def _show_role_hist(self, ctx, username):
+    async def _show_role_hist(self, ctx, user:discord.Member=None):
         """Display the role history of a user"""
 
         author = ctx.message.author
         server = ctx.message.server
 
-        if not username:
-            username = author
+        if not user:
+            user = author
 
-
+ 
         if server.id in self.settings:
+
+            found_member = None
+
             for member_key, member_value in self.settings[server.id]["Members"].items():
                 
                 member = server.get_member(member_key)
 
-                if username == member.display_name:
+                # if user == member.display_name:
+                if user == member:
                     await self.bot.say("Found Member.")
                     await ctx.invoke(General.userinfo, user=member)
                     out = []
@@ -109,10 +106,19 @@ class RoleHistory:
                         prev_roles = curr_roles
  
                     await self.bot.say("\n".join(out))
+                    found_member = member
 
-                else:
-                    # if no data found, add record
-                    await self.bot.say("Member not found in database. Saving current roles…")
+
+            # if no data found, add record
+            if found_member is None:
+
+                await self.bot.say("Member not found in database.")
+
+                member = user
+
+                if member is not None:  
+                
+                    
                     self.settings[server.id]["Members"][member.id] = { 
                         "MemberID" : member.id,
                         "History": {
@@ -120,9 +126,15 @@ class RoleHistory:
                             }
                         }
                     # save data
-                    # await self.bot.say(str(member))
+                    # await self.bot.say(str(self.get_member_data(member)))
+                    await self.bot.say("Added member.")
                     dataIO.save_json(self.file_path, self.settings)
-                        
+
+                else:
+                   await self.bot.say("{} is not a valid user on this server.".format(user)) 
+
+                # await self.bot.say("debug: {}".format(str(member)))
+                
                     
 
 
