@@ -56,70 +56,26 @@ class RoleHistory:
         self.bot = bot
         self.file_path = settings_path
         self.settings = dataIO.load_json(self.file_path)
+        print("rolehist: __init__")
         # self.remove_old()
 
-    @commands.group(pass_context=True, no_pm=True, invoke_without_command=False)
+    @commands.group(pass_context=True, no_pm=True)
     async def rolehist(self, ctx):
         """Role History Management"""
+
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
-
-    # @banned.command(name="add", pass_context=True, no_pm=True)
-    # @checks.mod_or_permissions(manage_server=True)
-    # async def _add_banned(self, ctx, member_name, member_tag, reason):
-    #     """Add a member to the ban list. 
-
-    #        Example: !banned add PlayerA #098UGYE "Being Toxic" """
-    #     server = ctx.message.server
-
-    #     if server.id not in self.banned_members:
-    #         self.banned_members[server.id] = {}
-
-    #     member_data = {
-    #         "Name"   : member_name,
-    #         "Tag"    : member_tag,
-    #         "Reason" : reason
-    #     }
-
-    #     self.banned_members[server.id][member_name] = member_data
-    #     dataIO.save_json(self.file_path, self.banned_members)
-
-    #     await self.bot.say("**{}** ({}) added to the list of banned members."
-    #                        "\n**Reason:** {}".format(member_name, member_tag, reason))
 
     @rolehist.command(name="show", pass_context=True, no_pm=True)
     async def _show_role_hist(self, ctx, username):
         """Display the role history of a user"""
 
-        pass
 
-        # server = ctx.message.server
-        # if server.id in self.banned_members:
-        #     members = self.banned_members[server.id]
-        #     # embed output
-        #     color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-        #     color = int(color, 16)
-
-        #     title = "Banned Members"
-        #     description = f"""List of players who have been banned from the RACF"""
-
-        #     data = discord.Embed(
-        #         title=title,
-        #         description=description,
-        #         color=discord.Color(value=color))
-
-        #     for member_key, member in members.items():
-        #         name = "{} ({})".format(member["Name"], member["Tag"])
-        #         value = member["Reason"]
-        #         data.add_field(name=str(name), value=str(value))
-
-        #     try:
-        #         await self.bot.type()
-        #         await self.bot.say(embed=data)
-
-        #     except discord.HTTPException:
-        #         await self.bot.say("I need the `Embed links` permission "
-        #                            "to send this")
+        server = ctx.message.server
+        if server.id in self.settings:
+            for member_id, value in self.settings[server.id].items():
+                # self.get_member(userid)
+                await self.bot.say(member_id)
 
     async def member_update(self, before, after):
         server = before.server
@@ -127,12 +83,12 @@ class RoleHistory:
         # process only on role changes
         if before.roles != after.roles:
  
-            print('======')
-            print(f"{self.server_time()}")
-            print('Server: {}'.format(str(server)))
-            print('Username: {}'.format(str(before.display_name)))
-            print("Roles: ")
-            print(str(', '.join([r.name for r in after.roles])))
+            # print('======')
+            # print(f"{self.server_time()}")
+            # print('Server: {}'.format(str(server)))
+            # print('Username: {}'.format(str(before.display_name)))
+            # print("Roles: ")
+            # print(str(', '.join([r.name for r in after.roles])))
             
 
             if server.id not in self.settings:
@@ -193,4 +149,5 @@ def setup(bot):
     check_file()
     n = RoleHistory(bot)
     bot.add_listener(n.member_update, "on_member_update")
+    bot.add_cog(n)
 
