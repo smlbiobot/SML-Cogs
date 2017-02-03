@@ -84,17 +84,46 @@ class RoleHistory:
                 member = server.get_member(member_key)
 
                 if username == member.display_name:
-                    await self.bot.say("Found Member")
+                    await self.bot.say("Found Member.")
                     await ctx.invoke(General.userinfo, user=member)
                     out = []
 
                     hist = sorted(member_value["History"].items())
 
+                    prev_roles = []
+
                     for time_key, time_value in hist:
                         out.append('**{}**'.format(time_key))
-                        out.append(', '.join(time_value["Roles"]))
+
+                        curr_roles = time_value["Roles"]
+                        # display role changes if not the first item
+                        if len(prev_roles):
+                            prev_roles_set = set(prev_roles)
+                            curr_roles_set = set(curr_roles)
+                            if prev_roles_set < curr_roles_set:
+                                out.append('**Added:** {}'.format(list(curr_roles_set - prev_roles_set)[0]))
+                            else:
+                                out.append('**Removed:** {}'.format(list(prev_roles_set - curr_roles_set)[0]))
+                        out.append(', '.join(curr_roles))
+
+                        prev_roles = curr_roles
  
                     await self.bot.say("\n".join(out))
+
+                else:
+                    # if no data found, add record
+                    await self.bot.say("Member not found in database. Saving current roles…")
+                    self.settings[server.id]["Members"][member.id] = { 
+                        "MemberID" : member.id,
+                        "History": {
+                            f"{self.server_time()}" : self.get_member_data(member)
+                            }
+                        }
+                    # save data
+                    # await self.bot.say(str(member))
+                    dataIO.save_json(self.file_path, self.settings)
+                        
+                    
 
 
     async def member_update(self, before, after):
