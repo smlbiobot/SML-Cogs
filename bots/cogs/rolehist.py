@@ -60,7 +60,7 @@ class RoleHistory:
 
     @commands.group(pass_context=True, no_pm=True, invoke_without_command=False)
     async def rolehist(self, ctx):
-        """Display role history of users"""
+        """Role History Management"""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
@@ -88,7 +88,7 @@ class RoleHistory:
     #                        "\n**Reason:** {}".format(member_name, member_tag, reason))
 
     @rolehist.command(name="show", pass_context=True, no_pm=True)
-    async def _show_role_hist(self, ctx):
+    async def _show_role_hist(self, ctx, username):
         """Display the role history of a user"""
 
         pass
@@ -148,18 +148,12 @@ class RoleHistory:
             # using server time as unique id for role changes
             if before.id not in self.settings[server.id]:
                 self.settings[server.id][before.id] = { 
-                    "id" : before.id,
-                    f"{self.server_time()}" : { 
-                        "MemberName": before.name,
-                        "Roles": [r.name for r in before.roles]
-                        }
+                    "MemberID" : before.id,
+                    f"{self.server_time()}" : self.get_member_data(before)
                     }
 
             # create values for timestamp as unique key
-            self.settings[server.id][after.id][self.server_time()] = {
-                "MemberName": after.name,
-                "Roles": [r.name for r in after.roles]
-                }
+            self.settings[server.id][after.id][self.server_time()] = self.get_member_data(after)
 
             # save data
             dataIO.save_json(self.file_path, self.settings)
@@ -167,6 +161,14 @@ class RoleHistory:
     def server_time(self):
         """Get UTC time instead of server local time so data can be ported between servers"""
         return str(datetime.datetime.utcnow())
+
+    def get_member_data(self, member):
+        """Return data to be stored."""
+        return { "MemberName": member.name,
+                 "DisplayName": member.display_name,
+                 "Roles": [r.name for r in member.roles]
+                 }
+
 
  
 
