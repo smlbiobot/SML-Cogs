@@ -126,8 +126,9 @@ class RoleHistory:
 
         # process only on role changes
         if before.roles != after.roles:
-
+ 
             print('======')
+            print(f"{self.server_time()}")
             print('Server: {}'.format(str(server)))
             print('Username: {}'.format(str(before.display_name)))
             print("Roles: ")
@@ -135,21 +136,39 @@ class RoleHistory:
             
 
             if server.id not in self.settings:
-                self.settings[server.id] = { "name": str(server)}
+                self.settings[server.id] = { 
+                    "ServerName": str(server),
+                    "ServerID": str(server.id)
+                    }
+            # Update server name in settings in case they have changed over time
+            self.settings[server.id]["ServerName"] = str(server)
 
-            # create member item if not already in settings
-            if after.id not in self.settings[server.id]:
-                self.settings[server.id][after.id] = { "id" : after.id }
+            # add member settings if it does not exist 
+            # initialize with before data
+            # using server time as unique id for role changes
+            if before.id not in self.settings[server.id]:
+                self.settings[server.id][before.id] = { 
+                    "id" : before.id,
+                    f"{self.server_time()}" : { 
+                        "MemberName": before.name,
+                        "Roles": [r.name for r in before.roles]
+                        }
+                    }
 
             # create values for timestamp as unique key
-            time = str(datetime.datetime.now())
+            self.settings[server.id][after.id][self.server_time()] = {
+                "MemberName": after.name,
+                "Roles": [r.name for r in after.roles]
+                }
 
-            self.settings[server.id][after.id][time] = {
-                "name": after.name,
-                "roles": [r.name for r in after.roles],
-
-            }
+            # save data
             dataIO.save_json(self.file_path, self.settings)
+
+    def server_time(self):
+        """Get UTC time instead of server local time so data can be ported between servers"""
+        return str(datetime.datetime.utcnow())
+
+ 
 
 
 def check_folder():
@@ -172,4 +191,4 @@ def setup(bot):
     check_file()
     n = RoleHistory(bot)
     bot.add_listener(n.member_update, "on_member_update")
-    bot.add_cog(n)
+
