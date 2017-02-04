@@ -50,7 +50,7 @@ class RoleHistory:
         self.bot = bot
         self.file_path = settings_path
         self.settings = dataIO.load_json(self.file_path)
-        print("rolehist: __init__")
+        # print("rolehist: __init__")
         # self.remove_old()
 
     @commands.group(pass_context=True, no_pm=True)
@@ -147,9 +147,17 @@ class RoleHistory:
         server = ctx.message.server
         members = server.members
 
+        if server.id not in self.settings:
+            self.settings[server.id] = { 
+                "ServerName": str(server),
+                "ServerID": str(server.id),
+                "Members": {}
+                }
+
+
         for member in members:
 
-            if not self.settings[server.id]["Members"][member.id]:
+            if member.id not in self.settings[server.id]["Members"]:
 
                 # init member only if not found
                 self.settings[server.id]["Members"][member.id] = { 
@@ -161,9 +169,6 @@ class RoleHistory:
 
         await self.bot.say("Added all member roles to database.")
         dataIO.save_json(self.file_path, self.settings)
-
-
-        
 
 
     async def member_update(self, before, after):
@@ -178,6 +183,9 @@ class RoleHistory:
                     "ServerID": str(server.id),
                     "Members": {}
                     }
+
+            
+
             # Update server name in settings in case they have changed over time
             self.settings[server.id]["ServerName"] = str(server)
 
@@ -211,10 +219,7 @@ class RoleHistory:
                  }
 
 
-    def init_server_settings(self):
-        """Popularize settings file with roles of all existing members"""
 
-        pass
 
 
 
