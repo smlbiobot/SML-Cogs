@@ -67,6 +67,8 @@ class MemberManagement:
             Append a string of user mentions for users displayed.
         --output-mentions-only
             Don’t display the long list and only display the list of member mentions
+        --members-without-clan-tag
+            RACF specific option. Equivalent to typing Member -Alpha -Bravo -Charlie -Delta -Echo -Foxtrot -Golf -Hotel
 
 
         """
@@ -74,6 +76,7 @@ class MemberManagement:
         # Extract optional arguments if exist
         option_output_mentions = "--output-mentions" in args
         option_output_mentions_only = "--output-mentions-only" in args
+        option_members_without_clan_tag = "--members-without-clan-tag" in args
 
 
         server = ctx.message.server
@@ -83,6 +86,11 @@ class MemberManagement:
         # as dictionary {flag, name}
 
         out=["**Member Management**"]
+
+        if option_members_without_clan_tag:
+            args = ['Member', '-Alpha', '-Bravo', '-Charlie', '-Delta', '-Echo',
+                    '-Foxtrot', '-Golf', '-Hotel']
+            
 
         role_args = []
         flags = ['+','-']
