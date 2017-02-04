@@ -79,8 +79,7 @@ class Farmers2:
         data = discord.Embed(
             color=discord.Color(value=color),
             title="Clan Chest Farmers",
-            description="Members who have contributed 150+ crowns to clan chest"
-             )
+            description="Members who have contributed 150+ crowns to clan chest")
 
         # for clan in clans:
         #     name = '{}{}'.format(clan[0].upper(), clan[1:].lower())
@@ -98,8 +97,6 @@ class Farmers2:
 
         self.save_settings()
 
-        
-                    
     @farmers2.command(name="set", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(mention_everyone=True)
     async def _set_farmers2(self, ctx, member:discord.Member=None, clan:str=None, crowns:int=None, date:str=None):
@@ -109,6 +106,8 @@ class Farmers2:
         Example: !farmers2 set MemberName Alpha 150 2017-02-28
 
         """
+
+
 
         # Validate arguments before proceeding
         # try:
@@ -158,10 +157,6 @@ class Farmers2:
                 "Crowns": int(crowns),
             }
 
-
-
-            
-
             # server = ctx.message.server
             # members = server.members
 
@@ -196,7 +191,6 @@ class Farmers2:
         except:
             return False
 
-        
     def check_settings(self, server):
         """
         Verify that settings are initialized.
@@ -206,8 +200,7 @@ class Farmers2:
             self.settings[server.id] = { 
                 "ServerName": str(server),
                 "ServerID": str(server.id),
-                "ClanChests": { }
-                }
+                "ClanChests": { } }
 
     def save_settings(self):
         """Saves settings"""
