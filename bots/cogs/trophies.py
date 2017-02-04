@@ -83,7 +83,6 @@ class Trophies:
             title="Trophy requirements",
             description="Minimum trophies to join our clans. "
                         "Current trophies required. "
-                        "PB is only used within 12 hours after the clan chest has been completed."
             )
 
         for clan in clans:
