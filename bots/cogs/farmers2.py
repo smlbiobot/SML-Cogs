@@ -148,8 +148,19 @@ class Farmers2:
             server = ctx.message.server
             self.check_settings(server)
 
-            # hacking the permission settings
-            # mention_everyone=True for all co-leaders and up
+            if d.isoformat() not in self.settings[server.id]["ClanChests"]:
+                self.settings[server.id]["ClanChests"][d.isoformat()] = {}
+
+            self.settings[server.id]["ClanChests"][d.isoformat()][member.id] = {
+                "MemberID": member.id,
+                "MemberDisplayName": member.display_name,
+                "Clan": clan.lower(),
+                "Crowns": int(crowns),
+            }
+
+
+
+            
 
             # server = ctx.message.server
             # members = server.members
