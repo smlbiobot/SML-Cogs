@@ -170,6 +170,30 @@ class RoleHistory:
         await self.bot.say("Added all member roles to database.")
         dataIO.save_json(self.file_path, self.settings)
 
+    async def member_join(self, member):
+        """Add member records when new user join"""
+        server = member.server
+
+        if server.id not in self.settings:
+            self.settings[server.id] = { 
+                "ServerName": str(server),
+                "ServerID": str(server.id),
+                "Members": {}
+                }
+
+        if member.id not in self.settings[server.id]["Members"]:
+
+            # init member only if not found
+            self.settings[server.id]["Members"][member.id] = { 
+                "MemberID" : member.id,
+                "History": {
+                    f"{self.server_time()}" : self.get_member_data(member)
+                    }
+                }
+        dataIO.save_json(self.file_path, self.settings)
+
+
+
 
     async def member_update(self, before, after):
         server = before.server
@@ -242,6 +266,7 @@ def setup(bot):
     check_folder()
     check_file()
     n = RoleHistory(bot)
+    bot.add_listener(n.member_join, "on_member_join")
     bot.add_listener(n.member_update, "on_member_update")
     bot.add_cog(n)
 
