@@ -103,9 +103,12 @@ class Trophies:
         
                     
     @trophies.command(name="set", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(role="Bot Commander")
+    @checks.mod_or_permissions(mention_everyone=True)
     async def _set_trophies(self, ctx, clan:str, req:str):
         """(MOD) Set the trophy requirements for clans"""
+
+        # hacking the permission settings
+        # mention_everyone=True for all co-leaders and up
 
         server = ctx.message.server
         members = server.members
