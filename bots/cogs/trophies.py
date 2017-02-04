@@ -38,6 +38,7 @@ import datetime
 
 settings_path = "data/trophies/settings.json"
 clans = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel']
+set_allowed_role = 'Bot Commander'
 
 class Trophies:
     """
@@ -102,7 +103,7 @@ class Trophies:
         
                     
     @trophies.command(name="set", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_server=True)
+    @checks.mod_or_permissions(role="Bot Commander")
     async def _set_trophies(self, ctx, clan:str, req:str):
         """(MOD) Set the trophy requirements for clans"""
 
