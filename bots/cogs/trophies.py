@@ -64,13 +64,23 @@ class Trophies:
 
         server = ctx.message.server
 
+        if server.id not in self.settings:
+            self.settings[server.id] = { 
+                "ServerName": str(server),
+                "ServerID": str(server.id),
+                "Trophies": { }
+                }
+
+            for c in clans:
+                self.settings[server.id]["Trophies"][c] = "0"
+
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
 
         data = discord.Embed(
             color=discord.Color(value=color),
             title="Trophy requirements",
-            description="Minimum trophies to join RACF clans. "
+            description="Minimum trophies to join our clans. "
                         "Current trophies required. "
                         "PB is only used within 12 hours after the clan chest has been completed."
             )
@@ -79,7 +89,7 @@ class Trophies:
             name = '{}{}'.format(clan[0].upper(), clan[1:].lower())
             value = self.settings[server.id]["Trophies"][clan]
 
-            data.add_field(name=str(name), value=str(value))
+            data.add_field(name=str(name), value='{:,}'.format(int(value)))
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
