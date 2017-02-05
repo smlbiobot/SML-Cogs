@@ -38,22 +38,69 @@ import datetime
 settings_path = "data/deck/settings.json"
 
 cards = ['archers', 'arrows', 'baby-dragon', 'balloon', 'barbarian-hut', 
-        'barbarians', 'battle-ram', 'bomb-tower', 'bomber', 'bowler',
-        'cannon', 'clone', 'dark-prince', 'dart-goblin', 'electro-wizard',
-        'elite-barbarians', 'elixir-collector', 'executioner', 'fire-spirits',
-        'fireball', 'freeze', 'furnace', 'gems-1', 'gems-2', 'gems-3',
-        'gems-4', 'gems-5', 'gems-6', 'gems', 'giant-skeleton', 'giant',
-        'goblin-barrel', 'goblin-gang', 'goblin-hut', 'goblins', 'gold-1',
-        'gold-2', 'gold-3', 'gold', 'golem', 'graveyard', 'guards', 'hog-rider', 
-        'ice-golem', 'ice-spirit', 'ice-wizard', 'inferno-dragon',
-        'inferno-tower', 'knight', 'lava-hound', 'lightning', 'lumberjack',
-        'mega-minion', 'miner', 'mini-pekka', 'minion-horde', 'minions',
-        'mirror', 'mortar', 'musketeer', 'pekka', 'poison', 'prince',
-        'princess', 'rage', 'rocket', 'royal-giant', 'skeleton-army',
-        'skeletons', 'soon', 'sparky', 'spear-goblins', 'tesla', 'the-log',
-        'three-muskateers', 'tombstone', 'tornado', 'valkyrie', 'witch',
-        'wizard', 'xbow', 'zap']
+         'barbarians', 'battle-ram', 'bomb-tower', 'bomber', 'bowler',
+         'cannon', 'clone', 'dark-prince', 'dart-goblin', 'electro-wizard',
+         'elite-barbarians', 'elixir-collector', 'executioner', 'fire-spirits',
+         'fireball', 'freeze', 'furnace', 'giant-skeleton', 'giant', 'goblin-barrel', 
+         'goblin-gang', 'goblin-hut', 'goblins', 'golem', 'graveyard',
+         'guards', 'hog-rider', 'ice-golem', 'ice-spirit', 'ice-wizard',
+         'inferno-dragon', 'inferno-tower', 'knight', 'lava-hound',
+         'lightning', 'lumberjack', 'mega-minion', 'miner', 'mini-pekka',
+         'minion-horde', 'minions', 'mirror', 'mortar', 'musketeer', 'pekka',
+         'poison', 'prince', 'princess', 'rage', 'rocket', 'royal-giant',
+         'skeleton-army', 'skeletons', 'soon', 'sparky', 'spear-goblins',
+         'tesla', 'the-log', 'three-muskateers', 'tombstone', 'tornado',
+         'valkyrie', 'witch', 'wizard', 'xbow', 'zap']
 
+cards_abbrev = { 'bbd': 'baby-dragon',
+                 'bbdragon': 'baby-dragon',
+                 'loon': 'balloon',
+                 'barb-hut': 'barbarian-hut',
+                 'barbhut': 'barbarian-hut',
+                 'barb': 'barbarians',
+                 'barbs': 'barbarians',
+                 'br': 'battle-ram',
+                 'bt': 'bomb-tower',
+                 'dp': 'dark-prince',
+                 'ew': 'electro-wizard',
+                 'ewiz': 'electro-wizard',
+                 'eb': 'elite-barbarians',
+                 'ebarb': 'elite-barbarians',
+                 'ebarbs': 'elite-barbarians',
+                 'ec': 'elixir-collector',
+                 'pump': 'elixir-collector',
+                 'collector': 'elixir-collector',
+                 'exe': 'executioner',
+                 'exec': 'executioner',
+                 'fs': 'fire-spirits',
+                 'fb': 'fireball',
+                 'gs': 'giant-skeleton',
+                 'gob-barrel': 'goblin-barrel',
+                 'gb': 'goblin-barrel',
+                 'gg': 'goblin-gang',
+                 'gob-hut': 'goblin-hut',
+                 'gobs': 'goblins',
+                 'hog': 'hog-rider',
+                 'ig': 'ice-golem',
+                 'is': 'ice-spirit',
+                 'iw': 'ice-wizard',
+                 'id': 'inferno-dragon',
+                 'it': 'inferno-tower',
+                 'lh': 'lava-hound',
+                 'lj': 'lumberjack',
+                 'mm': 'mega-minion',
+                 'mp': 'mini-pekka',
+                 'mh': 'minion-horde',
+                 'horde': 'minion-horde',
+                 'musk': 'musketeer',
+                 '1m': 'musketeer',
+                 'rg': 'royal-giant',
+                 'skarmy': 'skeleton-army',
+                 'spear-gobs': 'spear-goblins',
+                 'log': 'the-log',
+                 '3m': 'three-musketeers',
+                 'ts': 'tombstone',
+                 'valk': 'valkyrie' }
 
 class Deck:
     """
@@ -72,23 +119,67 @@ class Deck:
             await send_cmd_help(ctx)
 
     @deck.command(name="set", pass_context=True, no_pm=True)
-    async def _deck_set(self, ctx, *args):
-        """Set a decklist for the user calling the command"""
+    async def _deck_set(self, ctx, *member_deck:str):
+        """
+        Set a decklist for the user calling the command
+
+        Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
+        """
 
         author = ctx.message.author
         server = ctx.message.server
 
         self.check_server_settings(server)
-        self.check_member_settings(server, author)
-
-
-        await.bot.say(str(set(args)))
-        await.bot.say(str(set(cards)))
+        self.check_member_settings(server, author)  
         
-        if set(args) < set(cards):
-            await self.bot.say("valid deck")
+        member_deck = [c.lower() for c in member_deck]
+
+        # replace abbreviations
+        for i, card in enumerate(member_deck):
+            if card in cards_abbrev.keys():
+                member_deck[i] = cards_abbrev[card]
+
+        print(member_deck)
+
+       
+
+        if len(member_deck) != 8:
+            await self.bot.say("Please enter exactly 8 cards")
+        elif not set(member_deck) < set(cards):
+            for card in member_deck:
+                if not card in cards:
+                    await self.bot.say("{} is not a valid card name.".format(card))
+            await self.bot.say("**List of cards:** {}".format(", ".join(cards))                               )
         else:
-            await self.bot.say("invalid deck")
+
+            # try:
+            # await self.bot.say("Deck saved")
+            decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
+
+            # decks_hash = [hash(set(d)) for d in decks.values()]
+
+            # creates sets with decks.values
+            decks_sets = [set(d) for d in decks.values()]
+
+            if  set(member_deck) in decks_sets:
+                # existing deck
+                await self.bot.say("deck exists already")
+                
+
+            else:
+                # new deck
+                await self.bot.say("new deck")
+
+                member_deck_hash = str(hash(''.join(member_deck)))
+            
+                deck_id = str(len(decks))
+                # decks[deck_id] = member_deck
+                decks[member_deck_hash] = member_deck
+                self.save_settings()
+
+
+                # except:
+                #     await self.bot.say("Deck not saved")
 
 
 
@@ -139,4 +230,20 @@ def setup(bot):
     n = Deck(bot)
     bot.add_cog(n)
 
+
+"""  
+Bot commands for debugging
+
+http://statsroyale.com/profile/C0G20PR2
+http://statsroyale.com/profile/82P9CLC8
+http://statsroyale.com/profile/8L9L9GL      
+!deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
+!deck set mm bbd loon bt is fs gs lh
+!deck set bbd mm loon bt is fs gs lh
+!deck set lh mm loon it is fs gs gb
+!deck set archers ARROWS baby-dragon BALLOON barbarian-hut barbarians battle-ram bomb-tower
+!deck set dark-prince dart-goblin electro-wizard elite-barbarians elixir-collector executioner fire-spirits fireball
+!deck set dark-prince dart-goblin2 electro-wizard elite-barbarians2 elixir-collector executioner fire-spirits fireball
+dark-prince dart-goblin electro-wizard elite-barbarians elixir-collector executioner fire-spirits
+"""
     
