@@ -36,3 +36,10 @@ import datetime
 
 
 settings_path = "data/decks/settings.json"
+
+
+class Decks:
+	"""
+	Saves a Clash Royale deck for a user and display them
+	"""
+	
