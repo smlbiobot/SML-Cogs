@@ -170,11 +170,8 @@ class Deck:
                 # new deck
                 await self.bot.say("new deck")
 
-                member_deck_hash = str(hash(''.join(member_deck)))
-            
-                deck_id = str(len(decks))
-                # decks[deck_id] = member_deck
-                decks[member_deck_hash] = member_deck
+                deck_key = str(datetime.datetime.utcnow())
+                decks[deck_key] = member_deck
                 self.save_settings()
 
 
