@@ -154,41 +154,16 @@ class Deck:
             # with open(deck_image_file, 'rb') as f:
             #     await self.bot.send_file(ctx.message.channel, f)
 
+            # construct a filename using first three letters of each card
+            filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
+            description = "Deck: {}".format(', '.join(deck))
+
             with io.BytesIO() as f:
                 deck_image.save(f, "PNG")
                 f.seek(0)
-                await ctx.bot.send_file(ctx.message.channel, f, filename="square.png", content="Here's your square:")
+                await ctx.bot.send_file(ctx.message.channel, f, 
+                    filename=filename, content=description)
 
-            # os.remove(deck_image_file)
-
-            # for card in deck:
-            #     card_thumbnail_file = self.get_card_image_file(card, 0.2)
-
-            #     with open(card_thumbnail_file, 'rb') as f:
-            #         await self.bot.send_file(ctx.message.channel, f)
-
-    def send_and_remove_image(self, ctx, img):
-        """Send image to discord and remove from server"""
-        with open(img, 'rb') as f:
-            self.bot.send_file(ctx.message.channel, f)
-        # os.remove(img)  
-
-
-    # def get_card_image_file(self, name:str, scale:float):
-    #     """Return image of the card"""
-
-    #     infile = "data/deck/img/cards/{}.png".format(name)
-    #     outfile = "data/deck/img/cards-tn/{}.png".format(name)
-
-    #     try:
-    #         img = Image.open(infile)
-    #         size = (img.size[0]*scale, img.size[1]*scale)
-    #         img.thumbnail(size)
-    #         img.save(outfile, "PNG")
-
-    #         return outfile
-    #     except IOError:
-    #         print("cannot create thumbnail for", infile)
 
     def get_deck_image(self, deck):
         """Construct the deck with Pillow and return image"""
@@ -270,9 +245,7 @@ class Deck:
 def check_folder():
     folders = ["data/deck",
                "data/deck/img",
-               "data/deck/img/decks",
-               "data/deck/img/cards",
-               "data/deck/img/cards-tn"]
+               "data/deck/img/cards"]
     for f in folders:
         if not os.path.exists(f):
             print("Creating {} folder".format(f))
