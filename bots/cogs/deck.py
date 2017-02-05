@@ -183,6 +183,10 @@ class Deck:
         for k, deck in decks.items():
             await self.bot.say(str(deck))
 
+        # test image upload
+        with open('data/deck/img/cards/battle-ram.png', 'rb') as f:
+            await self.bot.send_file(ctx.message.channel, f)
+
 
 
 
@@ -233,6 +237,8 @@ def setup(bot):
 
 """  
 Bot commands for debugging
+
+
 
 http://statsroyale.com/profile/C0G20PR2
 http://statsroyale.com/profile/82P9CLC8
