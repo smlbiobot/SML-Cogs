@@ -115,6 +115,9 @@ class Deck:
         self.card_w = 302
         self.card_h = 363
         self.card_ratio = self.card_w / self.card_h
+        self.card_thumb_scale = 0.2
+        self.card_thumb_w = int(self.card_w * self.card_thumb_scale)
+        self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
 
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
@@ -187,11 +190,16 @@ class Deck:
         for k, deck in decks.items():
             await self.bot.say(str(deck))
 
-            for card in deck:
-                card_thumbnail_file = self.get_card_image_file(card, 0.2)
+            deck_image_file = self.get_deck_image_file(deck)
 
-                with open(card_thumbnail_file, 'rb') as f:
-                    await self.bot.send_file(ctx.message.channel, f)
+            with open(deck_image_file, 'rb') as f:
+                await self.bot.send_file(ctx.message.channel, f)
+
+            # for card in deck:
+            #     card_thumbnail_file = self.get_card_image_file(card, 0.2)
+
+            #     with open(card_thumbnail_file, 'rb') as f:
+            #         await self.bot.send_file(ctx.message.channel, f)
 
 
     def get_card_image_file(self, name:str, scale:float):
@@ -210,8 +218,29 @@ class Deck:
         except IOError:
             print("cannot create thumbnail for", infile)
 
-    def create_deck_image(self, deck):
-        """Construct the deck with Pillow and return as an image"""
+    def get_deck_image_file(self, deck):
+        """Construct the deck with Pillow and return the filename of the image"""
+
+        # PIL.Image.new(mode, size, color=0)
+        size = (self.card_thumb_w * 8, self.card_thumb_h)
+        out_image = Image.new("RGBA", size)
+        deck_hash = hash(''.join(deck))
+        out_file = "data/deck/img/decks/deck-{}.png".format(deck_hash)
+
+        for i, card in enumerate(deck):
+            card_image_file = "data/deck/img/cards/{}.png".format(card)
+            card_image = Image.open(card_image_file)
+            size = (self.card_thumb_w, self.card_thumb_h)
+            card_image.thumbnail(size)
+            box = (self.card_thumb_w * i, 0, self.card_thumb_w * (i+1), self.card_thumb_h)
+            out_image.paste(card_image, box)
+
+        try:
+            out_image.save(out_file, "PNG")
+            return out_file
+
+        except IOError:
+            print("Cannot create {}".format(out_file))
 
         # Source image dimension 302x363
 
@@ -243,6 +272,7 @@ class Deck:
 def check_folder():
     folders = ["data/deck",
                "data/deck/img",
+               "data/deck/img/decks",
                "data/deck/img/cards",
                "data/deck/img/cards-tn"]
     for f in folders:
