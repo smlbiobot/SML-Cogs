@@ -49,7 +49,7 @@ cards = ['archers', 'arrows', 'baby-dragon', 'balloon', 'barbarian-hut',
          'minion-horde', 'minions', 'mirror', 'mortar', 'musketeer', 'pekka',
          'poison', 'prince', 'princess', 'rage', 'rocket', 'royal-giant',
          'skeleton-army', 'skeletons', 'soon', 'sparky', 'spear-goblins',
-         'tesla', 'the-log', 'three-muskateers', 'tombstone', 'tornado',
+         'tesla', 'the-log', 'three-musketeers', 'tombstone', 'tornado',
          'valkyrie', 'witch', 'wizard', 'xbow', 'zap']
 
 cards_abbrev = { 'bbd': 'baby-dragon',
@@ -167,7 +167,7 @@ class Deck:
                 await self.bot.say("Deck exists already")
             else:
                 # new deck
-                await self.boy.say("Deck added.")
+                await self.bot.say("Deck added.")
                 deck_key = str(datetime.datetime.utcnow())
                 decks[deck_key] = member_deck
                 self.save_settings()
