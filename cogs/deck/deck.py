@@ -121,11 +121,7 @@ class Deck:
                 deck_key = str(datetime.datetime.utcnow())
                 decks[deck_key] = member_deck
 
-                deck_image_file = self.get_deck_image_file(member_deck)
-
-                with open(deck_image_file, 'rb') as f:
-                    await self.bot.send_file(ctx.message.channel, f)
-                os.remove(deck_image_file)
+                await self.upload_deck_image(ctx, member_deck)
 
                 self.save_settings()
 
@@ -147,22 +143,24 @@ class Deck:
         for k, deck in decks.items():
             await self.bot.say(str(deck))
 
-            # deck_image_file = self.get_deck_image_file(deck)
-            deck_image = self.get_deck_image(deck)
-            # self.send_and_remove_image(ctx, deck_image_file)
+            await self.upload_deck_image(ctx, deck)
 
-            # with open(deck_image_file, 'rb') as f:
-            #     await self.bot.send_file(ctx.message.channel, f)
+    async def upload_deck_image(self, ctx, deck):
+        """Upload deck image to the server"""
 
-            # construct a filename using first three letters of each card
-            filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
-            description = "Deck: {}".format(', '.join(deck))
+        deck_image = self.get_deck_image(deck)
 
-            with io.BytesIO() as f:
-                deck_image.save(f, "PNG")
-                f.seek(0)
-                await ctx.bot.send_file(ctx.message.channel, f, 
-                    filename=filename, content=description)
+        # construct a filename using first three letters of each card
+        filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
+        description = "Deck: {}".format(', '.join(deck))
+
+        with io.BytesIO() as f:
+            deck_image.save(f, "PNG")
+            f.seek(0)
+            await ctx.bot.send_file(ctx.message.channel, f, 
+                filename=filename, content=description)
+
+
 
 
     def get_deck_image(self, deck):
@@ -183,41 +181,6 @@ class Deck:
             out_image.paste(card_image, box)
 
         return out_image
-
-        # try:
-        #     out_image.save(out_file, "PNG")
-        #     return out_file
-
-        # except IOError:
-        #     print("Cannot create {}".format(out_file))
-
-    def get_deck_image_file(self, deck):
-        """Construct the deck with Pillow and return the filename of the image"""
-
-        # PIL.Image.new(mode, size, color=0)
-        size = (self.card_thumb_w * 8, self.card_thumb_h)
-        out_image = Image.new("RGBA", size)
-        deck_hash = hash(''.join(deck))
-        out_file = "data/deck/img/decks/deck-{}.png".format(deck_hash)
-
-        for i, card in enumerate(deck):
-            card_image_file = "data/deck/img/cards/{}.png".format(card)
-            card_image = Image.open(card_image_file)
-            size = (self.card_thumb_w, self.card_thumb_h)
-            card_image.thumbnail(size)
-            box = (self.card_thumb_w * i, 0, self.card_thumb_w * (i+1), self.card_thumb_h)
-            out_image.paste(card_image, box)
-
-        try:
-            out_image.save(out_file, "PNG")
-            return out_file
-
-        except IOError:
-            print("Cannot create {}".format(out_file))
-
-        # Source image dimension 302x363
-
-
 
 
     def check_member_settings(self, server, member):
