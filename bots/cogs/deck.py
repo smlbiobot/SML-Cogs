@@ -139,10 +139,6 @@ class Deck:
             if card in cards_abbrev.keys():
                 member_deck[i] = cards_abbrev[card]
 
-        print(member_deck)
-
-       
-
         if len(member_deck) != 8:
             await self.bot.say("Please enter exactly 8 cards")
         elif not set(member_deck) < set(cards):
@@ -156,32 +152,39 @@ class Deck:
             # await self.bot.say("Deck saved")
             decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
 
-            # decks_hash = [hash(set(d)) for d in decks.values()]
-
             # creates sets with decks.values
             decks_sets = [set(d) for d in decks.values()]
 
             if  set(member_deck) in decks_sets:
                 # existing deck
-                await self.bot.say("deck exists already")
-                
-
+                await self.bot.say("Deck exists already")
             else:
                 # new deck
-                await self.bot.say("new deck")
-
+                await self.boy.say("Deck added.")
                 deck_key = str(datetime.datetime.utcnow())
                 decks[deck_key] = member_deck
                 self.save_settings()
 
+    @deck.command(name="list", pass_context=True, no_pm=True)
+    async def deck_list(self, ctx, member:discord.Member=None):
+        """List the decks of a user"""
 
-                # except:
-                #     await self.bot.say("Deck not saved")
+        author = ctx.message.author
+        server = ctx.message.server
+
+        if not member:
+            member = author
+
+        self.check_server_settings(server)
+        self.check_member_settings(server, member)
+
+        decks = self.settings["Servers"][server.id]["Members"][member.id]["Decks"]
+
+        for k, deck in decks.items():
+            await self.bot.say(str(deck))
 
 
 
-
-        
 
     def check_member_settings(self, server, member):
         """Init member section if necessary"""
