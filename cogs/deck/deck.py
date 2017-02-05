@@ -100,7 +100,7 @@ cards_abbrev = { 'bbd': 'baby-dragon',
                  'log': 'the-log',
                  '3m': 'three-musketeers',
                  'ts': 'tombstone',
-                 'valk': 'valkyrie' }
+                 'valk': 'valkyrie'}
 
 
 class Deck:
@@ -137,8 +137,7 @@ class Deck:
         server = ctx.message.server
 
         self.check_server_settings(server)
-        self.check_member_settings(server, author)  
-        
+        self.check_member_settings(server, author)
         member_deck = [c.lower() for c in member_deck]
 
         # replace abbreviations
@@ -253,7 +252,7 @@ class Deck:
             self.settings["Servers"][server.id]["Members"][member.id] = {
                 "MemberID": member.id,
                 "MemberDisplayName": member.display_name,
-                "Decks": {} }
+                "Decks": {}}
             self.save_settings()
 
 
