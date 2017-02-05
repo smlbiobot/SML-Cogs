@@ -62,8 +62,6 @@ class RACF:
             title="Rules + Roles",
             description="Important information for all members. Please read."
             )
-        # data.add_field(name="Rules", value=rules_url)
-        # data.add_field(name="Roles", value=roles_url)
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
@@ -84,17 +82,23 @@ class RACF:
         out.append("<{}>".format(roles_url))
         await self.bot.say('\n'.join(out))
 
+    @commands.command(pass_context=True)
+    async def racfwelcome(self, ctx, member:discord.Member):
+        """Welcome people manually via command"""
+        # server = ctx.message.server
+        # self.member_join(member)
+        await self.bot.say("Hi {0.mention}! Are you in the Reddit Alpha Clan Family (RACF) / " \
+            "interested in joining our clans / just visiting?".format(member))
+
     async def member_join(self, member:discord.Member):
         """Greet users when they join the server"""
         server = member.server
         channel = server.default_channel.id
 
-        message = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
-          "interested in joining our clans / just visiting?"
-
         if (server.name == "Reddit Alpha Clan Family"):
             await self.bot.send_message(channel,
-                message.format(member, server))
+                "Hi {0.mention}! Are you in the Reddit Alpha Clan Family (RACF) / " \
+                "interested in joining our clans / just visiting?".format(member))
 
 
 
@@ -102,7 +106,7 @@ class RACF:
 
 def setup(bot):
     r = RACF(bot)
-    bot.add_listener(r.member_join, "on_member_join")
+    # bot.add_listener(r.member_join, "on_member_join")
     bot.add_cog(r)
 
 
