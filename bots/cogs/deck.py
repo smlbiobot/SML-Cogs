@@ -33,7 +33,7 @@ from .general import General
 from __main__ import send_cmd_help
 import os
 import datetime
-
+from PIL import Image
 
 settings_path = "data/deck/settings.json"
 
@@ -102,6 +102,7 @@ cards_abbrev = { 'bbd': 'baby-dragon',
                  'ts': 'tombstone',
                  'valk': 'valkyrie' }
 
+
 class Deck:
     """
     Saves a Clash Royale deck for a user and display them
@@ -111,6 +112,9 @@ class Deck:
         self.bot = bot
         self.file_path = settings_path
         self.settings = dataIO.load_json(self.file_path)
+        self.card_w = 302
+        self.card_h = 363
+        self.card_ratio = self.card_w / self.card_h
 
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
@@ -183,9 +187,33 @@ class Deck:
         for k, deck in decks.items():
             await self.bot.say(str(deck))
 
-        # test image upload
-        with open('data/deck/img/cards/battle-ram.png', 'rb') as f:
-            await self.bot.send_file(ctx.message.channel, f)
+            for card in deck:
+                card_thumbnail_file = self.get_card_image_file(card, 0.2)
+
+                with open(card_thumbnail_file, 'rb') as f:
+                    await self.bot.send_file(ctx.message.channel, f)
+
+
+    def get_card_image_file(self, name:str, scale:float):
+        """Return image of the card"""
+
+        infile = "data/deck/img/cards/{}.png".format(name)
+        outfile = "data/deck/img/cards-tn/{}.png".format(name)
+
+        try:
+            img = Image.open(infile)
+            size = (img.size[0]*scale, img.size[1]*scale)
+            img.thumbnail(size)
+            img.save(outfile, "PNG")
+
+            return outfile
+        except IOError:
+            print("cannot create thumbnail for", infile)
+
+    def create_deck_image(self, deck):
+        """Construct the deck with Pillow and return as an image"""
+
+        # Source image dimension 302x363
 
 
 
@@ -213,9 +241,14 @@ class Deck:
         dataIO.save_json(self.file_path, self.settings)
 
 def check_folder():
-    if not os.path.exists("data/deck"):
-        print("Creating data/deck folder...")
-        os.makedirs("data/deck")
+    folders = ["data/deck",
+               "data/deck/img",
+               "data/deck/img/cards",
+               "data/deck/img/cards-tn"]
+    for f in folders:
+        if not os.path.exists(f):
+            print("Creating {} folder".format(f))
+            os.makedirs(f)
 
 def check_file():
     settings = {
