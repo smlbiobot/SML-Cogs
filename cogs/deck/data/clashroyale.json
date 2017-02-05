@@ -77,16 +77,16 @@
         },
         "elite-barbarians": {
             "aka": ["eb", "ebarb", "ebarbs"],
-            "elixir": ,
+            "elixir": 6,
             "rarity": "common"
         },
         "elixir-collector": {
-            "aka": ["ec","pump","collector"],
+            "aka": ["ec", "pump", "collector"],
             "elixir": 6,
             "rarity": "rare"
         },
         "executioner": {
-            "aka": ["ex","exe","exec"],
+            "aka": ["ex", "exe", "exec"],
             "elixir": 5,
             "rarity": "epic"
         },
@@ -121,12 +121,12 @@
             "rarity": "rare"
         },
         "goblin-barrel": {
-            "aka": ["gb","gob-barrel"],
+            "aka": ["gb", "gob-barrel"],
             "elixir": 3,
             "rarity": "epic"
         },
         "goblin-gang": {
-            "aka": ["gg","gob-gang"],
+            "aka": ["gg", "gob-gang"],
             "elixir": 5,
             "rarity": "rare"
         },
@@ -136,7 +136,7 @@
             "rarity": "rare"
         },
         "goblins": {
-            "aka": ["gobs","gob","stab-gobs","stab-gob"],
+            "aka": ["gobs", "gob", "stab-gobs", "stab-gob"],
             "elixir": 2,
             "rarity": "common"
         },
@@ -146,7 +146,7 @@
             "rarity": "epic"
         },
         "graveyard": {
-            "aka": ["gy","skillyard"],
+            "aka": ["gy", "skillyard"],
             "elixir": 5,
             "rarity": "legendary"
         },
@@ -171,7 +171,7 @@
             "rarity": "common"
         },
         "ice-wizard": {
-            "aka": ["iw","ice-wiz"],
+            "aka": ["iw", "ice-wiz"],
             "elixir": 3,
             "rarity": "legendary"
         },
@@ -181,7 +181,7 @@
             "rarity": "legendary"
         },
         "inferno-tower": {
-            "aka": ["inferno","it"],
+            "aka": ["inferno", "it"],
             "elixir": 5,
             "rarity": "rare"
         },
@@ -191,7 +191,7 @@
             "rarity": "common"
         },
         "lava-hound": {
-            "aka": ["lava","lh","hound"],
+            "aka": ["lava", "lh", "hound"],
             "elixir": 7,
             "rarity": "legendary"
         },
@@ -206,7 +206,7 @@
             "rarity": "legendary"
         },
         "mega-minion": {
-            "aka": ["mm","meta-minion"],
+            "aka": ["mm", "meta-minion"],
             "elixir": 3,
             "rarity": "rare"
         },
@@ -216,12 +216,12 @@
             "rarity": "legendary"
         },
         "mini-pekka": {
-            "aka": ["minip","mini-p","mp"],
+            "aka": ["minip", "mini-p", "mp"],
             "elixir": 4,
             "rarity": "rare"
         },
         "minion-horde": {
-            "aka": ["mh","horde"],
+            "aka": ["mh", "horde"],
             "elixir": 5,
             "rarity": "common"
         },
@@ -241,7 +241,7 @@
             "rarity": "common"
         },
         "musketeer": {
-            "aka": ["1m","musk"],
+            "aka": ["1m", "musk"],
             "elixir": 4,
             "rarity": "rare"
         },
@@ -296,7 +296,7 @@
             "rarity": "legendary"
         },
         "spear-goblins": {
-            "aka": ["spear-gobs","spear-gob"],
+            "aka": ["spear-gobs", "spear-gob"],
             "elixir": 2,
             "rarity": "common"
         },
@@ -311,7 +311,7 @@
             "rarity": "legendary"
         },
         "three-musketeers": {
-            "aka": ["3m","3musk","3musks"],
+            "aka": ["3m", "3musk", "3musks"],
             "elixir": 9,
             "rarity": "rare"
         },
@@ -346,9 +346,10 @@
             "rarity": "epic"
         },
         "zap": {
-        	"aka": [],
-        	"elixir": 2,
-        	"rarity": "common"
+            "aka": [],
+            "elixir": 2,
+            "rarity": "common"
         }
-    }
+    },
+    "Rarity": ["common", "rare", "epic", "legendary"]
 }

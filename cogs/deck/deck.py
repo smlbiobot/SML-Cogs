@@ -36,72 +36,7 @@ import datetime
 from PIL import Image
 
 settings_path = "data/deck/settings.json"
-
-cards = ['archers', 'arrows', 'baby-dragon', 'balloon', 'barbarian-hut', 
-         'barbarians', 'battle-ram', 'bomb-tower', 'bomber', 'bowler',
-         'cannon', 'clone', 'dark-prince', 'dart-goblin', 'electro-wizard',
-         'elite-barbarians', 'elixir-collector', 'executioner', 'fire-spirits',
-         'fireball', 'freeze', 'furnace', 'giant-skeleton', 'giant', 'goblin-barrel', 
-         'goblin-gang', 'goblin-hut', 'goblins', 'golem', 'graveyard',
-         'guards', 'hog-rider', 'ice-golem', 'ice-spirit', 'ice-wizard',
-         'inferno-dragon', 'inferno-tower', 'knight', 'lava-hound',
-         'lightning', 'lumberjack', 'mega-minion', 'miner', 'mini-pekka',
-         'minion-horde', 'minions', 'mirror', 'mortar', 'musketeer', 'pekka',
-         'poison', 'prince', 'princess', 'rage', 'rocket', 'royal-giant',
-         'skeleton-army', 'skeletons', 'soon', 'sparky', 'spear-goblins',
-         'tesla', 'the-log', 'three-musketeers', 'tombstone', 'tornado',
-         'valkyrie', 'witch', 'wizard', 'xbow', 'zap']
-
-cards_abbrev = { 'bbd': 'baby-dragon',
-                 'bbdragon': 'baby-dragon',
-                 'loon': 'balloon',
-                 'barb-hut': 'barbarian-hut',
-                 'barbhut': 'barbarian-hut',
-                 'barb': 'barbarians',
-                 'barbs': 'barbarians',
-                 'br': 'battle-ram',
-                 'bt': 'bomb-tower',
-                 'dp': 'dark-prince',
-                 'ew': 'electro-wizard',
-                 'ewiz': 'electro-wizard',
-                 'eb': 'elite-barbarians',
-                 'ebarb': 'elite-barbarians',
-                 'ebarbs': 'elite-barbarians',
-                 'ec': 'elixir-collector',
-                 'pump': 'elixir-collector',
-                 'collector': 'elixir-collector',
-                 'exe': 'executioner',
-                 'exec': 'executioner',
-                 'fs': 'fire-spirits',
-                 'fb': 'fireball',
-                 'gs': 'giant-skeleton',
-                 'gob-barrel': 'goblin-barrel',
-                 'gb': 'goblin-barrel',
-                 'gg': 'goblin-gang',
-                 'gob-hut': 'goblin-hut',
-                 'gobs': 'goblins',
-                 'hog': 'hog-rider',
-                 'ig': 'ice-golem',
-                 'is': 'ice-spirit',
-                 'iw': 'ice-wizard',
-                 'id': 'inferno-dragon',
-                 'it': 'inferno-tower',
-                 'lh': 'lava-hound',
-                 'lj': 'lumberjack',
-                 'mm': 'mega-minion',
-                 'mp': 'mini-pekka',
-                 'mh': 'minion-horde',
-                 'horde': 'minion-horde',
-                 'musk': 'musketeer',
-                 '1m': 'musketeer',
-                 'rg': 'royal-giant',
-                 'skarmy': 'skeleton-army',
-                 'spear-gobs': 'spear-goblins',
-                 'log': 'the-log',
-                 '3m': 'three-musketeers',
-                 'ts': 'tombstone',
-                 'valk': 'valkyrie'}
-
+crdata_path = "data/deck/clashroyale.json"
 
 class Deck:
     """
@@ -111,7 +46,23 @@ class Deck:
     def __init__(self, bot):
         self.bot = bot
         self.file_path = settings_path
+        self.crdata_path = crdata_path
+
         self.settings = dataIO.load_json(self.file_path)
+        self.crdata = dataIO.load_json(self.crdata_path)
+
+        # init card data
+        self.cards = []
+        self.cards_abbrev = {}
+
+        for card_key, card_value in self.crdata["Cards"].items():
+            self.cards.append(card_key)
+
+            aka_list = card_value["aka"]
+            for aka in aka_list:
+                self.cards_abbrev[aka] = card_key
+
+
         self.card_w = 302
         self.card_h = 363
         self.card_ratio = self.card_w / self.card_h
@@ -142,16 +93,16 @@ class Deck:
 
         # replace abbreviations
         for i, card in enumerate(member_deck):
-            if card in cards_abbrev.keys():
-                member_deck[i] = cards_abbrev[card]
+            if card in self.cards_abbrev.keys():
+                member_deck[i] = self.cards_abbrev[card]
 
         if len(member_deck) != 8:
             await self.bot.say("Please enter exactly 8 cards")
-        elif not set(member_deck) < set(cards):
+        elif not set(member_deck) < set(self.cards):
             for card in member_deck:
-                if not card in cards:
+                if not card in self.cards:
                     await self.bot.say("{} is not a valid card name.".format(card))
-            await self.bot.say("**List of cards:** {}".format(", ".join(cards))                               )
+            await self.bot.say("**List of cards:** {}".format(", ".join(self.cards))                               )
         else:
 
             # try:
@@ -169,6 +120,13 @@ class Deck:
                 await self.bot.say("Deck added.")
                 deck_key = str(datetime.datetime.utcnow())
                 decks[deck_key] = member_deck
+
+                deck_image_file = self.get_deck_image_file(member_deck)
+
+                with open(deck_image_file, 'rb') as f:
+                    await self.bot.send_file(ctx.message.channel, f)
+                os.remove(deck_image_file)
+
                 self.save_settings()
 
     @deck.command(name="list", pass_context=True, no_pm=True)
@@ -190,9 +148,12 @@ class Deck:
             await self.bot.say(str(deck))
 
             deck_image_file = self.get_deck_image_file(deck)
+            # self.send_and_remove_image(ctx, deck_image_file)
 
             with open(deck_image_file, 'rb') as f:
                 await self.bot.send_file(ctx.message.channel, f)
+
+            os.remove(deck_image_file)
 
             # for card in deck:
             #     card_thumbnail_file = self.get_card_image_file(card, 0.2)
@@ -200,22 +161,28 @@ class Deck:
             #     with open(card_thumbnail_file, 'rb') as f:
             #         await self.bot.send_file(ctx.message.channel, f)
 
+    def send_and_remove_image(self, ctx, img):
+        """Send image to discord and remove from server"""
+        with open(img, 'rb') as f:
+            self.bot.send_file(ctx.message.channel, f)
+        # os.remove(img)  
 
-    def get_card_image_file(self, name:str, scale:float):
-        """Return image of the card"""
 
-        infile = "data/deck/img/cards/{}.png".format(name)
-        outfile = "data/deck/img/cards-tn/{}.png".format(name)
+    # def get_card_image_file(self, name:str, scale:float):
+    #     """Return image of the card"""
 
-        try:
-            img = Image.open(infile)
-            size = (img.size[0]*scale, img.size[1]*scale)
-            img.thumbnail(size)
-            img.save(outfile, "PNG")
+    #     infile = "data/deck/img/cards/{}.png".format(name)
+    #     outfile = "data/deck/img/cards-tn/{}.png".format(name)
 
-            return outfile
-        except IOError:
-            print("cannot create thumbnail for", infile)
+    #     try:
+    #         img = Image.open(infile)
+    #         size = (img.size[0]*scale, img.size[1]*scale)
+    #         img.thumbnail(size)
+    #         img.save(outfile, "PNG")
+
+    #         return outfile
+    #     except IOError:
+    #         print("cannot create thumbnail for", infile)
 
     def get_deck_image_file(self, deck):
         """Construct the deck with Pillow and return the filename of the image"""
@@ -281,7 +248,7 @@ def check_folder():
 
 def check_file():
     settings = {
-        "Cards": cards,
+        "Cards": [],
         "Servers": {},
         "Decks": {}
     }

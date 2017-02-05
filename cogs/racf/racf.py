@@ -36,6 +36,8 @@ import datetime
 rules_url = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
 roles_url = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
 
+
+
 class RACF:
     """
     Display RACF specifc info
@@ -82,6 +84,25 @@ class RACF:
         out.append("<{}>".format(roles_url))
         await self.bot.say('\n'.join(out))
 
+    async def member_join(self, member:discord.Member):
+        """Greet users when they join the server"""
+        server = member.server
+        channel = server.default_channel.id
+
+        message = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
+          "interested in joining our clans / just visiting?"
+
+        if (server.name == "Reddit Alpha Clan Family"):
+            await self.bot.send_message(channel,
+                message.format(member, server))
+
+
+
+
+
 def setup(bot):
-    bot.add_cog(RACF(bot))
+    r = RACF(bot)
+    bot.add_listener(r.member_join, "on_member_join")
+    bot.add_cog(r)
+
 
