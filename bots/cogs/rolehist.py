@@ -67,7 +67,7 @@ class RoleHistory:
         author = ctx.message.author
         server = ctx.message.server
 
-        print("rolehist: _show_role_hist")
+        # print("rolehist: _show_role_hist")
 
         if not user:
             user = author
