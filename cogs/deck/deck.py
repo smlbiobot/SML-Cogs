@@ -192,7 +192,7 @@ class Deck:
         txt_y0 = 430
         txt_y1 = 500
         txt_x0 = 50
-        txt_x1 = 1550
+        txt_x1 = 1570
 
         bg_image = Image.open("data/deck/img/deck-bg-b.png")
         size = bg_image.size
