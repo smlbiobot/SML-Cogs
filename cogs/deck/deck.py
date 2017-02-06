@@ -37,6 +37,7 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import io
 import string
+import itertools
 
 settings_path = "data/deck/settings.json"
 crdata_path = "data/deck/clashroyale.json"
@@ -73,24 +74,39 @@ class Deck:
         self.card_thumb_w = int(self.card_w * self.card_thumb_scale)
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
 
+    def grouper(self, n, iterable, fillvalue=None):
+        """
+        Helper function to split lists
+
+        Example:
+        grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
+        """
+        args = [iter(iterable)] * n
+        return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
+
+
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
-        """Clash Royale Decks"""
+        """
+        Clash Royale Decks
+        
+        Example usage:
+        !deck get 3m mm ig is fs pump horde knight
+        !deck get dark-prince dart-goblin electro-wizard elite-barbarians elixir-collector executioner fire-spirits fireball 
+        """
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @deck.command(name="add", pass_context=True, no_pm=True)
     async def _deck_add(self, ctx, *member_deck:str):
         """
-        Set a decklist for the user calling the command
+        Add a deck to a personal decklist 
 
         Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
         """
 
         author = ctx.message.author
         server = ctx.message.server
-
-
 
         member_deck = self.normalize_deck_data(member_deck)
 
@@ -114,31 +130,39 @@ class Deck:
 
             self.save_settings()
 
+        
+
  
     @deck.command(name="get", pass_context=True, no_pm=True)
     async def deck_get(self, ctx, *member_deck:str):
         """
-        Get an image of the deck but don’t add to user list
+        Display a deck image by entering 8 cards
 
         Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
         """
 
         await self.deck_show(ctx, member_deck)
 
-
-    def normalize_deck_data(self, deck:str):
+    @deck.command(name="cards", pass_context=True, no_pm=True)
+    async def deck_cards(self, ctx):
         """
-        Return a deck list which has no abbreviations etc
+        Display all available cards and acceptable abbreviations
         """
-        deck = [c.lower() for c in deck]
+        out = []
+        for card_key, card_value in self.crdata["Cards"].items():
+            names = [card_key]
+            name = string.capwords(card_key.replace('-', ' '))
+            for abbrev in card_value["aka"]:
+                names.append(abbrev)
+            rarity = string.capwords(card_value["rarity"])
+            elixir = card_value["elixir"]
+            out.append(
+                "**{}** ({}, {} elixir): {}".format(name, rarity, elixir, ", ".join(names)))
 
-        # replace abbreviations
-        for i, card in enumerate(deck):
-            if card in self.cards_abbrev.keys():
-                deck[i] = self.cards_abbrev[card]
+        split_out = self.grouper(25, out)
 
-        return deck
-
+        for o in split_out:
+            await self.bot.say('\n'.join(o))
 
 
     async def deck_show(self, ctx, member_deck:str):
@@ -156,17 +180,27 @@ class Deck:
 
         member_deck = self.normalize_deck_data(member_deck)
 
+        deck_is_valid = True
+
+        # Ensure: exactly 8 cards are entered
         if len(member_deck) != 8:
-            await self.bot.say("Please enter exactly 8 cards")
-        elif not set(member_deck) < set(self.cards):
+            await self.bot.say(
+                "You have entered {} card{}. "
+                "Please enter exactly 8 cards.".format(
+                    len(member_deck),
+                    's' if len(member_deck) > 1 else ''))
+            deck_is_valid = False
+
+        # Ensure: card names are valid
+        if not set(member_deck) < set(self.cards):
             for card in member_deck:
                 if not card in self.cards:
-                    await self.bot.say("{} is not a valid card name.".format(card))
-            await self.bot.say("**List of cards:** {}".format(", ".join(self.cards))                               )
-        else:
+                    await self.bot.say("**{}** is not a valid card name.".format(card))
+            await self.bot.say("\nType `!deck cards` for the full list")
+            deck_is_valid = False
 
+        if deck_is_valid:
             await self.upload_deck_image(ctx, member_deck)
-
 
 
     @deck.command(name="list", pass_context=True, no_pm=True)
@@ -187,7 +221,6 @@ class Deck:
         for k, deck in decks.items():
             await self.upload_deck_image(ctx, deck)
 
-        # await self.upload_image(ctx, self.get_deck_header_image(), "header.png")
 
     async def upload_deck_image(self, ctx, deck):
         """Upload deck image to the server"""
@@ -252,6 +285,7 @@ class Deck:
         average_elixir = "{:.3f}".format(total_elixir / 8)
 
         # text
+        # Take out hyphnens and capitlize the name of each card
         card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
 
         txt = Image.new("RGBA", size)
@@ -281,6 +315,20 @@ class Deck:
         image.thumbnail(scaled_size)
 
         return image
+
+
+    def normalize_deck_data(self, deck:str):
+        """
+        Return a deck list which has no abbreviations and uses all lowercase names
+        """
+        deck = [c.lower() for c in deck]
+
+        # replace abbreviations
+        for i, card in enumerate(deck):
+            if card in self.cards_abbrev.keys():
+                deck[i] = self.cards_abbrev[card]
+
+        return deck
 
 
 
