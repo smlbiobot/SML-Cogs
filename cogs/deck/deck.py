@@ -124,7 +124,7 @@ class Deck:
                 deck_key = str(datetime.datetime.utcnow())
                 decks[deck_key] = member_deck
 
-                await self.upload_deck_image(ctx, member_deck)
+                await self.upload_deck_image2(ctx, member_deck)
 
                 self.save_settings()
 
@@ -146,7 +146,7 @@ class Deck:
         for k, deck in decks.items():
             await self.upload_deck_image(ctx, deck)
 
-        await self.upload_image(ctx, self.get_deck_header_image(), "header.png")
+        # await self.upload_image(ctx, self.get_deck_header_image(), "header.png")
 
     async def upload_deck_image(self, ctx, deck):
         """Upload deck image to the server"""
@@ -176,49 +176,70 @@ class Deck:
                 filename=filename)
 
 
-    def get_deck_header_image(self):
-        """Construct the header with Pillow draw"""
-
-        font_file = "data/deck/fonts/Supercell-magic-webfont.ttf"
-
-        size = (self.card_thumb_w * 8, self.card_thumb_h)
-        # base = Image.new("RGBA", size)
-        txt = Image.new("RGBA", size)
-        font = ImageFont.truetype(font_file, size=72)
-
-        # drawing context
-        d = ImageDraw.Draw(txt)
-
-        # Discord Dark GUI color: #36393e
-        d.rectangle([(0,0), size], fill=(0x36, 0x39, 0x3e, 255))
-
-        d.text((10,10), "Clash", font=font, fill=(0xff, 0xff, 0xff, 255))
-        d.text((10,60), "Royale", font=font, fill=(0xff, 0xff, 0xff, 255))
-
-        # out = Image.alpha_composite(base, txt)
-        out = txt
-
-        return out
-
-
 
 
     def get_deck_image(self, deck):
         """Construct the deck with Pillow and return image"""
 
         # PIL.Image.new(mode, size, color=0)
-        size = (self.card_thumb_w * 8, self.card_thumb_h)
-        image = Image.new("RGBA", size)
+        # size = (self.card_thumb_w * 8, self.card_thumb_h)
+        
+        card_w = 302
+        card_h = 363
+        card_y = 0
 
+        bg_image = Image.open("data/deck/img/deck-bg-b.png")
+        size = bg_image.size
+
+        font_file_regular = "data/deck/fonts/OpenSans-Regular.ttf"
+        font_file_bold = "data/deck/fonts/OpenSans-Bold.ttf"
+
+        image = Image.new("RGBA", size)
+        image.paste(bg_image)
+
+        # cards
         for i, card in enumerate(deck):
             card_image_file = "data/deck/img/cards/{}.png".format(card)
             card_image = Image.open(card_image_file)
-            size = (self.card_thumb_w, self.card_thumb_h)
-            card_image.thumbnail(size)
-            box = (self.card_thumb_w * i, 0, self.card_thumb_w * (i+1), self.card_thumb_h)
-            image.paste(card_image, box)
+            # size = (card_w, card_h)
+            # card_image.thumbnail(size)
+            box = (self.card_w * i, card_y, card_w * (i+1), card_h + card_y)
+            image.paste(card_image, box, card_image)
+
+        # text
+        card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
+
+        txt = Image.new("RGBA", size)
+        font_regular = ImageFont.truetype(font_file_regular, size=40)
+
+        # drawing context
+        d = ImageDraw.Draw(txt)
+
+        line0 = ', '.join(card_names[:4])
+        line1 = ', '.join(card_names[4:])
+        card_text = '\n'.join([line0, line1])
+
+        d.multiline_text((10,10), card_text, font=font_regular, spacing=60, 
+                         fill=(0xff, 0xff, 0xff, 255))
+        image.paste(txt, (10,200), txt)
+        
+
+
+
+
+
+        # image = Image.alpha_composite(image, bg_image)
+
+        # scale down
+        scale = 0.5
+        scaled_size = tuple([x * scale for x in image.size])
+        image.thumbnail(scaled_size)
 
         return image
+
+
+
+    
 
 
     def check_member_settings(self, server, member):
