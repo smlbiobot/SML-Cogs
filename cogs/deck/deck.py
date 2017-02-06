@@ -172,8 +172,6 @@ class Deck:
         # PIL.Image.new(mode, size, color=0)
         size = (self.card_thumb_w * 8, self.card_thumb_h)
         out_image = Image.new("RGBA", size)
-        # deck_hash = hash(''.join(deck))
-        # out_file = "data/deck/img/decks/deck-{}.png".format(deck_hash)
 
         for i, card in enumerate(deck):
             card_image_file = "data/deck/img/cards/{}.png".format(card)
