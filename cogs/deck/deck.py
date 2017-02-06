@@ -34,6 +34,7 @@ import os
 import datetime
 from PIL import Image
 import io
+import string
 
 settings_path = "data/deck/settings.json"
 crdata_path = "data/deck/clashroyale.json"
@@ -66,7 +67,7 @@ class Deck:
         self.card_w = 302
         self.card_h = 363
         self.card_ratio = self.card_w / self.card_h
-        self.card_thumb_scale = 0.2
+        self.card_thumb_scale = 0.5
         self.card_thumb_w = int(self.card_w * self.card_thumb_scale)
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
 
@@ -141,8 +142,6 @@ class Deck:
         decks = self.settings["Servers"][server.id]["Members"][member.id]["Decks"]
 
         for k, deck in decks.items():
-            await self.bot.say(str(deck))
-
             await self.upload_deck_image(ctx, deck)
 
     async def upload_deck_image(self, ctx, deck):
@@ -152,7 +151,11 @@ class Deck:
 
         # construct a filename using first three letters of each card
         filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
-        description = "Deck: {}".format(', '.join(deck))
+
+        # Take out hyphnens and capitlize the name of each card
+        card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
+
+        description = "Deck: {}".format(', '.join(card_names))
 
         with io.BytesIO() as f:
             deck_image.save(f, "PNG")
