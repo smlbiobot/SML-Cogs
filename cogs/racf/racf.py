@@ -35,6 +35,7 @@ import datetime
 
 rules_url = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
 roles_url = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
+discord_url = "http://tiny.cc/alphachat"
 
 
 
@@ -80,6 +81,9 @@ class RACF:
         out.append('')
         out.append("**Roles**")
         out.append("<{}>".format(roles_url))
+        out.append('')
+        out.append("**Discord invite**")
+        out.append("<{}>".format(discord_url))
         await self.bot.say('\n'.join(out))
 
     @commands.command(pass_context=True)
