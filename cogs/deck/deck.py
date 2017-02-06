@@ -114,47 +114,7 @@ class Deck:
 
             self.save_settings()
 
-        # author = ctx.message.author
-        # server = ctx.message.server
-
-        # self.check_server_settings(server)
-        # self.check_member_settings(server, author)
-        # member_deck = [c.lower() for c in member_deck]
-
-        # # replace abbreviations
-        # for i, card in enumerate(member_deck):
-        #     if card in self.cards_abbrev.keys():
-        #         member_deck[i] = self.cards_abbrev[card]
-
-        # if len(member_deck) != 8:
-        #     await self.bot.say("Please enter exactly 8 cards")
-        # elif not set(member_deck) < set(self.cards):
-        #     for card in member_deck:
-        #         if not card in self.cards:
-        #             await self.bot.say("{} is not a valid card name.".format(card))
-        #     await self.bot.say("**List of cards:** {}".format(", ".join(self.cards))                               )
-        # else:
-
-            # try:
-            # # await self.bot.say("Deck saved")
-            # decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
-
-            # # creates sets with decks.values
-            # decks_sets = [set(d) for d in decks.values()]
-
-            # if  set(member_deck) in decks_sets:
-            #     # existing deck
-            #     await self.bot.say("Deck exists already")
-            # else:
-            #     # new deck
-            #     await self.bot.say("Deck added.")
-            #     deck_key = str(datetime.datetime.utcnow())
-            #     decks[deck_key] = member_deck
-
-            #     # await self.upload_deck_image(ctx, member_deck)
-
-            #     self.save_settings()
-
+ 
     @deck.command(name="get", pass_context=True, no_pm=True)
     async def deck_get(self, ctx, *member_deck:str):
         """
@@ -194,12 +154,7 @@ class Deck:
         self.check_server_settings(server)
         self.check_member_settings(server, author)
 
-        member_deck = [c.lower() for c in member_deck]
-
-        # replace abbreviations
-        for i, card in enumerate(member_deck):
-            if card in self.cards_abbrev.keys():
-                member_deck[i] = self.cards_abbrev[card]
+        member_deck = self.normalize_deck_data(member_deck)
 
         if len(member_deck) != 8:
             await self.bot.say("Please enter exactly 8 cards")
@@ -254,23 +209,10 @@ class Deck:
             await ctx.bot.send_file(ctx.message.channel, f, 
                 filename=filename, content=description)
 
-    async def upload_image(self, ctx, image, filename):
-        """Upload image without description"""
-        with io.BytesIO() as f:
-            image.save(f, "PNG")
-            f.seek(0)
-            await ctx.bot.send_file(ctx.message.channel, f,
-                filename=filename)
-
-
-
-
+ 
     def get_deck_image(self, deck):
         """Construct the deck with Pillow and return image"""
 
-        # PIL.Image.new(mode, size, color=0)
-        # size = (self.card_thumb_w * 8, self.card_thumb_h)
-        
         card_w = 302
         card_h = 363
         card_x = 30
@@ -332,10 +274,8 @@ class Deck:
                fill=(0xff, 0xff, 0xff, 255))
 
         image.paste(txt, (0,0), txt)
- 
 
-
-        # scale down
+        # scale down and return
         scale = 0.5
         scaled_size = tuple([x * scale for x in image.size])
         image.thumbnail(scaled_size)
@@ -401,11 +341,11 @@ Bot commands for debugging
 http://statsroyale.com/profile/C0G20PR2
 http://statsroyale.com/profile/82P9CLC8
 http://statsroyale.com/profile/8L9L9GL      
-!deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
-!deck set mm bbd loon bt is fs gs lh
-!deck set bbd mm loon bt is fs gs lh
-!deck set lh mm loon it is fs gs gb
-!deck set archers ARROWS baby-dragon BALLOON barbarian-hut barbarians battle-ram bomb-tower
+!deck get archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
+!deck get mm bbd loon bt is fs gs lh
+!deck get bbd mm loon bt is fs gs lh
+!deck get lh mm loon it is fs gs gb
+!deck get archers ARROWS baby-dragon BALLOON barbarian-hut barbarians battle-ram bomb-tower
 !deck set dark-prince dart-goblin electro-wizard elite-barbarians elixir-collector executioner fire-spirits fireball
 !deck set dark-prince dart-goblin2 electro-wizard elite-barbarians2 elixir-collector executioner fire-spirits fireball
 dark-prince dart-goblin electro-wizard elite-barbarians elixir-collector executioner fire-spirits
