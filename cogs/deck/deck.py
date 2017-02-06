@@ -41,6 +41,7 @@ import itertools
 
 settings_path = "data/deck/settings.json"
 crdata_path = "data/deck/clashroyale.json"
+max_deck_per_user = 3
 
 class Deck:
     """
@@ -73,6 +74,9 @@ class Deck:
         self.card_thumb_scale = 0.5
         self.card_thumb_w = int(self.card_w * self.card_thumb_scale)
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
+
+        # deck validation hack
+        self.deck_is_valid = False
 
     def grouper(self, n, iterable, fillvalue=None):
         """
@@ -114,23 +118,35 @@ class Deck:
 
         decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
 
-        # creates sets with decks.values
-        decks_sets = [set(d) for d in decks.values()]
+        if self.deck_is_valid:
 
-        if  set(member_deck) in decks_sets:
-            # existing deck
-            await self.bot.say("Deck exists already")
-        else:
-            # new deck
-            await self.bot.say("Deck added.")
-            deck_key = str(datetime.datetime.utcnow())
-            decks[deck_key] = member_deck
+            # creates sets with decks.values
+            decks_sets = [set(d) for d in decks.values()]
 
-            # await self.upload_deck_image(ctx, member_deck)
+            if  set(member_deck) in decks_sets:
+                # existing deck
+                await self.bot.say("Deck exists already")
+            else:
+                # new deck
+                await self.bot.say("Deck added.")
+                deck_key = str(datetime.datetime.utcnow())
+                decks[deck_key] = member_deck
+
+                # await self.upload_deck_image(ctx, member_deck)
+
+                self.save_settings()
+
+            # If user has more than allowed by max, remove older decks
+            timestamp = decks.keys()
+            timestamp = sorted(timestamp)
+
+            while len(decks) > max_deck_per_user:
+                t = timestamp.pop(0)
+                decks.pop(t, None)
 
             self.save_settings()
+            
 
-        
 
  
     @deck.command(name="get", pass_context=True, no_pm=True)
@@ -201,6 +217,12 @@ class Deck:
 
         if deck_is_valid:
             await self.upload_deck_image(ctx, member_deck)
+
+        self.deck_is_valid = deck_is_valid
+
+
+
+
 
 
     @deck.command(name="list", pass_context=True, no_pm=True)

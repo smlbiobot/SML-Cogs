@@ -129,7 +129,7 @@ class Trophies:
 
         else:
             self.settings[server.id]["Trophies"][clan] = req
-            await self.bot.say("Trophy requiremnt for {} updated to {}.".format(clan, req))
+            await self.bot.say("Trophy requirement for {} updated to {}.".format(clan, req))
 
         dataIO.save_json(self.file_path, self.settings)
 
