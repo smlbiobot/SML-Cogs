@@ -341,18 +341,20 @@ class Deck:
         card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
 
         txt = Image.new("RGBA", size)
+        txt_name = Image.new("RGBA", (txt_x_cards-30, size[1]))
         font_regular = ImageFont.truetype(font_file_regular, size=font_size)
         font_bold = ImageFont.truetype(font_file_bold, size=font_size)
 
         d = ImageDraw.Draw(txt)
+        d_name = ImageDraw.Draw(txt_name)
 
         line1 = ', '.join(card_names[:4])
         line2 = ', '.join(card_names[4:])
         # card_text = '\n'.join([line0, line1])
 
-        d.text((txt_x_name, txt_y_line1), deck_name, font=font_bold, 
+        d_name.text((txt_x_name, txt_y_line1), deck_name, font=font_bold, 
                          fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_name, txt_y_line2), deck_author.name, font=font_regular, 
+        d_name.text((txt_x_name, txt_y_line2), deck_author.name, font=font_regular, 
                          fill=(0xff, 0xff, 0xff, 255))
         d.text((txt_x_cards, txt_y_line1), line1, font=font_regular, 
                          fill=(0xff, 0xff, 0xff, 255))
@@ -364,6 +366,7 @@ class Deck:
                fill=(0xff, 0xff, 0xff, 255))
 
         image.paste(txt, (0,0), txt)
+        image.paste(txt_name, (0,0), txt_name)
 
         # scale down and return
         scale = 0.5
