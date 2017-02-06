@@ -108,13 +108,23 @@ class Deck:
 
         Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
         """
-
         author = ctx.message.author
         server = ctx.message.server
 
+        deck_name = ""
+
+        # convert arguments to deck list and name
+        if (len(member_deck) > 8):
+            deck_name = ' '.join(member_deck[8:])
+            member_deck = member_deck[:8]
+
+        print (str(deck_name))
+        print(str(member_deck))
+
+
         member_deck = self.normalize_deck_data(member_deck)
 
-        await self.deck_show(ctx, member_deck)
+        await self.deck_show(ctx, member_deck, deck_name)
 
         decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
 
@@ -132,8 +142,6 @@ class Deck:
                 deck_key = str(datetime.datetime.utcnow())
                 decks[deck_key] = member_deck
 
-                # await self.upload_deck_image(ctx, member_deck)
-
                 self.save_settings()
 
             # If user has more than allowed by max, remove older decks
@@ -150,14 +158,23 @@ class Deck:
 
  
     @deck.command(name="get", pass_context=True, no_pm=True)
-    async def deck_get(self, ctx, *member_deck:str):
+    async def deck_get(self, ctx, *member_deck):
         """
         Display a deck image by entering 8 cards
 
         Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
         """
+        deck_name = ""
 
-        await self.deck_show(ctx, member_deck)
+        # convert arguments to deck list and name
+        if (len(member_deck) > 8):
+            deck_name = ' '.join(member_deck[8:])
+            member_deck = member_deck[:8]
+
+        print (str(deck_name))
+        print(str(member_deck))
+
+        await self.deck_show(ctx, member_deck, deck_name)
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
     async def deck_cards(self, ctx):
@@ -181,7 +198,7 @@ class Deck:
             await self.bot.say('\n'.join(o))
 
 
-    async def deck_show(self, ctx, member_deck:str):
+    async def deck_show(self, ctx, member_deck, deck_name:str):
         """
         Upload deck to Discord
 
