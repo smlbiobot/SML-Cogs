@@ -41,7 +41,7 @@ import itertools
 
 settings_path = "data/deck/settings.json"
 crdata_path = "data/deck/clashroyale.json"
-max_deck_per_user = 3
+max_deck_per_user = 5
 
 class Deck:
     """
