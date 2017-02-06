@@ -33,6 +33,8 @@ from __main__ import send_cmd_help
 import os
 import datetime
 from PIL import Image
+from PIL import ImageDraw
+from PIL import ImageFont
 import io
 import string
 
@@ -144,6 +146,8 @@ class Deck:
         for k, deck in decks.items():
             await self.upload_deck_image(ctx, deck)
 
+        await self.upload_image(ctx, self.get_deck_header_image(), "header.png")
+
     async def upload_deck_image(self, ctx, deck):
         """Upload deck image to the server"""
 
@@ -163,6 +167,39 @@ class Deck:
             await ctx.bot.send_file(ctx.message.channel, f, 
                 filename=filename, content=description)
 
+    async def upload_image(self, ctx, image, filename):
+        """Upload image without description"""
+        with io.BytesIO() as f:
+            image.save(f, "PNG")
+            f.seek(0)
+            await ctx.bot.send_file(ctx.message.channel, f,
+                filename=filename)
+
+
+    def get_deck_header_image(self):
+        """Construct the header with Pillow draw"""
+
+        font_file = "data/deck/fonts/Supercell-magic-webfont.ttf"
+
+        size = (self.card_thumb_w * 8, self.card_thumb_h)
+        # base = Image.new("RGBA", size)
+        txt = Image.new("RGBA", size)
+        font = ImageFont.truetype(font_file, size=72)
+
+        # drawing context
+        d = ImageDraw.Draw(txt)
+
+        # Discord Dark GUI color: #36393e
+        d.rectangle([(0,0), size], fill=(0x36, 0x39, 0x3e, 255))
+
+        d.text((10,10), "Clash", font=font, fill=(0xff, 0xff, 0xff, 255))
+        d.text((10,60), "Royale", font=font, fill=(0xff, 0xff, 0xff, 255))
+
+        # out = Image.alpha_composite(base, txt)
+        out = txt
+
+        return out
+
 
 
 
@@ -171,7 +208,7 @@ class Deck:
 
         # PIL.Image.new(mode, size, color=0)
         size = (self.card_thumb_w * 8, self.card_thumb_h)
-        out_image = Image.new("RGBA", size)
+        image = Image.new("RGBA", size)
 
         for i, card in enumerate(deck):
             card_image_file = "data/deck/img/cards/{}.png".format(card)
@@ -179,9 +216,9 @@ class Deck:
             size = (self.card_thumb_w, self.card_thumb_h)
             card_image.thumbnail(size)
             box = (self.card_thumb_w * i, 0, self.card_thumb_w * (i+1), self.card_thumb_h)
-            out_image.paste(card_image, box)
+            image.paste(card_image, box)
 
-        return out_image
+        return image
 
 
     def check_member_settings(self, server, member):
