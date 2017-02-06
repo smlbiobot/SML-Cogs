@@ -211,6 +211,7 @@ class Deck:
 
         txt = Image.new("RGBA", size)
         font_regular = ImageFont.truetype(font_file_regular, size=50)
+        font_bold = ImageFont.truetype(font_file_bold, size=50)
 
         # drawing context
         d = ImageDraw.Draw(txt)
@@ -221,7 +222,7 @@ class Deck:
 
         d.multiline_text((20,370), card_text, font=font_regular, spacing=20, 
                          fill=(0xff, 0xff, 0xff, 255))
-        d.text((1528, 370), "Average elixir", font=font_file_bold,
+        d.text((1528, 370), "Average elixir", font=font_bold,
                fill=(0xff, 0xff, 0xff, 200))
         image.paste(txt, (0,0), txt)
  
