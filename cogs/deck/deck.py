@@ -210,7 +210,7 @@ class Deck:
         card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
 
         txt = Image.new("RGBA", size)
-        font_regular = ImageFont.truetype(font_file_regular, size=40)
+        font_regular = ImageFont.truetype(font_file_regular, size=50)
 
         # drawing context
         d = ImageDraw.Draw(txt)
@@ -219,15 +219,12 @@ class Deck:
         line1 = ', '.join(card_names[4:])
         card_text = '\n'.join([line0, line1])
 
-        d.multiline_text((10,10), card_text, font=font_regular, spacing=60, 
+        d.multiline_text((20,370), card_text, font=font_regular, spacing=20, 
                          fill=(0xff, 0xff, 0xff, 255))
-        image.paste(txt, (10,200), txt)
-        
-
-
-
-
-
+        d.text((1528, 370), "Average elixir", font=font_file_bold,
+               fill=(0xff, 0xff, 0xff, 200))
+        image.paste(txt, (0,0), txt)
+ 
         # image = Image.alpha_composite(image, bg_image)
 
         # scale down
@@ -237,9 +234,6 @@ class Deck:
 
         return image
 
-
-
-    
 
 
     def check_member_settings(self, server, member):
