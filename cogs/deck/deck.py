@@ -79,8 +79,8 @@ class Deck:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @deck.command(name="set", pass_context=True, no_pm=True)
-    async def _deck_set(self, ctx, *member_deck:str):
+    @deck.command(name="add", pass_context=True, no_pm=True)
+    async def _deck_add(self, ctx, *member_deck:str):
         """
         Set a decklist for the user calling the command
 
@@ -90,8 +90,110 @@ class Deck:
         author = ctx.message.author
         server = ctx.message.server
 
+
+
+        member_deck = self.normalize_deck_data(member_deck)
+
+        await self.deck_show(ctx, member_deck)
+
+        decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
+
+        # creates sets with decks.values
+        decks_sets = [set(d) for d in decks.values()]
+
+        if  set(member_deck) in decks_sets:
+            # existing deck
+            await self.bot.say("Deck exists already")
+        else:
+            # new deck
+            await self.bot.say("Deck added.")
+            deck_key = str(datetime.datetime.utcnow())
+            decks[deck_key] = member_deck
+
+            # await self.upload_deck_image(ctx, member_deck)
+
+            self.save_settings()
+
+        # author = ctx.message.author
+        # server = ctx.message.server
+
+        # self.check_server_settings(server)
+        # self.check_member_settings(server, author)
+        # member_deck = [c.lower() for c in member_deck]
+
+        # # replace abbreviations
+        # for i, card in enumerate(member_deck):
+        #     if card in self.cards_abbrev.keys():
+        #         member_deck[i] = self.cards_abbrev[card]
+
+        # if len(member_deck) != 8:
+        #     await self.bot.say("Please enter exactly 8 cards")
+        # elif not set(member_deck) < set(self.cards):
+        #     for card in member_deck:
+        #         if not card in self.cards:
+        #             await self.bot.say("{} is not a valid card name.".format(card))
+        #     await self.bot.say("**List of cards:** {}".format(", ".join(self.cards))                               )
+        # else:
+
+            # try:
+            # # await self.bot.say("Deck saved")
+            # decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
+
+            # # creates sets with decks.values
+            # decks_sets = [set(d) for d in decks.values()]
+
+            # if  set(member_deck) in decks_sets:
+            #     # existing deck
+            #     await self.bot.say("Deck exists already")
+            # else:
+            #     # new deck
+            #     await self.bot.say("Deck added.")
+            #     deck_key = str(datetime.datetime.utcnow())
+            #     decks[deck_key] = member_deck
+
+            #     # await self.upload_deck_image(ctx, member_deck)
+
+            #     self.save_settings()
+
+    @deck.command(name="get", pass_context=True, no_pm=True)
+    async def deck_get(self, ctx, *member_deck:str):
+        """
+        Get an image of the deck but don’t add to user list
+
+        Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
+        """
+
+        await self.deck_show(ctx, member_deck)
+
+
+    def normalize_deck_data(self, deck:str):
+        """
+        Return a deck list which has no abbreviations etc
+        """
+        deck = [c.lower() for c in deck]
+
+        # replace abbreviations
+        for i, card in enumerate(deck):
+            if card in self.cards_abbrev.keys():
+                deck[i] = self.cards_abbrev[card]
+
+        return deck
+
+
+
+    async def deck_show(self, ctx, member_deck:str):
+        """
+        Upload deck to Discord
+
+        Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
+        """
+
+        author = ctx.message.author
+        server = ctx.message.server
+
         self.check_server_settings(server)
         self.check_member_settings(server, author)
+
         member_deck = [c.lower() for c in member_deck]
 
         # replace abbreviations
@@ -108,25 +210,9 @@ class Deck:
             await self.bot.say("**List of cards:** {}".format(", ".join(self.cards))                               )
         else:
 
-            # try:
-            # await self.bot.say("Deck saved")
-            decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
+            await self.upload_deck_image(ctx, member_deck)
 
-            # creates sets with decks.values
-            decks_sets = [set(d) for d in decks.values()]
 
-            if  set(member_deck) in decks_sets:
-                # existing deck
-                await self.bot.say("Deck exists already")
-            else:
-                # new deck
-                await self.bot.say("Deck added.")
-                deck_key = str(datetime.datetime.utcnow())
-                decks[deck_key] = member_deck
-
-                await self.upload_deck_image2(ctx, member_deck)
-
-                self.save_settings()
 
     @deck.command(name="list", pass_context=True, no_pm=True)
     async def deck_list(self, ctx, member:discord.Member=None):
@@ -157,9 +243,10 @@ class Deck:
         filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
 
         # Take out hyphnens and capitlize the name of each card
-        card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
+        # card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
 
-        description = "Deck: {}".format(', '.join(card_names))
+        # description = "Deck: {}".format(', '.join(card_names))
+        description = ""
 
         with io.BytesIO() as f:
             deck_image.save(f, "PNG")
@@ -215,6 +302,13 @@ class Deck:
                    card_h + card_y)
             image.paste(card_image, box, card_image)
 
+        # elixir
+        total_elixir = 0
+        for card_key, card_value in self.crdata["Cards"].items():
+            if card_key in deck:
+                total_elixir += card_value["elixir"]
+        average_elixir = "{:.3f}".format(total_elixir / 8)
+
         # text
         card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
 
@@ -222,7 +316,6 @@ class Deck:
         font_regular = ImageFont.truetype(font_file_regular, size=font_size)
         font_bold = ImageFont.truetype(font_file_bold, size=font_size)
 
-        # drawing context
         d = ImageDraw.Draw(txt)
 
         line0 = ', '.join(card_names[:4])
@@ -235,7 +328,7 @@ class Deck:
                          fill=(0xff, 0xff, 0xff, 255))
         d.text((txt_x1, txt_y0), "Average elixir", font=font_bold,
                fill=(0xff, 0xff, 0xff, 200))
-        d.text((txt_x1, txt_y1), "3.6", font=font_bold,
+        d.text((txt_x1, txt_y1), average_elixir, font=font_bold,
                fill=(0xff, 0xff, 0xff, 255))
 
         image.paste(txt, (0,0), txt)

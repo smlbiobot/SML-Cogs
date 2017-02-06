@@ -6,7 +6,7 @@
             "rarity": "common"
         },
         "arrows": {
-            "aka": [],
+            "aka": ["arrow", "arr"],
             "elixir": 3,
             "rarity": ""
         },
