@@ -37,6 +37,9 @@ rules_url = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha
 roles_url = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
 discord_url = "http://tiny.cc/alphachat"
 
+welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
+              "interested in joining our clans / just visiting?"
+
 
 
 class RACF:
@@ -91,8 +94,31 @@ class RACF:
         """Welcome people manually via command"""
         # server = ctx.message.server
         # self.member_join(member)
-        await self.bot.say("Hi {0.mention}! Are you in the Reddit Alpha Clan Family (RACF) / " \
-            "interested in joining our clans / just visiting?".format(member))
+        await self.bot.say(welcome_msg.format(member.mention))
+
+    @commands.command(pass_context=True)
+    async def racfwelcomeall(self, ctx):
+        """Find all untagged users and send them the welcome message"""
+        server = ctx.message.server
+        members = server.members
+        online_members = [m for m in members if m.status == discord.Status.online]
+        online_untagged_members = [m for m in online_members if len(m.roles) == 1]
+        online_untagged_members_names = [m.name for m in online_untagged_members]
+        print(', '.join(online_untagged_members_names))
+
+    @commands.command(pass_context=True)
+    async def alluntaggedusers(self, ctx):
+        """Find all untagged users and send them the welcome message"""
+        server = ctx.message.server
+        members = server.members
+        online_members = [m for m in members if m.status == discord.Status.online]
+        online_untagged_members = [m for m in online_members if len(m.roles) == 1]
+        online_untagged_members_names = [m.name for m in online_untagged_members]
+        await self.bot.say("All online but untagged users:")
+        await self.bot.say(', '.join(online_untagged_members_names))
+
+    @commands.command
+
 
     async def member_join(self, member:discord.Member):
         """Greet users when they join the server"""
@@ -100,9 +126,7 @@ class RACF:
         channel = server.default_channel.id
 
         if (server.name == "Reddit Alpha Clan Family"):
-            await self.bot.send_message(channel,
-                "Hi {0.mention}! Are you in the Reddit Alpha Clan Family (RACF) / " \
-                "interested in joining our clans / just visiting?".format(member))
+            await self.bot.send_message(channel, welcome_msg.format(member))
 
 
 
