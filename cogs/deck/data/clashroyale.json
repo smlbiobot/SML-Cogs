@@ -276,7 +276,7 @@
             "rarity": "rare"
         },
         "royal-giant": {
-            "aka": [],
+            "aka": ["rg", "rgg"],
             "elixir": 6,
             "rarity": "common"
         },

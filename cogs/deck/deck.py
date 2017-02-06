@@ -176,6 +176,23 @@ class Deck:
 
         await self.deck_show(ctx, member_deck, deck_name)
 
+    @deck.command(name="get2", pass_context=True, no_pm=True)
+    async def deck_get2(self, ctx,
+                       card1=None, card2=None, card3=None, card4=None, 
+                       card5=None, card6=None, card7=None, card8=None, 
+                       deck_name=None):
+        """
+        Display a deck image by entering 8 cards
+
+        Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
+        """ 
+        member_deck = [card1, card2, card3, card4, card5, card6, card7, card8]
+        if not all(member_deck):
+            await self.bot.say("no argument")
+        else:
+            await self.deck_show(ctx, member_deck, deck_name)
+
+
     @deck.command(name="cards", pass_context=True, no_pm=True)
     async def deck_cards(self, ctx):
         """
@@ -290,10 +307,10 @@ class Deck:
         card_x = 30
         card_y = 30
         font_size = 50
-        txt_y0 = 430
-        txt_y1 = 500
-        txt_x0 = 50
-        txt_x1 = 1570
+        txt_y_line1 = 430
+        txt_y_line2 = 500
+        txt_x_cards = 50
+        txt_x_elixir = 1570
 
         bg_image = Image.open("data/deck/img/deck-bg-b.png")
         size = bg_image.size
@@ -337,13 +354,13 @@ class Deck:
         line1 = ', '.join(card_names[4:])
         # card_text = '\n'.join([line0, line1])
 
-        d.text((txt_x0, txt_y0), line0, font=font_regular, 
+        d.text((txt_x_cards, txt_y_line1), line0, font=font_regular, 
                          fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x0, txt_y1), line1, font=font_regular, 
+        d.text((txt_x_cards, txt_y_line2), line1, font=font_regular, 
                          fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x1, txt_y0), "Average elixir", font=font_bold,
+        d.text((txt_x_elixir, txt_y_line1), "Average elixir", font=font_bold,
                fill=(0xff, 0xff, 0xff, 200))
-        d.text((txt_x1, txt_y1), average_elixir, font=font_bold,
+        d.text((txt_x_elixir, txt_y_line2), average_elixir, font=font_bold,
                fill=(0xff, 0xff, 0xff, 255))
 
         image.paste(txt, (0,0), txt)
