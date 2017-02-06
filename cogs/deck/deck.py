@@ -131,18 +131,21 @@ class Deck:
         if self.deck_is_valid:
 
             # creates sets with decks.values
-            decks_sets = [set(d) for d in decks.values()]
+            # decks_sets = [set(d) for d in decks.values()]
 
-            if  set(member_deck) in decks_sets:
-                # existing deck
-                await self.bot.say("Deck exists already")
-            else:
-                # new deck
-                await self.bot.say("Deck added.")
-                deck_key = str(datetime.datetime.utcnow())
-                decks[deck_key] = member_deck
+            # if  set(member_deck) in decks_sets:
+            #     # existing deck
+            #     await self.bot.say("Deck exists already")
+            # else:
+            # new deck
+            await self.bot.say("Deck added.")
+            deck_key = str(datetime.datetime.utcnow())
+            decks[deck_key] = {
+                "Deck": member_deck,
+                "DeckName": deck_name
+            }
 
-                self.save_settings()
+            self.save_settings()
 
             # If user has more than allowed by max, remove older decks
             timestamp = decks.keys()
@@ -155,42 +158,28 @@ class Deck:
             self.save_settings()
             
 
-
- 
     @deck.command(name="get", pass_context=True, no_pm=True)
-    async def deck_get(self, ctx, *member_deck):
-        """
-        Display a deck image by entering 8 cards
-
-        Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
-        """
-        deck_name = ""
-
-        # convert arguments to deck list and name
-        if (len(member_deck) > 8):
-            deck_name = ' '.join(member_deck[8:])
-            member_deck = member_deck[:8]
-
-        print (str(deck_name))
-        print(str(member_deck))
-
-        await self.deck_show(ctx, member_deck, deck_name)
-
-    @deck.command(name="get2", pass_context=True, no_pm=True)
-    async def deck_get2(self, ctx,
+    async def deck_get(self, ctx,
                        card1=None, card2=None, card3=None, card4=None, 
                        card5=None, card6=None, card7=None, card8=None, 
                        deck_name=None):
         """
-        Display a deck image by entering 8 cards
+        Display a deck with cards and average elixir by entering 8 cards,
+        followed by a name. The deck will be named “unnamed deck”
+        if no name is entered
 
-        Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
-        """ 
+        Example: !deck get bbd mm loon bt is fs gs lh
+        """
+        if deck_name is None:
+            deck_name = 'Deck'
+        author = ctx.message.author
+
         member_deck = [card1, card2, card3, card4, card5, card6, card7, card8]
         if not all(member_deck):
-            await self.bot.say("no argument")
+            await self.bot.say("Please enter 8 cards.")
+            await send_cmd_help(ctx)
         else:
-            await self.deck_show(ctx, member_deck, deck_name)
+            await self.deck_show(ctx, member_deck, deck_name, author)
 
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
@@ -215,7 +204,7 @@ class Deck:
             await self.bot.say('\n'.join(o))
 
 
-    async def deck_show(self, ctx, member_deck, deck_name:str):
+    async def deck_show(self, ctx, member_deck, deck_name:str, member=None):
         """
         Upload deck to Discord
 
@@ -224,6 +213,9 @@ class Deck:
 
         author = ctx.message.author
         server = ctx.message.server
+
+        if member is None:
+            member = author
 
         self.check_server_settings(server)
         self.check_member_settings(server, author)
@@ -250,7 +242,7 @@ class Deck:
             deck_is_valid = False
 
         if deck_is_valid:
-            await self.upload_deck_image(ctx, member_deck)
+            await self.upload_deck_image(ctx, member_deck, deck_name, member)
 
         self.deck_is_valid = deck_is_valid
 
@@ -275,13 +267,13 @@ class Deck:
         decks = self.settings["Servers"][server.id]["Members"][member.id]["Decks"]
 
         for k, deck in decks.items():
-            await self.upload_deck_image(ctx, deck)
+            await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], member)
 
 
-    async def upload_deck_image(self, ctx, deck):
+    async def upload_deck_image(self, ctx, deck, deck_name, author):
         """Upload deck image to the server"""
 
-        deck_image = self.get_deck_image(deck)
+        deck_image = self.get_deck_image(deck, deck_name, author)
 
         # construct a filename using first three letters of each card
         filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
@@ -299,7 +291,7 @@ class Deck:
                 filename=filename, content=description)
 
  
-    def get_deck_image(self, deck):
+    def get_deck_image(self, deck, deck_name=None, deck_author=None):
         """Construct the deck with Pillow and return image"""
 
         card_w = 302
@@ -309,8 +301,9 @@ class Deck:
         font_size = 50
         txt_y_line1 = 430
         txt_y_line2 = 500
-        txt_x_cards = 50
-        txt_x_elixir = 1570
+        txt_x_name = 50
+        txt_x_cards = 503
+        txt_x_elixir = 1872
 
         bg_image = Image.open("data/deck/img/deck-bg-b.png")
         size = bg_image.size
@@ -320,6 +313,9 @@ class Deck:
 
         image = Image.new("RGBA", size)
         image.paste(bg_image)
+
+        if not deck_name:
+            deck_name = "Deck"
 
         # cards
         for i, card in enumerate(deck):
@@ -350,15 +346,19 @@ class Deck:
 
         d = ImageDraw.Draw(txt)
 
-        line0 = ', '.join(card_names[:4])
-        line1 = ', '.join(card_names[4:])
+        line1 = ', '.join(card_names[:4])
+        line2 = ', '.join(card_names[4:])
         # card_text = '\n'.join([line0, line1])
 
-        d.text((txt_x_cards, txt_y_line1), line0, font=font_regular, 
+        d.text((txt_x_name, txt_y_line1), deck_name, font=font_bold, 
                          fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_cards, txt_y_line2), line1, font=font_regular, 
+        d.text((txt_x_name, txt_y_line2), deck_author.name, font=font_regular, 
                          fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_elixir, txt_y_line1), "Average elixir", font=font_bold,
+        d.text((txt_x_cards, txt_y_line1), line1, font=font_regular, 
+                         fill=(0xff, 0xff, 0xff, 255))
+        d.text((txt_x_cards, txt_y_line2), line2, font=font_regular, 
+                         fill=(0xff, 0xff, 0xff, 255))
+        d.text((txt_x_elixir, txt_y_line1), "Avg elixir", font=font_bold,
                fill=(0xff, 0xff, 0xff, 200))
         d.text((txt_x_elixir, txt_y_line2), average_elixir, font=font_bold,
                fill=(0xff, 0xff, 0xff, 255))
