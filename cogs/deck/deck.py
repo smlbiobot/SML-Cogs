@@ -186,7 +186,13 @@ class Deck:
         
         card_w = 302
         card_h = 363
-        card_y = 0
+        card_x = 30
+        card_y = 30
+        font_size = 50
+        txt_y0 = 430
+        txt_y1 = 500
+        txt_x0 = 50
+        txt_x1 = 1550
 
         bg_image = Image.open("data/deck/img/deck-bg-b.png")
         size = bg_image.size
@@ -203,30 +209,38 @@ class Deck:
             card_image = Image.open(card_image_file)
             # size = (card_w, card_h)
             # card_image.thumbnail(size)
-            box = (self.card_w * i, card_y, card_w * (i+1), card_h + card_y)
+            box = (card_x + card_w * i, 
+                   card_y, 
+                   card_x + card_w * (i+1), 
+                   card_h + card_y)
             image.paste(card_image, box, card_image)
 
         # text
         card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
 
         txt = Image.new("RGBA", size)
-        font_regular = ImageFont.truetype(font_file_regular, size=50)
-        font_bold = ImageFont.truetype(font_file_bold, size=50)
+        font_regular = ImageFont.truetype(font_file_regular, size=font_size)
+        font_bold = ImageFont.truetype(font_file_bold, size=font_size)
 
         # drawing context
         d = ImageDraw.Draw(txt)
 
         line0 = ', '.join(card_names[:4])
         line1 = ', '.join(card_names[4:])
-        card_text = '\n'.join([line0, line1])
+        # card_text = '\n'.join([line0, line1])
 
-        d.multiline_text((20,370), card_text, font=font_regular, spacing=20, 
+        d.text((txt_x0, txt_y0), line0, font=font_regular, 
                          fill=(0xff, 0xff, 0xff, 255))
-        d.text((1528, 370), "Average elixir", font=font_bold,
+        d.text((txt_x0, txt_y1), line1, font=font_regular, 
+                         fill=(0xff, 0xff, 0xff, 255))
+        d.text((txt_x1, txt_y0), "Average elixir", font=font_bold,
                fill=(0xff, 0xff, 0xff, 200))
+        d.text((txt_x1, txt_y1), "3.6", font=font_bold,
+               fill=(0xff, 0xff, 0xff, 255))
+
         image.paste(txt, (0,0), txt)
  
-        # image = Image.alpha_composite(image, bg_image)
+
 
         # scale down
         scale = 0.5
