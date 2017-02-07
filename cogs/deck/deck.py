@@ -26,9 +26,7 @@ DEALINGS IN THE SOFTWARE.
 
 import discord
 from discord.ext import commands
-from .utils import checks
 from .utils.dataIO import dataIO
-from .general import General
 from __main__ import send_cmd_help
 import os
 import datetime
@@ -42,6 +40,32 @@ import itertools
 settings_path = "data/deck/settings.json"
 crdata_path = "data/deck/clashroyale.json"
 max_deck_per_user = 5
+
+help_text = f"""
+**Deck**
+The !deck command helps you organize your Clash Royale decks.
+
+**Deck image**
+To get an image of the deck, try:
+`!deck get 3M EB MM IG knight IS zap pump`
+To optionally add a name to your deck, try:
+`!deck get 3M EB MM IG knight IS zap pump "3M Ebarbs"`
+
+**Card Names**
+You can type the card names in full, or use abbreviations. Common abbreviations have been added.
+For the full list of available cards and acceptable abbreviations, type `!deck cards`
+
+**Database**
+You can save your decks. To add a deck to your personal collection, type:
+`!deck add 3M EB MM IG knight IS zap pump "3M Ebarbs"`
+You can have up to {max_deck_per_user} in yor personal collection.
+
+**List**
+To see the decks you have added, type `!deck list`
+To see the decks that others have added type `!deck list <username>`
+
+"""
+
 
 class Deck:
     """
@@ -101,6 +125,9 @@ class Deck:
 
         Card list
         !deck cards
+
+        Full help
+        !deck help
         """
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
@@ -243,6 +270,15 @@ class Deck:
 
         for o in split_out:
             await self.bot.say('\n'.join(o))
+
+    @deck.command(name="help", pass_context=True, no_pm=True)
+    async def deck_help(self, ctx):
+        """
+        Help prompt
+        """
+        await self.bot.say(help_text)
+
+        
 
 
     async def deck_show(self, ctx, member_deck, deck_name:str, member=None):
