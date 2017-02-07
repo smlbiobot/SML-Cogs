@@ -59,7 +59,7 @@ For the full list of available cards and acceptable abbreviations, type `!deck c
 **Database**
 You can save your decks. To add a deck to your personal collection, type:
 `!deck add 3M EB MM IG knight IS zap pump "3M Ebarbs"`
-You can have up to {max_deck_per_user} in yor personal collection.
+You can have up to {max_deck_per_user} decks in yor personal collection.
 
 **List**
 To see the decks you have added, type `!deck list`
@@ -279,8 +279,6 @@ class Deck:
         """
         await self.bot.say(help_text)
 
-        
-
 
     async def deck_show(self, ctx, member_deck, deck_name:str, member=None):
         """
@@ -470,6 +468,7 @@ class Deck:
         """Saves data to settings file"""
         dataIO.save_json(self.file_path, self.settings)
 
+
 def check_folder():
     folders = ["data/deck",
                "data/deck/img",
@@ -494,29 +493,3 @@ def setup(bot):
     n = Deck(bot)
     bot.add_cog(n)
 
-
-"""  
-Bot commands for debugging
-
-Add 5 valid decks with names
-!deck add 3M EB MM IG knight IS zap pump "3M Ebarbs"
-!deck add 3M EB MM IG hog IS zap pump "3M Ebarbs Hog"
-!deck add LH loon ts zap fb MM minions skarmy "LavaLoon"
-!deck add giant 3M exec knight mp is zap pump "DJJ Giant 3M"
-!deck add golem exec tornado MM GY log zap TS "Golem Exec GY"
-
-
-
-http://statsroyale.com/profile/C0G20PR2
-http://statsroyale.com/profile/82P9CLC8
-http://statsroyale.com/profile/8L9L9GL      
-!deck get archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
-!deck get mm bbd loon bt is fs gs lh
-!deck get bbd mm loon bt is fs gs lh
-!deck get lh mm loon it is fs gs gb
-!deck get archers ARROWS baby-dragon BALLOON barbarian-hut barbarians battle-ram bomb-tower
-!deck set dark-prince dart-goblin electro-wizard elite-barbarians elixir-collector executioner fire-spirits fireball
-!deck set dark-prince dart-goblin2 electro-wizard elite-barbarians2 elixir-collector executioner fire-spirits fireball
-dark-prince dart-goblin electro-wizard elite-barbarians elixir-collector executioner fire-spirits
-"""
-    
