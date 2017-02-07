@@ -111,11 +111,14 @@ class RACF:
         """Find all untagged users and send them the welcome message"""
         server = ctx.message.server
         members = server.members
-        online_members = [m for m in members if m.status == discord.Status.online]
-        online_untagged_members = [m for m in online_members if len(m.roles) == 1]
-        online_untagged_members_names = [m.name for m in online_untagged_members]
+        untagged_members = [m for m in members if len(m.roles) == 1]
+        untagged_members_names = [m.name for m in untagged_members]
+        untagged_members_mention = [m.mention for m in untagged_members]
+
         await self.bot.say("All online but untagged users:")
-        await self.bot.say(', '.join(online_untagged_members_names))
+        await self.bot.say(', '.join(untagged_members_names))
+        await self.bot.say("Mentions:")
+        await self.bot.say("'''{}'''".format(' '.join(untagged_members_mention)))
 
     @commands.command
 

@@ -96,17 +96,48 @@ class Deck:
         
         Example usage:
         !deck get 3m mm ig is fs pump horde knight
+
         !deck get dark-prince dart-goblin electro-wizard elite-barbarians elixir-collector executioner fire-spirits fireball 
+
+        Card list
+        !deck cards
         """
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    @deck.command(name="get", pass_context=True, no_pm=True)
+    async def deck_get(self, ctx,
+                       card1=None, card2=None, card3=None, card4=None, 
+                       card5=None, card6=None, card7=None, card8=None, 
+                       deck_name=None):
+        """
+        Display a deck with cards and average elixir by entering 8 cards,
+        followed by a name. The deck will be named “unnamed deck”
+        if no name is entered
+
+        Example: !deck get bbd mm loon bt is fs gs lh
+
+        For the full list of acceptable card names, type !deck cards
+        """
+        if deck_name is None:
+            deck_name = 'Deck'
+        author = ctx.message.author
+
+        member_deck = [card1, card2, card3, card4, card5, card6, card7, card8]
+        if not all(member_deck):
+            await self.bot.say("Please enter 8 cards.")
+            await send_cmd_help(ctx)
+        else:
+            await self.deck_show(ctx, member_deck, deck_name, author)
 
     @deck.command(name="add", pass_context=True, no_pm=True)
     async def _deck_add(self, ctx, *member_deck:str):
         """
         Add a deck to a personal decklist 
 
-        Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
+        Example: !deck add bbd mm loon bt is fs gs lh
+
+        For the full list of acceptable card names, type !deck cards
         """
         author = ctx.message.author
         server = ctx.message.server
@@ -117,9 +148,6 @@ class Deck:
         if (len(member_deck) > 8):
             deck_name = ' '.join(member_deck[8:])
             member_deck = member_deck[:8]
-
-        print (str(deck_name))
-        print(str(member_deck))
 
 
         member_deck = self.normalize_deck_data(member_deck)
@@ -158,28 +186,37 @@ class Deck:
             self.save_settings()
             
 
-    @deck.command(name="get", pass_context=True, no_pm=True)
-    async def deck_get(self, ctx,
-                       card1=None, card2=None, card3=None, card4=None, 
-                       card5=None, card6=None, card7=None, card8=None, 
-                       deck_name=None):
+    @deck.command(name="list", pass_context=True, no_pm=True)
+    async def deck_list(self, ctx, member:discord.Member=None):
         """
-        Display a deck with cards and average elixir by entering 8 cards,
-        followed by a name. The deck will be named “unnamed deck”
-        if no name is entered
+        List the decks of a user
 
-        Example: !deck get bbd mm loon bt is fs gs lh
         """
-        if deck_name is None:
-            deck_name = 'Deck'
+
         author = ctx.message.author
+        server = ctx.message.server
 
-        member_deck = [card1, card2, card3, card4, card5, card6, card7, card8]
-        if not all(member_deck):
-            await self.bot.say("Please enter 8 cards.")
-            await send_cmd_help(ctx)
-        else:
-            await self.deck_show(ctx, member_deck, deck_name, author)
+        member_is_author = False
+
+        if not member:
+            member = author
+            member_is_author = True
+
+        self.check_server_settings(server)
+        self.check_member_settings(server, member)
+
+        decks = self.settings["Servers"][server.id]["Members"][member.id]["Decks"]
+
+        for k, deck in decks.items():
+            await self.bot.say("Deck {}".format(str(k)))
+            await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], member)
+
+        if not len(decks):
+            if member_is_author:
+                await self.bot.say("You don’t have any decks stored.\n"
+                                   "Type `!deck add` learn how to add some.")
+            else:
+                await self.bot.say("{} hasn’t added any decks yet.".format(member.name))
 
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
@@ -231,6 +268,7 @@ class Deck:
                 "Please enter exactly 8 cards.".format(
                     len(member_deck),
                     's' if len(member_deck) > 1 else ''))
+            await send_cmd_help(ctx)
             deck_is_valid = False
 
         # Ensure: card names are valid
@@ -239,6 +277,7 @@ class Deck:
                 if not card in self.cards:
                     await self.bot.say("**{}** is not a valid card name.".format(card))
             await self.bot.say("\nType `!deck cards` for the full list")
+            await send_cmd_help(ctx)
             deck_is_valid = False
 
         if deck_is_valid:
@@ -251,23 +290,7 @@ class Deck:
 
 
 
-    @deck.command(name="list", pass_context=True, no_pm=True)
-    async def deck_list(self, ctx, member:discord.Member=None):
-        """List the decks of a user"""
-
-        author = ctx.message.author
-        server = ctx.message.server
-
-        if not member:
-            member = author
-
-        self.check_server_settings(server)
-        self.check_member_settings(server, member)
-
-        decks = self.settings["Servers"][server.id]["Members"][member.id]["Decks"]
-
-        for k, deck in decks.items():
-            await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], member)
+    
 
 
     async def upload_deck_image(self, ctx, deck, deck_name, author):
