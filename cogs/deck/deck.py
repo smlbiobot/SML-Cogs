@@ -208,9 +208,12 @@ class Deck:
 
         decks = self.settings["Servers"][server.id]["Members"][member.id]["Decks"]
 
+        deck_id = 1
+
         for k, deck in decks.items():
-            await self.bot.say("Deck {}".format(str(k)))
+            await self.bot.say("**{}**. {}".format(deck_id, deck["DeckName"]))
             await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], member)
+            deck_id += 1
 
         if not len(decks):
             if member_is_author:
@@ -441,9 +444,7 @@ def check_folder():
 
 def check_file():
     settings = {
-        "Cards": [],
-        "Servers": {},
-        "Decks": {}
+        "Servers": {}
     }
     f = settings_path
     if not dataIO.is_valid_json(f):
@@ -459,6 +460,13 @@ def setup(bot):
 
 """  
 Bot commands for debugging
+
+Add 5 valid decks with names
+!deck add 3M EB MM IG knight IS zap pump "3M Ebarbs"
+!deck add 3M EB MM IG hog IS zap pump "3M Ebarbs Hog"
+!deck add LH loon ts zap fb MM minions skarmy "LavaLoon"
+!deck add giant 3M exec knight mp is zap pump "DJJ Giant 3M"
+!deck add golem exec tornado MM GY log zap TS "Golem Exec GY"
 
 
 
