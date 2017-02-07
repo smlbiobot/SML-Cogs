@@ -287,13 +287,6 @@ class Deck:
         self.deck_is_valid = deck_is_valid
 
 
-
-
-
-
-    
-
-
     async def upload_deck_image(self, ctx, deck, deck_name, author):
         """Upload deck image to the server"""
 
