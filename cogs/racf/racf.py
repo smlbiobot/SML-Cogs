@@ -31,6 +31,8 @@ from random import choice
 from __main__ import send_cmd_help
 import os
 import datetime
+import aiohttp
+# from .economy import Economy
 
 
 rules_url = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
@@ -120,16 +122,51 @@ class RACF:
         await self.bot.say("Mentions:")
         await self.bot.say("'''{}'''".format(' '.join(untagged_members_mention)))
 
-    @commands.command
+    @commands.command(pass_context=True)
+    async def racf_bank_deposit(self, ctx):
+        """Hacking the eco system to add points"""
+
+        # bank = self.bot.get_cog("Economy").bank
+
+        # author = ctx.message.author
+
+        # bank.deposit_credits(author, 10)
+
+        pass
+
+    @commands.command(pass_context=True)
+    async def avatar(self, ctx, member:discord.Member=None):
+        """Display avatar of the user"""
+        author = ctx.message.author
+
+        if member is None:
+            member = author
+        avatar_url = member.avatar_url
+        data = discord.Embed()
+        data.set_image(url=avatar_url)
+        await self.bot.say(embed=data)
+
+        # image_loaded = False
+
+        # if not simage_loaded:
+        #     try:
+        #         async with aiohttp.get(self.url) as r:
+        #             image = await r.content.read()
+        #         with open('data/sadface/sadface.png','wb') as f:
+        #             f.write(image)
+        #         image_loaded = os.path.exists('data/sadface/sadface.png')
+        #         await self.bot.send_file(message.channel,self.image)
+        #     except Exception as e:
+        #         print(e)
+        #         print("Sadface error D: I couldn't download the file, so we're gonna use the url instead")
+        #         await self.bot.send_message(message.channel,self.url)
+        # else:
+        #     await self.bot.send_file(message.channel,self.image)
+
+        
 
 
-    async def member_join(self, member:discord.Member):
-        """Greet users when they join the server"""
-        server = member.server
-        channel = server.default_channel.id
 
-        if (server.name == "Reddit Alpha Clan Family"):
-            await self.bot.send_message(channel, welcome_msg.format(member))
 
 
 
