@@ -131,7 +131,10 @@ class Deck:
             await self.deck_show(ctx, member_deck, deck_name, author)
 
     @deck.command(name="add", pass_context=True, no_pm=True)
-    async def _deck_add(self, ctx, *member_deck:str):
+    async def _deck_add(self, ctx,
+                       card1=None, card2=None, card3=None, card4=None, 
+                       card5=None, card6=None, card7=None, card8=None, 
+                       deck_name=None):
         """
         Add a deck to a personal decklist 
 
@@ -139,51 +142,49 @@ class Deck:
 
         For the full list of acceptable card names, type !deck cards
         """
+        if deck_name is None:
+            deck_name = 'Deck'
         author = ctx.message.author
         server = ctx.message.server
 
-        deck_name = ""
-
         # convert arguments to deck list and name
-        if (len(member_deck) > 8):
-            deck_name = ' '.join(member_deck[8:])
-            member_deck = member_deck[:8]
+        member_deck = [card1, card2, card3, card4, card5, card6, card7, card8]
+        if not all(member_deck):
+            await self.bot.say("Please enter 8 cards.")
+            await send_cmd_help(ctx)
+        else:
+            member_deck = self.normalize_deck_data(member_deck)
 
+            await self.deck_show(ctx, member_deck, deck_name)
 
-        member_deck = self.normalize_deck_data(member_deck)
+            decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
 
-        await self.deck_show(ctx, member_deck, deck_name)
+            if self.deck_is_valid:
 
-        decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
+                # creates sets with decks.values
+                # decks_sets = [set(d) for d in decks.values()]
 
-        if self.deck_is_valid:
+                # if  set(member_deck) in decks_sets:
+                #     # existing deck
+                #     await self.bot.say("Deck exists already")
+                # else:
+                # new deck
+                await self.bot.say("Deck added.")
+                deck_key = str(datetime.datetime.utcnow())
+                decks[deck_key] = {
+                    "Deck": member_deck,
+                    "DeckName": deck_name
+                }
 
-            # creates sets with decks.values
-            # decks_sets = [set(d) for d in decks.values()]
+                # If user has more than allowed by max, remove older decks
+                timestamp = decks.keys()
+                timestamp = sorted(timestamp)
 
-            # if  set(member_deck) in decks_sets:
-            #     # existing deck
-            #     await self.bot.say("Deck exists already")
-            # else:
-            # new deck
-            await self.bot.say("Deck added.")
-            deck_key = str(datetime.datetime.utcnow())
-            decks[deck_key] = {
-                "Deck": member_deck,
-                "DeckName": deck_name
-            }
+                while len(decks) > max_deck_per_user:
+                    t = timestamp.pop(0)
+                    decks.pop(t, None)
 
-            self.save_settings()
-
-            # If user has more than allowed by max, remove older decks
-            timestamp = decks.keys()
-            timestamp = sorted(timestamp)
-
-            while len(decks) > max_deck_per_user:
-                t = timestamp.pop(0)
-                decks.pop(t, None)
-
-            self.save_settings()
+                self.save_settings()
             
 
     @deck.command(name="list", pass_context=True, no_pm=True)
