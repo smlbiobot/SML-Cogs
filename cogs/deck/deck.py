@@ -46,13 +46,14 @@ help_text = f"""
 The !deck command helps you organize your Clash Royale decks.
 
 **Deck image**
-To get an image of the deck, try:
+To get an image of the deck, type:
 `!deck get 3M EB MM IG knight IS zap pump`
-To optionally add a name to your deck, try:
+
+To optionally add a name to your deck, type:
 `!deck get 3M EB MM IG knight IS zap pump "3M Ebarbs"`
 
 **Card Names**
-You can type the card names in full, or use abbreviations. Common abbreviations have been added.
+You can type the card names in full or use abbreviations. Common abbreviations have been added.
 For the full list of available cards and acceptable abbreviations, type `!deck cards`
 
 **Database**
@@ -62,7 +63,7 @@ You can have up to {max_deck_per_user} in yor personal collection.
 
 **List**
 To see the decks you have added, type `!deck list`
-To see the decks that others have added type `!deck list <username>`
+To see the decks that others have added, type `!deck list <username>`
 
 """
 
@@ -274,7 +275,7 @@ class Deck:
     @deck.command(name="help", pass_context=True, no_pm=True)
     async def deck_help(self, ctx):
         """
-        Help prompt
+        Complete help and tutorial
         """
         await self.bot.say(help_text)
 
