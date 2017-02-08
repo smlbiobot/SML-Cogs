@@ -305,7 +305,7 @@ class Deck:
             deck_id = 1
 
             for deck in found_decks:
-                await self.bot.say("**{}**. {}".format(deck_id, deck["DeckName"]))
+                await self.bot.say("**{}. {}** by {}".format(deck_id, deck["DeckName"], deck["Member"].display_name))
                 await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], deck["Member"])
                 deck_id += 1
 
