@@ -272,6 +272,46 @@ class Deck:
         for o in split_out:
             await self.bot.say('\n'.join(o))
 
+    @deck.command(name="search", pass_context=True, no_pm=True)
+    async def deck_search(self, ctx, *params):
+        """
+        Search through all the decks to find matches in name or card
+        """
+        server = ctx.message.server
+        server_members = self.settings["Servers"][server.id]["Members"]
+
+        # normalize params
+        params = self.normalize_deck_data(params)
+
+        found_decks = []
+
+        for k, server_member in server_members.items():
+            member_decks = server_member["Decks"]
+            member_id = server_member["MemberID"]
+            member = server.get_member(member_id)
+            for k, member_deck in member_decks.items():
+                cards = member_deck["Deck"]
+                # await self.bot.say(set(params))
+                if set(params) < set(cards):
+                    found_decks.append({
+                        "Deck": member_deck["Deck"], 
+                        "DeckName": member_deck["DeckName"],
+                        "Member": member })
+
+        await self.bot.say("Found {} decks".format(len(found_decks)))
+
+        if len(found_decks):
+
+            deck_id = 1
+
+            for deck in found_decks:
+                await self.bot.say("**{}**. {}".format(deck_id, deck["DeckName"]))
+                await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], deck["Member"])
+                deck_id += 1
+
+        
+
+
     @deck.command(name="help", pass_context=True, no_pm=True)
     async def deck_help(self, ctx):
         """
@@ -431,7 +471,7 @@ class Deck:
         return image
 
 
-    def normalize_deck_data(self, deck:str):
+    def normalize_deck_data(self, deck):
         """
         Return a deck list which has no abbreviations and uses all lowercase names
         """
