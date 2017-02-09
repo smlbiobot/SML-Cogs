@@ -310,7 +310,19 @@ class Deck:
                 deck_id += 1
 
         
+    @deck.command(name="rename", pass_context=True, no_pm=True)
+    async def deck_rename(self, ctx, deck_id, new_name):
+        """
+        Rename a deck based on deck id
+        """
+        server = ctx.message.server
+        author = ctx.message.author
 
+        members = self.settings["Servers"][server.id]["Members"]
+
+        # check member has data
+        if not author.id in members:
+            self.bot.say("You have no decks")
 
     @deck.command(name="help", pass_context=True, no_pm=True)
     async def deck_help(self, ctx):

@@ -123,6 +123,7 @@ class RACF:
         await self.bot.say("'''{}'''".format(' '.join(untagged_members_mention)))
 
     @commands.command(pass_context=True)
+    @checks.mod_or_permissions(mention_everyone=True)
     async def racf_bank_deposit(self, ctx):
         """Hacking the eco system to add points"""
 
@@ -133,6 +134,32 @@ class RACF:
         # bank.deposit_credits(author, 10)
 
         pass
+
+    @commands.command(pass_context=True)
+    @checks.mod_or_permissions(mention_everyone=True)
+    async def mentionusers(self, ctx, role:str, msg:str):
+        """
+        Mention users by role (Co’s and up)
+
+        Example: !mentionusers Delta "Anyone who is 4,300+ please move up to Charlie!"
+
+        """
+        server = ctx.message.server
+        server_roles_names = [r.name for r in server.roles]
+
+        if not role in server_roles_names:
+            await self.bot.say("{} is not a valid role on this server.".format(role))
+        elif not msg:
+            await self.bot.say("You have not entered any messages.")
+        else:
+            out_mentions = []
+            for m in server.members:
+                if role in [r.name for r in m.roles]:
+                    out_mentions.append(m.mention)
+            await self.bot.say("{} {}".format(" ".join(out_mentions), msg))
+
+
+
 
     @commands.command(pass_context=True)
     async def avatar(self, ctx, member:discord.Member=None):
