@@ -137,11 +137,13 @@ class RACF:
 
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(mention_everyone=True)
-    async def mentionusers(self, ctx, role:str, msg:str):
+    async def mentionusers(self, ctx, role:str, *msg):
         """
-        Mention users by role (Co’s and up)
+        Mention users by role
 
-        Example: !mentionusers Delta "Anyone who is 4,300+ please move up to Charlie!"
+        Example: !mentionusers Delta Anyone who is 4,300+ please move up to Charlie!
+
+        Note: only usable by people with the permission to mention @everyone
 
         """
         server = ctx.message.server
@@ -156,7 +158,7 @@ class RACF:
             for m in server.members:
                 if role in [r.name for r in m.roles]:
                     out_mentions.append(m.mention)
-            await self.bot.say("{} {}".format(" ".join(out_mentions), msg))
+            await self.bot.say("{} {}".format(" ".join(out_mentions), " ".join(msg)))
 
 
 

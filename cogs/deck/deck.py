@@ -59,7 +59,7 @@ For the full list of available cards and acceptable abbreviations, type `!deck c
 **Database**
 You can save your decks. To add a deck to your personal collection, type:
 `!deck add 3M EB MM IG knight IS zap pump "3M Ebarbs"`
-You can have up to {max_deck_per_user} decks in yor personal collection.
+You can have up to {max_deck_per_user} decks in your personal collection.
 
 **List**
 To see the decks you have added, type `!deck list`
