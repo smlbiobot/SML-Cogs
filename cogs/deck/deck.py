@@ -318,6 +318,7 @@ class Deck:
     @deck.command(name="rename", pass_context=True, no_pm=True)
     async def deck_rename(self, ctx, deck_id, new_name):
         """
+        This feature is TBD. Not implemented yet. Pls ignore
         Rename a deck based on deck id
         """
         server = ctx.message.server

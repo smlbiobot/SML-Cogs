@@ -121,7 +121,7 @@
             "rarity": "rare"
         },
         "goblin-barrel": {
-            "aka": ["gb", "gob-barrel"],
+            "aka": ["gb", "gob-barrel", "barrel"],
             "elixir": 3,
             "rarity": "epic"
         },
