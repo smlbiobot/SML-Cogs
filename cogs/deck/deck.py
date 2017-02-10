@@ -130,7 +130,12 @@ class Deck:
         Full help
         !deck help
         """
-        if ctx.invoked_subcommand is None:
+
+        # Disallow command use in #strategy
+        if ctx.message.channel.name == "strategy":
+            await self.bot.say("Sorry, we have received some complaints about excessive use of this command in this channel. Please use #bot-spam for the `!deck` command for now. Thanks!")
+
+        elif ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @deck.command(name="get", pass_context=True, no_pm=True)
