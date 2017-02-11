@@ -324,11 +324,28 @@ class Deck:
         server = ctx.message.server
         author = ctx.message.author
 
+        deck_id = int(deck_id) - 1
+
         members = self.settings["Servers"][server.id]["Members"]
 
         # check member has data
         if not author.id in members:
             self.bot.say("You have no decks")
+        else:
+            member = members[author.id]
+            decks = member["Decks"]
+            if deck_id > len(decks):
+                await self.bot.say("The deck id you entered is invalid")
+            else:
+                for i, deck in enumerate(decks.values()):
+                    if deck_id == i:
+                        # await self.bot.say(deck["DeckName"])
+                        deck["DeckName"] = new_name
+                        await self.bot.say("Deck renamed to {}.".format(new_name))
+                        self.save_settings()
+
+
+
 
     @deck.command(name="help", pass_context=True, no_pm=True)
     async def deck_help(self, ctx):
