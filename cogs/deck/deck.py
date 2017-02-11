@@ -334,7 +334,7 @@ class Deck:
         else:
             member = members[author.id]
             decks = member["Decks"]
-            if deck_id > len(decks):
+            if deck_id >= len(decks):
                 await self.bot.say("The deck id you entered is invalid")
             else:
                 for i, deck in enumerate(decks.values()):
