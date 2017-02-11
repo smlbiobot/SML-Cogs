@@ -342,6 +342,7 @@ class Deck:
                         # await self.bot.say(deck["DeckName"])
                         deck["DeckName"] = new_name
                         await self.bot.say("Deck renamed to {}.".format(new_name))
+                        await self.deck_show(ctx, deck["Deck"], new_name, author)
                         self.save_settings()
 
 
