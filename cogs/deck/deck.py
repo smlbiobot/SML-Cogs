@@ -318,8 +318,9 @@ class Deck:
     @deck.command(name="rename", pass_context=True, no_pm=True)
     async def deck_rename(self, ctx, deck_id, new_name):
         """
-        This feature is TBD. Not implemented yet. Pls ignore
-        Rename a deck based on deck id
+        Rename a deck based on deck id. 
+        Syntax: !deck rename [deck_id] [new_name]
+        where deck_id is the number associated with the deck when you run !deck list
         """
         server = ctx.message.server
         author = ctx.message.author
@@ -330,12 +331,12 @@ class Deck:
 
         # check member has data
         if not author.id in members:
-            self.bot.say("You have no decks")
+            self.bot.say("You have not added any decks.")
         else:
             member = members[author.id]
             decks = member["Decks"]
             if deck_id >= len(decks):
-                await self.bot.say("The deck id you entered is invalid")
+                await self.bot.say("The deck id you have entered is invalid.")
             else:
                 for i, deck in enumerate(decks.values()):
                     if deck_id == i:
@@ -344,6 +345,35 @@ class Deck:
                         await self.bot.say("Deck renamed to {}.".format(new_name))
                         await self.deck_show(ctx, deck["Deck"], new_name, author)
                         self.save_settings()
+
+    @deck.command(name="remove", pass_context=True, no_pm=True)
+    async def deck_remove(self, ctx, deck_id):
+        """
+        Remove a deck based on deck id, which is the number associated with the deck when you run !deck list
+        """
+        server = ctx.message.server
+        author = ctx.message.author
+
+        deck_id = int(deck_id) - 1
+        members = self.settings["Servers"][server.id]["Members"]
+
+        if not author.id in members:
+            self.bot.say("You have not added any decks.")
+        else:
+            member = members[author.id]
+            decks = member["Decks"]
+            if deck_id >= len(decks):
+                await self.bot.say("The deck id you have entered is invalid.")
+            else:
+                remove_key = ""
+                for i, key in enumerate(decks.keys()):
+                    if deck_id == i:
+                        remove_key = key
+                decks.pop(remove_key)
+                await self.bot.say("Deck {} removed.".format(deck_id + 1))
+                self.save_settings()
+
+
 
 
 
