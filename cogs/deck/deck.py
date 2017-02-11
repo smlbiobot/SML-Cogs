@@ -65,6 +65,15 @@ You can have up to {max_deck_per_user} decks in your personal collection.
 To see the decks you have added, type `!deck list`
 To see the decks that others have added, type `!deck list <username>`
 
+**Rename**
+To rename a deck, type `!deck rename [deck_id] [new_name]`
+where deck_id is the number on your list, and new_name is the new name, obviously. 
+Remember to quote the name if you want it to contain spaces.
+
+**Remove**
+To remove a deck, type `Deck remove [deck_id]` 
+where deck_id is the number on your deck list.
+
 """
 
 
