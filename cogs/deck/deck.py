@@ -53,8 +53,7 @@ To optionally add a name to your deck, type:
 `!deck get 3M EB MM IG knight IS zap pump "3M Ebarbs"`
 
 **Card Names**
-You can type the card names in full or use abbreviations. Common abbreviations have been added.
-For the full list of available cards and acceptable abbreviations, type `!deck cards`
+You can type the card names in full or use abbreviations. Common abbreviations have been added. For the full list of available cards and acceptable abbreviations, type `!deck cards`
 
 **Database**
 You can save your decks. To add a deck to your personal collection, type:
