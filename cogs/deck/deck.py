@@ -191,11 +191,14 @@ class Deck:
 
         # convert arguments to deck list and name
         member_deck = [card1, card2, card3, card4, card5, card6, card7, card8]
+        member_deck = self.normalize_deck_data(member_deck)
+
         if not all(member_deck):
             await self.bot.say("Please enter 8 cards.")
             await send_cmd_help(ctx)
+        elif len(set(member_deck)) < len(member_deck):
+            await self.bot.say("Please enter 8 unique cards.")
         else:
-            member_deck = self.normalize_deck_data(member_deck)
 
             await self.deck_show(ctx, member_deck, deck_name)
 
@@ -550,7 +553,7 @@ class Deck:
         """
         Return a deck list which has no abbreviations and uses all lowercase names
         """
-        deck = [c.lower() for c in deck]
+        deck = [c.lower() if c is not None else '' for c in deck]
 
         # replace abbreviations
         for i, card in enumerate(deck):
