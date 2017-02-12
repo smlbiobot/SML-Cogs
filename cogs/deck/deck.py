@@ -337,14 +337,15 @@ class Deck:
         server = ctx.message.server
         author = ctx.message.author
 
-        deck_id = int(deck_id) - 1
-
         members = self.settings["Servers"][server.id]["Members"]
 
         # check member has data
         if not author.id in members:
             self.bot.say("You have not added any decks.")
+        elif not deck_id.isdigit():
+            await self.bot.say("The deck_id you have entered is not a number.")
         else:
+            deck_id = int(deck_id) - 1
             member = members[author.id]
             decks = member["Decks"]
             if deck_id >= len(decks):
@@ -366,12 +367,15 @@ class Deck:
         server = ctx.message.server
         author = ctx.message.author
 
-        deck_id = int(deck_id) - 1
+        
         members = self.settings["Servers"][server.id]["Members"]
 
         if not author.id in members:
-            self.bot.say("You have not added any decks.")
+            await self.bot.say("You have not added any decks.")
+        elif not deck_id.isdigit():
+            await self.bot.say("The deck_id you have entered is not a number.")
         else:
+            deck_id = int(deck_id) - 1
             member = members[author.id]
             decks = member["Decks"]
             if deck_id >= len(decks):
