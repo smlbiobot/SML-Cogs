@@ -169,7 +169,7 @@ class Deck:
             await self.bot.say("Please enter 8 cards.")
             await send_cmd_help(ctx)
         else:
-            await self.deck_show(ctx, member_deck, deck_name, author)
+            await self.deck_upload(ctx, member_deck, deck_name, author)
 
     @deck.command(name="add", pass_context=True, no_pm=True)
     async def _deck_add(self, ctx,
@@ -199,7 +199,7 @@ class Deck:
             await self.bot.say("Please enter 8 unique cards.")
         else:
 
-            await self.deck_show(ctx, member_deck, deck_name)
+            await self.deck_upload(ctx, member_deck, deck_name)
 
             decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
 
@@ -265,6 +265,28 @@ class Deck:
                                    "Type `!deck add` learn how to add some.")
             else:
                 await self.bot.say("{} hasn’t added any decks yet.".format(member.name))
+
+    @deck.command(name="show", pass_context=True, no_pm=True)
+    async def deck_show(self, ctx, deck_id=None, member:discord.Member=None):
+        """
+        Show the deck of a user by id
+        """
+        author = ctx.message.author
+        server = ctx.message.server
+        if not member:
+            member = author
+        self.check_server_settings(server)
+        members = self.settings["Servers"][server.id]["Members"]
+        if not member.id in members:
+            self.bot.say("You have not added any decks.")
+        elif not deck_id.isdigit():
+            await self.bot.say("The deck_id you have entered is not a number.")
+        else:
+            deck_id = int(deck_id) - 1
+            decks = members[member.id]["Decks"]
+            for i, deck in enumerate(decks.values()):
+                if i == deck_id:
+                    await self.deck_upload(ctx, deck["Deck"], deck["DeckName"], member)
 
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
@@ -355,7 +377,7 @@ class Deck:
                         # await self.bot.say(deck["DeckName"])
                         deck["DeckName"] = new_name
                         await self.bot.say("Deck renamed to {}.".format(new_name))
-                        await self.deck_show(ctx, deck["Deck"], new_name, author)
+                        await self.deck_upload(ctx, deck["Deck"], new_name, author)
                         self.save_settings()
 
     @deck.command(name="remove", pass_context=True, no_pm=True)
@@ -401,7 +423,7 @@ class Deck:
         await self.bot.say(help_text)
 
 
-    async def deck_show(self, ctx, member_deck, deck_name:str, member=None):
+    async def deck_upload(self, ctx, member_deck, deck_name:str, member=None):
         """
         Upload deck to Discord
 
