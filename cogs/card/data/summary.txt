@@ -1,4 +1,4 @@
-----------------------------------------
+--------------------------------------------------------------------------------
 Snapshot #16
 Decks:
  4: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
@@ -86,7 +86,7 @@ Cards:
  1: Bomber
  1: Goblin Barrel
  1: Mirror
-----------------------------------------
+--------------------------------------------------------------------------------
 Snapshot #17
 Decks:
  6: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
@@ -195,7 +195,7 @@ Cards:
  1: Skeletons
  1: Fire Spirits
  1: Tesla
-----------------------------------------
+--------------------------------------------------------------------------------
 Snapshot #18
 Decks:
  7: Archers, Bowler, Cannon, Freeze, Graveyard, Ice Golem, Mega Minion, Zap
@@ -310,7 +310,7 @@ Cards:
  1: Barbarian Hut
  1: P.E.K.K.A
  1: Prince
-----------------------------------------
+--------------------------------------------------------------------------------
 Snapshot #19
 Decks:
  9: Fireball, Furnace, Giant, Mega Minion, Minions, Musketeer, Skeleton Army, Zap
@@ -418,7 +418,7 @@ Cards:
  1: Three Musketeers
  1: Mini P.E.K.K.A
  1: Prince
-----------------------------------------
+--------------------------------------------------------------------------------
 Snapshot #20
 Decks:
 11: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
@@ -516,7 +516,7 @@ Cards:
  1: Rocket
  1: Arrows
  1: Tornado
-----------------------------------------
+--------------------------------------------------------------------------------
 Snapshot #21
 Decks:
 10: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
@@ -625,7 +625,7 @@ Cards:
  1: Royal Giant
  1: Ice Wizard
  1: Valkyrie
-----------------------------------------
+--------------------------------------------------------------------------------
 Snapshot #22
 Decks:
  8: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
@@ -734,7 +734,7 @@ Cards:
  1: Fire Spirits
  1: Goblin Hut
  1: Mortar
-----------------------------------------
+--------------------------------------------------------------------------------
 Snapshot #23
 Decks:
  6: Elixir Collector, Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Musketeer, The Log, X-Bow

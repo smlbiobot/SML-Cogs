@@ -58,7 +58,7 @@ def process_data():
         cardpop = {}
         decks = {}
 
-        out.append("-" * 40)
+        out.append("-" * 80)
         out.append("Snapshot #{}".format(id))
 
         for i, row in enumerate(ws.iter_rows()):
