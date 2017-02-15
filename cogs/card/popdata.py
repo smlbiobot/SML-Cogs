@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 from openpyxl import load_workbook
+from difflib import SequenceMatcher
 import json
 
 cardpop_xlsx_path = 'data/cardpop{}.xlsx'
@@ -101,7 +102,8 @@ def process_data():
                         decks[deck_id] = {
                             "id": deck_id,
                             "deck": deck,
-                            "count": 1
+                            "count": 1,
+                            "similarity": {}
                             }
                     else:
                         decks[deck_id]["count"] += 1
@@ -114,10 +116,18 @@ def process_data():
                     v["change"] = v["count"] - prev_cardpop[k]["count"]
 
 
-
-
         decks = dict(sorted(decks.items(), key = lambda x: -x[1]["count"]))
         cardpop = dict(sorted(cardpop.items(), key = lambda x: -x[1]["count"]))
+
+        # calculate similarity
+
+        for k, deck in decks.items():
+            similarity = {}
+            for j, deck2 in decks.items():
+                if k != j:
+                    similarity[j] = SequenceMatcher(a=k, b=j).ratio()
+            similarity = dict(sorted(similarity.items(), key = lambda x: -x[1]))
+            deck["similarity"] = similarity
         
         prev_cardpop = cardpop
 
