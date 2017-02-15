@@ -128,9 +128,7 @@ class Deck:
         Clash Royale Decks
         
         Example usage:
-        !deck get 3m mm ig is fs pump horde knight
-
-        !deck get dark-prince dart-goblin electro-wizard elite-barbarians elixir-collector executioner fire-spirits fireball 
+        !deck add 3m mm ig is fs pump horde knight "3M EBarbs"
 
         Card list
         !deck cards
@@ -237,7 +235,6 @@ class Deck:
         List the decks of a user
 
         """
-
         author = ctx.message.author
         server = ctx.message.server
 
@@ -262,7 +259,7 @@ class Deck:
         if not len(decks):
             if member_is_author:
                 await self.bot.say("You don’t have any decks stored.\n"
-                                   "Type `!deck add` learn how to add some.")
+                                   "Type `!deck add` to add some.")
             else:
                 await self.bot.say("{} hasn’t added any decks yet.".format(member.name))
 
@@ -287,7 +284,6 @@ class Deck:
             for i, deck in enumerate(decks.values()):
                 if i == deck_id:
                     await self.deck_upload(ctx, deck["Deck"], deck["DeckName"], member)
-
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
     async def deck_cards(self, ctx):
@@ -347,7 +343,6 @@ class Deck:
                 await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], deck["Member"])
                 deck_id += 1
 
-        
     @deck.command(name="rename", pass_context=True, no_pm=True)
     async def deck_rename(self, ctx, deck_id, new_name):
         """
@@ -410,11 +405,6 @@ class Deck:
                 await self.bot.say("Deck {} removed.".format(deck_id + 1))
                 self.save_settings()
 
-
-
-
-
-
     @deck.command(name="help", pass_context=True, no_pm=True)
     async def deck_help(self, ctx):
         """
@@ -467,7 +457,6 @@ class Deck:
 
         self.deck_is_valid = deck_is_valid
 
-
     async def upload_deck_image(self, ctx, deck, deck_name, author):
         """Upload deck image to the server"""
 
@@ -488,7 +477,6 @@ class Deck:
             await ctx.bot.send_file(ctx.message.channel, f, 
                 filename=filename, content=description)
 
- 
     def get_deck_image(self, deck, deck_name=None, deck_author=None):
         """Construct the deck with Pillow and return image"""
 
@@ -587,8 +575,6 @@ class Deck:
 
         return deck
 
-
-
     def check_member_settings(self, server, member):
         """Init member section if necessary"""
         if member.id not in self.settings["Servers"][server.id]["Members"]:
@@ -597,7 +583,6 @@ class Deck:
                 "MemberDisplayName": member.display_name,
                 "Decks": {}}
             self.save_settings()
-
 
     def check_server_settings(self, server):
         """Init server data if necessary"""
