@@ -36,6 +36,8 @@ summary_path = 'data/summary.txt'
 cardpop_range_min = 16
 cardpop_range_max = 24
 
+similarity_threshold = 0.8
+
 data = {}
 
 out = []
@@ -120,7 +122,6 @@ def process_data():
         cardpop = dict(sorted(cardpop.items(), key = lambda x: -x[1]["count"]))
 
         # calculate similarity
-
         for k, deck in decks.items():
             similarity = {}
             for j, deck2 in decks.items():
@@ -132,8 +133,13 @@ def process_data():
         prev_cardpop = cardpop
 
         out.append("Decks:")
-        for k, v in decks.items():
-            out.append("{:3d}: {}".format(v["count"], k))
+        out.append("Deck similarity threshold: {}".format(similarity_threshold))
+        for k, deck in decks.items():
+            out.append("{:3d}: {}".format(deck["count"], k))
+            # output similarity over threshold
+            for sk, sv in deck["similarity"].items():
+                if sv > similarity_threshold:
+                    out.append("        {:3f}: {}".format(sv, sk))
 
         out.append("Cards:")
         for k, v in cardpop.items():
