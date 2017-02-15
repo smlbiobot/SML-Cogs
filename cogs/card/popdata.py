@@ -46,6 +46,9 @@ def save_json(filename=None, data=None):
 
 
 def process_data():
+
+    prev_cardpop = None
+
     for id in range(cardpop_range_min, cardpop_range_max):
 
 
@@ -68,7 +71,8 @@ def process_data():
                     if j:
                         cards.append(cell.value)
                         cardpop[cell.value] = {
-                            "count": 0
+                            "count": 0,
+                            "change": 0
                         }
             # row 2-101 are card data
             # for older worksheets, it’s len - 2
@@ -102,15 +106,28 @@ def process_data():
                     else:
                         decks[deck_id]["count"] += 1
 
+        # calculate change
+        if prev_cardpop is not None:
+            for k, v in cardpop.items():
+                # verify card exists previously as some cards may be new
+                if k in prev_cardpop:
+                    v["change"] = v["count"] - prev_cardpop[k]["count"]
+
+
+
+
         decks = dict(sorted(decks.items(), key = lambda x: -x[1]["count"]))
         cardpop = dict(sorted(cardpop.items(), key = lambda x: -x[1]["count"]))
         
+        prev_cardpop = cardpop
+
         out.append("Decks:")
         for k, v in decks.items():
-            out.append("{:2d}: {}".format(v["count"], k))
+            out.append("{:3d}: {}".format(v["count"], k))
+
         out.append("Cards:")
         for k, v in cardpop.items():
-            out.append("{:2d}: {}".format(v["count"], k))
+            out.append("{:3d} ({:3d}): {}".format(v["count"], v["change"], k))
 
         data[str(id)] = {
             "players": players,

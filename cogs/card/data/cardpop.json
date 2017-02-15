@@ -1275,133 +1275,176 @@
         },
         "cardpop" : {
             "Mega Minion" : {
-                "count" : 43
+                "count" : 43,
+                "change" : 0
             },
             "The Log" : {
-                "count" : 34
+                "count" : 34,
+                "change" : 0
             },
             "Lightning" : {
-                "count" : 30
+                "count" : 30,
+                "change" : 0
             },
             "Tombstone" : {
-                "count" : 28
+                "count" : 28,
+                "change" : 0
             },
             "Archers" : {
-                "count" : 27
+                "count" : 27,
+                "change" : 0
             },
             "Zap" : {
-                "count" : 21
+                "count" : 21,
+                "change" : 0
             },
             "Golem" : {
-                "count" : 20
+                "count" : 20,
+                "change" : 0
             },
             "Ice Golem" : {
-                "count" : 16
+                "count" : 16,
+                "change" : 0
             },
             "Baby Dragon" : {
-                "count" : 14
+                "count" : 14,
+                "change" : 0
             },
             "Ice Spirit" : {
-                "count" : 14
+                "count" : 14,
+                "change" : 0
             },
             "Inferno Tower" : {
-                "count" : 13
+                "count" : 13,
+                "change" : 0
             },
             "Fireball" : {
-                "count" : 12
+                "count" : 12,
+                "change" : 0
             },
             "Skeleton Army" : {
-                "count" : 11
+                "count" : 11,
+                "change" : 0
             },
             "Miner" : {
-                "count" : 10
+                "count" : 10,
+                "change" : 0
             },
             "Musketeer" : {
-                "count" : 9
+                "count" : 9,
+                "change" : 0
             },
             "Lava Hound" : {
-                "count" : 8
+                "count" : 8,
+                "change" : 0
             },
             "Minions" : {
-                "count" : 8
+                "count" : 8,
+                "change" : 0
             },
             "Princess" : {
-                "count" : 7
+                "count" : 7,
+                "change" : 0
             },
             "Arrows" : {
-                "count" : 7
+                "count" : 7,
+                "change" : 0
             },
             "Graveyard" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 0
             },
             "Mini P.E.K.K.A" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 0
             },
             "Lumberjack" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 0
             },
             "Giant" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 0
             },
             "Hog Rider" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 0
             },
             "Guards" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 0
             },
             "X-Bow" : {
-                "count" : 4
+                "count" : 4,
+                "change" : 0
             },
             "Bowler" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 0
             },
             "Minion Horde" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 0
             },
             "Fire Spirits" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 0
             },
             "Elixir Collector" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 0
             },
             "Knight" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Inferno Dragon" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Royal Giant" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Ice Wizard" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Barbarians" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Goblins" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Furnace" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Skeletons" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Three Musketeers" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Rocket" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Bomber" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Goblin Barrel" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Mirror" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             }
         }
     },
@@ -3586,142 +3629,188 @@
         },
         "cardpop" : {
             "Mega Minion" : {
-                "count" : 84
+                "count" : 84,
+                "change" : 41
             },
             "The Log" : {
-                "count" : 79
+                "count" : 79,
+                "change" : 45
             },
             "Zap" : {
-                "count" : 57
+                "count" : 57,
+                "change" : 36
             },
             "Archers" : {
-                "count" : 53
+                "count" : 53,
+                "change" : 26
             },
             "Tombstone" : {
-                "count" : 44
+                "count" : 44,
+                "change" : 16
             },
             "Lightning" : {
-                "count" : 41
+                "count" : 41,
+                "change" : 11
             },
             "Ice Spirit" : {
-                "count" : 34
+                "count" : 34,
+                "change" : 20
             },
             "Ice Golem" : {
-                "count" : 33
+                "count" : 33,
+                "change" : 17
             },
             "Fireball" : {
-                "count" : 32
+                "count" : 32,
+                "change" : 20
             },
             "Miner" : {
-                "count" : 28
+                "count" : 28,
+                "change" : 18
             },
             "Giant" : {
-                "count" : 27
+                "count" : 27,
+                "change" : 22
             },
             "Hog Rider" : {
-                "count" : 26
+                "count" : 26,
+                "change" : 21
             },
             "Skeleton Army" : {
-                "count" : 26
+                "count" : 26,
+                "change" : 15
             },
             "Inferno Tower" : {
-                "count" : 26
+                "count" : 26,
+                "change" : 13
             },
             "Bowler" : {
-                "count" : 24
+                "count" : 24,
+                "change" : 21
             },
             "Princess" : {
-                "count" : 23
+                "count" : 23,
+                "change" : 16
             },
             "Furnace" : {
-                "count" : 15
+                "count" : 15,
+                "change" : 13
             },
             "Minions" : {
-                "count" : 14
+                "count" : 14,
+                "change" : 6
             },
             "Minion Horde" : {
-                "count" : 13
+                "count" : 13,
+                "change" : 10
             },
             "Arrows" : {
-                "count" : 10
+                "count" : 10,
+                "change" : 3
             },
             "Goblin Barrel" : {
-                "count" : 9
+                "count" : 9,
+                "change" : 8
             },
             "Musketeer" : {
-                "count" : 9
+                "count" : 9,
+                "change" : 0
             },
             "Golem" : {
-                "count" : 8
+                "count" : 8,
+                "change" : -12
             },
             "Baby Dragon" : {
-                "count" : 7
+                "count" : 7,
+                "change" : -7
             },
             "Mini P.E.K.K.A" : {
-                "count" : 7
+                "count" : 7,
+                "change" : 1
             },
             "Graveyard" : {
-                "count" : 7
+                "count" : 7,
+                "change" : 1
             },
             "Barbarians" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 4
             },
             "Royal Giant" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 4
             },
             "Cannon" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 0
             },
             "Freeze" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 0
             },
             "Barbarian Hut" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 0
             },
             "Rocket" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 4
             },
             "Lava Hound" : {
-                "count" : 5
+                "count" : 5,
+                "change" : -3
             },
             "Elixir Collector" : {
-                "count" : 4
+                "count" : 4,
+                "change" : 1
             },
             "Three Musketeers" : {
-                "count" : 4
+                "count" : 4,
+                "change" : 3
             },
             "Guards" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -2
             },
             "X-Bow" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -1
             },
             "Goblins" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Knight" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Ice Wizard" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Spear Goblins" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Tornado" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Mirror" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Skeletons" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Fire Spirits" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -2
             },
             "Tesla" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             }
         }
     },
@@ -5977,145 +6066,192 @@
         },
         "cardpop" : {
             "Mega Minion" : {
-                "count" : 83
+                "count" : 83,
+                "change" : -1
             },
             "Archers" : {
-                "count" : 68
+                "count" : 68,
+                "change" : 15
             },
             "The Log" : {
-                "count" : 66
+                "count" : 66,
+                "change" : -13
             },
             "Zap" : {
-                "count" : 60
+                "count" : 60,
+                "change" : 3
             },
             "Fireball" : {
-                "count" : 36
+                "count" : 36,
+                "change" : 4
             },
             "Ice Golem" : {
-                "count" : 35
+                "count" : 35,
+                "change" : 2
             },
             "Tombstone" : {
-                "count" : 28
+                "count" : 28,
+                "change" : -16
             },
             "Bowler" : {
-                "count" : 27
+                "count" : 27,
+                "change" : 3
             },
             "Ice Spirit" : {
-                "count" : 26
+                "count" : 26,
+                "change" : -8
             },
             "Graveyard" : {
-                "count" : 25
+                "count" : 25,
+                "change" : 18
             },
             "Lightning" : {
-                "count" : 25
+                "count" : 25,
+                "change" : -16
             },
             "Skeleton Army" : {
-                "count" : 25
+                "count" : 25,
+                "change" : -1
             },
             "Furnace" : {
-                "count" : 25
+                "count" : 25,
+                "change" : 10
             },
             "Giant" : {
-                "count" : 24
+                "count" : 24,
+                "change" : -3
             },
             "Miner" : {
-                "count" : 21
+                "count" : 21,
+                "change" : -7
             },
             "Freeze" : {
-                "count" : 19
+                "count" : 19,
+                "change" : 14
             },
             "Inferno Tower" : {
-                "count" : 19
+                "count" : 19,
+                "change" : -7
             },
             "Hog Rider" : {
-                "count" : 19
+                "count" : 19,
+                "change" : -7
             },
             "Minions" : {
-                "count" : 17
+                "count" : 17,
+                "change" : 3
             },
             "Royal Giant" : {
-                "count" : 15
+                "count" : 15,
+                "change" : 9
             },
             "Cannon" : {
-                "count" : 13
+                "count" : 13,
+                "change" : 8
             },
             "Princess" : {
-                "count" : 12
+                "count" : 12,
+                "change" : -11
             },
             "Minion Horde" : {
-                "count" : 12
+                "count" : 12,
+                "change" : -1
             },
             "Musketeer" : {
-                "count" : 10
+                "count" : 10,
+                "change" : 1
             },
             "Fire Spirits" : {
-                "count" : 9
+                "count" : 9,
+                "change" : 8
             },
             "Mini P.E.K.K.A" : {
-                "count" : 8
+                "count" : 8,
+                "change" : 1
             },
             "Barbarians" : {
-                "count" : 8
+                "count" : 8,
+                "change" : 2
             },
             "Elixir Collector" : {
-                "count" : 7
+                "count" : 7,
+                "change" : 3
             },
             "Goblin Barrel" : {
-                "count" : 7
+                "count" : 7,
+                "change" : -2
             },
             "Poison" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 0
             },
             "Knight" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 4
             },
             "Guards" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 2
             },
             "Golem" : {
-                "count" : 5
+                "count" : 5,
+                "change" : -3
             },
             "Rocket" : {
-                "count" : 4
+                "count" : 4,
+                "change" : -1
             },
             "Arrows" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -7
             },
             "Baby Dragon" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -4
             },
             "Lava Hound" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -2
             },
             "Three Musketeers" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -1
             },
             "Spear Goblins" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Goblins" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Ice Wizard" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "X-Bow" : {
-                "count" : 2
+                "count" : 2,
+                "change" : -1
             },
             "Rage" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Valkyrie" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Barbarian Hut" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -4
             },
             "P.E.K.K.A" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Prince" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             }
         }
     },
@@ -8273,145 +8409,192 @@
         },
         "cardpop" : {
             "Zap" : {
-                "count" : 83
+                "count" : 83,
+                "change" : 23
             },
             "Mega Minion" : {
-                "count" : 79
+                "count" : 79,
+                "change" : -4
             },
             "Fireball" : {
-                "count" : 69
+                "count" : 69,
+                "change" : 33
             },
             "Ice Golem" : {
-                "count" : 52
+                "count" : 52,
+                "change" : 17
             },
             "Archers" : {
-                "count" : 42
+                "count" : 42,
+                "change" : -26
             },
             "Minions" : {
-                "count" : 34
+                "count" : 34,
+                "change" : 17
             },
             "Elite Barbarians" : {
-                "count" : 33
+                "count" : 33,
+                "change" : 0
             },
             "Furnace" : {
-                "count" : 32
+                "count" : 32,
+                "change" : 7
             },
             "Skeleton Army" : {
-                "count" : 31
+                "count" : 31,
+                "change" : 6
             },
             "Ice Spirit" : {
-                "count" : 30
+                "count" : 30,
+                "change" : 4
             },
             "Hog Rider" : {
-                "count" : 29
+                "count" : 29,
+                "change" : 10
             },
             "The Log" : {
-                "count" : 29
+                "count" : 29,
+                "change" : -37
             },
             "Giant" : {
-                "count" : 29
+                "count" : 29,
+                "change" : 5
             },
             "Musketeer" : {
-                "count" : 28
+                "count" : 28,
+                "change" : 18
             },
             "Bowler" : {
-                "count" : 24
+                "count" : 24,
+                "change" : -3
             },
             "Tombstone" : {
-                "count" : 21
+                "count" : 21,
+                "change" : -7
             },
             "Freeze" : {
-                "count" : 20
+                "count" : 20,
+                "change" : 1
             },
             "Graveyard" : {
-                "count" : 16
+                "count" : 16,
+                "change" : -9
             },
             "Cannon" : {
-                "count" : 16
+                "count" : 16,
+                "change" : 3
             },
             "Miner" : {
-                "count" : 12
+                "count" : 12,
+                "change" : -9
             },
             "Lightning" : {
-                "count" : 10
+                "count" : 10,
+                "change" : -15
             },
             "Elixir Collector" : {
-                "count" : 9
+                "count" : 9,
+                "change" : 2
             },
             "Princess" : {
-                "count" : 7
+                "count" : 7,
+                "change" : -5
             },
             "Lava Hound" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 3
             },
             "Guards" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 1
             },
             "Inferno Tower" : {
-                "count" : 5
+                "count" : 5,
+                "change" : -14
             },
             "X-Bow" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 3
             },
             "Royal Giant" : {
-                "count" : 4
+                "count" : 4,
+                "change" : -11
             },
             "Fire Spirits" : {
-                "count" : 4
+                "count" : 4,
+                "change" : -5
             },
             "Poison" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -3
             },
             "Barbarians" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -5
             },
             "Ice Wizard" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 1
             },
             "Minion Horde" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -9
             },
             "Goblin Barrel" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -4
             },
             "Golem" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -2
             },
             "Lumberjack" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Balloon" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Arrows" : {
-                "count" : 2
+                "count" : 2,
+                "change" : -1
             },
             "Spear Goblins" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Mirror" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Knight" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -5
             },
             "Barbarian Hut" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Goblins" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -1
             },
             "Baby Dragon" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -2
             },
             "Three Musketeers" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -2
             },
             "Mini P.E.K.K.A" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -7
             },
             "Prince" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             }
         }
     },
@@ -10520,124 +10703,164 @@
         },
         "cardpop" : {
             "Zap" : {
-                "count" : 77
+                "count" : 77,
+                "change" : -6
             },
             "Ice Golem" : {
-                "count" : 67
+                "count" : 67,
+                "change" : 15
             },
             "Mega Minion" : {
-                "count" : 58
+                "count" : 58,
+                "change" : -21
             },
             "Fireball" : {
-                "count" : 43
+                "count" : 43,
+                "change" : -26
             },
             "Skeleton Army" : {
-                "count" : 38
+                "count" : 38,
+                "change" : 7
             },
             "Musketeer" : {
-                "count" : 37
+                "count" : 37,
+                "change" : 9
             },
             "Ice Spirit" : {
-                "count" : 37
+                "count" : 37,
+                "change" : 7
             },
             "Minions" : {
-                "count" : 34
+                "count" : 34,
+                "change" : 0
             },
             "Tombstone" : {
-                "count" : 34
+                "count" : 34,
+                "change" : 13
             },
             "Archers" : {
-                "count" : 31
+                "count" : 31,
+                "change" : -11
             },
             "Freeze" : {
-                "count" : 30
+                "count" : 30,
+                "change" : 10
             },
             "The Log" : {
-                "count" : 29
+                "count" : 29,
+                "change" : 0
             },
             "Hog Rider" : {
-                "count" : 24
+                "count" : 24,
+                "change" : -5
             },
             "Elite Barbarians" : {
-                "count" : 22
+                "count" : 22,
+                "change" : -11
             },
             "Furnace" : {
-                "count" : 22
+                "count" : 22,
+                "change" : -10
             },
             "Graveyard" : {
-                "count" : 20
+                "count" : 20,
+                "change" : 4
             },
             "Balloon" : {
-                "count" : 19
+                "count" : 19,
+                "change" : 17
             },
             "Bowler" : {
-                "count" : 18
+                "count" : 18,
+                "change" : -6
             },
             "Elixir Collector" : {
-                "count" : 18
+                "count" : 18,
+                "change" : 9
             },
             "Giant" : {
-                "count" : 18
+                "count" : 18,
+                "change" : -11
             },
             "Goblin Barrel" : {
-                "count" : 14
+                "count" : 14,
+                "change" : 11
             },
             "Cannon" : {
-                "count" : 14
+                "count" : 14,
+                "change" : -2
             },
             "Minion Horde" : {
-                "count" : 13
+                "count" : 13,
+                "change" : 10
             },
             "Three Musketeers" : {
-                "count" : 12
+                "count" : 12,
+                "change" : 11
             },
             "Mirror" : {
-                "count" : 11
+                "count" : 11,
+                "change" : 9
             },
             "Lava Hound" : {
-                "count" : 9
+                "count" : 9,
+                "change" : 3
             },
             "Princess" : {
-                "count" : 8
+                "count" : 8,
+                "change" : 1
             },
             "Skeletons" : {
-                "count" : 8
+                "count" : 8,
+                "change" : 0
             },
             "Miner" : {
-                "count" : 8
+                "count" : 8,
+                "change" : -4
             },
             "X-Bow" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 1
             },
             "Spear Goblins" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 3
             },
             "Inferno Tower" : {
-                "count" : 4
+                "count" : 4,
+                "change" : -1
             },
             "Fire Spirits" : {
-                "count" : 2
+                "count" : 2,
+                "change" : -2
             },
             "Lightning" : {
-                "count" : 2
+                "count" : 2,
+                "change" : -8
             },
             "Golem" : {
-                "count" : 2
+                "count" : 2,
+                "change" : -1
             },
             "Poison" : {
-                "count" : 2
+                "count" : 2,
+                "change" : -1
             },
             "Royal Giant" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -3
             },
             "Rocket" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Arrows" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -1
             },
             "Tornado" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             }
         }
     },
@@ -12757,157 +12980,208 @@
         },
         "cardpop" : {
             "Ice Golem" : {
-                "count" : 77
+                "count" : 77,
+                "change" : 10
             },
             "Zap" : {
-                "count" : 76
+                "count" : 76,
+                "change" : -1
             },
             "Mega Minion" : {
-                "count" : 56
+                "count" : 56,
+                "change" : -2
             },
             "Musketeer" : {
-                "count" : 47
+                "count" : 47,
+                "change" : 10
             },
             "Fireball" : {
-                "count" : 40
+                "count" : 40,
+                "change" : -3
             },
             "Minions" : {
-                "count" : 40
+                "count" : 40,
+                "change" : 6
             },
             "Tombstone" : {
-                "count" : 39
+                "count" : 39,
+                "change" : 5
             },
             "Archers" : {
-                "count" : 31
+                "count" : 31,
+                "change" : 0
             },
             "The Log" : {
-                "count" : 31
+                "count" : 31,
+                "change" : 2
             },
             "Freeze" : {
-                "count" : 29
+                "count" : 29,
+                "change" : -1
             },
             "Bowler" : {
-                "count" : 29
+                "count" : 29,
+                "change" : 11
             },
             "Elixir Collector" : {
-                "count" : 28
+                "count" : 28,
+                "change" : 10
             },
             "Graveyard" : {
-                "count" : 27
+                "count" : 27,
+                "change" : 7
             },
             "Elite Barbarians" : {
-                "count" : 26
+                "count" : 26,
+                "change" : 4
             },
             "Ice Spirit" : {
-                "count" : 24
+                "count" : 24,
+                "change" : -13
             },
             "Hog Rider" : {
-                "count" : 18
+                "count" : 18,
+                "change" : -6
             },
             "Skeleton Army" : {
-                "count" : 16
+                "count" : 16,
+                "change" : -22
             },
             "Giant" : {
-                "count" : 16
+                "count" : 16,
+                "change" : -2
             },
             "Balloon" : {
-                "count" : 15
+                "count" : 15,
+                "change" : -4
             },
             "Rocket" : {
-                "count" : 12
+                "count" : 12,
+                "change" : 11
             },
             "Furnace" : {
-                "count" : 12
+                "count" : 12,
+                "change" : -10
             },
             "Inferno Tower" : {
-                "count" : 11
+                "count" : 11,
+                "change" : 7
             },
             "X-Bow" : {
-                "count" : 9
+                "count" : 9,
+                "change" : 3
             },
             "Lava Hound" : {
-                "count" : 9
+                "count" : 9,
+                "change" : 0
             },
             "Cannon" : {
-                "count" : 9
+                "count" : 9,
+                "change" : -5
             },
             "Minion Horde" : {
-                "count" : 8
+                "count" : 8,
+                "change" : -5
             },
             "Goblin Barrel" : {
-                "count" : 8
+                "count" : 8,
+                "change" : -6
             },
             "Mirror" : {
-                "count" : 6
+                "count" : 6,
+                "change" : -5
             },
             "Skeletons" : {
-                "count" : 6
+                "count" : 6,
+                "change" : -2
             },
             "Golem" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 4
             },
             "Three Musketeers" : {
-                "count" : 5
+                "count" : 5,
+                "change" : -7
             },
             "Princess" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -5
             },
             "Miner" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -5
             },
             "Poison" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 1
             },
             "Lightning" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 1
             },
             "Dart Goblin" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Spear Goblins" : {
-                "count" : 2
+                "count" : 2,
+                "change" : -3
             },
             "Guards" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Knight" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Baby Dragon" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Arrows" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 1
             },
             "Mortar" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Electro Wizard" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Barbarian Hut" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Barbarians" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Wizard" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Witch" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Tornado" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Royal Giant" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Ice Wizard" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Valkyrie" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             }
         }
     },
@@ -15040,154 +15314,204 @@
         },
         "cardpop" : {
             "The Log" : {
-                "count" : 63
+                "count" : 63,
+                "change" : 32
             },
             "Minions" : {
-                "count" : 49
+                "count" : 49,
+                "change" : 9
             },
             "Zap" : {
-                "count" : 47
+                "count" : 47,
+                "change" : -29
             },
             "Skeleton Army" : {
-                "count" : 42
+                "count" : 42,
+                "change" : 26
             },
             "Mega Minion" : {
-                "count" : 41
+                "count" : 41,
+                "change" : -15
             },
             "Giant" : {
-                "count" : 32
+                "count" : 32,
+                "change" : 16
             },
             "Lightning" : {
-                "count" : 31
+                "count" : 31,
+                "change" : 28
             },
             "Furnace" : {
-                "count" : 30
+                "count" : 30,
+                "change" : 18
             },
             "Musketeer" : {
-                "count" : 30
+                "count" : 30,
+                "change" : -17
             },
             "Ice Golem" : {
-                "count" : 28
+                "count" : 28,
+                "change" : -49
             },
             "Elixir Collector" : {
-                "count" : 25
+                "count" : 25,
+                "change" : -3
             },
             "Hog Rider" : {
-                "count" : 24
+                "count" : 24,
+                "change" : 6
             },
             "Tombstone" : {
-                "count" : 24
+                "count" : 24,
+                "change" : -15
             },
             "Goblin Barrel" : {
-                "count" : 23
+                "count" : 23,
+                "change" : 15
             },
             "Princess" : {
-                "count" : 22
+                "count" : 22,
+                "change" : 19
             },
             "Inferno Tower" : {
-                "count" : 20
+                "count" : 20,
+                "change" : 9
             },
             "Arrows" : {
-                "count" : 19
+                "count" : 19,
+                "change" : 17
             },
             "Executioner" : {
-                "count" : 18
+                "count" : 18,
+                "change" : 0
             },
             "Fireball" : {
-                "count" : 18
+                "count" : 18,
+                "change" : -22
             },
             "Prince" : {
-                "count" : 16
+                "count" : 16,
+                "change" : 0
             },
             "Balloon" : {
-                "count" : 15
+                "count" : 15,
+                "change" : 0
             },
             "Golem" : {
-                "count" : 14
+                "count" : 14,
+                "change" : 8
             },
             "Bowler" : {
-                "count" : 14
+                "count" : 14,
+                "change" : -15
             },
             "Freeze" : {
-                "count" : 13
+                "count" : 13,
+                "change" : -16
             },
             "Mini P.E.K.K.A" : {
-                "count" : 11
+                "count" : 11,
+                "change" : 0
             },
             "Archers" : {
-                "count" : 11
+                "count" : 11,
+                "change" : -20
             },
             "Rocket" : {
-                "count" : 11
+                "count" : 11,
+                "change" : -1
             },
             "Minion Horde" : {
-                "count" : 10
+                "count" : 10,
+                "change" : 2
             },
             "Ice Spirit" : {
-                "count" : 10
+                "count" : 10,
+                "change" : -14
             },
             "Baby Dragon" : {
-                "count" : 8
+                "count" : 8,
+                "change" : 6
             },
             "Graveyard" : {
-                "count" : 8
+                "count" : 8,
+                "change" : -19
             },
             "Mirror" : {
-                "count" : 8
+                "count" : 8,
+                "change" : 2
             },
             "Goblins" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 0
             },
             "Rage" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 0
             },
             "Lava Hound" : {
-                "count" : 6
+                "count" : 6,
+                "change" : -3
             },
             "Miner" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 2
             },
             "Tornado" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 4
             },
             "Skeletons" : {
-                "count" : 5
+                "count" : 5,
+                "change" : -1
             },
             "Royal Giant" : {
-                "count" : 5
+                "count" : 5,
+                "change" : 4
             },
             "Dark Prince" : {
-                "count" : 4
+                "count" : 4,
+                "change" : 0
             },
             "Electro Wizard" : {
-                "count" : 4
+                "count" : 4,
+                "change" : 3
             },
             "X-Bow" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -6
             },
             "Cannon" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -6
             },
             "Dart Goblin" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 1
             },
             "Elite Barbarians" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -23
             },
             "Guards" : {
-                "count" : 2
+                "count" : 2,
+                "change" : 0
             },
             "Three Musketeers" : {
-                "count" : 2
+                "count" : 2,
+                "change" : -3
             },
             "Fire Spirits" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Goblin Hut" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Mortar" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             }
         }
     },
@@ -17393,163 +17717,216 @@
         },
         "cardpop" : {
             "The Log" : {
-                "count" : 73
+                "count" : 73,
+                "change" : 10
             },
             "Zap" : {
-                "count" : 41
+                "count" : 41,
+                "change" : -6
             },
             "Minions" : {
-                "count" : 40
+                "count" : 40,
+                "change" : -9
             },
             "Skeleton Army" : {
-                "count" : 37
+                "count" : 37,
+                "change" : -5
             },
             "Giant" : {
-                "count" : 35
+                "count" : 35,
+                "change" : 3
             },
             "Lightning" : {
-                "count" : 33
+                "count" : 33,
+                "change" : 2
             },
             "Inferno Tower" : {
-                "count" : 30
+                "count" : 30,
+                "change" : 10
             },
             "Musketeer" : {
-                "count" : 30
+                "count" : 30,
+                "change" : 0
             },
             "Ice Golem" : {
-                "count" : 25
+                "count" : 25,
+                "change" : -3
             },
             "Executioner" : {
-                "count" : 24
+                "count" : 24,
+                "change" : 6
             },
             "Princess" : {
-                "count" : 23
+                "count" : 23,
+                "change" : 1
             },
             "Fire Spirits" : {
-                "count" : 23
+                "count" : 23,
+                "change" : 22
             },
             "Ice Spirit" : {
-                "count" : 23
+                "count" : 23,
+                "change" : 13
             },
             "Furnace" : {
-                "count" : 23
+                "count" : 23,
+                "change" : -7
             },
             "Elixir Collector" : {
-                "count" : 22
+                "count" : 22,
+                "change" : -3
             },
             "Goblin Barrel" : {
-                "count" : 21
+                "count" : 21,
+                "change" : -2
             },
             "Mini P.E.K.K.A" : {
-                "count" : 20
+                "count" : 20,
+                "change" : 9
             },
             "Mega Minion" : {
-                "count" : 20
+                "count" : 20,
+                "change" : -21
             },
             "Tombstone" : {
-                "count" : 18
+                "count" : 18,
+                "change" : -6
             },
             "Rocket" : {
-                "count" : 17
+                "count" : 17,
+                "change" : 6
             },
             "Hog Rider" : {
-                "count" : 17
+                "count" : 17,
+                "change" : -7
             },
             "Tornado" : {
-                "count" : 16
+                "count" : 16,
+                "change" : 11
             },
             "Knight" : {
-                "count" : 14
+                "count" : 14,
+                "change" : 0
             },
             "Arrows" : {
-                "count" : 13
+                "count" : 13,
+                "change" : -6
             },
             "Graveyard" : {
-                "count" : 13
+                "count" : 13,
+                "change" : 5
             },
             "Bowler" : {
-                "count" : 13
+                "count" : 13,
+                "change" : -1
             },
             "Freeze" : {
-                "count" : 12
+                "count" : 12,
+                "change" : -1
             },
             "Balloon" : {
-                "count" : 12
+                "count" : 12,
+                "change" : -3
             },
             "Minion Horde" : {
-                "count" : 10
+                "count" : 10,
+                "change" : 0
             },
             "Royal Giant" : {
-                "count" : 9
+                "count" : 9,
+                "change" : 4
             },
             "X-Bow" : {
-                "count" : 8
+                "count" : 8,
+                "change" : 5
             },
             "Fireball" : {
-                "count" : 8
+                "count" : 8,
+                "change" : -10
             },
             "Goblins" : {
-                "count" : 7
+                "count" : 7,
+                "change" : 1
             },
             "Skeletons" : {
-                "count" : 7
+                "count" : 7,
+                "change" : 2
             },
             "Archers" : {
-                "count" : 6
+                "count" : 6,
+                "change" : -5
             },
             "Miner" : {
-                "count" : 6
+                "count" : 6,
+                "change" : 1
             },
             "Golem" : {
-                "count" : 6
+                "count" : 6,
+                "change" : -8
             },
             "Lava Hound" : {
-                "count" : 5
+                "count" : 5,
+                "change" : -1
             },
             "Mirror" : {
-                "count" : 5
+                "count" : 5,
+                "change" : -3
             },
             "Baby Dragon" : {
-                "count" : 5
+                "count" : 5,
+                "change" : -3
             },
             "Prince" : {
-                "count" : 4
+                "count" : 4,
+                "change" : -12
             },
             "Wizard" : {
-                "count" : 4
+                "count" : 4,
+                "change" : 0
             },
             "Cannon" : {
-                "count" : 4
+                "count" : 4,
+                "change" : 1
             },
             "Electro Wizard" : {
-                "count" : 3
+                "count" : 3,
+                "change" : -1
             },
             "Barbarians" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 0
             },
             "Three Musketeers" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 1
             },
             "Dart Goblin" : {
-                "count" : 3
+                "count" : 3,
+                "change" : 0
             },
             "Mortar" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Witch" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Rage" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -5
             },
             "Clone" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             },
             "Dark Prince" : {
-                "count" : 1
+                "count" : 1,
+                "change" : -3
             },
             "P.E.K.K.A" : {
-                "count" : 1
+                "count" : 1,
+                "change" : 0
             }
         }
     }

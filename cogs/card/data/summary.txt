@@ -1,853 +1,853 @@
 --------------------------------------------------------------------------------
 Snapshot #16
 Decks:
- 4: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
- 4: Archers, Baby Dragon, Golem, Ice Golem, Lightning, Mega Minion, The Log, Tombstone
- 2: Golem, Lightning, Mega Minion, Minions, Musketeer, Skeleton Army, The Log, Tombstone
- 2: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
- 2: Archers, Golem, Lightning, Lumberjack, Mega Minion, The Log, Tombstone, Zap
- 1: Baby Dragon, Lava Hound, Lightning, Lumberjack, Mega Minion, Miner, The Log, Tombstone
- 1: Archers, Golem, Graveyard, Ice Golem, Mega Minion, The Log, Tombstone, Zap
- 1: Archers, Giant, Ice Golem, Lightning, Mega Minion, Musketeer, The Log, Tombstone
- 1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Princess, Skeleton Army, The Log
- 1: Archers, Baby Dragon, Golem, Lightning, Mega Minion, Miner, Tombstone, Zap
- 1: Archers, Arrows, Lava Hound, Lightning, Mega Minion, Miner, Minions, Tombstone
- 1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mini P.E.K.K.A, Princess, Skeletons, Zap
- 1: Bowler, Fireball, Guards, Ice Spirit, Inferno Tower, Mega Minion, The Log, X-Bow
- 1: Arrows, Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone
- 1: Guards, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Miner, Princess, The Log
- 1: Fireball, Graveyard, Ice Golem, Inferno Tower, Mega Minion, Miner, Skeleton Army, The Log
- 1: Arrows, Ice Golem, Lava Hound, Lightning, Lumberjack, Minion Horde, Minions, Tombstone
- 1: Fireball, Graveyard, Lava Hound, Lumberjack, Mega Minion, Minions, Tombstone, Zap
- 1: Archers, Arrows, Fireball, Graveyard, Knight, Lava Hound, Mega Minion, Tombstone
- 1: Fire Spirits, Fireball, Golem, Mega Minion, Mini P.E.K.K.A, Minions, Musketeer, Zap
- 1: Archers, Arrows, Elixir Collector, Ice Spirit, Knight, Miner, The Log, Three Musketeers
- 1: Baby Dragon, Elixir Collector, Fireball, Inferno Dragon, Lava Hound, Mega Minion, Skeleton Army, Zap
- 1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
- 1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
- 1: Archers, Baby Dragon, Elixir Collector, Lava Hound, Lightning, Mega Minion, Miner, Skeleton Army
- 1: Archers, Bowler, Fireball, Graveyard, Ice Golem, Inferno Tower, Mega Minion, Zap
- 1: Archers, Arrows, Ice Golem, Mega Minion, Musketeer, Royal Giant, Skeleton Army, The Log
- 1: Guards, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Princess, Rocket, The Log
- 1: Archers, Baby Dragon, Bomber, Golem, Lightning, Mega Minion, Tombstone, Zap
- 1: Archers, Barbarians, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
- 1: Fire Spirits, Ice Spirit, Inferno Tower, Mega Minion, Princess, Skeleton Army, The Log, X-Bow
- 1: Giant, Ice Wizard, Inferno Tower, Lightning, Mega Minion, Musketeer, Skeleton Army, Zap
- 1: Goblin Barrel, Inferno Tower, Miner, Minion Horde, Mirror, Princess, Skeleton Army, Zap
- 1: Archers, Barbarians, Giant, Ice Spirit, Lightning, Mega Minion, The Log, Tombstone
- 1: Goblins, Ice Golem, Inferno Tower, Miner, Mini P.E.K.K.A, Princess, The Log, Zap
- 1: Archers, Arrows, Golem, Graveyard, Ice Golem, Mega Minion, The Log, Tombstone
- 1: Archers, Furnace, Guards, Ice Spirit, Lightning, Mega Minion, Royal Giant, The Log
- 1: Fireball, Giant, Goblins, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Musketeer, Zap
- 1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mini P.E.K.K.A, The Log, Zap
- 1: Guards, Inferno Dragon, Lava Hound, Lightning, Mega Minion, Miner, Minion Horde, Tombstone
- 1: Fire Spirits, Golem, Lightning, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
+  4: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
+  4: Archers, Baby Dragon, Golem, Ice Golem, Lightning, Mega Minion, The Log, Tombstone
+  2: Golem, Lightning, Mega Minion, Minions, Musketeer, Skeleton Army, The Log, Tombstone
+  2: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
+  2: Archers, Golem, Lightning, Lumberjack, Mega Minion, The Log, Tombstone, Zap
+  1: Baby Dragon, Lava Hound, Lightning, Lumberjack, Mega Minion, Miner, The Log, Tombstone
+  1: Archers, Golem, Graveyard, Ice Golem, Mega Minion, The Log, Tombstone, Zap
+  1: Archers, Giant, Ice Golem, Lightning, Mega Minion, Musketeer, The Log, Tombstone
+  1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Princess, Skeleton Army, The Log
+  1: Archers, Baby Dragon, Golem, Lightning, Mega Minion, Miner, Tombstone, Zap
+  1: Archers, Arrows, Lava Hound, Lightning, Mega Minion, Miner, Minions, Tombstone
+  1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mini P.E.K.K.A, Princess, Skeletons, Zap
+  1: Bowler, Fireball, Guards, Ice Spirit, Inferno Tower, Mega Minion, The Log, X-Bow
+  1: Arrows, Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone
+  1: Guards, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Miner, Princess, The Log
+  1: Fireball, Graveyard, Ice Golem, Inferno Tower, Mega Minion, Miner, Skeleton Army, The Log
+  1: Arrows, Ice Golem, Lava Hound, Lightning, Lumberjack, Minion Horde, Minions, Tombstone
+  1: Fireball, Graveyard, Lava Hound, Lumberjack, Mega Minion, Minions, Tombstone, Zap
+  1: Archers, Arrows, Fireball, Graveyard, Knight, Lava Hound, Mega Minion, Tombstone
+  1: Fire Spirits, Fireball, Golem, Mega Minion, Mini P.E.K.K.A, Minions, Musketeer, Zap
+  1: Archers, Arrows, Elixir Collector, Ice Spirit, Knight, Miner, The Log, Three Musketeers
+  1: Baby Dragon, Elixir Collector, Fireball, Inferno Dragon, Lava Hound, Mega Minion, Skeleton Army, Zap
+  1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
+  1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
+  1: Archers, Baby Dragon, Elixir Collector, Lava Hound, Lightning, Mega Minion, Miner, Skeleton Army
+  1: Archers, Bowler, Fireball, Graveyard, Ice Golem, Inferno Tower, Mega Minion, Zap
+  1: Archers, Arrows, Ice Golem, Mega Minion, Musketeer, Royal Giant, Skeleton Army, The Log
+  1: Guards, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Princess, Rocket, The Log
+  1: Archers, Baby Dragon, Bomber, Golem, Lightning, Mega Minion, Tombstone, Zap
+  1: Archers, Barbarians, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
+  1: Fire Spirits, Ice Spirit, Inferno Tower, Mega Minion, Princess, Skeleton Army, The Log, X-Bow
+  1: Giant, Ice Wizard, Inferno Tower, Lightning, Mega Minion, Musketeer, Skeleton Army, Zap
+  1: Goblin Barrel, Inferno Tower, Miner, Minion Horde, Mirror, Princess, Skeleton Army, Zap
+  1: Archers, Barbarians, Giant, Ice Spirit, Lightning, Mega Minion, The Log, Tombstone
+  1: Goblins, Ice Golem, Inferno Tower, Miner, Mini P.E.K.K.A, Princess, The Log, Zap
+  1: Archers, Arrows, Golem, Graveyard, Ice Golem, Mega Minion, The Log, Tombstone
+  1: Archers, Furnace, Guards, Ice Spirit, Lightning, Mega Minion, Royal Giant, The Log
+  1: Fireball, Giant, Goblins, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Musketeer, Zap
+  1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mini P.E.K.K.A, The Log, Zap
+  1: Guards, Inferno Dragon, Lava Hound, Lightning, Mega Minion, Miner, Minion Horde, Tombstone
+  1: Fire Spirits, Golem, Lightning, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
 Cards:
-43: Mega Minion
-34: The Log
-30: Lightning
-28: Tombstone
-27: Archers
-21: Zap
-20: Golem
-16: Ice Golem
-14: Baby Dragon
-14: Ice Spirit
-13: Inferno Tower
-12: Fireball
-11: Skeleton Army
-10: Miner
- 9: Musketeer
- 8: Lava Hound
- 8: Minions
- 7: Princess
- 7: Arrows
- 6: Graveyard
- 6: Mini P.E.K.K.A
- 5: Lumberjack
- 5: Giant
- 5: Hog Rider
- 5: Guards
- 4: X-Bow
- 3: Bowler
- 3: Minion Horde
- 3: Fire Spirits
- 3: Elixir Collector
- 2: Knight
- 2: Inferno Dragon
- 2: Royal Giant
- 2: Ice Wizard
- 2: Barbarians
- 2: Goblins
- 2: Furnace
- 1: Skeletons
- 1: Three Musketeers
- 1: Rocket
- 1: Bomber
- 1: Goblin Barrel
- 1: Mirror
+ 43 (  0): Mega Minion
+ 34 (  0): The Log
+ 30 (  0): Lightning
+ 28 (  0): Tombstone
+ 27 (  0): Archers
+ 21 (  0): Zap
+ 20 (  0): Golem
+ 16 (  0): Ice Golem
+ 14 (  0): Baby Dragon
+ 14 (  0): Ice Spirit
+ 13 (  0): Inferno Tower
+ 12 (  0): Fireball
+ 11 (  0): Skeleton Army
+ 10 (  0): Miner
+  9 (  0): Musketeer
+  8 (  0): Lava Hound
+  8 (  0): Minions
+  7 (  0): Princess
+  7 (  0): Arrows
+  6 (  0): Graveyard
+  6 (  0): Mini P.E.K.K.A
+  5 (  0): Lumberjack
+  5 (  0): Giant
+  5 (  0): Hog Rider
+  5 (  0): Guards
+  4 (  0): X-Bow
+  3 (  0): Bowler
+  3 (  0): Minion Horde
+  3 (  0): Fire Spirits
+  3 (  0): Elixir Collector
+  2 (  0): Knight
+  2 (  0): Inferno Dragon
+  2 (  0): Royal Giant
+  2 (  0): Ice Wizard
+  2 (  0): Barbarians
+  2 (  0): Goblins
+  2 (  0): Furnace
+  1 (  0): Skeletons
+  1 (  0): Three Musketeers
+  1 (  0): Rocket
+  1 (  0): Bomber
+  1 (  0): Goblin Barrel
+  1 (  0): Mirror
 --------------------------------------------------------------------------------
 Snapshot #17
 Decks:
- 6: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
- 6: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
- 6: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
- 5: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
- 5: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Miner, Rocket, The Log
- 5: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
- 4: Barbarians, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Princess, The Log, Zap
- 4: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone
- 2: Cannon, Elixir Collector, Guards, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
- 2: Archers, Cannon, Freeze, Graveyard, Hog Rider, Ice Golem, Mega Minion, Zap
- 2: Arrows, Lava Hound, Lightning, Mega Minion, Miner, Minion Horde, Minions, Tombstone
- 2: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
- 2: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
- 2: Archers, Fireball, Giant, Mega Minion, Minions, The Log, Tombstone, Zap
- 2: Fireball, Lava Hound, Mega Minion, Miner, Minion Horde, Minions, Tombstone, Zap
- 2: Archers, Barbarian Hut, Fireball, Hog Rider, Ice Golem, Mega Minion, The Log, Three Musketeers
- 1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Tombstone, Zap
- 1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Skeleton Army, The Log
- 1: Archers, Barbarian Hut, Ice Golem, Lightning, Mega Minion, Miner, The Log, Zap
- 1: Fireball, Furnace, Inferno Tower, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
- 1: Ice Golem, Ice Spirit, Mirror, Skeletons, The Log, Tornado, X-Bow, Zap
- 1: Bowler, Fireball, Inferno Tower, Mega Minion, Miner, Skeleton Army, The Log, Zap
- 1: Archers, Barbarian Hut, Fireball, Ice Golem, Mega Minion, Miner, The Log, Zap
- 1: Archers, Bowler, Fireball, Giant, Ice Spirit, Mega Minion, Tombstone, Zap
- 1: Archers, Bowler, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow, Zap
- 1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minions, Princess, Skeleton Army, The Log
- 1: Archers, Arrows, Furnace, Lightning, Mini P.E.K.K.A, Royal Giant, Skeleton Army, The Log
- 1: Fireball, Furnace, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, The Log
- 1: Barbarians, Fireball, Furnace, Ice Spirit, Mega Minion, Royal Giant, The Log, Zap
- 1: Archers, Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Tombstone, Zap
- 1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Knight, Mega Minion, The Log
- 1: Fire Spirits, Ice Golem, Inferno Tower, Mega Minion, Princess, Skeleton Army, The Log, X-Bow
- 1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
- 1: Fireball, Goblin Barrel, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, Zap
- 1: Archers, Hog Rider, Ice Golem, Ice Spirit, Lightning, Mega Minion, The Log, Tombstone
- 1: Inferno Tower, Lightning, Mega Minion, Miner, Princess, Skeleton Army, The Log, Zap
- 1: Bowler, Fireball, Mega Minion, Miner, Minions, Tesla, The Log, Zap
- 1: Archers, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone, Zap
- 1: Barbarian Hut, Fireball, Lightning, Mega Minion, Musketeer, Royal Giant, Skeleton Army, The Log
- 1: Archers, Furnace, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, The Log, Zap
- 1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
- 1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone, Zap
- 1: Arrows, Barbarians, Lava Hound, Lightning, Mega Minion, Miner, Minions, Tombstone
- 1: Hog Rider, Ice Spirit, Ice Wizard, Inferno Tower, Lightning, Skeleton Army, Spear Goblins, Zap
- 1: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
- 1: Archers, Bowler, Fireball, Graveyard, Inferno Tower, Knight, Mega Minion, The Log
- 1: Archers, Arrows, Bowler, Furnace, Lightning, Mega Minion, Royal Giant, The Log
- 1: Archers, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log, Zap
- 1: Archers, Bowler, Fireball, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
- 1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
- 1: Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Musketeer, Tombstone, Zap
- 1: Archers, Baby Dragon, Cannon, Golem, Lightning, Mega Minion, The Log, Zap
- 1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Minions, Skeleton Army, The Log
- 1: Archers, Furnace, Giant, Lightning, Mega Minion, Skeleton Army, The Log, Zap
- 1: Hog Rider, Ice Spirit, Ice Wizard, Lightning, Mega Minion, Princess, Skeleton Army, The Log
- 1: Archers, Arrows, Giant, Graveyard, Mega Minion, Skeleton Army, The Log, Zap
- 1: Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, Spear Goblins, The Log, Zap
- 1: Freeze, Guards, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, The Log
- 1: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
+  6: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
+  6: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
+  6: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  5: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
+  5: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Miner, Rocket, The Log
+  5: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
+  4: Barbarians, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Princess, The Log, Zap
+  4: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone
+  2: Cannon, Elixir Collector, Guards, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
+  2: Archers, Cannon, Freeze, Graveyard, Hog Rider, Ice Golem, Mega Minion, Zap
+  2: Arrows, Lava Hound, Lightning, Mega Minion, Miner, Minion Horde, Minions, Tombstone
+  2: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
+  2: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
+  2: Archers, Fireball, Giant, Mega Minion, Minions, The Log, Tombstone, Zap
+  2: Fireball, Lava Hound, Mega Minion, Miner, Minion Horde, Minions, Tombstone, Zap
+  2: Archers, Barbarian Hut, Fireball, Hog Rider, Ice Golem, Mega Minion, The Log, Three Musketeers
+  1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Tombstone, Zap
+  1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Skeleton Army, The Log
+  1: Archers, Barbarian Hut, Ice Golem, Lightning, Mega Minion, Miner, The Log, Zap
+  1: Fireball, Furnace, Inferno Tower, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
+  1: Ice Golem, Ice Spirit, Mirror, Skeletons, The Log, Tornado, X-Bow, Zap
+  1: Bowler, Fireball, Inferno Tower, Mega Minion, Miner, Skeleton Army, The Log, Zap
+  1: Archers, Barbarian Hut, Fireball, Ice Golem, Mega Minion, Miner, The Log, Zap
+  1: Archers, Bowler, Fireball, Giant, Ice Spirit, Mega Minion, Tombstone, Zap
+  1: Archers, Bowler, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow, Zap
+  1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minions, Princess, Skeleton Army, The Log
+  1: Archers, Arrows, Furnace, Lightning, Mini P.E.K.K.A, Royal Giant, Skeleton Army, The Log
+  1: Fireball, Furnace, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, The Log
+  1: Barbarians, Fireball, Furnace, Ice Spirit, Mega Minion, Royal Giant, The Log, Zap
+  1: Archers, Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Tombstone, Zap
+  1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Knight, Mega Minion, The Log
+  1: Fire Spirits, Ice Golem, Inferno Tower, Mega Minion, Princess, Skeleton Army, The Log, X-Bow
+  1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
+  1: Fireball, Goblin Barrel, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, Zap
+  1: Archers, Hog Rider, Ice Golem, Ice Spirit, Lightning, Mega Minion, The Log, Tombstone
+  1: Inferno Tower, Lightning, Mega Minion, Miner, Princess, Skeleton Army, The Log, Zap
+  1: Bowler, Fireball, Mega Minion, Miner, Minions, Tesla, The Log, Zap
+  1: Archers, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone, Zap
+  1: Barbarian Hut, Fireball, Lightning, Mega Minion, Musketeer, Royal Giant, Skeleton Army, The Log
+  1: Archers, Furnace, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, The Log, Zap
+  1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone, Zap
+  1: Arrows, Barbarians, Lava Hound, Lightning, Mega Minion, Miner, Minions, Tombstone
+  1: Hog Rider, Ice Spirit, Ice Wizard, Inferno Tower, Lightning, Skeleton Army, Spear Goblins, Zap
+  1: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
+  1: Archers, Bowler, Fireball, Graveyard, Inferno Tower, Knight, Mega Minion, The Log
+  1: Archers, Arrows, Bowler, Furnace, Lightning, Mega Minion, Royal Giant, The Log
+  1: Archers, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log, Zap
+  1: Archers, Bowler, Fireball, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
+  1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
+  1: Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Musketeer, Tombstone, Zap
+  1: Archers, Baby Dragon, Cannon, Golem, Lightning, Mega Minion, The Log, Zap
+  1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Minions, Skeleton Army, The Log
+  1: Archers, Furnace, Giant, Lightning, Mega Minion, Skeleton Army, The Log, Zap
+  1: Hog Rider, Ice Spirit, Ice Wizard, Lightning, Mega Minion, Princess, Skeleton Army, The Log
+  1: Archers, Arrows, Giant, Graveyard, Mega Minion, Skeleton Army, The Log, Zap
+  1: Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, Spear Goblins, The Log, Zap
+  1: Freeze, Guards, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, The Log
+  1: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
 Cards:
-84: Mega Minion
-79: The Log
-57: Zap
-53: Archers
-44: Tombstone
-41: Lightning
-34: Ice Spirit
-33: Ice Golem
-32: Fireball
-28: Miner
-27: Giant
-26: Hog Rider
-26: Skeleton Army
-26: Inferno Tower
-24: Bowler
-23: Princess
-15: Furnace
-14: Minions
-13: Minion Horde
-10: Arrows
- 9: Goblin Barrel
- 9: Musketeer
- 8: Golem
- 7: Baby Dragon
- 7: Mini P.E.K.K.A
- 7: Graveyard
- 6: Barbarians
- 6: Royal Giant
- 5: Cannon
- 5: Freeze
- 5: Barbarian Hut
- 5: Rocket
- 5: Lava Hound
- 4: Elixir Collector
- 4: Three Musketeers
- 3: Guards
- 3: X-Bow
- 2: Goblins
- 2: Knight
- 2: Ice Wizard
- 2: Spear Goblins
- 1: Tornado
- 1: Mirror
- 1: Skeletons
- 1: Fire Spirits
- 1: Tesla
+ 84 ( 41): Mega Minion
+ 79 ( 45): The Log
+ 57 ( 36): Zap
+ 53 ( 26): Archers
+ 44 ( 16): Tombstone
+ 41 ( 11): Lightning
+ 34 ( 20): Ice Spirit
+ 33 ( 17): Ice Golem
+ 32 ( 20): Fireball
+ 28 ( 18): Miner
+ 27 ( 22): Giant
+ 26 ( 21): Hog Rider
+ 26 ( 15): Skeleton Army
+ 26 ( 13): Inferno Tower
+ 24 ( 21): Bowler
+ 23 ( 16): Princess
+ 15 ( 13): Furnace
+ 14 (  6): Minions
+ 13 ( 10): Minion Horde
+ 10 (  3): Arrows
+  9 (  8): Goblin Barrel
+  9 (  0): Musketeer
+  8 (-12): Golem
+  7 ( -7): Baby Dragon
+  7 (  1): Mini P.E.K.K.A
+  7 (  1): Graveyard
+  6 (  4): Barbarians
+  6 (  4): Royal Giant
+  5 (  0): Cannon
+  5 (  0): Freeze
+  5 (  0): Barbarian Hut
+  5 (  4): Rocket
+  5 ( -3): Lava Hound
+  4 (  1): Elixir Collector
+  4 (  3): Three Musketeers
+  3 ( -2): Guards
+  3 ( -1): X-Bow
+  2 (  0): Goblins
+  2 (  0): Knight
+  2 (  0): Ice Wizard
+  2 (  0): Spear Goblins
+  1 (  0): Tornado
+  1 (  0): Mirror
+  1 (  0): Skeletons
+  1 ( -2): Fire Spirits
+  1 (  0): Tesla
 --------------------------------------------------------------------------------
 Snapshot #18
 Decks:
- 7: Archers, Bowler, Cannon, Freeze, Graveyard, Ice Golem, Mega Minion, Zap
- 6: Archers, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
- 6: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
- 4: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, The Log, Zap
- 4: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
- 3: Archers, Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log
- 2: Bowler, Fireball, Guards, Inferno Tower, Mega Minion, Miner, The Log, Zap
- 2: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
- 2: Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log, Zap
- 2: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
- 2: Elixir Collector, Giant, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log, Zap
- 2: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
- 2: Archers, Barbarians, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, The Log
- 2: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Miner, Rocket, The Log
- 2: Archers, Furnace, Ice Spirit, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
- 2: Fireball, Lava Hound, Mega Minion, Miner, Minion Horde, Minions, The Log, Tombstone
- 2: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
- 2: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
- 1: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Spear Goblins, Zap
- 1: Guards, Ice Golem, Inferno Tower, Mega Minion, Miner, Musketeer, Poison, The Log
- 1: Archers, Bowler, Cannon, Freeze, Hog Rider, Ice Golem, Mega Minion, Zap
- 1: Archers, Graveyard, Ice Golem, Inferno Tower, Knight, Mega Minion, Poison, The Log
- 1: Freeze, Goblins, Hog Rider, Ice Spirit, Minion Horde, Minions, Princess, Zap
- 1: Archers, Arrows, Cannon, Freeze, Graveyard, Mini P.E.K.K.A, Spear Goblins, The Log
- 1: Archers, Fireball, Furnace, Giant, Graveyard, Minions, Skeleton Army, Zap
- 1: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Skeleton Army, Zap
- 1: Archers, Fireball, Hog Rider, Ice Spirit, Knight, Mega Minion, Royal Giant, The Log
- 1: Archers, Fireball, Guards, Inferno Tower, Knight, Mega Minion, Miner, The Log
- 1: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
- 1: Archers, Furnace, Giant, Ice Spirit, Mega Minion, Minions, Rage, Zap
- 1: Barbarians, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Princess, The Log, Zap
- 1: Bowler, Fireball, Ice Spirit, Inferno Tower, Mega Minion, Miner, Princess, The Log
- 1: Barbarians, Fireball, Furnace, Ice Spirit, Mega Minion, Royal Giant, The Log, Zap
- 1: Cannon, Elixir Collector, Hog Rider, Mega Minion, Musketeer, Poison, Valkyrie, Zap
- 1: Guards, Hog Rider, Ice Golem, Ice Wizard, Mini P.E.K.K.A, Princess, Rocket, The Log
- 1: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
- 1: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
- 1: Archers, Bowler, Hog Rider, Ice Golem, Lightning, Mega Minion, Tombstone, Zap
- 1: Archers, Barbarian Hut, Fireball, Graveyard, Ice Golem, Mega Minion, Musketeer, Zap
- 1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
- 1: Archers, Arrows, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
- 1: Furnace, Goblin Barrel, Miner, Minion Horde, P.E.K.K.A, Princess, Skeleton Army, The Log
- 1: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
- 1: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
- 1: Fireball, Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Skeleton Army, The Log
- 1: Archers, Fireball, Furnace, Mini P.E.K.K.A, Musketeer, Royal Giant, The Log, Zap
- 1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
- 1: Archers, Ice Spirit, Inferno Tower, Knight, Mega Minion, Miner, Rocket, The Log
- 1: Archers, Fireball, Giant, Ice Spirit, Mega Minion, Minions, The Log, Tombstone
- 1: Archers, Fireball, Golem, Mega Minion, Minions, The Log, Tombstone, Zap
- 1: Furnace, Hog Rider, Ice Spirit, Knight, Minions, Musketeer, Poison, Zap
- 1: Archers, Fireball, Giant, Graveyard, Mega Minion, Minions, Tombstone, Zap
- 1: Archers, Bowler, Freeze, Furnace, Graveyard, Ice Golem, Mega Minion, Zap
- 1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
- 1: Archers, Bowler, Giant, Lightning, Mega Minion, Poison, Tombstone, Zap
- 1: Archers, Elixir Collector, Giant, Mega Minion, Mini P.E.K.K.A, Poison, The Log, Zap
- 1: Fire Spirits, Ice Spirit, Inferno Tower, Knight, Miner, The Log, Three Musketeers, Zap
- 1: Lava Hound, Mega Minion, Miner, Minion Horde, Minions, The Log, Tombstone, Zap
- 1: Archers, Fireball, Golem, Lightning, Mega Minion, Minions, The Log, Tombstone
- 1: Archers, Baby Dragon, Golem, Mega Minion, Prince, The Log, Tombstone, Zap
- 1: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, Tombstone, Zap
- 1: Barbarians, Fireball, Freeze, Hog Rider, Ice Wizard, Miner, Minions, Zap
- 1: Fireball, Furnace, Giant, Mega Minion, Minions, The Log, Three Musketeers, Zap
- 1: Archers, Hog Rider, Ice Golem, Mega Minion, Minions, Royal Giant, The Log, Tombstone
+  7: Archers, Bowler, Cannon, Freeze, Graveyard, Ice Golem, Mega Minion, Zap
+  6: Archers, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
+  6: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
+  4: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, The Log, Zap
+  4: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
+  3: Archers, Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log
+  2: Bowler, Fireball, Guards, Inferno Tower, Mega Minion, Miner, The Log, Zap
+  2: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
+  2: Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log, Zap
+  2: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
+  2: Elixir Collector, Giant, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log, Zap
+  2: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
+  2: Archers, Barbarians, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, The Log
+  2: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Miner, Rocket, The Log
+  2: Archers, Furnace, Ice Spirit, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
+  2: Fireball, Lava Hound, Mega Minion, Miner, Minion Horde, Minions, The Log, Tombstone
+  2: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
+  2: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  1: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Spear Goblins, Zap
+  1: Guards, Ice Golem, Inferno Tower, Mega Minion, Miner, Musketeer, Poison, The Log
+  1: Archers, Bowler, Cannon, Freeze, Hog Rider, Ice Golem, Mega Minion, Zap
+  1: Archers, Graveyard, Ice Golem, Inferno Tower, Knight, Mega Minion, Poison, The Log
+  1: Freeze, Goblins, Hog Rider, Ice Spirit, Minion Horde, Minions, Princess, Zap
+  1: Archers, Arrows, Cannon, Freeze, Graveyard, Mini P.E.K.K.A, Spear Goblins, The Log
+  1: Archers, Fireball, Furnace, Giant, Graveyard, Minions, Skeleton Army, Zap
+  1: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Skeleton Army, Zap
+  1: Archers, Fireball, Hog Rider, Ice Spirit, Knight, Mega Minion, Royal Giant, The Log
+  1: Archers, Fireball, Guards, Inferno Tower, Knight, Mega Minion, Miner, The Log
+  1: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
+  1: Archers, Furnace, Giant, Ice Spirit, Mega Minion, Minions, Rage, Zap
+  1: Barbarians, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Princess, The Log, Zap
+  1: Bowler, Fireball, Ice Spirit, Inferno Tower, Mega Minion, Miner, Princess, The Log
+  1: Barbarians, Fireball, Furnace, Ice Spirit, Mega Minion, Royal Giant, The Log, Zap
+  1: Cannon, Elixir Collector, Hog Rider, Mega Minion, Musketeer, Poison, Valkyrie, Zap
+  1: Guards, Hog Rider, Ice Golem, Ice Wizard, Mini P.E.K.K.A, Princess, Rocket, The Log
+  1: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
+  1: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
+  1: Archers, Bowler, Hog Rider, Ice Golem, Lightning, Mega Minion, Tombstone, Zap
+  1: Archers, Barbarian Hut, Fireball, Graveyard, Ice Golem, Mega Minion, Musketeer, Zap
+  1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
+  1: Archers, Arrows, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
+  1: Furnace, Goblin Barrel, Miner, Minion Horde, P.E.K.K.A, Princess, Skeleton Army, The Log
+  1: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
+  1: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
+  1: Fireball, Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Skeleton Army, The Log
+  1: Archers, Fireball, Furnace, Mini P.E.K.K.A, Musketeer, Royal Giant, The Log, Zap
+  1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
+  1: Archers, Ice Spirit, Inferno Tower, Knight, Mega Minion, Miner, Rocket, The Log
+  1: Archers, Fireball, Giant, Ice Spirit, Mega Minion, Minions, The Log, Tombstone
+  1: Archers, Fireball, Golem, Mega Minion, Minions, The Log, Tombstone, Zap
+  1: Furnace, Hog Rider, Ice Spirit, Knight, Minions, Musketeer, Poison, Zap
+  1: Archers, Fireball, Giant, Graveyard, Mega Minion, Minions, Tombstone, Zap
+  1: Archers, Bowler, Freeze, Furnace, Graveyard, Ice Golem, Mega Minion, Zap
+  1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  1: Archers, Bowler, Giant, Lightning, Mega Minion, Poison, Tombstone, Zap
+  1: Archers, Elixir Collector, Giant, Mega Minion, Mini P.E.K.K.A, Poison, The Log, Zap
+  1: Fire Spirits, Ice Spirit, Inferno Tower, Knight, Miner, The Log, Three Musketeers, Zap
+  1: Lava Hound, Mega Minion, Miner, Minion Horde, Minions, The Log, Tombstone, Zap
+  1: Archers, Fireball, Golem, Lightning, Mega Minion, Minions, The Log, Tombstone
+  1: Archers, Baby Dragon, Golem, Mega Minion, Prince, The Log, Tombstone, Zap
+  1: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, Tombstone, Zap
+  1: Barbarians, Fireball, Freeze, Hog Rider, Ice Wizard, Miner, Minions, Zap
+  1: Fireball, Furnace, Giant, Mega Minion, Minions, The Log, Three Musketeers, Zap
+  1: Archers, Hog Rider, Ice Golem, Mega Minion, Minions, Royal Giant, The Log, Tombstone
 Cards:
-83: Mega Minion
-68: Archers
-66: The Log
-60: Zap
-36: Fireball
-35: Ice Golem
-28: Tombstone
-27: Bowler
-26: Ice Spirit
-25: Graveyard
-25: Lightning
-25: Skeleton Army
-25: Furnace
-24: Giant
-21: Miner
-19: Freeze
-19: Inferno Tower
-19: Hog Rider
-17: Minions
-15: Royal Giant
-13: Cannon
-12: Princess
-12: Minion Horde
-10: Musketeer
- 9: Fire Spirits
- 8: Mini P.E.K.K.A
- 8: Barbarians
- 7: Elixir Collector
- 7: Goblin Barrel
- 6: Poison
- 6: Knight
- 5: Guards
- 5: Golem
- 4: Rocket
- 3: Arrows
- 3: Baby Dragon
- 3: Lava Hound
- 3: Three Musketeers
- 2: Spear Goblins
- 2: Goblins
- 2: Ice Wizard
- 2: X-Bow
- 1: Rage
- 1: Valkyrie
- 1: Barbarian Hut
- 1: P.E.K.K.A
- 1: Prince
+ 83 ( -1): Mega Minion
+ 68 ( 15): Archers
+ 66 (-13): The Log
+ 60 (  3): Zap
+ 36 (  4): Fireball
+ 35 (  2): Ice Golem
+ 28 (-16): Tombstone
+ 27 (  3): Bowler
+ 26 ( -8): Ice Spirit
+ 25 ( 18): Graveyard
+ 25 (-16): Lightning
+ 25 ( -1): Skeleton Army
+ 25 ( 10): Furnace
+ 24 ( -3): Giant
+ 21 ( -7): Miner
+ 19 ( 14): Freeze
+ 19 ( -7): Inferno Tower
+ 19 ( -7): Hog Rider
+ 17 (  3): Minions
+ 15 (  9): Royal Giant
+ 13 (  8): Cannon
+ 12 (-11): Princess
+ 12 ( -1): Minion Horde
+ 10 (  1): Musketeer
+  9 (  8): Fire Spirits
+  8 (  1): Mini P.E.K.K.A
+  8 (  2): Barbarians
+  7 (  3): Elixir Collector
+  7 ( -2): Goblin Barrel
+  6 (  0): Poison
+  6 (  4): Knight
+  5 (  2): Guards
+  5 ( -3): Golem
+  4 ( -1): Rocket
+  3 ( -7): Arrows
+  3 ( -4): Baby Dragon
+  3 ( -2): Lava Hound
+  3 ( -1): Three Musketeers
+  2 (  0): Spear Goblins
+  2 (  0): Goblins
+  2 (  0): Ice Wizard
+  2 ( -1): X-Bow
+  1 (  0): Rage
+  1 (  0): Valkyrie
+  1 ( -4): Barbarian Hut
+  1 (  0): P.E.K.K.A
+  1 (  0): Prince
 --------------------------------------------------------------------------------
 Snapshot #19
 Decks:
- 9: Fireball, Furnace, Giant, Mega Minion, Minions, Musketeer, Skeleton Army, Zap
- 5: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
- 5: Fireball, Lava Hound, Mega Minion, Miner, Minions, Skeleton Army, Tombstone, Zap
- 5: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
- 4: Archers, Elite Barbarians, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, The Log
- 4: Archers, Cannon, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
- 4: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
- 4: Archers, Bowler, Fireball, Giant, Mega Minion, Minions, Tombstone, Zap
- 3: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
- 3: Bowler, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
- 2: Elite Barbarians, Fireball, Freeze, Furnace, Hog Rider, Ice Golem, Mega Minion, Zap
- 2: Bowler, Elite Barbarians, Fireball, Furnace, Ice Golem, Mega Minion, Musketeer, Zap
- 2: Cannon, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Musketeer, Skeleton Army, Zap
- 2: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
- 2: Elite Barbarians, Fireball, Furnace, Ice Golem, Minions, Musketeer, The Log, Zap
- 2: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
- 2: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
- 1: Elite Barbarians, Elixir Collector, Fireball, Hog Rider, Ice Golem, Minions, Musketeer, Zap
- 1: Bowler, Guards, Ice Spirit, Inferno Tower, Miner, Poison, Princess, The Log
- 1: Archers, Bowler, Elite Barbarians, Fireball, Graveyard, Ice Golem, Mega Minion, Zap
- 1: Archers, Cannon, Hog Rider, Ice Golem, Ice Spirit, Lightning, Mega Minion, Zap
- 1: Archers, Fireball, Freeze, Giant, Hog Rider, Mega Minion, Skeleton Army, Zap
- 1: Bowler, Freeze, Furnace, Graveyard, Guards, Ice Golem, Mega Minion, Zap
- 1: Archers, Bowler, Giant, Mega Minion, Minions, The Log, Tombstone, Zap
- 1: Barbarians, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Princess, The Log, Zap
- 1: Archers, Barbarian Hut, Graveyard, Ice Golem, Knight, Mega Minion, Poison, The Log
- 1: Guards, Hog Rider, Ice Golem, Ice Wizard, Lightning, Lumberjack, Princess, Zap
- 1: Archers, Elite Barbarians, Fireball, Furnace, Graveyard, Ice Golem, Mega Minion, Zap
- 1: Archers, Arrows, Balloon, Barbarians, Freeze, Furnace, Giant, Mega Minion
- 1: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Spirit, Minions, Musketeer, Zap
- 1: Archers, Elite Barbarians, Fireball, Giant, Ice Golem, Mega Minion, The Log, Zap
- 1: Elite Barbarians, Elixir Collector, Freeze, Goblins, Ice Golem, Ice Spirit, Mega Minion, Zap
- 1: Baby Dragon, Fireball, Lava Hound, Mega Minion, Miner, Skeleton Army, Tombstone, Zap
- 1: Fireball, Guards, Ice Spirit, Inferno Tower, Mega Minion, Miner, Princess, Zap
- 1: Bowler, Fireball, Furnace, Graveyard, Ice Golem, Mega Minion, Musketeer, Zap
- 1: Fireball, Furnace, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Zap
- 1: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
- 1: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
- 1: Guards, Hog Rider, Ice Spirit, Ice Wizard, Lightning, Mini P.E.K.K.A, Princess, Zap
- 1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
- 1: Archers, Elite Barbarians, Elixir Collector, Golem, Mega Minion, Poison, Skeleton Army, Zap
- 1: Barbarians, Fireball, Freeze, Hog Rider, Ice Wizard, Miner, Minions, Zap
- 1: Elite Barbarians, Fireball, Furnace, Inferno Tower, Lightning, Miner, Skeleton Army, The Log
- 1: Bowler, Cannon, Fireball, Ice Golem, Mega Minion, Miner, The Log, Zap
- 1: Archers, Fireball, Furnace, Golem, Mega Minion, Musketeer, Skeleton Army, Zap
- 1: Archers, Golem, Lightning, Lumberjack, Mega Minion, The Log, Tombstone, Zap
- 1: Archers, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
- 1: Archers, Bowler, Fireball, Giant, Mega Minion, Minions, The Log, Zap
- 1: Archers, Elite Barbarians, Elixir Collector, Fireball, Freeze, Ice Golem, Mega Minion, Zap
- 1: Bowler, Elite Barbarians, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
- 1: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
- 1: Balloon, Bowler, Elixir Collector, Freeze, Ice Golem, Mega Minion, Princess, Zap
- 1: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
- 1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
- 1: Archers, Cannon, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Mega Minion, Zap
- 1: Elite Barbarians, Fireball, Furnace, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
- 1: Elixir Collector, Fireball, Giant, Guards, Minions, Musketeer, Prince, Zap
+  9: Fireball, Furnace, Giant, Mega Minion, Minions, Musketeer, Skeleton Army, Zap
+  5: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
+  5: Fireball, Lava Hound, Mega Minion, Miner, Minions, Skeleton Army, Tombstone, Zap
+  5: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
+  4: Archers, Elite Barbarians, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, The Log
+  4: Archers, Cannon, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
+  4: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
+  4: Archers, Bowler, Fireball, Giant, Mega Minion, Minions, Tombstone, Zap
+  3: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
+  3: Bowler, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
+  2: Elite Barbarians, Fireball, Freeze, Furnace, Hog Rider, Ice Golem, Mega Minion, Zap
+  2: Bowler, Elite Barbarians, Fireball, Furnace, Ice Golem, Mega Minion, Musketeer, Zap
+  2: Cannon, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Musketeer, Skeleton Army, Zap
+  2: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
+  2: Elite Barbarians, Fireball, Furnace, Ice Golem, Minions, Musketeer, The Log, Zap
+  2: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
+  2: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
+  1: Elite Barbarians, Elixir Collector, Fireball, Hog Rider, Ice Golem, Minions, Musketeer, Zap
+  1: Bowler, Guards, Ice Spirit, Inferno Tower, Miner, Poison, Princess, The Log
+  1: Archers, Bowler, Elite Barbarians, Fireball, Graveyard, Ice Golem, Mega Minion, Zap
+  1: Archers, Cannon, Hog Rider, Ice Golem, Ice Spirit, Lightning, Mega Minion, Zap
+  1: Archers, Fireball, Freeze, Giant, Hog Rider, Mega Minion, Skeleton Army, Zap
+  1: Bowler, Freeze, Furnace, Graveyard, Guards, Ice Golem, Mega Minion, Zap
+  1: Archers, Bowler, Giant, Mega Minion, Minions, The Log, Tombstone, Zap
+  1: Barbarians, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Princess, The Log, Zap
+  1: Archers, Barbarian Hut, Graveyard, Ice Golem, Knight, Mega Minion, Poison, The Log
+  1: Guards, Hog Rider, Ice Golem, Ice Wizard, Lightning, Lumberjack, Princess, Zap
+  1: Archers, Elite Barbarians, Fireball, Furnace, Graveyard, Ice Golem, Mega Minion, Zap
+  1: Archers, Arrows, Balloon, Barbarians, Freeze, Furnace, Giant, Mega Minion
+  1: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Spirit, Minions, Musketeer, Zap
+  1: Archers, Elite Barbarians, Fireball, Giant, Ice Golem, Mega Minion, The Log, Zap
+  1: Elite Barbarians, Elixir Collector, Freeze, Goblins, Ice Golem, Ice Spirit, Mega Minion, Zap
+  1: Baby Dragon, Fireball, Lava Hound, Mega Minion, Miner, Skeleton Army, Tombstone, Zap
+  1: Fireball, Guards, Ice Spirit, Inferno Tower, Mega Minion, Miner, Princess, Zap
+  1: Bowler, Fireball, Furnace, Graveyard, Ice Golem, Mega Minion, Musketeer, Zap
+  1: Fireball, Furnace, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Zap
+  1: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
+  1: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
+  1: Guards, Hog Rider, Ice Spirit, Ice Wizard, Lightning, Mini P.E.K.K.A, Princess, Zap
+  1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
+  1: Archers, Elite Barbarians, Elixir Collector, Golem, Mega Minion, Poison, Skeleton Army, Zap
+  1: Barbarians, Fireball, Freeze, Hog Rider, Ice Wizard, Miner, Minions, Zap
+  1: Elite Barbarians, Fireball, Furnace, Inferno Tower, Lightning, Miner, Skeleton Army, The Log
+  1: Bowler, Cannon, Fireball, Ice Golem, Mega Minion, Miner, The Log, Zap
+  1: Archers, Fireball, Furnace, Golem, Mega Minion, Musketeer, Skeleton Army, Zap
+  1: Archers, Golem, Lightning, Lumberjack, Mega Minion, The Log, Tombstone, Zap
+  1: Archers, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
+  1: Archers, Bowler, Fireball, Giant, Mega Minion, Minions, The Log, Zap
+  1: Archers, Elite Barbarians, Elixir Collector, Fireball, Freeze, Ice Golem, Mega Minion, Zap
+  1: Bowler, Elite Barbarians, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
+  1: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
+  1: Balloon, Bowler, Elixir Collector, Freeze, Ice Golem, Mega Minion, Princess, Zap
+  1: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
+  1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  1: Archers, Cannon, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Mega Minion, Zap
+  1: Elite Barbarians, Fireball, Furnace, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
+  1: Elixir Collector, Fireball, Giant, Guards, Minions, Musketeer, Prince, Zap
 Cards:
-83: Zap
-79: Mega Minion
-69: Fireball
-52: Ice Golem
-42: Archers
-34: Minions
-33: Elite Barbarians
-32: Furnace
-31: Skeleton Army
-30: Ice Spirit
-29: Hog Rider
-29: The Log
-29: Giant
-28: Musketeer
-24: Bowler
-21: Tombstone
-20: Freeze
-16: Graveyard
-16: Cannon
-12: Miner
-10: Lightning
- 9: Elixir Collector
- 7: Princess
- 6: Lava Hound
- 6: Guards
- 5: Inferno Tower
- 5: X-Bow
- 4: Royal Giant
- 4: Fire Spirits
- 3: Poison
- 3: Barbarians
- 3: Ice Wizard
- 3: Minion Horde
- 3: Goblin Barrel
- 3: Golem
- 2: Lumberjack
- 2: Balloon
- 2: Arrows
- 2: Spear Goblins
- 2: Mirror
- 1: Knight
- 1: Barbarian Hut
- 1: Goblins
- 1: Baby Dragon
- 1: Three Musketeers
- 1: Mini P.E.K.K.A
- 1: Prince
+ 83 ( 23): Zap
+ 79 ( -4): Mega Minion
+ 69 ( 33): Fireball
+ 52 ( 17): Ice Golem
+ 42 (-26): Archers
+ 34 ( 17): Minions
+ 33 (  0): Elite Barbarians
+ 32 (  7): Furnace
+ 31 (  6): Skeleton Army
+ 30 (  4): Ice Spirit
+ 29 ( 10): Hog Rider
+ 29 (-37): The Log
+ 29 (  5): Giant
+ 28 ( 18): Musketeer
+ 24 ( -3): Bowler
+ 21 ( -7): Tombstone
+ 20 (  1): Freeze
+ 16 ( -9): Graveyard
+ 16 (  3): Cannon
+ 12 ( -9): Miner
+ 10 (-15): Lightning
+  9 (  2): Elixir Collector
+  7 ( -5): Princess
+  6 (  3): Lava Hound
+  6 (  1): Guards
+  5 (-14): Inferno Tower
+  5 (  3): X-Bow
+  4 (-11): Royal Giant
+  4 ( -5): Fire Spirits
+  3 ( -3): Poison
+  3 ( -5): Barbarians
+  3 (  1): Ice Wizard
+  3 ( -9): Minion Horde
+  3 ( -4): Goblin Barrel
+  3 ( -2): Golem
+  2 (  0): Lumberjack
+  2 (  0): Balloon
+  2 ( -1): Arrows
+  2 (  0): Spear Goblins
+  2 (  0): Mirror
+  1 ( -5): Knight
+  1 (  0): Barbarian Hut
+  1 ( -1): Goblins
+  1 ( -2): Baby Dragon
+  1 ( -2): Three Musketeers
+  1 ( -7): Mini P.E.K.K.A
+  1 (  0): Prince
 --------------------------------------------------------------------------------
 Snapshot #20
 Decks:
-11: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
- 6: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
- 4: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
- 4: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
- 4: Bowler, Furnace, Goblin Barrel, Miner, Minion Horde, Princess, Skeleton Army, The Log
- 4: Elite Barbarians, Elixir Collector, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Three Musketeers, Zap
- 3: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
- 3: Balloon, Freeze, Giant, Minions, Musketeer, Skeleton Army, Tombstone, Zap
- 3: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Zap
- 3: Archers, Balloon, Cannon, Freeze, Ice Golem, Minions, Skeleton Army, Zap
- 3: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Golem, Minions, Musketeer, Zap
- 3: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
- 2: Elite Barbarians, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, The Log, Zap
- 2: Balloon, Fireball, Lava Hound, Minions, Musketeer, Skeleton Army, Tombstone, Zap
- 2: Fireball, Giant, Graveyard, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
- 2: Archers, Balloon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Tombstone, Zap
- 2: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
- 2: Archers, Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log, X-Bow
- 2: Elite Barbarians, Fireball, Furnace, Ice Golem, Miner, Minions, Musketeer, Zap
- 1: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Minions, Mirror, Three Musketeers, Zap
- 1: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
- 1: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
- 1: Bowler, Fireball, Furnace, Giant, Graveyard, Mega Minion, Musketeer, Zap
- 1: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
- 1: Archers, Freeze, Giant, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
- 1: Elite Barbarians, Fireball, Furnace, Mega Minion, Minions, Royal Giant, The Log, Zap
- 1: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
- 1: Archers, Balloon, Cannon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Zap
- 1: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
- 1: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
- 1: Cannon, Fire Spirits, Ice Golem, Ice Spirit, Mega Minion, Mirror, Rocket, X-Bow
- 1: Archers, Freeze, Furnace, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Zap
- 1: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, Zap
- 1: Elixir Collector, Fireball, Giant, Ice Golem, Mega Minion, Musketeer, Three Musketeers, Zap
- 1: Archers, Bowler, Furnace, Giant, Lightning, Mega Minion, The Log, Zap
- 1: Cannon, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, The Log, Zap
- 1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
- 1: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
- 1: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
- 1: Fireball, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Tombstone, Zap
- 1: Archers, Cannon, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
- 1: Freeze, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Tombstone, Zap
- 1: Archers, Fire Spirits, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
- 1: Archers, Cannon, Fireball, Giant, Ice Spirit, Mega Minion, Minions, Zap
- 1: Elite Barbarians, Elixir Collector, Fireball, Golem, Ice Golem, Mega Minion, Musketeer, Zap
- 1: Archers, Balloon, Freeze, Ice Golem, Minions, Skeleton Army, Tombstone, Zap
- 1: Bowler, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone, Zap
- 1: Arrows, Balloon, Lava Hound, Lightning, Mega Minion, Minions, Skeleton Army, Tombstone
- 1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
- 1: Furnace, Ice Golem, Ice Spirit, Miner, Minions, Musketeer, Poison, The Log
- 1: Archers, Furnace, Ice Golem, Miner, Musketeer, Poison, Skeleton Army, Tornado
- 1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
- 1: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Three Musketeers, Zap
- 1: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
+ 11: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
+  6: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
+  4: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
+  4: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
+  4: Bowler, Furnace, Goblin Barrel, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  4: Elite Barbarians, Elixir Collector, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Three Musketeers, Zap
+  3: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
+  3: Balloon, Freeze, Giant, Minions, Musketeer, Skeleton Army, Tombstone, Zap
+  3: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Zap
+  3: Archers, Balloon, Cannon, Freeze, Ice Golem, Minions, Skeleton Army, Zap
+  3: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Golem, Minions, Musketeer, Zap
+  3: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
+  2: Elite Barbarians, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, The Log, Zap
+  2: Balloon, Fireball, Lava Hound, Minions, Musketeer, Skeleton Army, Tombstone, Zap
+  2: Fireball, Giant, Graveyard, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
+  2: Archers, Balloon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Tombstone, Zap
+  2: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
+  2: Archers, Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log, X-Bow
+  2: Elite Barbarians, Fireball, Furnace, Ice Golem, Miner, Minions, Musketeer, Zap
+  1: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Minions, Mirror, Three Musketeers, Zap
+  1: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
+  1: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
+  1: Bowler, Fireball, Furnace, Giant, Graveyard, Mega Minion, Musketeer, Zap
+  1: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
+  1: Archers, Freeze, Giant, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
+  1: Elite Barbarians, Fireball, Furnace, Mega Minion, Minions, Royal Giant, The Log, Zap
+  1: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
+  1: Archers, Balloon, Cannon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Zap
+  1: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
+  1: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
+  1: Cannon, Fire Spirits, Ice Golem, Ice Spirit, Mega Minion, Mirror, Rocket, X-Bow
+  1: Archers, Freeze, Furnace, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Zap
+  1: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, Zap
+  1: Elixir Collector, Fireball, Giant, Ice Golem, Mega Minion, Musketeer, Three Musketeers, Zap
+  1: Archers, Bowler, Furnace, Giant, Lightning, Mega Minion, The Log, Zap
+  1: Cannon, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, The Log, Zap
+  1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
+  1: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
+  1: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
+  1: Fireball, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Tombstone, Zap
+  1: Archers, Cannon, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
+  1: Freeze, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Tombstone, Zap
+  1: Archers, Fire Spirits, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
+  1: Archers, Cannon, Fireball, Giant, Ice Spirit, Mega Minion, Minions, Zap
+  1: Elite Barbarians, Elixir Collector, Fireball, Golem, Ice Golem, Mega Minion, Musketeer, Zap
+  1: Archers, Balloon, Freeze, Ice Golem, Minions, Skeleton Army, Tombstone, Zap
+  1: Bowler, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone, Zap
+  1: Arrows, Balloon, Lava Hound, Lightning, Mega Minion, Minions, Skeleton Army, Tombstone
+  1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
+  1: Furnace, Ice Golem, Ice Spirit, Miner, Minions, Musketeer, Poison, The Log
+  1: Archers, Furnace, Ice Golem, Miner, Musketeer, Poison, Skeleton Army, Tornado
+  1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
+  1: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Three Musketeers, Zap
+  1: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
 Cards:
-77: Zap
-67: Ice Golem
-58: Mega Minion
-43: Fireball
-38: Skeleton Army
-37: Musketeer
-37: Ice Spirit
-34: Minions
-34: Tombstone
-31: Archers
-30: Freeze
-29: The Log
-24: Hog Rider
-22: Elite Barbarians
-22: Furnace
-20: Graveyard
-19: Balloon
-18: Bowler
-18: Elixir Collector
-18: Giant
-14: Goblin Barrel
-14: Cannon
-13: Minion Horde
-12: Three Musketeers
-11: Mirror
- 9: Lava Hound
- 8: Princess
- 8: Skeletons
- 8: Miner
- 6: X-Bow
- 5: Spear Goblins
- 4: Inferno Tower
- 2: Fire Spirits
- 2: Lightning
- 2: Golem
- 2: Poison
- 1: Royal Giant
- 1: Rocket
- 1: Arrows
- 1: Tornado
+ 77 ( -6): Zap
+ 67 ( 15): Ice Golem
+ 58 (-21): Mega Minion
+ 43 (-26): Fireball
+ 38 (  7): Skeleton Army
+ 37 (  9): Musketeer
+ 37 (  7): Ice Spirit
+ 34 (  0): Minions
+ 34 ( 13): Tombstone
+ 31 (-11): Archers
+ 30 ( 10): Freeze
+ 29 (  0): The Log
+ 24 ( -5): Hog Rider
+ 22 (-11): Elite Barbarians
+ 22 (-10): Furnace
+ 20 (  4): Graveyard
+ 19 ( 17): Balloon
+ 18 ( -6): Bowler
+ 18 (  9): Elixir Collector
+ 18 (-11): Giant
+ 14 ( 11): Goblin Barrel
+ 14 ( -2): Cannon
+ 13 ( 10): Minion Horde
+ 12 ( 11): Three Musketeers
+ 11 (  9): Mirror
+  9 (  3): Lava Hound
+  8 (  1): Princess
+  8 (  0): Skeletons
+  8 ( -4): Miner
+  6 (  1): X-Bow
+  5 (  3): Spear Goblins
+  4 ( -1): Inferno Tower
+  2 ( -2): Fire Spirits
+  2 ( -8): Lightning
+  2 ( -1): Golem
+  2 ( -1): Poison
+  1 ( -3): Royal Giant
+  1 (  0): Rocket
+  1 ( -1): Arrows
+  1 (  0): Tornado
 --------------------------------------------------------------------------------
 Snapshot #21
 Decks:
-10: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
- 6: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, X-Bow
- 6: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Minions, Musketeer, Zap
- 6: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
- 5: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Golem, Minions, Musketeer, Zap
- 4: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
- 4: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
- 3: Bowler, Freeze, Graveyard, Ice Golem, Minions, Musketeer, Tombstone, Zap
- 3: Archers, Balloon, Bowler, Freeze, Ice Golem, Mega Minion, Tombstone, Zap
- 2: Archers, Elite Barbarians, Fireball, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
- 2: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
- 2: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
- 2: Bowler, Fireball, Giant, Graveyard, Mega Minion, Musketeer, Tombstone, Zap
- 2: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
- 2: Elixir Collector, Golem, Guards, Ice Golem, Mega Minion, The Log, Three Musketeers, Zap
- 2: Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
- 2: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, Musketeer, The Log, Zap
- 1: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
- 1: Dart Goblin, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
- 1: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Mega Minion, Minions, Zap
- 1: Elite Barbarians, Elixir Collector, Ice Golem, Minions, Mortar, Musketeer, The Log, Zap
- 1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Minions, Rocket, The Log, X-Bow
- 1: Balloon, Fireball, Lava Hound, Mega Minion, Musketeer, Skeletons, Tombstone, Zap
- 1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Miner, Minions, Rocket, Zap
- 1: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
- 1: Archers, Furnace, Ice Golem, Ice Spirit, Mega Minion, Rocket, The Log, X-Bow
- 1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Minions, Musketeer, Zap
- 1: Ice Golem, Ice Spirit, Inferno Tower, Miner, Minions, Musketeer, Rocket, The Log
- 1: Archers, Balloon, Bowler, Elixir Collector, Freeze, Ice Golem, Mega Minion, Zap
- 1: Archers, Balloon, Bowler, Freeze, Ice Golem, Minions, Tombstone, Zap
- 1: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Minions, Skeletons, Three Musketeers, Zap
- 1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
- 1: Elite Barbarians, Elixir Collector, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Three Musketeers, Zap
- 1: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
- 1: Bowler, Electro Wizard, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
- 1: Archers, Barbarian Hut, Graveyard, Ice Golem, Mega Minion, Musketeer, Poison, The Log
- 1: Archers, Elite Barbarians, Fireball, Graveyard, Ice Golem, Musketeer, Tombstone, Zap
- 1: Fireball, Furnace, Graveyard, Ice Golem, Knight, Minions, Musketeer, Zap
- 1: Bowler, Furnace, Goblin Barrel, Miner, Minion Horde, Princess, Skeleton Army, The Log
- 1: Baby Dragon, Lava Hound, Mega Minion, Minions, Musketeer, Poison, Tombstone, Zap
- 1: Elixir Collector, Fireball, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
- 1: Archers, Fireball, Furnace, Graveyard, Ice Golem, Knight, Musketeer, Zap
- 1: Cannon, Dart Goblin, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
- 1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, Poison, Zap
- 1: Balloon, Fireball, Ice Golem, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
- 1: Balloon, Barbarians, Elixir Collector, Freeze, Giant, Rocket, Witch, Wizard
- 1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
- 1: Elixir Collector, Giant, Graveyard, Mega Minion, Musketeer, Skeleton Army, Tornado, Zap
- 1: Bowler, Furnace, Lightning, Mega Minion, Minion Horde, Musketeer, Royal Giant, The Log
- 1: Arrows, Balloon, Fireball, Lava Hound, Mega Minion, Minions, The Log, Tombstone
- 1: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
- 1: Bowler, Fireball, Graveyard, Ice Golem, Ice Wizard, Mega Minion, Tombstone, Zap
- 1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
- 1: Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, Valkyrie, X-Bow
+ 10: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
+  6: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, X-Bow
+  6: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Minions, Musketeer, Zap
+  6: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
+  5: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Golem, Minions, Musketeer, Zap
+  4: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
+  4: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
+  3: Bowler, Freeze, Graveyard, Ice Golem, Minions, Musketeer, Tombstone, Zap
+  3: Archers, Balloon, Bowler, Freeze, Ice Golem, Mega Minion, Tombstone, Zap
+  2: Archers, Elite Barbarians, Fireball, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
+  2: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
+  2: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
+  2: Bowler, Fireball, Giant, Graveyard, Mega Minion, Musketeer, Tombstone, Zap
+  2: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
+  2: Elixir Collector, Golem, Guards, Ice Golem, Mega Minion, The Log, Three Musketeers, Zap
+  2: Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
+  2: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, Musketeer, The Log, Zap
+  1: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
+  1: Dart Goblin, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
+  1: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Mega Minion, Minions, Zap
+  1: Elite Barbarians, Elixir Collector, Ice Golem, Minions, Mortar, Musketeer, The Log, Zap
+  1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Minions, Rocket, The Log, X-Bow
+  1: Balloon, Fireball, Lava Hound, Mega Minion, Musketeer, Skeletons, Tombstone, Zap
+  1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Miner, Minions, Rocket, Zap
+  1: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
+  1: Archers, Furnace, Ice Golem, Ice Spirit, Mega Minion, Rocket, The Log, X-Bow
+  1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Minions, Musketeer, Zap
+  1: Ice Golem, Ice Spirit, Inferno Tower, Miner, Minions, Musketeer, Rocket, The Log
+  1: Archers, Balloon, Bowler, Elixir Collector, Freeze, Ice Golem, Mega Minion, Zap
+  1: Archers, Balloon, Bowler, Freeze, Ice Golem, Minions, Tombstone, Zap
+  1: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Minions, Skeletons, Three Musketeers, Zap
+  1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
+  1: Elite Barbarians, Elixir Collector, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Three Musketeers, Zap
+  1: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
+  1: Bowler, Electro Wizard, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
+  1: Archers, Barbarian Hut, Graveyard, Ice Golem, Mega Minion, Musketeer, Poison, The Log
+  1: Archers, Elite Barbarians, Fireball, Graveyard, Ice Golem, Musketeer, Tombstone, Zap
+  1: Fireball, Furnace, Graveyard, Ice Golem, Knight, Minions, Musketeer, Zap
+  1: Bowler, Furnace, Goblin Barrel, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  1: Baby Dragon, Lava Hound, Mega Minion, Minions, Musketeer, Poison, Tombstone, Zap
+  1: Elixir Collector, Fireball, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
+  1: Archers, Fireball, Furnace, Graveyard, Ice Golem, Knight, Musketeer, Zap
+  1: Cannon, Dart Goblin, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
+  1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, Poison, Zap
+  1: Balloon, Fireball, Ice Golem, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
+  1: Balloon, Barbarians, Elixir Collector, Freeze, Giant, Rocket, Witch, Wizard
+  1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
+  1: Elixir Collector, Giant, Graveyard, Mega Minion, Musketeer, Skeleton Army, Tornado, Zap
+  1: Bowler, Furnace, Lightning, Mega Minion, Minion Horde, Musketeer, Royal Giant, The Log
+  1: Arrows, Balloon, Fireball, Lava Hound, Mega Minion, Minions, The Log, Tombstone
+  1: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
+  1: Bowler, Fireball, Graveyard, Ice Golem, Ice Wizard, Mega Minion, Tombstone, Zap
+  1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
+  1: Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, Valkyrie, X-Bow
 Cards:
-77: Ice Golem
-76: Zap
-56: Mega Minion
-47: Musketeer
-40: Fireball
-40: Minions
-39: Tombstone
-31: Archers
-31: The Log
-29: Freeze
-29: Bowler
-28: Elixir Collector
-27: Graveyard
-26: Elite Barbarians
-24: Ice Spirit
-18: Hog Rider
-16: Skeleton Army
-16: Giant
-15: Balloon
-12: Rocket
-12: Furnace
-11: Inferno Tower
- 9: X-Bow
- 9: Lava Hound
- 9: Cannon
- 8: Minion Horde
- 8: Goblin Barrel
- 6: Mirror
- 6: Skeletons
- 6: Golem
- 5: Three Musketeers
- 3: Princess
- 3: Miner
- 3: Poison
- 3: Lightning
- 2: Dart Goblin
- 2: Spear Goblins
- 2: Guards
- 2: Knight
- 2: Baby Dragon
- 2: Arrows
- 1: Mortar
- 1: Electro Wizard
- 1: Barbarian Hut
- 1: Barbarians
- 1: Wizard
- 1: Witch
- 1: Tornado
- 1: Royal Giant
- 1: Ice Wizard
- 1: Valkyrie
+ 77 ( 10): Ice Golem
+ 76 ( -1): Zap
+ 56 ( -2): Mega Minion
+ 47 ( 10): Musketeer
+ 40 ( -3): Fireball
+ 40 (  6): Minions
+ 39 (  5): Tombstone
+ 31 (  0): Archers
+ 31 (  2): The Log
+ 29 ( -1): Freeze
+ 29 ( 11): Bowler
+ 28 ( 10): Elixir Collector
+ 27 (  7): Graveyard
+ 26 (  4): Elite Barbarians
+ 24 (-13): Ice Spirit
+ 18 ( -6): Hog Rider
+ 16 (-22): Skeleton Army
+ 16 ( -2): Giant
+ 15 ( -4): Balloon
+ 12 ( 11): Rocket
+ 12 (-10): Furnace
+ 11 (  7): Inferno Tower
+  9 (  3): X-Bow
+  9 (  0): Lava Hound
+  9 ( -5): Cannon
+  8 ( -5): Minion Horde
+  8 ( -6): Goblin Barrel
+  6 ( -5): Mirror
+  6 ( -2): Skeletons
+  6 (  4): Golem
+  5 ( -7): Three Musketeers
+  3 ( -5): Princess
+  3 ( -5): Miner
+  3 (  1): Poison
+  3 (  1): Lightning
+  2 (  0): Dart Goblin
+  2 ( -3): Spear Goblins
+  2 (  0): Guards
+  2 (  0): Knight
+  2 (  0): Baby Dragon
+  2 (  1): Arrows
+  1 (  0): Mortar
+  1 (  0): Electro Wizard
+  1 (  0): Barbarian Hut
+  1 (  0): Barbarians
+  1 (  0): Wizard
+  1 (  0): Witch
+  1 (  0): Tornado
+  1 (  0): Royal Giant
+  1 (  0): Ice Wizard
+  1 (  0): Valkyrie
 --------------------------------------------------------------------------------
 Snapshot #22
 Decks:
- 8: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
- 7: Executioner, Furnace, Giant, Lightning, Mega Minion, Prince, The Log, Zap
- 6: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, The Log, Tombstone
- 5: Elixir Collector, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Zap
- 4: Arrows, Balloon, Dark Prince, Elixir Collector, Golem, Mega Minion, Rage, Skeleton Army
- 4: Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log, Zap
- 3: Bowler, Freeze, Graveyard, Ice Golem, Minions, Musketeer, Tombstone, Zap
- 3: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
- 3: Furnace, Giant, Lightning, Mega Minion, Musketeer, Prince, The Log, Zap
- 3: Arrows, Balloon, Bowler, Freeze, Giant, Minions, Musketeer, Tombstone
- 3: Furnace, Giant, Lightning, Minions, Musketeer, Prince, The Log, Zap
- 2: Arrows, Balloon, Elixir Collector, Executioner, Golem, Mega Minion, Rage, Skeleton Army
- 2: Dart Goblin, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
- 2: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, Zap
- 2: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
- 2: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
- 2: Elixir Collector, Fireball, Golem, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Minions, Zap
- 2: Arrows, Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone
- 1: Goblin Barrel, Inferno Tower, Mega Minion, Miner, Minion Horde, Rocket, Skeleton Army, Zap
- 1: Arrows, Lava Hound, Miner, Minion Horde, Minions, Musketeer, Skeleton Army, Tombstone
- 1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Minions, Rocket, The Log, X-Bow
- 1: Electro Wizard, Elixir Collector, Executioner, Giant, Lightning, Minions, The Log, Tombstone
- 1: Fireball, Goblins, Hog Rider, Ice Golem, Musketeer, Skeletons, The Log, Tornado
- 1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, X-Bow
- 1: Cannon, Guards, Ice Spirit, Mega Minion, Miner, Musketeer, Rocket, The Log
- 1: Executioner, Furnace, Giant, Lightning, Minions, Prince, The Log, Zap
- 1: Balloon, Fireball, Lava Hound, Mini P.E.K.K.A, Minions, Musketeer, Skeleton Army, Tombstone
- 1: Electro Wizard, Elite Barbarians, Elixir Collector, Fireball, Giant, Mega Minion, Three Musketeers, Zap
- 1: Arrows, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Tombstone, Tornado
- 1: Elixir Collector, Fire Spirits, Ice Golem, Inferno Tower, Minions, Musketeer, The Log, X-Bow
- 1: Archers, Arrows, Executioner, Giant, Graveyard, Mega Minion, The Log, Zap
- 1: Executioner, Goblin Barrel, Ice Golem, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
- 1: Fireball, Furnace, Minions, Mirror, Musketeer, Royal Giant, Skeleton Army, The Log
- 1: Baby Dragon, Bowler, Graveyard, Ice Golem, Minions, Tombstone, Tornado, Zap
- 1: Electro Wizard, Elixir Collector, Executioner, Giant, Mega Minion, Prince, The Log, Tornado
- 1: Arrows, Balloon, Freeze, Giant, Mega Minion, Mini P.E.K.K.A, Musketeer, Zap
- 1: Arrows, Furnace, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Zap
- 1: Executioner, Fireball, Furnace, Giant, Graveyard, Mega Minion, Mini P.E.K.K.A, Zap
- 1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, The Log, Three Musketeers, Zap
- 1: Furnace, Giant, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log, Zap
- 1: Archers, Goblin Hut, Ice Golem, Ice Spirit, Mortar, Rocket, Skeletons, The Log
- 1: Dart Goblin, Elite Barbarians, Executioner, Fireball, Giant, Mega Minion, Musketeer, Zap
- 1: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone
- 1: Bowler, Furnace, Goblin Barrel, Miner, Minion Horde, Princess, Skeleton Army, The Log
- 1: Freeze, Hog Rider, Ice Spirit, Inferno Tower, Mega Minion, Musketeer, Skeletons, The Log
- 1: Electro Wizard, Elixir Collector, Executioner, Hog Rider, Ice Golem, The Log, Tornado, Zap
- 1: Cannon, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Rocket, The Log, Zap
- 1: Arrows, Baby Dragon, Bowler, Giant, Lightning, Minions, The Log, Tombstone
- 1: Goblin Barrel, Guards, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, The Log
- 1: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
- 1: Cannon, Hog Rider, Ice Golem, Ice Spirit, Lightning, Minions, Musketeer, Zap
- 1: Bowler, Furnace, Miner, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
- 1: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
- 1: Executioner, Giant, Ice Spirit, Lightning, Minions, Prince, The Log, Zap
- 1: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, Zap
+  8: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
+  7: Executioner, Furnace, Giant, Lightning, Mega Minion, Prince, The Log, Zap
+  6: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, The Log, Tombstone
+  5: Elixir Collector, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Zap
+  4: Arrows, Balloon, Dark Prince, Elixir Collector, Golem, Mega Minion, Rage, Skeleton Army
+  4: Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log, Zap
+  3: Bowler, Freeze, Graveyard, Ice Golem, Minions, Musketeer, Tombstone, Zap
+  3: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
+  3: Furnace, Giant, Lightning, Mega Minion, Musketeer, Prince, The Log, Zap
+  3: Arrows, Balloon, Bowler, Freeze, Giant, Minions, Musketeer, Tombstone
+  3: Furnace, Giant, Lightning, Minions, Musketeer, Prince, The Log, Zap
+  2: Arrows, Balloon, Elixir Collector, Executioner, Golem, Mega Minion, Rage, Skeleton Army
+  2: Dart Goblin, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
+  2: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, Zap
+  2: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
+  2: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
+  2: Elixir Collector, Fireball, Golem, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Minions, Zap
+  2: Arrows, Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone
+  1: Goblin Barrel, Inferno Tower, Mega Minion, Miner, Minion Horde, Rocket, Skeleton Army, Zap
+  1: Arrows, Lava Hound, Miner, Minion Horde, Minions, Musketeer, Skeleton Army, Tombstone
+  1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Minions, Rocket, The Log, X-Bow
+  1: Electro Wizard, Elixir Collector, Executioner, Giant, Lightning, Minions, The Log, Tombstone
+  1: Fireball, Goblins, Hog Rider, Ice Golem, Musketeer, Skeletons, The Log, Tornado
+  1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, X-Bow
+  1: Cannon, Guards, Ice Spirit, Mega Minion, Miner, Musketeer, Rocket, The Log
+  1: Executioner, Furnace, Giant, Lightning, Minions, Prince, The Log, Zap
+  1: Balloon, Fireball, Lava Hound, Mini P.E.K.K.A, Minions, Musketeer, Skeleton Army, Tombstone
+  1: Electro Wizard, Elite Barbarians, Elixir Collector, Fireball, Giant, Mega Minion, Three Musketeers, Zap
+  1: Arrows, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Tombstone, Tornado
+  1: Elixir Collector, Fire Spirits, Ice Golem, Inferno Tower, Minions, Musketeer, The Log, X-Bow
+  1: Archers, Arrows, Executioner, Giant, Graveyard, Mega Minion, The Log, Zap
+  1: Executioner, Goblin Barrel, Ice Golem, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
+  1: Fireball, Furnace, Minions, Mirror, Musketeer, Royal Giant, Skeleton Army, The Log
+  1: Baby Dragon, Bowler, Graveyard, Ice Golem, Minions, Tombstone, Tornado, Zap
+  1: Electro Wizard, Elixir Collector, Executioner, Giant, Mega Minion, Prince, The Log, Tornado
+  1: Arrows, Balloon, Freeze, Giant, Mega Minion, Mini P.E.K.K.A, Musketeer, Zap
+  1: Arrows, Furnace, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Zap
+  1: Executioner, Fireball, Furnace, Giant, Graveyard, Mega Minion, Mini P.E.K.K.A, Zap
+  1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, The Log, Three Musketeers, Zap
+  1: Furnace, Giant, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log, Zap
+  1: Archers, Goblin Hut, Ice Golem, Ice Spirit, Mortar, Rocket, Skeletons, The Log
+  1: Dart Goblin, Elite Barbarians, Executioner, Fireball, Giant, Mega Minion, Musketeer, Zap
+  1: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone
+  1: Bowler, Furnace, Goblin Barrel, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  1: Freeze, Hog Rider, Ice Spirit, Inferno Tower, Mega Minion, Musketeer, Skeletons, The Log
+  1: Electro Wizard, Elixir Collector, Executioner, Hog Rider, Ice Golem, The Log, Tornado, Zap
+  1: Cannon, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Rocket, The Log, Zap
+  1: Arrows, Baby Dragon, Bowler, Giant, Lightning, Minions, The Log, Tombstone
+  1: Goblin Barrel, Guards, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, The Log
+  1: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
+  1: Cannon, Hog Rider, Ice Golem, Ice Spirit, Lightning, Minions, Musketeer, Zap
+  1: Bowler, Furnace, Miner, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
+  1: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
+  1: Executioner, Giant, Ice Spirit, Lightning, Minions, Prince, The Log, Zap
+  1: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, Zap
 Cards:
-63: The Log
-49: Minions
-47: Zap
-42: Skeleton Army
-41: Mega Minion
-32: Giant
-31: Lightning
-30: Furnace
-30: Musketeer
-28: Ice Golem
-25: Elixir Collector
-24: Hog Rider
-24: Tombstone
-23: Goblin Barrel
-22: Princess
-20: Inferno Tower
-19: Arrows
-18: Executioner
-18: Fireball
-16: Prince
-15: Balloon
-14: Golem
-14: Bowler
-13: Freeze
-11: Mini P.E.K.K.A
-11: Archers
-11: Rocket
-10: Minion Horde
-10: Ice Spirit
- 8: Baby Dragon
- 8: Graveyard
- 8: Mirror
- 6: Goblins
- 6: Rage
- 6: Lava Hound
- 5: Miner
- 5: Tornado
- 5: Skeletons
- 5: Royal Giant
- 4: Dark Prince
- 4: Electro Wizard
- 3: X-Bow
- 3: Cannon
- 3: Dart Goblin
- 3: Elite Barbarians
- 2: Guards
- 2: Three Musketeers
- 1: Fire Spirits
- 1: Goblin Hut
- 1: Mortar
+ 63 ( 32): The Log
+ 49 (  9): Minions
+ 47 (-29): Zap
+ 42 ( 26): Skeleton Army
+ 41 (-15): Mega Minion
+ 32 ( 16): Giant
+ 31 ( 28): Lightning
+ 30 ( 18): Furnace
+ 30 (-17): Musketeer
+ 28 (-49): Ice Golem
+ 25 ( -3): Elixir Collector
+ 24 (  6): Hog Rider
+ 24 (-15): Tombstone
+ 23 ( 15): Goblin Barrel
+ 22 ( 19): Princess
+ 20 (  9): Inferno Tower
+ 19 ( 17): Arrows
+ 18 (  0): Executioner
+ 18 (-22): Fireball
+ 16 (  0): Prince
+ 15 (  0): Balloon
+ 14 (  8): Golem
+ 14 (-15): Bowler
+ 13 (-16): Freeze
+ 11 (  0): Mini P.E.K.K.A
+ 11 (-20): Archers
+ 11 ( -1): Rocket
+ 10 (  2): Minion Horde
+ 10 (-14): Ice Spirit
+  8 (  6): Baby Dragon
+  8 (-19): Graveyard
+  8 (  2): Mirror
+  6 (  0): Goblins
+  6 (  0): Rage
+  6 ( -3): Lava Hound
+  5 (  2): Miner
+  5 (  4): Tornado
+  5 ( -1): Skeletons
+  5 (  4): Royal Giant
+  4 (  0): Dark Prince
+  4 (  3): Electro Wizard
+  3 ( -6): X-Bow
+  3 ( -6): Cannon
+  3 (  1): Dart Goblin
+  3 (-23): Elite Barbarians
+  2 (  0): Guards
+  2 ( -3): Three Musketeers
+  1 (  0): Fire Spirits
+  1 (  0): Goblin Hut
+  1 (  0): Mortar
 --------------------------------------------------------------------------------
 Snapshot #23
 Decks:
- 6: Elixir Collector, Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Musketeer, The Log, X-Bow
- 5: Fire Spirits, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
- 4: Executioner, Furnace, Giant, Ice Spirit, Lightning, Prince, The Log, Zap
- 4: Fire Spirits, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
- 4: Executioner, Fire Spirits, Furnace, Knight, Lightning, Minions, Royal Giant, The Log
- 3: Arrows, Balloon, Lava Hound, Lightning, Mega Minion, Minions, Skeleton Army, Tombstone
- 3: Fireball, Furnace, Goblin Barrel, Inferno Tower, Minion Horde, Mirror, Skeleton Army, The Log
- 3: Arrows, Balloon, Bowler, Freeze, Giant, Mega Minion, Minions, Tombstone
- 3: Furnace, Giant, Lightning, Mini P.E.K.K.A, Minions, Musketeer, The Log, Zap
- 3: Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log, Zap
- 3: Elixir Collector, Giant, Lightning, Mini P.E.K.K.A, Minion Horde, Minions, The Log, Zap
- 2: Elixir Collector, Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Princess, Zap
- 2: Archers, Bowler, Executioner, Giant, Graveyard, The Log, Tornado, Zap
- 2: Elixir Collector, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Zap
- 2: Arrows, Balloon, Lava Hound, Lightning, Minions, Musketeer, Skeleton Army, Tombstone
- 2: Bowler, Executioner, Giant, Graveyard, Mega Minion, The Log, Tornado, Zap
- 2: Executioner, Giant, Lightning, Mini P.E.K.K.A, Minions, The Log, Tombstone, Zap
- 2: Bowler, Giant, Graveyard, Mega Minion, Tombstone, Tornado, Wizard, Zap
- 2: Archers, Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Rocket, The Log, X-Bow
- 2: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, The Log
- 2: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, The Log
- 1: Electro Wizard, Executioner, Giant, Goblins, Ice Spirit, Lightning, The Log, Tornado
- 1: Goblin Barrel, Hog Rider, Inferno Tower, Princess, Rocket, Skeleton Army, Skeletons, The Log
- 1: Executioner, Ice Golem, Inferno Tower, Miner, Minions, Rocket, The Log, Tornado
- 1: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, The Log
- 1: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Musketeer, The Log, Tombstone
- 1: Bowler, Electro Wizard, Executioner, Hog Rider, Ice Golem, Lightning, The Log, Tornado
- 1: Giant, Ice Spirit, Lightning, Mini P.E.K.K.A, Minions, The Log, Wizard, Zap
- 1: Barbarians, Fireball, Giant, Graveyard, Minions, Musketeer, The Log, Zap
- 1: Elixir Collector, Giant, Mini P.E.K.K.A, Minions, Musketeer, The Log, Three Musketeers, Zap
- 1: Giant, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Mortar, Musketeer, The Log, Zap
- 1: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log
- 1: Bowler, Fireball, Giant, Graveyard, Minions, Musketeer, Tornado, Zap
- 1: Balloon, Elixir Collector, Freeze, Ice Golem, Inferno Tower, Minions, Skeleton Army, Zap
- 1: Goblin Barrel, Inferno Tower, Knight, Mirror, Princess, Rocket, Skeleton Army, The Log
- 1: Arrows, Furnace, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Zap
- 1: Executioner, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Tornado, Zap
- 1: Arrows, Balloon, Freeze, Furnace, Ice Golem, Minions, Musketeer, Skeleton Army
- 1: Arrows, Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log
- 1: Dart Goblin, Goblin Barrel, Ice Golem, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
- 1: Balloon, Barbarians, Elixir Collector, Freeze, Giant, Rocket, Witch, Wizard
- 1: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Miner, Princess, Skeleton Army, The Log
- 1: Cannon, Goblins, Miner, Minion Horde, Princess, Skeleton Army, The Log, Zap
- 1: Executioner, Furnace, Ice Spirit, Knight, Lightning, Mega Minion, Royal Giant, The Log
- 1: Arrows, Furnace, Giant, Graveyard, Mega Minion, Mini P.E.K.K.A, Minions, Zap
- 1: Executioner, Ice Golem, Ice Spirit, Miner, Rocket, Skeletons, The Log, Tornado
- 1: Executioner, Furnace, Goblin Barrel, Mirror, Rocket, Skeleton Army, The Log, Tornado
- 1: Cannon, Fire Spirits, Hog Rider, Ice Golem, Musketeer, Rocket, Skeletons, The Log
- 1: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
- 1: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
- 1: Balloon, Elixir Collector, Executioner, Golem, Mega Minion, Rage, Skeleton Army, Tornado
- 1: Baby Dragon, Bowler, Giant, Graveyard, Musketeer, Tombstone, Tornado, Zap
- 1: Bowler, Fire Spirits, Giant, Graveyard, Musketeer, Tombstone, Tornado, Zap
- 1: Archers, Baby Dragon, Elixir Collector, Fireball, Golem, Mega Minion, The Log, Tombstone
- 1: Executioner, Giant, Knight, Miner, Minion Horde, Minions, The Log, Zap
- 1: Barbarians, Clone, Electro Wizard, Golem, Minion Horde, Minions, Skeleton Army, Three Musketeers
- 1: Elixir Collector, Giant, Ice Golem, Mini P.E.K.K.A, Minions, The Log, Three Musketeers, Zap
- 1: Goblin Barrel, Hog Rider, Ice Spirit, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
- 1: Arrows, Giant, Miner, Minion Horde, Minions, Musketeer, Skeleton Army, Tombstone
- 1: Dark Prince, Executioner, Lightning, Mega Minion, Musketeer, P.E.K.K.A, The Log, Zap
+  6: Elixir Collector, Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Musketeer, The Log, X-Bow
+  5: Fire Spirits, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
+  4: Executioner, Furnace, Giant, Ice Spirit, Lightning, Prince, The Log, Zap
+  4: Fire Spirits, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
+  4: Executioner, Fire Spirits, Furnace, Knight, Lightning, Minions, Royal Giant, The Log
+  3: Arrows, Balloon, Lava Hound, Lightning, Mega Minion, Minions, Skeleton Army, Tombstone
+  3: Fireball, Furnace, Goblin Barrel, Inferno Tower, Minion Horde, Mirror, Skeleton Army, The Log
+  3: Arrows, Balloon, Bowler, Freeze, Giant, Mega Minion, Minions, Tombstone
+  3: Furnace, Giant, Lightning, Mini P.E.K.K.A, Minions, Musketeer, The Log, Zap
+  3: Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log, Zap
+  3: Elixir Collector, Giant, Lightning, Mini P.E.K.K.A, Minion Horde, Minions, The Log, Zap
+  2: Elixir Collector, Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Princess, Zap
+  2: Archers, Bowler, Executioner, Giant, Graveyard, The Log, Tornado, Zap
+  2: Elixir Collector, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Zap
+  2: Arrows, Balloon, Lava Hound, Lightning, Minions, Musketeer, Skeleton Army, Tombstone
+  2: Bowler, Executioner, Giant, Graveyard, Mega Minion, The Log, Tornado, Zap
+  2: Executioner, Giant, Lightning, Mini P.E.K.K.A, Minions, The Log, Tombstone, Zap
+  2: Bowler, Giant, Graveyard, Mega Minion, Tombstone, Tornado, Wizard, Zap
+  2: Archers, Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Rocket, The Log, X-Bow
+  2: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, The Log
+  2: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, The Log
+  1: Electro Wizard, Executioner, Giant, Goblins, Ice Spirit, Lightning, The Log, Tornado
+  1: Goblin Barrel, Hog Rider, Inferno Tower, Princess, Rocket, Skeleton Army, Skeletons, The Log
+  1: Executioner, Ice Golem, Inferno Tower, Miner, Minions, Rocket, The Log, Tornado
+  1: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, The Log
+  1: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Musketeer, The Log, Tombstone
+  1: Bowler, Electro Wizard, Executioner, Hog Rider, Ice Golem, Lightning, The Log, Tornado
+  1: Giant, Ice Spirit, Lightning, Mini P.E.K.K.A, Minions, The Log, Wizard, Zap
+  1: Barbarians, Fireball, Giant, Graveyard, Minions, Musketeer, The Log, Zap
+  1: Elixir Collector, Giant, Mini P.E.K.K.A, Minions, Musketeer, The Log, Three Musketeers, Zap
+  1: Giant, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Mortar, Musketeer, The Log, Zap
+  1: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log
+  1: Bowler, Fireball, Giant, Graveyard, Minions, Musketeer, Tornado, Zap
+  1: Balloon, Elixir Collector, Freeze, Ice Golem, Inferno Tower, Minions, Skeleton Army, Zap
+  1: Goblin Barrel, Inferno Tower, Knight, Mirror, Princess, Rocket, Skeleton Army, The Log
+  1: Arrows, Furnace, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Zap
+  1: Executioner, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Tornado, Zap
+  1: Arrows, Balloon, Freeze, Furnace, Ice Golem, Minions, Musketeer, Skeleton Army
+  1: Arrows, Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log
+  1: Dart Goblin, Goblin Barrel, Ice Golem, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
+  1: Balloon, Barbarians, Elixir Collector, Freeze, Giant, Rocket, Witch, Wizard
+  1: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Miner, Princess, Skeleton Army, The Log
+  1: Cannon, Goblins, Miner, Minion Horde, Princess, Skeleton Army, The Log, Zap
+  1: Executioner, Furnace, Ice Spirit, Knight, Lightning, Mega Minion, Royal Giant, The Log
+  1: Arrows, Furnace, Giant, Graveyard, Mega Minion, Mini P.E.K.K.A, Minions, Zap
+  1: Executioner, Ice Golem, Ice Spirit, Miner, Rocket, Skeletons, The Log, Tornado
+  1: Executioner, Furnace, Goblin Barrel, Mirror, Rocket, Skeleton Army, The Log, Tornado
+  1: Cannon, Fire Spirits, Hog Rider, Ice Golem, Musketeer, Rocket, Skeletons, The Log
+  1: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
+  1: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
+  1: Balloon, Elixir Collector, Executioner, Golem, Mega Minion, Rage, Skeleton Army, Tornado
+  1: Baby Dragon, Bowler, Giant, Graveyard, Musketeer, Tombstone, Tornado, Zap
+  1: Bowler, Fire Spirits, Giant, Graveyard, Musketeer, Tombstone, Tornado, Zap
+  1: Archers, Baby Dragon, Elixir Collector, Fireball, Golem, Mega Minion, The Log, Tombstone
+  1: Executioner, Giant, Knight, Miner, Minion Horde, Minions, The Log, Zap
+  1: Barbarians, Clone, Electro Wizard, Golem, Minion Horde, Minions, Skeleton Army, Three Musketeers
+  1: Elixir Collector, Giant, Ice Golem, Mini P.E.K.K.A, Minions, The Log, Three Musketeers, Zap
+  1: Goblin Barrel, Hog Rider, Ice Spirit, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
+  1: Arrows, Giant, Miner, Minion Horde, Minions, Musketeer, Skeleton Army, Tombstone
+  1: Dark Prince, Executioner, Lightning, Mega Minion, Musketeer, P.E.K.K.A, The Log, Zap
 Cards:
-73: The Log
-41: Zap
-40: Minions
-37: Skeleton Army
-35: Giant
-33: Lightning
-30: Inferno Tower
-30: Musketeer
-25: Ice Golem
-24: Executioner
-23: Princess
-23: Fire Spirits
-23: Ice Spirit
-23: Furnace
-22: Elixir Collector
-21: Goblin Barrel
-20: Mini P.E.K.K.A
-20: Mega Minion
-18: Tombstone
-17: Rocket
-17: Hog Rider
-16: Tornado
-14: Knight
-13: Arrows
-13: Graveyard
-13: Bowler
-12: Freeze
-12: Balloon
-10: Minion Horde
- 9: Royal Giant
- 8: X-Bow
- 8: Fireball
- 7: Goblins
- 7: Skeletons
- 6: Archers
- 6: Miner
- 6: Golem
- 5: Lava Hound
- 5: Mirror
- 5: Baby Dragon
- 4: Prince
- 4: Wizard
- 4: Cannon
- 3: Electro Wizard
- 3: Barbarians
- 3: Three Musketeers
- 3: Dart Goblin
- 1: Mortar
- 1: Witch
- 1: Rage
- 1: Clone
- 1: Dark Prince
- 1: P.E.K.K.A
+ 73 ( 10): The Log
+ 41 ( -6): Zap
+ 40 ( -9): Minions
+ 37 ( -5): Skeleton Army
+ 35 (  3): Giant
+ 33 (  2): Lightning
+ 30 ( 10): Inferno Tower
+ 30 (  0): Musketeer
+ 25 ( -3): Ice Golem
+ 24 (  6): Executioner
+ 23 (  1): Princess
+ 23 ( 22): Fire Spirits
+ 23 ( 13): Ice Spirit
+ 23 ( -7): Furnace
+ 22 ( -3): Elixir Collector
+ 21 ( -2): Goblin Barrel
+ 20 (  9): Mini P.E.K.K.A
+ 20 (-21): Mega Minion
+ 18 ( -6): Tombstone
+ 17 (  6): Rocket
+ 17 ( -7): Hog Rider
+ 16 ( 11): Tornado
+ 14 (  0): Knight
+ 13 ( -6): Arrows
+ 13 (  5): Graveyard
+ 13 ( -1): Bowler
+ 12 ( -1): Freeze
+ 12 ( -3): Balloon
+ 10 (  0): Minion Horde
+  9 (  4): Royal Giant
+  8 (  5): X-Bow
+  8 (-10): Fireball
+  7 (  1): Goblins
+  7 (  2): Skeletons
+  6 ( -5): Archers
+  6 (  1): Miner
+  6 ( -8): Golem
+  5 ( -1): Lava Hound
+  5 ( -3): Mirror
+  5 ( -3): Baby Dragon
+  4 (-12): Prince
+  4 (  0): Wizard
+  4 (  1): Cannon
+  3 ( -1): Electro Wizard
+  3 (  0): Barbarians
+  3 (  1): Three Musketeers
+  3 (  0): Dart Goblin
+  1 (  0): Mortar
+  1 (  0): Witch
+  1 ( -5): Rage
+  1 (  0): Clone
+  1 ( -3): Dark Prince
+  1 (  0): P.E.K.K.A
