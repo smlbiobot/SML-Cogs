@@ -26,33 +26,24 @@ DEALINGS IN THE SOFTWARE.
 
 from openpyxl import load_workbook
 import json
-import operator
-from operator import itemgetter
-
-
 
 cardpop_xlsx_path = 'data/cardpop{}.xlsx'
 cardpop_json_path = 'data/cardpop{}.json'
 cardpop_path = 'data/cardpop.json'
+summary_path = 'data/summary.txt'
 
 cardpop_range_min = 16
 cardpop_range_max = 24
 
-cardpop = {}
+data = {}
 
-class Deck:
-    def __init__(self, cards=None):
-        self.cards = sorted(cards)
-        self.name = ', '.join(self.cards)
-        self.count = 1
+out = []
 
 
 def save_json(filename=None, data=None):
     with open(filename, encoding='utf-8', mode='w') as f:
         json.dump(data, f, indent=4, sort_keys=False, separators=(',',' : '))
 
-def sort_by_deck_count(deck):
-    return deck["count"]
 
 def process_data():
     for id in range(cardpop_range_min, cardpop_range_max):
@@ -64,7 +55,11 @@ def process_data():
 
         cards = []
         players = []
+        cardpop = {}
         decks = {}
+
+        out.append("-" * 40)
+        out.append("Snapshot #{}".format(id))
 
         for i, row in enumerate(ws.iter_rows()):
             # first row is card names
@@ -72,13 +67,18 @@ def process_data():
                 for j, cell in enumerate(row):
                     if j:
                         cards.append(cell.value)
+                        cardpop[cell.value] = {
+                            "count": 0
+                        }
             # row 2-101 are card data
             # for older worksheets, it’s len - 2
             elif i<101:
                 deck = []
                 for j, cell in enumerate(row):
                     if j>0 and cell.value == 1:
-                        deck.append(cards[j-1])
+                        card_name = cards[j-1]
+                        deck.append(card_name)
+                        cardpop[card_name]["count"] += 1
 
                 deck = sorted(deck)
                 player = {
@@ -102,21 +102,31 @@ def process_data():
                     else:
                         decks[deck_id]["count"] += 1
 
-        decks = sorted(decks.items(), key = lambda x: -x[1]["count"])
-        decks = dict(decks)
-        # decks = [{k: v} for k, v in decks.items()]
+        decks = dict(sorted(decks.items(), key = lambda x: -x[1]["count"]))
+        cardpop = dict(sorted(cardpop.items(), key = lambda x: -x[1]["count"]))
         
+        out.append("Decks:")
+        for k, v in decks.items():
+            out.append("{:2d}: {}".format(v["count"], k))
+        out.append("Cards:")
+        for k, v in cardpop.items():
+            out.append("{:2d}: {}".format(v["count"], k))
 
-        cardpop[str(id)] = {
+        data[str(id)] = {
             "players": players,
             "cards": sorted(cards),
-            "decks": decks
+            "decks": decks,
+            "cardpop": cardpop
             }
 
-    save_json(cardpop_path, cardpop)
+    save_json(cardpop_path, data)
 
+    with open(summary_path, encoding="utf-8", mode="w") as f:
+        f.write('\n'.join(out))
 
 process_data()
+
+
 
 
 

@@ -1272,6 +1272,137 @@
                 ],
                 "count" : 1
             }
+        },
+        "cardpop" : {
+            "Mega Minion" : {
+                "count" : 43
+            },
+            "The Log" : {
+                "count" : 34
+            },
+            "Lightning" : {
+                "count" : 30
+            },
+            "Tombstone" : {
+                "count" : 28
+            },
+            "Archers" : {
+                "count" : 27
+            },
+            "Zap" : {
+                "count" : 21
+            },
+            "Golem" : {
+                "count" : 20
+            },
+            "Ice Golem" : {
+                "count" : 16
+            },
+            "Baby Dragon" : {
+                "count" : 14
+            },
+            "Ice Spirit" : {
+                "count" : 14
+            },
+            "Inferno Tower" : {
+                "count" : 13
+            },
+            "Fireball" : {
+                "count" : 12
+            },
+            "Skeleton Army" : {
+                "count" : 11
+            },
+            "Miner" : {
+                "count" : 10
+            },
+            "Musketeer" : {
+                "count" : 9
+            },
+            "Lava Hound" : {
+                "count" : 8
+            },
+            "Minions" : {
+                "count" : 8
+            },
+            "Princess" : {
+                "count" : 7
+            },
+            "Arrows" : {
+                "count" : 7
+            },
+            "Graveyard" : {
+                "count" : 6
+            },
+            "Mini P.E.K.K.A" : {
+                "count" : 6
+            },
+            "Lumberjack" : {
+                "count" : 5
+            },
+            "Giant" : {
+                "count" : 5
+            },
+            "Hog Rider" : {
+                "count" : 5
+            },
+            "Guards" : {
+                "count" : 5
+            },
+            "X-Bow" : {
+                "count" : 4
+            },
+            "Bowler" : {
+                "count" : 3
+            },
+            "Minion Horde" : {
+                "count" : 3
+            },
+            "Fire Spirits" : {
+                "count" : 3
+            },
+            "Elixir Collector" : {
+                "count" : 3
+            },
+            "Knight" : {
+                "count" : 2
+            },
+            "Inferno Dragon" : {
+                "count" : 2
+            },
+            "Royal Giant" : {
+                "count" : 2
+            },
+            "Ice Wizard" : {
+                "count" : 2
+            },
+            "Barbarians" : {
+                "count" : 2
+            },
+            "Goblins" : {
+                "count" : 2
+            },
+            "Furnace" : {
+                "count" : 2
+            },
+            "Skeletons" : {
+                "count" : 1
+            },
+            "Three Musketeers" : {
+                "count" : 1
+            },
+            "Rocket" : {
+                "count" : 1
+            },
+            "Bomber" : {
+                "count" : 1
+            },
+            "Goblin Barrel" : {
+                "count" : 1
+            },
+            "Mirror" : {
+                "count" : 1
+            }
         }
     },
     "17" : {
@@ -3450,6 +3581,146 @@
                     "Three Musketeers",
                     "Zap"
                 ],
+                "count" : 1
+            }
+        },
+        "cardpop" : {
+            "Mega Minion" : {
+                "count" : 84
+            },
+            "The Log" : {
+                "count" : 79
+            },
+            "Zap" : {
+                "count" : 57
+            },
+            "Archers" : {
+                "count" : 53
+            },
+            "Tombstone" : {
+                "count" : 44
+            },
+            "Lightning" : {
+                "count" : 41
+            },
+            "Ice Spirit" : {
+                "count" : 34
+            },
+            "Ice Golem" : {
+                "count" : 33
+            },
+            "Fireball" : {
+                "count" : 32
+            },
+            "Miner" : {
+                "count" : 28
+            },
+            "Giant" : {
+                "count" : 27
+            },
+            "Hog Rider" : {
+                "count" : 26
+            },
+            "Skeleton Army" : {
+                "count" : 26
+            },
+            "Inferno Tower" : {
+                "count" : 26
+            },
+            "Bowler" : {
+                "count" : 24
+            },
+            "Princess" : {
+                "count" : 23
+            },
+            "Furnace" : {
+                "count" : 15
+            },
+            "Minions" : {
+                "count" : 14
+            },
+            "Minion Horde" : {
+                "count" : 13
+            },
+            "Arrows" : {
+                "count" : 10
+            },
+            "Goblin Barrel" : {
+                "count" : 9
+            },
+            "Musketeer" : {
+                "count" : 9
+            },
+            "Golem" : {
+                "count" : 8
+            },
+            "Baby Dragon" : {
+                "count" : 7
+            },
+            "Mini P.E.K.K.A" : {
+                "count" : 7
+            },
+            "Graveyard" : {
+                "count" : 7
+            },
+            "Barbarians" : {
+                "count" : 6
+            },
+            "Royal Giant" : {
+                "count" : 6
+            },
+            "Cannon" : {
+                "count" : 5
+            },
+            "Freeze" : {
+                "count" : 5
+            },
+            "Barbarian Hut" : {
+                "count" : 5
+            },
+            "Rocket" : {
+                "count" : 5
+            },
+            "Lava Hound" : {
+                "count" : 5
+            },
+            "Elixir Collector" : {
+                "count" : 4
+            },
+            "Three Musketeers" : {
+                "count" : 4
+            },
+            "Guards" : {
+                "count" : 3
+            },
+            "X-Bow" : {
+                "count" : 3
+            },
+            "Goblins" : {
+                "count" : 2
+            },
+            "Knight" : {
+                "count" : 2
+            },
+            "Ice Wizard" : {
+                "count" : 2
+            },
+            "Spear Goblins" : {
+                "count" : 2
+            },
+            "Tornado" : {
+                "count" : 1
+            },
+            "Mirror" : {
+                "count" : 1
+            },
+            "Skeletons" : {
+                "count" : 1
+            },
+            "Fire Spirits" : {
+                "count" : 1
+            },
+            "Tesla" : {
                 "count" : 1
             }
         }
@@ -5703,6 +5974,149 @@
                 ],
                 "count" : 1
             }
+        },
+        "cardpop" : {
+            "Mega Minion" : {
+                "count" : 83
+            },
+            "Archers" : {
+                "count" : 68
+            },
+            "The Log" : {
+                "count" : 66
+            },
+            "Zap" : {
+                "count" : 60
+            },
+            "Fireball" : {
+                "count" : 36
+            },
+            "Ice Golem" : {
+                "count" : 35
+            },
+            "Tombstone" : {
+                "count" : 28
+            },
+            "Bowler" : {
+                "count" : 27
+            },
+            "Ice Spirit" : {
+                "count" : 26
+            },
+            "Graveyard" : {
+                "count" : 25
+            },
+            "Lightning" : {
+                "count" : 25
+            },
+            "Skeleton Army" : {
+                "count" : 25
+            },
+            "Furnace" : {
+                "count" : 25
+            },
+            "Giant" : {
+                "count" : 24
+            },
+            "Miner" : {
+                "count" : 21
+            },
+            "Freeze" : {
+                "count" : 19
+            },
+            "Inferno Tower" : {
+                "count" : 19
+            },
+            "Hog Rider" : {
+                "count" : 19
+            },
+            "Minions" : {
+                "count" : 17
+            },
+            "Royal Giant" : {
+                "count" : 15
+            },
+            "Cannon" : {
+                "count" : 13
+            },
+            "Princess" : {
+                "count" : 12
+            },
+            "Minion Horde" : {
+                "count" : 12
+            },
+            "Musketeer" : {
+                "count" : 10
+            },
+            "Fire Spirits" : {
+                "count" : 9
+            },
+            "Mini P.E.K.K.A" : {
+                "count" : 8
+            },
+            "Barbarians" : {
+                "count" : 8
+            },
+            "Elixir Collector" : {
+                "count" : 7
+            },
+            "Goblin Barrel" : {
+                "count" : 7
+            },
+            "Poison" : {
+                "count" : 6
+            },
+            "Knight" : {
+                "count" : 6
+            },
+            "Guards" : {
+                "count" : 5
+            },
+            "Golem" : {
+                "count" : 5
+            },
+            "Rocket" : {
+                "count" : 4
+            },
+            "Arrows" : {
+                "count" : 3
+            },
+            "Baby Dragon" : {
+                "count" : 3
+            },
+            "Lava Hound" : {
+                "count" : 3
+            },
+            "Three Musketeers" : {
+                "count" : 3
+            },
+            "Spear Goblins" : {
+                "count" : 2
+            },
+            "Goblins" : {
+                "count" : 2
+            },
+            "Ice Wizard" : {
+                "count" : 2
+            },
+            "X-Bow" : {
+                "count" : 2
+            },
+            "Rage" : {
+                "count" : 1
+            },
+            "Valkyrie" : {
+                "count" : 1
+            },
+            "Barbarian Hut" : {
+                "count" : 1
+            },
+            "P.E.K.K.A" : {
+                "count" : 1
+            },
+            "Prince" : {
+                "count" : 1
+            }
         }
     },
     "19" : {
@@ -7856,6 +8270,149 @@
                 ],
                 "count" : 1
             }
+        },
+        "cardpop" : {
+            "Zap" : {
+                "count" : 83
+            },
+            "Mega Minion" : {
+                "count" : 79
+            },
+            "Fireball" : {
+                "count" : 69
+            },
+            "Ice Golem" : {
+                "count" : 52
+            },
+            "Archers" : {
+                "count" : 42
+            },
+            "Minions" : {
+                "count" : 34
+            },
+            "Elite Barbarians" : {
+                "count" : 33
+            },
+            "Furnace" : {
+                "count" : 32
+            },
+            "Skeleton Army" : {
+                "count" : 31
+            },
+            "Ice Spirit" : {
+                "count" : 30
+            },
+            "Hog Rider" : {
+                "count" : 29
+            },
+            "The Log" : {
+                "count" : 29
+            },
+            "Giant" : {
+                "count" : 29
+            },
+            "Musketeer" : {
+                "count" : 28
+            },
+            "Bowler" : {
+                "count" : 24
+            },
+            "Tombstone" : {
+                "count" : 21
+            },
+            "Freeze" : {
+                "count" : 20
+            },
+            "Graveyard" : {
+                "count" : 16
+            },
+            "Cannon" : {
+                "count" : 16
+            },
+            "Miner" : {
+                "count" : 12
+            },
+            "Lightning" : {
+                "count" : 10
+            },
+            "Elixir Collector" : {
+                "count" : 9
+            },
+            "Princess" : {
+                "count" : 7
+            },
+            "Lava Hound" : {
+                "count" : 6
+            },
+            "Guards" : {
+                "count" : 6
+            },
+            "Inferno Tower" : {
+                "count" : 5
+            },
+            "X-Bow" : {
+                "count" : 5
+            },
+            "Royal Giant" : {
+                "count" : 4
+            },
+            "Fire Spirits" : {
+                "count" : 4
+            },
+            "Poison" : {
+                "count" : 3
+            },
+            "Barbarians" : {
+                "count" : 3
+            },
+            "Ice Wizard" : {
+                "count" : 3
+            },
+            "Minion Horde" : {
+                "count" : 3
+            },
+            "Goblin Barrel" : {
+                "count" : 3
+            },
+            "Golem" : {
+                "count" : 3
+            },
+            "Lumberjack" : {
+                "count" : 2
+            },
+            "Balloon" : {
+                "count" : 2
+            },
+            "Arrows" : {
+                "count" : 2
+            },
+            "Spear Goblins" : {
+                "count" : 2
+            },
+            "Mirror" : {
+                "count" : 2
+            },
+            "Knight" : {
+                "count" : 1
+            },
+            "Barbarian Hut" : {
+                "count" : 1
+            },
+            "Goblins" : {
+                "count" : 1
+            },
+            "Baby Dragon" : {
+                "count" : 1
+            },
+            "Three Musketeers" : {
+                "count" : 1
+            },
+            "Mini P.E.K.K.A" : {
+                "count" : 1
+            },
+            "Prince" : {
+                "count" : 1
+            }
         }
     },
     "20" : {
@@ -9958,6 +10515,128 @@
                     "Skeleton Army",
                     "Zap"
                 ],
+                "count" : 1
+            }
+        },
+        "cardpop" : {
+            "Zap" : {
+                "count" : 77
+            },
+            "Ice Golem" : {
+                "count" : 67
+            },
+            "Mega Minion" : {
+                "count" : 58
+            },
+            "Fireball" : {
+                "count" : 43
+            },
+            "Skeleton Army" : {
+                "count" : 38
+            },
+            "Musketeer" : {
+                "count" : 37
+            },
+            "Ice Spirit" : {
+                "count" : 37
+            },
+            "Minions" : {
+                "count" : 34
+            },
+            "Tombstone" : {
+                "count" : 34
+            },
+            "Archers" : {
+                "count" : 31
+            },
+            "Freeze" : {
+                "count" : 30
+            },
+            "The Log" : {
+                "count" : 29
+            },
+            "Hog Rider" : {
+                "count" : 24
+            },
+            "Elite Barbarians" : {
+                "count" : 22
+            },
+            "Furnace" : {
+                "count" : 22
+            },
+            "Graveyard" : {
+                "count" : 20
+            },
+            "Balloon" : {
+                "count" : 19
+            },
+            "Bowler" : {
+                "count" : 18
+            },
+            "Elixir Collector" : {
+                "count" : 18
+            },
+            "Giant" : {
+                "count" : 18
+            },
+            "Goblin Barrel" : {
+                "count" : 14
+            },
+            "Cannon" : {
+                "count" : 14
+            },
+            "Minion Horde" : {
+                "count" : 13
+            },
+            "Three Musketeers" : {
+                "count" : 12
+            },
+            "Mirror" : {
+                "count" : 11
+            },
+            "Lava Hound" : {
+                "count" : 9
+            },
+            "Princess" : {
+                "count" : 8
+            },
+            "Skeletons" : {
+                "count" : 8
+            },
+            "Miner" : {
+                "count" : 8
+            },
+            "X-Bow" : {
+                "count" : 6
+            },
+            "Spear Goblins" : {
+                "count" : 5
+            },
+            "Inferno Tower" : {
+                "count" : 4
+            },
+            "Fire Spirits" : {
+                "count" : 2
+            },
+            "Lightning" : {
+                "count" : 2
+            },
+            "Golem" : {
+                "count" : 2
+            },
+            "Poison" : {
+                "count" : 2
+            },
+            "Royal Giant" : {
+                "count" : 1
+            },
+            "Rocket" : {
+                "count" : 1
+            },
+            "Arrows" : {
+                "count" : 1
+            },
+            "Tornado" : {
                 "count" : 1
             }
         }
@@ -12073,6 +12752,161 @@
                     "Valkyrie",
                     "X-Bow"
                 ],
+                "count" : 1
+            }
+        },
+        "cardpop" : {
+            "Ice Golem" : {
+                "count" : 77
+            },
+            "Zap" : {
+                "count" : 76
+            },
+            "Mega Minion" : {
+                "count" : 56
+            },
+            "Musketeer" : {
+                "count" : 47
+            },
+            "Fireball" : {
+                "count" : 40
+            },
+            "Minions" : {
+                "count" : 40
+            },
+            "Tombstone" : {
+                "count" : 39
+            },
+            "Archers" : {
+                "count" : 31
+            },
+            "The Log" : {
+                "count" : 31
+            },
+            "Freeze" : {
+                "count" : 29
+            },
+            "Bowler" : {
+                "count" : 29
+            },
+            "Elixir Collector" : {
+                "count" : 28
+            },
+            "Graveyard" : {
+                "count" : 27
+            },
+            "Elite Barbarians" : {
+                "count" : 26
+            },
+            "Ice Spirit" : {
+                "count" : 24
+            },
+            "Hog Rider" : {
+                "count" : 18
+            },
+            "Skeleton Army" : {
+                "count" : 16
+            },
+            "Giant" : {
+                "count" : 16
+            },
+            "Balloon" : {
+                "count" : 15
+            },
+            "Rocket" : {
+                "count" : 12
+            },
+            "Furnace" : {
+                "count" : 12
+            },
+            "Inferno Tower" : {
+                "count" : 11
+            },
+            "X-Bow" : {
+                "count" : 9
+            },
+            "Lava Hound" : {
+                "count" : 9
+            },
+            "Cannon" : {
+                "count" : 9
+            },
+            "Minion Horde" : {
+                "count" : 8
+            },
+            "Goblin Barrel" : {
+                "count" : 8
+            },
+            "Mirror" : {
+                "count" : 6
+            },
+            "Skeletons" : {
+                "count" : 6
+            },
+            "Golem" : {
+                "count" : 6
+            },
+            "Three Musketeers" : {
+                "count" : 5
+            },
+            "Princess" : {
+                "count" : 3
+            },
+            "Miner" : {
+                "count" : 3
+            },
+            "Poison" : {
+                "count" : 3
+            },
+            "Lightning" : {
+                "count" : 3
+            },
+            "Dart Goblin" : {
+                "count" : 2
+            },
+            "Spear Goblins" : {
+                "count" : 2
+            },
+            "Guards" : {
+                "count" : 2
+            },
+            "Knight" : {
+                "count" : 2
+            },
+            "Baby Dragon" : {
+                "count" : 2
+            },
+            "Arrows" : {
+                "count" : 2
+            },
+            "Mortar" : {
+                "count" : 1
+            },
+            "Electro Wizard" : {
+                "count" : 1
+            },
+            "Barbarian Hut" : {
+                "count" : 1
+            },
+            "Barbarians" : {
+                "count" : 1
+            },
+            "Wizard" : {
+                "count" : 1
+            },
+            "Witch" : {
+                "count" : 1
+            },
+            "Tornado" : {
+                "count" : 1
+            },
+            "Royal Giant" : {
+                "count" : 1
+            },
+            "Ice Wizard" : {
+                "count" : 1
+            },
+            "Valkyrie" : {
                 "count" : 1
             }
         }
@@ -14201,6 +15035,158 @@
                     "Skeleton Army",
                     "Zap"
                 ],
+                "count" : 1
+            }
+        },
+        "cardpop" : {
+            "The Log" : {
+                "count" : 63
+            },
+            "Minions" : {
+                "count" : 49
+            },
+            "Zap" : {
+                "count" : 47
+            },
+            "Skeleton Army" : {
+                "count" : 42
+            },
+            "Mega Minion" : {
+                "count" : 41
+            },
+            "Giant" : {
+                "count" : 32
+            },
+            "Lightning" : {
+                "count" : 31
+            },
+            "Furnace" : {
+                "count" : 30
+            },
+            "Musketeer" : {
+                "count" : 30
+            },
+            "Ice Golem" : {
+                "count" : 28
+            },
+            "Elixir Collector" : {
+                "count" : 25
+            },
+            "Hog Rider" : {
+                "count" : 24
+            },
+            "Tombstone" : {
+                "count" : 24
+            },
+            "Goblin Barrel" : {
+                "count" : 23
+            },
+            "Princess" : {
+                "count" : 22
+            },
+            "Inferno Tower" : {
+                "count" : 20
+            },
+            "Arrows" : {
+                "count" : 19
+            },
+            "Executioner" : {
+                "count" : 18
+            },
+            "Fireball" : {
+                "count" : 18
+            },
+            "Prince" : {
+                "count" : 16
+            },
+            "Balloon" : {
+                "count" : 15
+            },
+            "Golem" : {
+                "count" : 14
+            },
+            "Bowler" : {
+                "count" : 14
+            },
+            "Freeze" : {
+                "count" : 13
+            },
+            "Mini P.E.K.K.A" : {
+                "count" : 11
+            },
+            "Archers" : {
+                "count" : 11
+            },
+            "Rocket" : {
+                "count" : 11
+            },
+            "Minion Horde" : {
+                "count" : 10
+            },
+            "Ice Spirit" : {
+                "count" : 10
+            },
+            "Baby Dragon" : {
+                "count" : 8
+            },
+            "Graveyard" : {
+                "count" : 8
+            },
+            "Mirror" : {
+                "count" : 8
+            },
+            "Goblins" : {
+                "count" : 6
+            },
+            "Rage" : {
+                "count" : 6
+            },
+            "Lava Hound" : {
+                "count" : 6
+            },
+            "Miner" : {
+                "count" : 5
+            },
+            "Tornado" : {
+                "count" : 5
+            },
+            "Skeletons" : {
+                "count" : 5
+            },
+            "Royal Giant" : {
+                "count" : 5
+            },
+            "Dark Prince" : {
+                "count" : 4
+            },
+            "Electro Wizard" : {
+                "count" : 4
+            },
+            "X-Bow" : {
+                "count" : 3
+            },
+            "Cannon" : {
+                "count" : 3
+            },
+            "Dart Goblin" : {
+                "count" : 3
+            },
+            "Elite Barbarians" : {
+                "count" : 3
+            },
+            "Guards" : {
+                "count" : 2
+            },
+            "Three Musketeers" : {
+                "count" : 2
+            },
+            "Fire Spirits" : {
+                "count" : 1
+            },
+            "Goblin Hut" : {
+                "count" : 1
+            },
+            "Mortar" : {
                 "count" : 1
             }
         }
@@ -16402,6 +17388,167 @@
                     "The Log",
                     "Zap"
                 ],
+                "count" : 1
+            }
+        },
+        "cardpop" : {
+            "The Log" : {
+                "count" : 73
+            },
+            "Zap" : {
+                "count" : 41
+            },
+            "Minions" : {
+                "count" : 40
+            },
+            "Skeleton Army" : {
+                "count" : 37
+            },
+            "Giant" : {
+                "count" : 35
+            },
+            "Lightning" : {
+                "count" : 33
+            },
+            "Inferno Tower" : {
+                "count" : 30
+            },
+            "Musketeer" : {
+                "count" : 30
+            },
+            "Ice Golem" : {
+                "count" : 25
+            },
+            "Executioner" : {
+                "count" : 24
+            },
+            "Princess" : {
+                "count" : 23
+            },
+            "Fire Spirits" : {
+                "count" : 23
+            },
+            "Ice Spirit" : {
+                "count" : 23
+            },
+            "Furnace" : {
+                "count" : 23
+            },
+            "Elixir Collector" : {
+                "count" : 22
+            },
+            "Goblin Barrel" : {
+                "count" : 21
+            },
+            "Mini P.E.K.K.A" : {
+                "count" : 20
+            },
+            "Mega Minion" : {
+                "count" : 20
+            },
+            "Tombstone" : {
+                "count" : 18
+            },
+            "Rocket" : {
+                "count" : 17
+            },
+            "Hog Rider" : {
+                "count" : 17
+            },
+            "Tornado" : {
+                "count" : 16
+            },
+            "Knight" : {
+                "count" : 14
+            },
+            "Arrows" : {
+                "count" : 13
+            },
+            "Graveyard" : {
+                "count" : 13
+            },
+            "Bowler" : {
+                "count" : 13
+            },
+            "Freeze" : {
+                "count" : 12
+            },
+            "Balloon" : {
+                "count" : 12
+            },
+            "Minion Horde" : {
+                "count" : 10
+            },
+            "Royal Giant" : {
+                "count" : 9
+            },
+            "X-Bow" : {
+                "count" : 8
+            },
+            "Fireball" : {
+                "count" : 8
+            },
+            "Goblins" : {
+                "count" : 7
+            },
+            "Skeletons" : {
+                "count" : 7
+            },
+            "Archers" : {
+                "count" : 6
+            },
+            "Miner" : {
+                "count" : 6
+            },
+            "Golem" : {
+                "count" : 6
+            },
+            "Lava Hound" : {
+                "count" : 5
+            },
+            "Mirror" : {
+                "count" : 5
+            },
+            "Baby Dragon" : {
+                "count" : 5
+            },
+            "Prince" : {
+                "count" : 4
+            },
+            "Wizard" : {
+                "count" : 4
+            },
+            "Cannon" : {
+                "count" : 4
+            },
+            "Electro Wizard" : {
+                "count" : 3
+            },
+            "Barbarians" : {
+                "count" : 3
+            },
+            "Three Musketeers" : {
+                "count" : 3
+            },
+            "Dart Goblin" : {
+                "count" : 3
+            },
+            "Mortar" : {
+                "count" : 1
+            },
+            "Witch" : {
+                "count" : 1
+            },
+            "Rage" : {
+                "count" : 1
+            },
+            "Clone" : {
+                "count" : 1
+            },
+            "Dark Prince" : {
+                "count" : 1
+            },
+            "P.E.K.K.A" : {
                 "count" : 1
             }
         }
