@@ -36,7 +36,7 @@ summary_path = 'data/summary.txt'
 cardpop_range_min = 16
 cardpop_range_max = 24
 
-similarity_threshold = 0.8
+similarity_threshold = 0.85
 
 data = {}
 
