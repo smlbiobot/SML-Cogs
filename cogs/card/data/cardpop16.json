@@ -1,0 +1,652 @@
+[
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 1
+    },
+    {
+        "deck" : [
+            "Baby Dragon",
+            "Lava Hound",
+            "Lightning",
+            "Lumberjack",
+            "Mega Minion",
+            "Miner",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 2
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Golem",
+            "Graveyard",
+            "Ice Golem",
+            "Mega Minion",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 3
+    },
+    {
+        "deck" : [
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "Minions",
+            "Musketeer",
+            "Skeleton Army",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 4
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Giant",
+            "Ice Golem",
+            "Lightning",
+            "Mega Minion",
+            "Musketeer",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 5
+    },
+    {
+        "deck" : [
+            "Fireball",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Mega Minion",
+            "Minions",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 6
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Golem",
+            "Ice Golem",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 7
+    },
+    {
+        "deck" : [
+            "Hog Rider",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Lightning",
+            "Mega Minion",
+            "Princess",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 8
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "Miner",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 9
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Golem",
+            "Lightning",
+            "Lumberjack",
+            "Mega Minion",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 10
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Arrows",
+            "Lava Hound",
+            "Lightning",
+            "Mega Minion",
+            "Miner",
+            "Minions",
+            "Tombstone"
+        ],
+        "rank" : 11
+    },
+    {
+        "deck" : [
+            "Hog Rider",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Princess",
+            "Skeletons",
+            "Zap"
+        ],
+        "rank" : 12
+    },
+    {
+        "deck" : [
+            "Bowler",
+            "Fireball",
+            "Guards",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Mega Minion",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 13
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Bowler",
+            "Giant",
+            "Lightning",
+            "Mega Minion",
+            "Musketeer",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 14
+    },
+    {
+        "deck" : [
+            "Guards",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Lightning",
+            "Mega Minion",
+            "Miner",
+            "Princess",
+            "The Log"
+        ],
+        "rank" : 15
+    },
+    {
+        "deck" : [
+            "Fireball",
+            "Graveyard",
+            "Ice Golem",
+            "Inferno Tower",
+            "Mega Minion",
+            "Miner",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 16
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Ice Golem",
+            "Lava Hound",
+            "Lightning",
+            "Lumberjack",
+            "Minion Horde",
+            "Minions",
+            "Tombstone"
+        ],
+        "rank" : 17
+    },
+    {
+        "deck" : [
+            "Fireball",
+            "Graveyard",
+            "Lava Hound",
+            "Lumberjack",
+            "Mega Minion",
+            "Minions",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 18
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Arrows",
+            "Fireball",
+            "Graveyard",
+            "Knight",
+            "Lava Hound",
+            "Mega Minion",
+            "Tombstone"
+        ],
+        "rank" : 19
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Golem",
+            "Lightning",
+            "Lumberjack",
+            "Mega Minion",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 20
+    },
+    {
+        "deck" : [
+            "Fireball",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Mega Minion",
+            "Minions",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 21
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Fireball",
+            "Golem",
+            "Mega Minion",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "Musketeer",
+            "Zap"
+        ],
+        "rank" : 22
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Golem",
+            "Ice Golem",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 23
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Arrows",
+            "Elixir Collector",
+            "Ice Spirit",
+            "Knight",
+            "Miner",
+            "The Log",
+            "Three Musketeers"
+        ],
+        "rank" : 24
+    },
+    {
+        "deck" : [
+            "Baby Dragon",
+            "Elixir Collector",
+            "Fireball",
+            "Inferno Dragon",
+            "Lava Hound",
+            "Mega Minion",
+            "Skeleton Army",
+            "Zap"
+        ],
+        "rank" : 25
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Fireball",
+            "Hog Rider",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Mega Minion",
+            "The Log"
+        ],
+        "rank" : 26
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Fireball",
+            "Hog Rider",
+            "Ice Golem",
+            "Ice Spirit",
+            "Mega Minion",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 27
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Elixir Collector",
+            "Lava Hound",
+            "Lightning",
+            "Mega Minion",
+            "Miner",
+            "Skeleton Army"
+        ],
+        "rank" : 28
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Bowler",
+            "Fireball",
+            "Graveyard",
+            "Ice Golem",
+            "Inferno Tower",
+            "Mega Minion",
+            "Zap"
+        ],
+        "rank" : 29
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Arrows",
+            "Ice Golem",
+            "Mega Minion",
+            "Musketeer",
+            "Royal Giant",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 30
+    },
+    {
+        "deck" : [
+            "Guards",
+            "Hog Rider",
+            "Ice Spirit",
+            "Ice Wizard",
+            "Mini P.E.K.K.A",
+            "Princess",
+            "Rocket",
+            "The Log"
+        ],
+        "rank" : 31
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Bomber",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 32
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Barbarians",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 33
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 34
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Mega Minion",
+            "Princess",
+            "Skeleton Army",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 35
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Golem",
+            "Ice Golem",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 36
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 37
+    },
+    {
+        "deck" : [
+            "Giant",
+            "Ice Wizard",
+            "Inferno Tower",
+            "Lightning",
+            "Mega Minion",
+            "Musketeer",
+            "Skeleton Army",
+            "Zap"
+        ],
+        "rank" : 38
+    },
+    {
+        "deck" : [
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Miner",
+            "Minion Horde",
+            "Mirror",
+            "Princess",
+            "Skeleton Army",
+            "Zap"
+        ],
+        "rank" : 39
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Barbarians",
+            "Giant",
+            "Ice Spirit",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 40
+    },
+    {
+        "deck" : [
+            "Goblins",
+            "Ice Golem",
+            "Inferno Tower",
+            "Miner",
+            "Mini P.E.K.K.A",
+            "Princess",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 41
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Arrows",
+            "Golem",
+            "Graveyard",
+            "Ice Golem",
+            "Mega Minion",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 42
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Furnace",
+            "Guards",
+            "Ice Spirit",
+            "Lightning",
+            "Mega Minion",
+            "Royal Giant",
+            "The Log"
+        ],
+        "rank" : 43
+    },
+    {
+        "deck" : [
+            "Fireball",
+            "Giant",
+            "Goblins",
+            "Ice Spirit",
+            "Mega Minion",
+            "Mini P.E.K.K.A",
+            "Musketeer",
+            "Zap"
+        ],
+        "rank" : 44
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Furnace",
+            "Golem",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 45
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Golem",
+            "Ice Golem",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 46
+    },
+    {
+        "deck" : [
+            "Guards",
+            "Inferno Dragon",
+            "Lava Hound",
+            "Lightning",
+            "Mega Minion",
+            "Miner",
+            "Minion Horde",
+            "Tombstone"
+        ],
+        "rank" : 47
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 48
+    },
+    {
+        "deck" : [
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "Minions",
+            "Musketeer",
+            "Skeleton Army",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 49
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "Musketeer",
+            "Skeleton Army",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 50
+    }
+]

@@ -26,39 +26,48 @@ DEALINGS IN THE SOFTWARE.
 
 from openpyxl import load_workbook
 import json
-import os
 
 
-cardpop_xlsx_path = 'data/cardpop23.xlsx'
-cardpop_json_path = 'data/cardpop23.json'
+
+cardpop_xlsx_path = 'data/cardpop{}.xlsx'
+cardpop_json_path = 'data/cardpop{}.json'
+
+for id in range(16, 24):
 
 
-wb = load_workbook(cardpop_xlsx_path)
+    wb = load_workbook(cardpop_xlsx_path.format(id))
 
-ws = wb['Sheet1']
+    ws = wb.worksheets[0]
 
-cards = []
-decks = []
+    cards = []
+    decks = []
+    rows = ws.iter_rows()
 
-for i, row in enumerate(ws.iter_rows()):
-    # first row is card names
-    if i==0:
-        for j, cell in enumerate(row):
-            if j:
-                cards.append(cell.value)
-    # row 2-101 are card data
-    elif i<101:
-        deck = []
-        for j, cell in enumerate(row):
-            if j>0 and cell.value is not None:
-                deck.append(cards[j-1])
-        decks.append(deck)
+    for i, row in enumerate(ws.iter_rows()):
+        # first row is card names
+        if i==0:
+            for j, cell in enumerate(row):
+                if j:
+                    cards.append(cell.value)
+        # row 2-101 are card data
+        # for older worksheets, it’s len - 2
+        elif i<101:
+            deck = []
+            for j, cell in enumerate(row):
+                if j>0 and cell.value == 1:
+                    deck.append(cards[j-1])
+            player = {
+                "rank": i,
+                "deck": sorted(deck)
+            }
+            if len(deck):
+                decks.append(player)
 
-with open(cardpop_json_path, encoding='utf-8', mode='w') as f:
-    json.dump(decks, f, indent=4, sort_keys=True, separators=(',',' : '))
+    with open(cardpop_json_path.format(id), encoding='utf-8', mode='w') as f:
+        json.dump(decks, f, indent=4, sort_keys=True, separators=(',',' : '))
 
-print(str(decks))
-print(len(decks))
+    # print(str(decks))
+    # print(len(decks))
 
 
 

@@ -1,1002 +1,1302 @@
 [
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Knight",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits"
-    ],
-    [
-        "Princess",
-        "Hog Rider",
-        "Elixir Collector",
-        "Zap",
-        "Ice Spirit",
-        "Freeze",
-        "Mini P.E.K.K.A",
-        "Goblins"
-    ],
-    [
-        "Skeleton Army",
-        "Lava Hound",
-        "Lightning",
-        "Arrows",
-        "Tombstone",
-        "Mega Minion",
-        "Balloon",
-        "Minions"
-    ],
-    [
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Elixir Collector",
-        "Ice Spirit",
-        "Ice Golem",
-        "X-Bow",
-        "Musketeer"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Graveyard",
-        "Giant",
-        "Bowler",
-        "Archers",
-        "Tornado",
-        "Executioner"
-    ],
-    [
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Elixir Collector",
-        "Ice Spirit",
-        "Ice Golem",
-        "X-Bow",
-        "Musketeer"
-    ],
-    [
-        "Princess",
-        "Hog Rider",
-        "Elixir Collector",
-        "Zap",
-        "Freeze",
-        "Mini P.E.K.K.A",
-        "Goblins",
-        "Minions"
-    ],
-    [
-        "Skeleton Army",
-        "Lava Hound",
-        "Lightning",
-        "Arrows",
-        "Tombstone",
-        "Balloon",
-        "Minions",
-        "Musketeer"
-    ],
-    [
-        "The Log",
-        "Ice Spirit",
-        "Goblins",
-        "Lightning",
-        "Giant",
-        "Tornado",
-        "Executioner",
-        "Electro Wizard"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Mega Minion",
-        "Graveyard",
-        "Giant",
-        "Bowler",
-        "Tornado",
-        "Executioner"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "The Log",
-        "Inferno Tower",
-        "Fireball",
-        "Furnace",
-        "Mirror",
-        "Minion Horde"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Tombstone",
-        "Minions",
-        "Giant",
-        "Executioner"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Hog Rider",
-        "Skeletons"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Knight",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits"
-    ],
-    [
-        "Princess",
-        "Hog Rider",
-        "Elixir Collector",
-        "Zap",
-        "Freeze",
-        "Mini P.E.K.K.A",
-        "Goblins",
-        "Minions"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Ice Spirit",
-        "Lightning",
-        "Giant",
-        "Executioner",
-        "Furnace",
-        "Prince"
-    ],
-    [
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Elixir Collector",
-        "Ice Spirit",
-        "Ice Golem",
-        "X-Bow",
-        "Musketeer"
-    ],
-    [
-        "Freeze",
-        "Arrows",
-        "Tombstone",
-        "Mega Minion",
-        "Balloon",
-        "Minions",
-        "Giant",
-        "Bowler"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Hog Rider",
-        "Ice Golem"
-    ],
-    [
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Minions",
-        "Ice Golem",
-        "Tornado",
-        "Executioner",
-        "Miner"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Minions",
-        "Musketeer",
-        "Giant",
-        "Furnace"
-    ],
-    [
-        "Zap",
-        "Tombstone",
-        "Mega Minion",
-        "Graveyard",
-        "Giant",
-        "Bowler",
-        "Tornado",
-        "Wizard"
-    ],
-    [
-        "The Log",
-        "Elixir Collector",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Mega Minion",
-        "Archers",
-        "Golem",
-        "Baby Dragon"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "The Log",
-        "Inferno Tower",
-        "Fireball",
-        "Furnace",
-        "Mirror",
-        "Minion Horde"
-    ],
-    [
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Ice Spirit",
-        "Ice Golem",
-        "X-Bow",
-        "Archers"
-    ],
-    [
-        "Skeleton Army",
-        "Lava Hound",
-        "Lightning",
-        "Arrows",
-        "Tombstone",
-        "Mega Minion",
-        "Balloon",
-        "Minions"
-    ],
-    [
-        "The Log",
-        "Elixir Collector",
-        "Lightning",
-        "Tombstone",
-        "Mega Minion",
-        "Musketeer",
-        "Golem",
-        "Baby Dragon"
-    ],
-    [
-        "The Log",
-        "Hog Rider",
-        "Lightning",
-        "Ice Golem",
-        "Bowler",
-        "Tornado",
-        "Executioner",
-        "Electro Wizard"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Ice Spirit",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Minions",
-        "Giant",
-        "Wizard"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Minions",
-        "Musketeer",
-        "Graveyard",
-        "Giant",
-        "Fireball",
-        "Barbarians"
-    ],
-    [
-        "The Log",
-        "Elixir Collector",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Minions",
-        "Musketeer",
-        "Giant",
-        "Three Musketeers"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Ice Spirit",
-        "Mini P.E.K.K.A",
-        "Mega Minion",
-        "Musketeer",
-        "Giant",
-        "Mortar"
-    ],
-    [
-        "The Log",
-        "Elixir Collector",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Mega Minion",
-        "Musketeer",
-        "Golem",
-        "Baby Dragon"
-    ],
-    [
-        "Zap",
-        "Minions",
-        "Musketeer",
-        "Graveyard",
-        "Giant",
-        "Bowler",
-        "Tornado",
-        "Fireball"
-    ],
-    [
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Elixir Collector",
-        "Ice Spirit",
-        "Ice Golem",
-        "X-Bow",
-        "Musketeer"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Knight",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Tombstone",
-        "Minions",
-        "Giant",
-        "Executioner"
-    ],
-    [
-        "Skeleton Army",
-        "Inferno Tower",
-        "Elixir Collector",
-        "Zap",
-        "Freeze",
-        "Balloon",
-        "Minions",
-        "Ice Golem"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Ice Spirit",
-        "Lightning",
-        "Giant",
-        "Executioner",
-        "Furnace",
-        "Prince"
-    ],
-    [
-        "Freeze",
-        "Arrows",
-        "Tombstone",
-        "Mega Minion",
-        "Balloon",
-        "Minions",
-        "Giant",
-        "Bowler"
-    ],
-    [
-        "Knight",
-        "The Log",
-        "Fire Spirits",
-        "Lightning",
-        "Minions",
-        "Executioner",
-        "Furnace",
-        "Royal Giant"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "The Log",
-        "Inferno Tower",
-        "Hog Rider",
-        "Ice Golem",
-        "Skeletons"
-    ],
-    [
-        "Skeleton Army",
-        "The Log",
-        "Zap",
-        "Lightning",
-        "Minions",
-        "Musketeer",
-        "Furnace",
-        "Royal Giant"
-    ],
-    [
-        "Zap",
-        "Tombstone",
-        "Mega Minion",
-        "Graveyard",
-        "Giant",
-        "Bowler",
-        "Tornado",
-        "Wizard"
-    ],
-    [
-        "Knight",
-        "The Log",
-        "Fire Spirits",
-        "Lightning",
-        "Minions",
-        "Executioner",
-        "Furnace",
-        "Royal Giant"
-    ],
-    [
-        "Skeleton Army",
-        "Lava Hound",
-        "Lightning",
-        "Arrows",
-        "Tombstone",
-        "Mega Minion",
-        "Balloon",
-        "Minions"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Knight",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits"
-    ],
-    [
-        "The Log",
-        "Elixir Collector",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Minions",
-        "Giant",
-        "Minion Horde"
-    ],
-    [
-        "Knight",
-        "The Log",
-        "Fire Spirits",
-        "Lightning",
-        "Minions",
-        "Executioner",
-        "Furnace",
-        "Royal Giant"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "The Log",
-        "Inferno Tower",
-        "Fireball",
-        "Furnace",
-        "Mirror",
-        "Minion Horde"
-    ],
-    [
-        "The Log",
-        "Hog Rider",
-        "Ice Spirit",
-        "Ice Golem",
-        "Musketeer",
-        "Fireball",
-        "Skeletons",
-        "Cannon"
-    ],
-    [
-        "Skeleton Army",
-        "The Log",
-        "Zap",
-        "Lightning",
-        "Minions",
-        "Musketeer",
-        "Furnace",
-        "Royal Giant"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Hog Rider",
-        "Ice Golem"
-    ],
-    [
-        "The Log",
-        "Elixir Collector",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Minions",
-        "Giant",
-        "Minion Horde"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Knight",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Mirror"
-    ],
-    [
-        "Skeleton Army",
-        "Zap",
-        "Arrows",
-        "Minions",
-        "Musketeer",
-        "Graveyard",
-        "Giant",
-        "Furnace"
-    ],
-    [
-        "Knight",
-        "The Log",
-        "Fire Spirits",
-        "Lightning",
-        "Minions",
-        "Executioner",
-        "Furnace",
-        "Royal Giant"
-    ],
-    [
-        "Zap",
-        "Freeze",
-        "Tombstone",
-        "Mega Minion",
-        "Ice Golem",
-        "Graveyard",
-        "Tornado",
-        "Executioner"
-    ],
-    [
-        "Skeleton Army",
-        "Freeze",
-        "Arrows",
-        "Balloon",
-        "Minions",
-        "Ice Golem",
-        "Musketeer",
-        "Furnace"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "The Log",
-        "Inferno Tower",
-        "Hog Rider",
-        "Ice Golem",
-        "Skeletons"
-    ],
-    [
-        "Freeze",
-        "Arrows",
-        "Tombstone",
-        "Mega Minion",
-        "Balloon",
-        "Minions",
-        "Giant",
-        "Bowler"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Hog Rider",
-        "Ice Golem"
-    ],
-    [
-        "Skeleton Army",
-        "The Log",
-        "Lightning",
-        "Arrows",
-        "Minions",
-        "Musketeer",
-        "Furnace",
-        "Royal Giant"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Ice Golem",
-        "Dart Goblin"
-    ],
-    [
-        "Rocket",
-        "Elixir Collector",
-        "Freeze",
-        "Balloon",
-        "Giant",
-        "Wizard",
-        "Barbarians",
-        "Witch"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Knight",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits"
-    ],
-    [
-        "Skeleton Army",
-        "Lava Hound",
-        "Lightning",
-        "Arrows",
-        "Tombstone",
-        "Balloon",
-        "Minions",
-        "Musketeer"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Knight",
-        "The Log",
-        "Inferno Tower",
-        "Miner",
-        "Dart Goblin"
-    ],
-    [
-        "Skeleton Army",
-        "Princess",
-        "The Log",
-        "Zap",
-        "Goblins",
-        "Minion Horde",
-        "Miner",
-        "Cannon"
-    ],
-    [
-        "Knight",
-        "The Log",
-        "Ice Spirit",
-        "Lightning",
-        "Mega Minion",
-        "Executioner",
-        "Furnace",
-        "Royal Giant"
-    ],
-    [
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Arrows",
-        "Mega Minion",
-        "Minions",
-        "Graveyard",
-        "Giant",
-        "Furnace"
-    ],
-    [
-        "Princess",
-        "Hog Rider",
-        "Elixir Collector",
-        "Zap",
-        "Ice Spirit",
-        "Freeze",
-        "Mini P.E.K.K.A",
-        "Goblins"
-    ],
-    [
-        "Rocket",
-        "The Log",
-        "Ice Spirit",
-        "Ice Golem",
-        "Tornado",
-        "Executioner",
-        "Skeletons",
-        "Miner"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Rocket",
-        "The Log",
-        "Tornado",
-        "Executioner",
-        "Furnace",
-        "Mirror"
-    ],
-    [
-        "The Log",
-        "Hog Rider",
-        "Ice Spirit",
-        "Ice Golem",
-        "Musketeer",
-        "Fireball",
-        "Skeletons",
-        "Cannon"
-    ],
-    [
-        "Rocket",
-        "The Log",
-        "Fire Spirits",
-        "Hog Rider",
-        "Ice Golem",
-        "Musketeer",
-        "Skeletons",
-        "Cannon"
-    ],
-    [
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Elixir Collector",
-        "Ice Spirit",
-        "Ice Golem",
-        "X-Bow",
-        "Musketeer"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Mega Minion",
-        "Graveyard",
-        "Giant",
-        "Bowler",
-        "Tornado",
-        "Executioner"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Knight",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Dart Goblin"
-    ],
-    [
-        "Princess",
-        "Hog Rider",
-        "Zap",
-        "Ice Spirit",
-        "Freeze",
-        "Mini P.E.K.K.A",
-        "Goblins",
-        "Minions"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Ice Spirit",
-        "Lightning",
-        "Giant",
-        "Executioner",
-        "Furnace",
-        "Prince"
-    ],
-    [
-        "Skeleton Army",
-        "Elixir Collector",
-        "Mega Minion",
-        "Balloon",
-        "Tornado",
-        "Executioner",
-        "Golem",
-        "Rage"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Minions",
-        "Musketeer",
-        "Giant",
-        "Furnace"
-    ],
-    [
-        "Zap",
-        "Tombstone",
-        "Musketeer",
-        "Graveyard",
-        "Giant",
-        "Bowler",
-        "Tornado",
-        "Baby Dragon"
-    ],
-    [
-        "Fire Spirits",
-        "Zap",
-        "Tombstone",
-        "Musketeer",
-        "Graveyard",
-        "Giant",
-        "Bowler",
-        "Tornado"
-    ],
-    [
-        "The Log",
-        "Elixir Collector",
-        "Tombstone",
-        "Mega Minion",
-        "Archers",
-        "Fireball",
-        "Golem",
-        "Baby Dragon"
-    ],
-    [
-        "Knight",
-        "The Log",
-        "Zap",
-        "Minions",
-        "Giant",
-        "Executioner",
-        "Minion Horde",
-        "Miner"
-    ],
-    [
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Elixir Collector",
-        "Ice Spirit",
-        "Ice Golem",
-        "X-Bow",
-        "Musketeer"
-    ],
-    [
-        "Skeleton Army",
-        "Minions",
-        "Electro Wizard",
-        "Minion Horde",
-        "Golem",
-        "Barbarians",
-        "Three Musketeers",
-        "Clone"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Ice Spirit",
-        "Lightning",
-        "Giant",
-        "Executioner",
-        "Furnace",
-        "Prince"
-    ],
-    [
-        "The Log",
-        "Elixir Collector",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Minions",
-        "Ice Golem",
-        "Giant",
-        "Three Musketeers"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Hog Rider",
-        "Ice Spirit"
-    ],
-    [
-        "Skeleton Army",
-        "The Log",
-        "Zap",
-        "Lightning",
-        "Minions",
-        "Musketeer",
-        "Furnace",
-        "Royal Giant"
-    ],
-    [
-        "Skeleton Army",
-        "Arrows",
-        "Tombstone",
-        "Minions",
-        "Musketeer",
-        "Giant",
-        "Minion Horde",
-        "Miner"
-    ],
-    [
-        "Skeleton Army",
-        "Goblin Barrel",
-        "Princess",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Hog Rider",
-        "Ice Golem"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Lightning",
-        "Mega Minion",
-        "Musketeer",
-        "Executioner",
-        "Dark Prince",
-        "P.E.K.K.A"
-    ],
-    [
-        "Rocket",
-        "The Log",
-        "Inferno Tower",
-        "Fire Spirits",
-        "Ice Spirit",
-        "Ice Golem",
-        "X-Bow",
-        "Archers"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Minions",
-        "Musketeer",
-        "Giant",
-        "Furnace"
-    ],
-    [
-        "The Log",
-        "Zap",
-        "Graveyard",
-        "Giant",
-        "Bowler",
-        "Archers",
-        "Tornado",
-        "Executioner"
-    ],
-    [
-        "The Log",
-        "Elixir Collector",
-        "Zap",
-        "Mini P.E.K.K.A",
-        "Lightning",
-        "Minions",
-        "Giant",
-        "Minion Horde"
-    ]
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Knight",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 1
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Freeze",
+            "Goblins",
+            "Hog Rider",
+            "Ice Spirit",
+            "Mini P.E.K.K.A",
+            "Princess",
+            "Zap"
+        ],
+        "rank" : 2
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Balloon",
+            "Lava Hound",
+            "Lightning",
+            "Mega Minion",
+            "Minions",
+            "Skeleton Army",
+            "Tombstone"
+        ],
+        "rank" : 3
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Fire Spirits",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Musketeer",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 4
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Bowler",
+            "Executioner",
+            "Giant",
+            "Graveyard",
+            "The Log",
+            "Tornado",
+            "Zap"
+        ],
+        "rank" : 5
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Fire Spirits",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Musketeer",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 6
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Freeze",
+            "Goblins",
+            "Hog Rider",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "Princess",
+            "Zap"
+        ],
+        "rank" : 7
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Balloon",
+            "Lava Hound",
+            "Lightning",
+            "Minions",
+            "Musketeer",
+            "Skeleton Army",
+            "Tombstone"
+        ],
+        "rank" : 8
+    },
+    {
+        "deck" : [
+            "Electro Wizard",
+            "Executioner",
+            "Giant",
+            "Goblins",
+            "Ice Spirit",
+            "Lightning",
+            "The Log",
+            "Tornado"
+        ],
+        "rank" : 9
+    },
+    {
+        "deck" : [
+            "Bowler",
+            "Executioner",
+            "Giant",
+            "Graveyard",
+            "Mega Minion",
+            "The Log",
+            "Tornado",
+            "Zap"
+        ],
+        "rank" : 10
+    },
+    {
+        "deck" : [
+            "Fireball",
+            "Furnace",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Minion Horde",
+            "Mirror",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 11
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Giant",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 12
+    },
+    {
+        "deck" : [
+            "Goblin Barrel",
+            "Hog Rider",
+            "Inferno Tower",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "Skeletons",
+            "The Log"
+        ],
+        "rank" : 13
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Knight",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 14
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Freeze",
+            "Goblins",
+            "Hog Rider",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "Princess",
+            "Zap"
+        ],
+        "rank" : 15
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Furnace",
+            "Giant",
+            "Ice Spirit",
+            "Lightning",
+            "Prince",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 16
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Fire Spirits",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Musketeer",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 17
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Balloon",
+            "Bowler",
+            "Freeze",
+            "Giant",
+            "Mega Minion",
+            "Minions",
+            "Tombstone"
+        ],
+        "rank" : 18
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Goblin Barrel",
+            "Hog Rider",
+            "Ice Golem",
+            "Inferno Tower",
+            "Princess",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 19
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Ice Golem",
+            "Inferno Tower",
+            "Miner",
+            "Minions",
+            "Rocket",
+            "The Log",
+            "Tornado"
+        ],
+        "rank" : 20
+    },
+    {
+        "deck" : [
+            "Furnace",
+            "Giant",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "Musketeer",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 21
+    },
+    {
+        "deck" : [
+            "Bowler",
+            "Giant",
+            "Graveyard",
+            "Mega Minion",
+            "Tombstone",
+            "Tornado",
+            "Wizard",
+            "Zap"
+        ],
+        "rank" : 22
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Elixir Collector",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "Mini P.E.K.K.A",
+            "The Log"
+        ],
+        "rank" : 23
+    },
+    {
+        "deck" : [
+            "Fireball",
+            "Furnace",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Minion Horde",
+            "Mirror",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 24
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Fire Spirits",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Rocket",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 25
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Balloon",
+            "Lava Hound",
+            "Lightning",
+            "Mega Minion",
+            "Minions",
+            "Skeleton Army",
+            "Tombstone"
+        ],
+        "rank" : 26
+    },
+    {
+        "deck" : [
+            "Baby Dragon",
+            "Elixir Collector",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "Musketeer",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 27
+    },
+    {
+        "deck" : [
+            "Bowler",
+            "Electro Wizard",
+            "Executioner",
+            "Hog Rider",
+            "Ice Golem",
+            "Lightning",
+            "The Log",
+            "Tornado"
+        ],
+        "rank" : 28
+    },
+    {
+        "deck" : [
+            "Giant",
+            "Ice Spirit",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "The Log",
+            "Wizard",
+            "Zap"
+        ],
+        "rank" : 29
+    },
+    {
+        "deck" : [
+            "Barbarians",
+            "Fireball",
+            "Giant",
+            "Graveyard",
+            "Minions",
+            "Musketeer",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 30
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Giant",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "Musketeer",
+            "The Log",
+            "Three Musketeers",
+            "Zap"
+        ],
+        "rank" : 31
+    },
+    {
+        "deck" : [
+            "Giant",
+            "Ice Spirit",
+            "Mega Minion",
+            "Mini P.E.K.K.A",
+            "Mortar",
+            "Musketeer",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 32
+    },
+    {
+        "deck" : [
+            "Baby Dragon",
+            "Elixir Collector",
+            "Golem",
+            "Lightning",
+            "Mega Minion",
+            "Mini P.E.K.K.A",
+            "Musketeer",
+            "The Log"
+        ],
+        "rank" : 33
+    },
+    {
+        "deck" : [
+            "Bowler",
+            "Fireball",
+            "Giant",
+            "Graveyard",
+            "Minions",
+            "Musketeer",
+            "Tornado",
+            "Zap"
+        ],
+        "rank" : 34
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Fire Spirits",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Musketeer",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 35
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Knight",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 36
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Giant",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "The Log",
+            "Tombstone",
+            "Zap"
+        ],
+        "rank" : 37
+    },
+    {
+        "deck" : [
+            "Balloon",
+            "Elixir Collector",
+            "Freeze",
+            "Ice Golem",
+            "Inferno Tower",
+            "Minions",
+            "Skeleton Army",
+            "Zap"
+        ],
+        "rank" : 38
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Furnace",
+            "Giant",
+            "Ice Spirit",
+            "Lightning",
+            "Prince",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 39
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Balloon",
+            "Bowler",
+            "Freeze",
+            "Giant",
+            "Mega Minion",
+            "Minions",
+            "Tombstone"
+        ],
+        "rank" : 40
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Fire Spirits",
+            "Furnace",
+            "Knight",
+            "Lightning",
+            "Minions",
+            "Royal Giant",
+            "The Log"
+        ],
+        "rank" : 41
+    },
+    {
+        "deck" : [
+            "Goblin Barrel",
+            "Hog Rider",
+            "Ice Golem",
+            "Inferno Tower",
+            "Princess",
+            "Skeleton Army",
+            "Skeletons",
+            "The Log"
+        ],
+        "rank" : 42
+    },
+    {
+        "deck" : [
+            "Furnace",
+            "Lightning",
+            "Minions",
+            "Musketeer",
+            "Royal Giant",
+            "Skeleton Army",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 43
+    },
+    {
+        "deck" : [
+            "Bowler",
+            "Giant",
+            "Graveyard",
+            "Mega Minion",
+            "Tombstone",
+            "Tornado",
+            "Wizard",
+            "Zap"
+        ],
+        "rank" : 44
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Fire Spirits",
+            "Furnace",
+            "Knight",
+            "Lightning",
+            "Minions",
+            "Royal Giant",
+            "The Log"
+        ],
+        "rank" : 45
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Balloon",
+            "Lava Hound",
+            "Lightning",
+            "Mega Minion",
+            "Minions",
+            "Skeleton Army",
+            "Tombstone"
+        ],
+        "rank" : 46
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Knight",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 47
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Giant",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Minion Horde",
+            "Minions",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 48
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Fire Spirits",
+            "Furnace",
+            "Knight",
+            "Lightning",
+            "Minions",
+            "Royal Giant",
+            "The Log"
+        ],
+        "rank" : 49
+    },
+    {
+        "deck" : [
+            "Fireball",
+            "Furnace",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Minion Horde",
+            "Mirror",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 50
+    },
+    {
+        "deck" : [
+            "Cannon",
+            "Fireball",
+            "Hog Rider",
+            "Ice Golem",
+            "Ice Spirit",
+            "Musketeer",
+            "Skeletons",
+            "The Log"
+        ],
+        "rank" : 51
+    },
+    {
+        "deck" : [
+            "Furnace",
+            "Lightning",
+            "Minions",
+            "Musketeer",
+            "Royal Giant",
+            "Skeleton Army",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 52
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Goblin Barrel",
+            "Hog Rider",
+            "Ice Golem",
+            "Inferno Tower",
+            "Princess",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 53
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Giant",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Minion Horde",
+            "Minions",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 54
+    },
+    {
+        "deck" : [
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Knight",
+            "Mirror",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 55
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Furnace",
+            "Giant",
+            "Graveyard",
+            "Minions",
+            "Musketeer",
+            "Skeleton Army",
+            "Zap"
+        ],
+        "rank" : 56
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Fire Spirits",
+            "Furnace",
+            "Knight",
+            "Lightning",
+            "Minions",
+            "Royal Giant",
+            "The Log"
+        ],
+        "rank" : 57
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Freeze",
+            "Graveyard",
+            "Ice Golem",
+            "Mega Minion",
+            "Tombstone",
+            "Tornado",
+            "Zap"
+        ],
+        "rank" : 58
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Balloon",
+            "Freeze",
+            "Furnace",
+            "Ice Golem",
+            "Minions",
+            "Musketeer",
+            "Skeleton Army"
+        ],
+        "rank" : 59
+    },
+    {
+        "deck" : [
+            "Goblin Barrel",
+            "Hog Rider",
+            "Ice Golem",
+            "Inferno Tower",
+            "Princess",
+            "Skeleton Army",
+            "Skeletons",
+            "The Log"
+        ],
+        "rank" : 60
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Balloon",
+            "Bowler",
+            "Freeze",
+            "Giant",
+            "Mega Minion",
+            "Minions",
+            "Tombstone"
+        ],
+        "rank" : 61
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Goblin Barrel",
+            "Hog Rider",
+            "Ice Golem",
+            "Inferno Tower",
+            "Princess",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 62
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Furnace",
+            "Lightning",
+            "Minions",
+            "Musketeer",
+            "Royal Giant",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 63
+    },
+    {
+        "deck" : [
+            "Dart Goblin",
+            "Goblin Barrel",
+            "Ice Golem",
+            "Inferno Tower",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 64
+    },
+    {
+        "deck" : [
+            "Balloon",
+            "Barbarians",
+            "Elixir Collector",
+            "Freeze",
+            "Giant",
+            "Rocket",
+            "Witch",
+            "Wizard"
+        ],
+        "rank" : 65
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Knight",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 66
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Balloon",
+            "Lava Hound",
+            "Lightning",
+            "Minions",
+            "Musketeer",
+            "Skeleton Army",
+            "Tombstone"
+        ],
+        "rank" : 67
+    },
+    {
+        "deck" : [
+            "Dart Goblin",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Knight",
+            "Miner",
+            "Princess",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 68
+    },
+    {
+        "deck" : [
+            "Cannon",
+            "Goblins",
+            "Miner",
+            "Minion Horde",
+            "Princess",
+            "Skeleton Army",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 69
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Furnace",
+            "Ice Spirit",
+            "Knight",
+            "Lightning",
+            "Mega Minion",
+            "Royal Giant",
+            "The Log"
+        ],
+        "rank" : 70
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Furnace",
+            "Giant",
+            "Graveyard",
+            "Mega Minion",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "Zap"
+        ],
+        "rank" : 71
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Freeze",
+            "Goblins",
+            "Hog Rider",
+            "Ice Spirit",
+            "Mini P.E.K.K.A",
+            "Princess",
+            "Zap"
+        ],
+        "rank" : 72
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Ice Golem",
+            "Ice Spirit",
+            "Miner",
+            "Rocket",
+            "Skeletons",
+            "The Log",
+            "Tornado"
+        ],
+        "rank" : 73
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Furnace",
+            "Goblin Barrel",
+            "Mirror",
+            "Rocket",
+            "Skeleton Army",
+            "The Log",
+            "Tornado"
+        ],
+        "rank" : 74
+    },
+    {
+        "deck" : [
+            "Cannon",
+            "Fireball",
+            "Hog Rider",
+            "Ice Golem",
+            "Ice Spirit",
+            "Musketeer",
+            "Skeletons",
+            "The Log"
+        ],
+        "rank" : 75
+    },
+    {
+        "deck" : [
+            "Cannon",
+            "Fire Spirits",
+            "Hog Rider",
+            "Ice Golem",
+            "Musketeer",
+            "Rocket",
+            "Skeletons",
+            "The Log"
+        ],
+        "rank" : 76
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Fire Spirits",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Musketeer",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 77
+    },
+    {
+        "deck" : [
+            "Bowler",
+            "Executioner",
+            "Giant",
+            "Graveyard",
+            "Mega Minion",
+            "The Log",
+            "Tornado",
+            "Zap"
+        ],
+        "rank" : 78
+    },
+    {
+        "deck" : [
+            "Dart Goblin",
+            "Goblin Barrel",
+            "Inferno Tower",
+            "Knight",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 79
+    },
+    {
+        "deck" : [
+            "Freeze",
+            "Goblins",
+            "Hog Rider",
+            "Ice Spirit",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "Princess",
+            "Zap"
+        ],
+        "rank" : 80
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Furnace",
+            "Giant",
+            "Ice Spirit",
+            "Lightning",
+            "Prince",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 81
+    },
+    {
+        "deck" : [
+            "Balloon",
+            "Elixir Collector",
+            "Executioner",
+            "Golem",
+            "Mega Minion",
+            "Rage",
+            "Skeleton Army",
+            "Tornado"
+        ],
+        "rank" : 82
+    },
+    {
+        "deck" : [
+            "Furnace",
+            "Giant",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "Musketeer",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 83
+    },
+    {
+        "deck" : [
+            "Baby Dragon",
+            "Bowler",
+            "Giant",
+            "Graveyard",
+            "Musketeer",
+            "Tombstone",
+            "Tornado",
+            "Zap"
+        ],
+        "rank" : 84
+    },
+    {
+        "deck" : [
+            "Bowler",
+            "Fire Spirits",
+            "Giant",
+            "Graveyard",
+            "Musketeer",
+            "Tombstone",
+            "Tornado",
+            "Zap"
+        ],
+        "rank" : 85
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Baby Dragon",
+            "Elixir Collector",
+            "Fireball",
+            "Golem",
+            "Mega Minion",
+            "The Log",
+            "Tombstone"
+        ],
+        "rank" : 86
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Giant",
+            "Knight",
+            "Miner",
+            "Minion Horde",
+            "Minions",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 87
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Fire Spirits",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Musketeer",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 88
+    },
+    {
+        "deck" : [
+            "Barbarians",
+            "Clone",
+            "Electro Wizard",
+            "Golem",
+            "Minion Horde",
+            "Minions",
+            "Skeleton Army",
+            "Three Musketeers"
+        ],
+        "rank" : 89
+    },
+    {
+        "deck" : [
+            "Executioner",
+            "Furnace",
+            "Giant",
+            "Ice Spirit",
+            "Lightning",
+            "Prince",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 90
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Giant",
+            "Ice Golem",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "The Log",
+            "Three Musketeers",
+            "Zap"
+        ],
+        "rank" : 91
+    },
+    {
+        "deck" : [
+            "Goblin Barrel",
+            "Hog Rider",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Princess",
+            "Rocket",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 92
+    },
+    {
+        "deck" : [
+            "Furnace",
+            "Lightning",
+            "Minions",
+            "Musketeer",
+            "Royal Giant",
+            "Skeleton Army",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 93
+    },
+    {
+        "deck" : [
+            "Arrows",
+            "Giant",
+            "Miner",
+            "Minion Horde",
+            "Minions",
+            "Musketeer",
+            "Skeleton Army",
+            "Tombstone"
+        ],
+        "rank" : 94
+    },
+    {
+        "deck" : [
+            "Fire Spirits",
+            "Goblin Barrel",
+            "Hog Rider",
+            "Ice Golem",
+            "Inferno Tower",
+            "Princess",
+            "Skeleton Army",
+            "The Log"
+        ],
+        "rank" : 95
+    },
+    {
+        "deck" : [
+            "Dark Prince",
+            "Executioner",
+            "Lightning",
+            "Mega Minion",
+            "Musketeer",
+            "P.E.K.K.A",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 96
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Fire Spirits",
+            "Ice Golem",
+            "Ice Spirit",
+            "Inferno Tower",
+            "Rocket",
+            "The Log",
+            "X-Bow"
+        ],
+        "rank" : 97
+    },
+    {
+        "deck" : [
+            "Furnace",
+            "Giant",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Minions",
+            "Musketeer",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 98
+    },
+    {
+        "deck" : [
+            "Archers",
+            "Bowler",
+            "Executioner",
+            "Giant",
+            "Graveyard",
+            "The Log",
+            "Tornado",
+            "Zap"
+        ],
+        "rank" : 99
+    },
+    {
+        "deck" : [
+            "Elixir Collector",
+            "Giant",
+            "Lightning",
+            "Mini P.E.K.K.A",
+            "Minion Horde",
+            "Minions",
+            "The Log",
+            "Zap"
+        ],
+        "rank" : 100
+    }
 ]
