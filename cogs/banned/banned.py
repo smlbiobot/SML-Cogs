@@ -63,26 +63,43 @@ class Banned:
 
     @banned.command(name="add", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_server=True)
-    async def _add_banned(self, ctx, member_name, member_tag, reason):
+    async def _add_banned(self, ctx, member_name=None, member_tag="#", reason="---"):
         """Add a member to the ban list. 
 
-           Example: !banned add PlayerA #098UGYE "Being Toxic" """
+           Example: !banned add PlayerA #098UGYE "Being Toxic"---"""
         server = ctx.message.server
 
         if server.id not in self.banned_members:
             self.banned_members[server.id] = {}
 
-        member_data = {
-            "Name"   : member_name,
-            "Tag"    : member_tag,
-            "Reason" : reason
-        }
+        if member_name is None:
+            await self.bot.say("You must enter a member name.")
+        else:
+            member_data = {
+                "Name"   : member_name,
+                "Tag"    : member_tag,
+                "Reason" : reason
+            }
 
-        self.banned_members[server.id][member_name] = member_data
-        dataIO.save_json(self.file_path, self.banned_members)
+            self.banned_members[server.id][member_name] = member_data
+            dataIO.save_json(self.file_path, self.banned_members)
 
-        await self.bot.say("**{}** ({}) added to the list of banned members."
-                           "\n**Reason:** {}".format(member_name, member_tag, reason))
+            await self.bot.say("**{}** ({}) added to the list of banned members."
+                               "\n**Reason:** {}".format(member_name, member_tag, reason))
+
+    @banned.command(name="remove", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_server=True)
+    async def _remove_banned(self, ctx, member_name=None):
+        """Remove a member from the ban list by name.
+        Example: !banned remove PlayerA"""
+        server = ctx.message.server
+
+        if server.id in self.banned_members:
+            if member_name in self.banned_members[server.id]:
+                self.banned_members[server.id].pop(member_name)
+                await self.bot.say("**{}** removed from the list of banned members.".format(member_name))
+                dataIO.save_json(self.file_path, self.banned_members)
+
 
     @banned.command(name="show", pass_context=True, no_pm=True)
     async def _show_banned(self, ctx):
@@ -96,7 +113,7 @@ class Banned:
             color = int(color, 16)
 
             title = "Banned Members"
-            description = f"""List of players who have been banned from the RACF"""
+            description = "List of players who have been banned from the RACF"
 
             data = discord.Embed(
                 title=title,
@@ -106,7 +123,10 @@ class Banned:
             for member_key, member in members.items():
                 name = "{} ({})".format(member["Name"], member["Tag"])
                 value = member["Reason"]
-                data.add_field(name=str(name), value=str(value))
+                data.add_field(
+                    name=str(name), 
+                    value=str(value)
+                    )
 
             try:
                 await self.bot.type()
@@ -115,6 +135,13 @@ class Banned:
             except discord.HTTPException:
                 await self.bot.say("I need the `Embed links` permission "
                                    "to send this")
+
+    @banned.command(name="debug", pass_context=True)
+    async def _debug_banned(self, ctx):
+        data = discord.Embed(
+            title="DEBUG")
+
+        await self.bot.say(embed=data)
 
 def check_folder():
     if not os.path.exists("data/banned"):

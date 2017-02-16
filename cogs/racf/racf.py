@@ -192,6 +192,9 @@ class RACF:
         # else:
         #     await self.bot.send_file(message.channel,self.image)
 
+
+
+
         
 
 
@@ -205,5 +208,52 @@ def setup(bot):
     r = RACF(bot)
     # bot.add_listener(r.member_join, "on_member_join")
     bot.add_cog(r)
+
+"""
+Sample code for timer events
+
+https://github.com/Rapptz/discord.py/blob/master/examples/background_task.py
+
+import discord
+import asyncio
+
+client = discord.Client()
+
+async def my_background_task():
+    await client.wait_until_ready()
+    counter = 0
+    channel = discord.Object(id='channel_id_here')
+    while not client.is_closed:
+        counter += 1
+        await client.send_message(channel, counter)
+        await asyncio.sleep(60) # task runs every 60 seconds
+
+@client.event
+async def on_ready():
+    print('Logged in as')
+    print(client.user.name)
+    print(client.user.id)
+    print('------')
+
+client.loop.create_task(my_background_task())
+client.run('token')
+
+"""
+"""
+
+https://github.com/tekulvw/Squid-Plugins/blob/master/scheduler/scheduler.py
+
+loop = asyncio.get_event_loop()
+loop.create_task(self.check())
+
+async def check(self):
+    while True:
+        # do some stuff
+        await asyncio.sleep(3600)
+
+"""
+
+
+
 
 
