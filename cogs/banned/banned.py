@@ -26,19 +26,10 @@ DEALINGS IN THE SOFTWARE.
 
 import discord
 from discord.ext import commands
-from .utils import checks
 from random import choice
 from .utils.dataIO import dataIO
 from __main__ import send_cmd_help
 import os
-
-# try: # check if BeautifulSoup4 is installed
-#     from bs4 import BeautifulSoup
-#     soupAvailable = True
-# except:
-#     soupAvailable = False
-
-# import aiohttp
 
 settings_path = "data/banned/settings.json"
 admin_role = "Bot Commander"
