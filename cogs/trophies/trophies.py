@@ -26,15 +26,11 @@ DEALINGS IN THE SOFTWARE.
 
 import discord
 from discord.ext import commands
-from .utils import checks
 from random import choice
 from .utils.dataIO import dataIO
-from .general import General
 from __main__ import send_cmd_help
 
 import os
-import datetime
-
 
 settings_path = "data/trophies/settings.json"
 clans = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel']
@@ -54,7 +50,7 @@ class Trophies:
 
     @commands.group(pass_context=True, no_pm=True)
     async def trophies(self, ctx):
-        """Role History Management"""
+        """Display RACF Trophy requirements"""
 
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
@@ -102,15 +98,11 @@ class Trophies:
         
                     
     @trophies.command(name="set", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(mention_everyone=True)
+    @commands.has_role(set_allowed_role)
     async def _set_trophies(self, ctx, clan:str, req:str):
-        """(MOD) Set the trophy requirements for clans"""
-
-        # hacking the permission settings
-        # mention_everyone=True for all co-leaders and up
+        """Set the trophy requirements for clans"""
 
         server = ctx.message.server
-        members = server.members
 
         clan = clan.lower()
 

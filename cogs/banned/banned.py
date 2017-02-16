@@ -41,6 +41,7 @@ import os
 # import aiohttp
 
 settings_path = "data/banned/settings.json"
+admin_role = "Bot Commander"
 
 class Banned:
     """
@@ -62,11 +63,12 @@ class Banned:
             await send_cmd_help(ctx)
 
     @banned.command(name="add", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_server=True)
+    @commands.has_role(admin_role)
     async def _add_banned(self, ctx, member_name=None, member_tag="#", reason="---"):
         """Add a member to the ban list. 
 
-           Example: !banned add PlayerA #098UGYE "Being Toxic"---"""
+           Example: !banned add PlayerA #098UGYE "Being Toxic"
+           """
         server = ctx.message.server
 
         if server.id not in self.banned_members:
@@ -88,7 +90,7 @@ class Banned:
                                "\n**Reason:** {}".format(member_name, member_tag, reason))
 
     @banned.command(name="remove", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_server=True)
+    @commands.has_role(admin_role)
     async def _remove_banned(self, ctx, member_name=None):
         """Remove a member from the ban list by name.
         Example: !banned remove PlayerA"""
@@ -162,3 +164,4 @@ def setup(bot):
     check_folder()
     check_file()
     bot.add_cog(Banned(bot))
+
