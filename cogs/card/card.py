@@ -33,6 +33,9 @@ from PIL import ImageFont
 from random import choice
 import discord
 import itertools
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 import os
 import string
 
@@ -92,6 +95,8 @@ class Card:
         self.card_thumb_scale = 0.5
         self.card_thumb_w = int(self.card_w * self.card_thumb_scale)
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
+
+        self.plotfigure = 0
 
 
     # @commands.group(pass_context=True)
@@ -206,6 +211,39 @@ class Card:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
 
+    @commands.command(pass_context=True)
+    async def cardtrend(self, ctx, card=None):
+        """
+        Display trends about a card based on popularity snapshot
+        Example: !cardtrend miner
+        """
+        if card is None:
+            await send_cmd_help(ctx)
+
+        card = self.get_card_name(card)
+
+        if card is None:
+            await self.bot.say("Card name is not valid.")
+            return
+
+        x = range(cardpop_range_min, cardpop_range_max)
+        y = [int(self.get_cardpop_count(card, id)) for id in x]
+        # ids = [id for id in x]
+        
+        plt.figure(self.plotfigure)
+        plt.plot(x, y)
+
+        filename = "data/card/trend-{}.png".format(card)
+        plt.savefig(filename)
+
+        with open(filename, 'rb') as f:
+            await self.bot.upload(f)
+
+        self.plotfigure += 1
+
+
+        
+
 
 
     def get_random_color(self):
@@ -262,6 +300,20 @@ class Card:
         if card is None:
             return None
         return "https://smlbiobot.github.io/img/cards/{}.png".format(card)
+
+    def get_cardpop_count(self, card=None, snapshot_id=None):
+        """
+        Return card popularity count by snapshot id
+        """
+        out = 0
+        snapshot_id = str(snapshot_id)
+        if card is not None and snapshot_id is not None:
+            if snapshot_id in self.cardpop:
+                cardpop = self.cardpop[snapshot_id]["cardpop"]
+                cpid = self.get_card_cpid(card)
+                if cpid in cardpop:
+                    out = cardpop[cpid]["count"]
+        return out
 
     def get_cardpop(self, card=None, snapshot_id=None):
         """
