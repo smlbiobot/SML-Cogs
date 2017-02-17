@@ -264,7 +264,7 @@
             "elixir": 3,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_KNIGHT",
-            "cpid": "knight"
+            "cpid": "Knight"
         },
         "lava-hound": {
             "aka": ["lava", "lh", "hound"],

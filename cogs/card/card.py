@@ -44,6 +44,8 @@ crtexts_path = "data/card/crtexts.json"
 cardpop_range_min = 16
 cardpop_range_max = 24
 
+discord_ui_bgcolor = discord.Color(value=int('36393e', 16))
+
 def grouper(self, n, iterable, fillvalue=None):
     """
     Helper function to split lists
@@ -92,16 +94,16 @@ class Card:
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
 
 
-    @commands.group(pass_context=True)
-    async def card(self, ctx):
-        """
-        Clash Royale Decks
-        """
-        if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+    # @commands.group(pass_context=True)
+    # async def card(self, ctx):
+    #     """
+    #     Clash Royale Decks
+    #     """
+    #     if ctx.invoked_subcommand is None:
+    #         await send_cmd_help(ctx)
 
-    @card.command(name="get", pass_context=True)
-    async def card_get(self, ctx, card=None):
+    @commands.command(pass_context=True)
+    async def card(self, ctx, card=None):
         """
         Display statistics about a card
         Example: !card get miner
@@ -115,13 +117,11 @@ class Card:
             await self.bot.say("Card name is not valid.")
             return
 
-        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-        color = int(color, 16)
 
         data = discord.Embed(
             title = self.card_to_str(card),
             description = self.get_card_description(card),
-            color = discord.Color(value=color))
+            color = self.get_random_color())
         data.set_thumbnail(url=self.get_card_image_url(card))
         data.add_field(
             name="Elixir",
@@ -142,12 +142,16 @@ class Card:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
 
-    @card.command(name="decks", pass_context=True)
-    async def card_decks(self, ctx, card=None, snapshot_id=None):
+    @commands.command(pass_context=True)
+    async def decks(self, ctx, card=None, snapshot_id=None):
         """
         Display decks which uses a particular card in a specific snapshot
         Syntax: !card decks Miner 23
         """
+        if card is None:
+            await send_cmd_help(ctx)
+            return
+
         if snapshot_id is None:
             snapshot_id = str(cardpop_range_max - 1)
 
@@ -174,12 +178,43 @@ class Card:
             norm_cards = [self.get_card_from_cpid(c) for c in cards]
             print(cards)
             print(norm_cards)
-            # norm_found_decks.append(', '.join(norm_cards))
+            norm_found_decks.append(', '.join(norm_cards))
 
 
 
         if len(norm_found_decks):
             await self.bot.say("\n".join(norm_found_decks))
+
+    @commands.command(pass_context=True)
+    async def cardimage(self, ctx, card=None):
+        """Display the card image"""
+
+        card = self.get_card_name(card)  
+        if card is None:
+            await self.bot.say("Card name is not valid.")
+            return
+
+        data = discord.Embed(
+            # url=self.get_card_image_url(card),
+            color = discord_ui_bgcolor)
+        data.set_image(url=self.get_card_image_url(card))
+       
+        try:
+            await self.bot.type()
+            await self.bot.say(embed=data)
+        except discord.HTTPException:
+            await self.bot.say("I need the `Embed links` permission "
+                               "to send this")
+
+
+
+    def get_random_color(self):
+        """
+        Return a discord.Color instance of a random color
+        """
+        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+        color = int(color, 16)
+        return discord.Color(value=color)
 
       
 
