@@ -39,6 +39,7 @@ import itertools
 
 settings_path = "data/card/settings.json"
 crdata_path = "data/card/clashroyale.json"
+cardpop_path = "data/card/cardpop.json"
 
 def grouper(self, n, iterable, fillvalue=None):
     """
@@ -60,9 +61,11 @@ class Card:
         self.bot = bot
         self.file_path = settings_path
         self.crdata_path = crdata_path
+        self.cardpop_path = cardpop_path
 
         self.settings = dataIO.load_json(self.file_path)
         self.crdata = dataIO.load_json(self.crdata_path)
+        self.cardpop = dataIO.load_json(self.cardpop_path)
 
         # init card data
         self.cards = []
@@ -100,6 +103,8 @@ class Card:
         """
         if card is None:
             await send_cmd_help(ctx)
+
+
 
     def check_member_settings(self, server, member):
         """Init member section if necessary"""
