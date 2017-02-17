@@ -41,7 +41,7 @@ crdata_path = "data/card/clashroyale.json"
 cardpop_path = "data/card/cardpop.json"
 crtexts_path = "data/card/crtexts.json"
 
-cardpop_range_min = 16
+cardpop_range_min = 8
 cardpop_range_max = 24
 
 discord_ui_bgcolor = discord.Color(value=int('36393e', 16))

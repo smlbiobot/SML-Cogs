@@ -1,26 +1,850 @@
 --------------------------------------------------------------------------------
+Snapshot #8
+Decks:
+ 10: Cannon, Elixir Collector, Hog Rider, Musketeer, Poison, Skeletons, Valkyrie, Zap
+  9: Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Skeletons, Zap
+  5: Cannon, Elixir Collector, Goblins, Guards, Miner, Princess, Three Musketeers, Zap
+  4: Arrows, Balloon, Barbarians, Elixir Collector, Giant, Minions, Princess, Skeletons
+  3: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Spear Goblins, Zap
+  3: Arrows, Cannon, Elixir Collector, Freeze, Hog Rider, Musketeer, Skeletons, Valkyrie
+  2: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Musketeer, Poison, Spear Goblins, Zap
+  2: Elixir Collector, Giant, Miner, Mini P.E.K.K.A, Poison, Princess, Witch, Zap
+  2: Furnace, Goblins, Miner, Mini P.E.K.K.A, Minions, Poison, Princess, Zap
+  2: Cannon, Elixir Collector, Freeze, Hog Rider, Musketeer, Poison, Skeletons, Valkyrie
+  1: Guards, Ice Wizard, Mini P.E.K.K.A, Minions, Princess, Royal Giant, Skeletons, Zap
+  1: Arrows, Cannon, Elixir Collector, Goblins, Guards, Knight, Three Musketeers, Valkyrie
+  1: Cannon, Elixir Collector, Miner, Minions, Princess, Three Musketeers, Valkyrie, Zap
+  1: Furnace, Guards, Lightning, Miner, Mini P.E.K.K.A, Princess, Spear Goblins, Zap
+  1: Arrows, Elixir Collector, Lightning, Mini P.E.K.K.A, Minion Horde, Minions, Musketeer, P.E.K.K.A
+  1: Cannon, Fire Spirits, Miner, Mini P.E.K.K.A, Princess, Skeletons, Spear Goblins, Zap
+  1: Elixir Collector, Fireball, Goblins, Hog Rider, Ice Wizard, Inferno Tower, Minions, Zap
+  1: Baby Dragon, Balloon, Barbarians, Cannon, Elixir Collector, Freeze, Poison, Prince
+  1: Cannon, Hog Rider, Knight, Poison, Princess, Spear Goblins, Valkyrie, Zap
+  1: Dark Prince, Elixir Collector, Ice Wizard, Minions, P.E.K.K.A, Poison, Prince, Zap
+  1: Arrows, Barbarians, Elixir Collector, Ice Wizard, Rocket, Tesla, Valkyrie, X-Bow
+  1: Arrows, Barbarians, Freeze, Hog Rider, Minion Horde, P.E.K.K.A, Rocket, Wizard
+  1: Elixir Collector, Golem, Mini P.E.K.K.A, Minions, Poison, Princess, Skeletons, Tesla
+  1: Cannon, Elixir Collector, Fireball, Guards, Ice Wizard, Musketeer, Royal Giant, Zap
+  1: Elixir Collector, Guards, Ice Wizard, Mini P.E.K.K.A, Minions, P.E.K.K.A, Poison, Princess
+  1: Barbarians, Elixir Collector, Giant, Poison, Princess, Skeletons, Three Musketeers, Zap
+  1: Goblins, Inferno Tower, Miner, Mini P.E.K.K.A, Minions, Poison, Princess, Zap
+  1: Archers, Elixir Collector, Giant, Mini P.E.K.K.A, Poison, Valkyrie, Witch, Zap
+  1: Cannon, Giant, Miner, Mini P.E.K.K.A, Poison, Princess, Witch, Zap
+  1: Arrows, Elixir Collector, Freeze, Giant, Guards, Mini P.E.K.K.A, Princess, Witch
+  1: Arrows, Elixir Collector, Furnace, Guards, Ice Wizard, Prince, Valkyrie, X-Bow
+  1: Arrows, Baby Dragon, Elixir Collector, Golem, Ice Wizard, Minions, Poison, Prince
+  1: Cannon, Elixir Collector, Goblins, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
+  1: Dark Prince, Elixir Collector, Ice Wizard, P.E.K.K.A, Poison, Prince, Princess, Zap
+  1: Elixir Collector, Hog Rider, Musketeer, Poison, Skeletons, Tesla, Valkyrie, Zap
+  1: Barbarians, Elixir Collector, Ice Wizard, Miner, Minions, Princess, Royal Giant, Zap
+  1: Arrows, Balloon, Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Poison, Princess
+  1: Barbarians, Cannon, Elixir Collector, Goblins, Golem, Poison, Princess, Three Musketeers
+  1: Cannon, Elixir Collector, Golem, Guards, Mini P.E.K.K.A, Minions, Poison, Princess
+  1: Elixir Collector, Freeze, Ice Wizard, P.E.K.K.A, Prince, Princess, Witch, Zap
+  1: Barbarians, Elixir Collector, Giant, Minion Horde, Musketeer, Princess, Rage, Three Musketeers
+  1: Barbarians, Fireball, Giant, Ice Wizard, Musketeer, Rage, Witch, Zap
+  1: Arrows, Barbarians, Elixir Collector, Giant, Ice Wizard, Poison, Princess, Witch
+  1: Cannon, Elixir Collector, Guards, Hog Rider, Musketeer, Poison, Valkyrie, Zap
+  1: Arrows, Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Wizard, P.E.K.K.A, Princess
+  1: Archers, Elixir Collector, Giant, Poison, Tesla, Valkyrie, Witch, Zap
+  1: Arrows, Bomber, Cannon, Freeze, Goblins, Hog Rider, Musketeer, Valkyrie
+  1: Archers, Barbarian Hut, Barbarians, Giant Skeleton, Hog Rider, Musketeer, Poison, Zap
+  1: Elixir Collector, Giant, Mini P.E.K.K.A, Princess, Skeletons, Three Musketeers, Valkyrie, Zap
+  1: Arrows, Elixir Collector, Mini P.E.K.K.A, Minion Horde, Minions, Musketeer, P.E.K.K.A, Three Musketeers
+  1: Barbarians, Elixir Collector, Fireball, Ice Wizard, Minions, Princess, Royal Giant, Zap
+  1: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Poison, Spear Goblins, Three Musketeers, Zap
+  1: Cannon, Elixir Collector, Guards, Miner, Spear Goblins, Three Musketeers, Valkyrie, Zap
+  1: Barbarians, Elixir Collector, Giant, Mini P.E.K.K.A, Musketeer, Poison, Princess, Witch
+  1: Arrows, Barbarians, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess
+  1: Elixir Collector, Fireball, Freeze, Hog Rider, Mini P.E.K.K.A, Musketeer, Poison, Valkyrie
+  1: Arrows, Dark Prince, Elixir Collector, Freeze, Guards, Ice Wizard, P.E.K.K.A, Prince
+  1: Arrows, Balloon, Elixir Collector, Giant, Goblins, Inferno Tower, Princess, Witch
+  1: Elixir Collector, Giant, Inferno Tower, Knight, Musketeer, Poison, Princess, Witch
+  1: Arrows, Balloon, Barbarians, Elixir Collector, Giant, Hog Rider, Princess, Skeletons
+  1: Barbarians, Cannon, Elixir Collector, Freeze, Goblins, Hog Rider, Spear Goblins, Zap
+  1: Elixir Collector, Giant, Miner, Musketeer, Poison, Valkyrie, Witch, Zap
+  1: Cannon, Lightning, Miner, Mini P.E.K.K.A, Minions, Musketeer, Princess, Zap
+  1: Archers, Barbarians, Cannon, Elixir Collector, Fireball, Goblins, Royal Giant, Zap
+  1: Arrows, Elixir Collector, Fire Spirits, Furnace, Goblins, Mini P.E.K.K.A, Spear Goblins, Valkyrie
+  1: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Minion Horde, Minions, Princess, Zap
+  1: Arrows, Baby Dragon, Barbarian Hut, Barbarians, Fireball, Goblin Hut, Musketeer, Witch
+  1: Arrows, Balloon, Elixir Collector, Giant, Mini P.E.K.K.A, Musketeer, Poison, Princess
+Cards:
+ 76 (  0): Elixir Collector
+ 63 (  0): Zap
+ 56 (  0): Princess
+ 43 (  0): Cannon
+ 43 (  0): Poison
+ 41 (  0): Mini P.E.K.K.A
+ 36 (  0): Hog Rider
+ 35 (  0): Skeletons
+ 33 (  0): Musketeer
+ 31 (  0): Minions
+ 30 (  0): Valkyrie
+ 27 (  0): Goblins
+ 26 (  0): Miner
+ 26 (  0): Arrows
+ 24 (  0): Freeze
+ 22 (  0): Giant
+ 22 (  0): Barbarians
+ 17 (  0): Guards
+ 16 (  0): Ice Wizard
+ 14 (  0): Three Musketeers
+ 14 (  0): Witch
+ 12 (  0): Spear Goblins
+  9 (  0): Balloon
+  9 (  0): Minion Horde
+  9 (  0): P.E.K.K.A
+  7 (  0): Fireball
+  7 (  0): Prince
+  5 (  0): Royal Giant
+  5 (  0): Furnace
+  4 (  0): Inferno Tower
+  4 (  0): Tesla
+  4 (  0): Golem
+  4 (  0): Archers
+  3 (  0): Knight
+  3 (  0): Lightning
+  3 (  0): Baby Dragon
+  3 (  0): Dark Prince
+  2 (  0): Fire Spirits
+  2 (  0): X-Bow
+  2 (  0): Rocket
+  2 (  0): Rage
+  2 (  0): Barbarian Hut
+  1 (  0): Wizard
+  1 (  0): Bomber
+  1 (  0): Giant Skeleton
+  1 (  0): Goblin Hut
+--------------------------------------------------------------------------------
+Snapshot #9
+Decks:
+ 14: Cannon, Elixir Collector, Hog Rider, Musketeer, Poison, Skeletons, Valkyrie, Zap
+  6: Barbarians, Elixir Collector, Fireball, Giant, Goblin Barrel, Minions, Princess, Spear Goblins
+  5: Furnace, Guards, Miner, Mini P.E.K.K.A, Musketeer, Poison, Spear Goblins, Zap
+  4: Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Skeletons, Zap
+  4: Furnace, Guards, Ice Wizard, Miner, Mini P.E.K.K.A, Minions, Poison, Zap
+  3: Cannon, Elixir Collector, Goblin Barrel, Miner, Mini P.E.K.K.A, Minions, Princess, Zap
+  3: Cannon, Elixir Collector, Giant, Mini P.E.K.K.A, Musketeer, Poison, Valkyrie, Zap
+  3: Dark Prince, Elixir Collector, Ice Wizard, P.E.K.K.A, Poison, Prince, Princess, Zap
+  3: Elixir Collector, Giant, Miner, Mini P.E.K.K.A, Poison, Princess, Witch, Zap
+  2: Elixir Collector, Giant, Guards, Ice Wizard, Mini P.E.K.K.A, Poison, Three Musketeers, Zap
+  2: Dark Prince, Elixir Collector, Ice Spirit, Ice Wizard, P.E.K.K.A, Prince, Princess, Zap
+  2: Fire Spirits, Goblins, Ice Wizard, Inferno Tower, Miner, Mini P.E.K.K.A, Princess, Zap
+  2: Arrows, Balloon, Barbarians, Elixir Collector, Giant, Minions, Princess, Skeletons
+  2: Elixir Collector, Furnace, Ice Wizard, Mini P.E.K.K.A, Minions, Poison, Princess, Royal Giant
+  2: Cannon, Elixir Collector, Giant, Mini P.E.K.K.A, Musketeer, Poison, Spear Goblins, Zap
+  1: Furnace, Guards, Miner, Mini P.E.K.K.A, Minions, Musketeer, Poison, Zap
+  1: Elixir Collector, Ice Wizard, Miner, Mini P.E.K.K.A, Princess, Tesla, Valkyrie, Zap
+  1: Furnace, Guards, Miner, Mini P.E.K.K.A, Poison, Princess, Spear Goblins, Zap
+  1: Cannon, Elixir Collector, Goblin Barrel, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
+  1: Elixir Collector, Giant, Ice Wizard, Mini P.E.K.K.A, Minions, Poison, Witch, Zap
+  1: Bowler, Elixir Collector, Hog Rider, Inferno Tower, Mini P.E.K.K.A, Minion Horde, Wizard, Zap
+  1: Barbarians, Elixir Collector, Giant, Goblin Barrel, Minions, Poison, Princess, Spear Goblins
+  1: Fire Spirits, Goblins, Hog Rider, Ice Wizard, Inferno Tower, Lightning, Spear Goblins, Zap
+  1: Dark Prince, Elixir Collector, Ice Wizard, Musketeer, P.E.K.K.A, Poison, Prince, Princess
+  1: Elixir Collector, Furnace, Hog Rider, Musketeer, Poison, Skeletons, Valkyrie, Zap
+  1: Hog Rider, Miner, Mini P.E.K.K.A, Musketeer, Poison, Princess, Valkyrie, Zap
+  1: Cannon, Elixir Collector, Ice Wizard, Miner, Mini P.E.K.K.A, Princess, Spear Goblins, Zap
+  1: Goblin Barrel, Guards, Ice Spirit, Miner, Mini P.E.K.K.A, Minions, Princess, Zap
+  1: Furnace, Goblins, Ice Wizard, Miner, Mini P.E.K.K.A, Minions, Poison, Zap
+  1: Freeze, Goblin Barrel, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
+  1: Elixir Collector, Guards, Miner, Mini P.E.K.K.A, Princess, Skeletons, Three Musketeers, Zap
+  1: Arrows, Barbarians, Freeze, Goblins, Hog Rider, Minion Horde, Princess, Tombstone
+  1: Arrows, Barbarians, Elixir Collector, Giant, Mini P.E.K.K.A, Minions, Musketeer, Princess
+  1: Cannon, Guards, Miner, Mini P.E.K.K.A, Musketeer, Poison, Princess, Zap
+  1: Goblins, Hog Rider, Ice Wizard, Miner, Mini P.E.K.K.A, Poison, Princess, Zap
+  1: Arrows, Elixir Collector, Giant, Mini P.E.K.K.A, Mirror, Musketeer, Rage, Three Musketeers
+  1: Barbarians, Fireball, Giant, Ice Wizard, Miner, Minion Horde, Three Musketeers, Zap
+  1: Arrows, Barbarians, Freeze, Hog Rider, Minion Horde, P.E.K.K.A, Rocket, Wizard
+  1: Furnace, Guards, Miner, Mini P.E.K.K.A, Minions, Poison, Princess, Zap
+  1: Cannon, Guards, Ice Wizard, Miner, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  1: Arrows, Cannon, Freeze, Hog Rider, Musketeer, Poison, Princess, Valkyrie
+  1: Elixir Collector, Giant, Goblins, Miner, Mini P.E.K.K.A, Poison, Witch, Zap
+  1: Arrows, Dark Prince, Elixir Collector, Freeze, P.E.K.K.A, Prince, Princess, Skeletons
+  1: Arrows, Cannon, Goblins, Hog Rider, Minion Horde, Princess, Skeletons, Zap
+  1: Cannon, Fireball, Hog Rider, Ice Wizard, Lumberjack, Musketeer, Valkyrie, Zap
+  1: Elixir Collector, Freeze, Guards, P.E.K.K.A, Poison, Prince, Princess, Witch
+  1: Cannon, Elixir Collector, Giant, Ice Spirit, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  1: Arrows, Dark Prince, Elixir Collector, Ice Wizard, P.E.K.K.A, Poison, Prince, Princess
+  1: Barbarians, Elixir Collector, Giant, Guards, Musketeer, Poison, Princess, Zap
+  1: Cannon, Elixir Collector, Giant, Ice Wizard, Mini P.E.K.K.A, Poison, Princess, Witch
+  1: Arrows, Bomber, Cannon, Freeze, Goblins, Hog Rider, Musketeer, Valkyrie
+  1: Cannon, Hog Rider, Ice Spirit, Musketeer, Poison, Skeletons, Valkyrie, Zap
+  1: Goblin Barrel, Goblins, Mini P.E.K.K.A, Minion Horde, Princess, Royal Giant, Valkyrie, Zap
+  1: Dark Prince, Elixir Collector, Ice Wizard, P.E.K.K.A, Poison, Prince, Witch, Zap
+  1: Fire Spirits, Freeze, Hog Rider, Inferno Tower, Mini P.E.K.K.A, Princess, Valkyrie, Zap
+  1: Elixir Collector, Fireball, Freeze, Hog Rider, Inferno Tower, Three Musketeers, Valkyrie, Zap
+  1: Baby Dragon, Cannon, Furnace, Giant, Mini P.E.K.K.A, Minions, Princess, Zap
+  1: Elixir Collector, Furnace, Guards, Miner, Mini P.E.K.K.A, Minions, Poison, Zap
+Cards:
+ 78 ( 15): Zap
+ 63 (-13): Elixir Collector
+ 60 ( 17): Poison
+ 55 ( 14): Mini P.E.K.K.A
+ 52 ( -4): Princess
+ 38 (  5): Musketeer
+ 34 ( -9): Cannon
+ 33 ( -3): Hog Rider
+ 33 (  7): Miner
+ 31 (  0): Minions
+ 28 (  6): Giant
+ 28 ( 12): Ice Wizard
+ 27 ( -3): Valkyrie
+ 25 (-10): Skeletons
+ 21 (  4): Guards
+ 18 ( 13): Furnace
+ 17 (  5): Spear Goblins
+ 14 (-13): Goblins
+ 14 (  0): Goblin Barrel
+ 14 ( -8): Barbarians
+ 13 (-11): Freeze
+ 11 (-15): Arrows
+ 11 (  2): P.E.K.K.A
+ 10 (  3): Prince
+  9 (  2): Fireball
+  9 (  6): Dark Prince
+  8 ( -6): Witch
+  7 ( -2): Minion Horde
+  6 ( -8): Three Musketeers
+  6 (  0): Ice Spirit
+  6 (  2): Inferno Tower
+  4 (  2): Fire Spirits
+  3 ( -2): Royal Giant
+  2 ( -7): Balloon
+  2 (  1): Wizard
+  1 ( -3): Tesla
+  1 (  0): Bowler
+  1 ( -2): Lightning
+  1 (  0): Tombstone
+  1 ( -1): Rage
+  1 (  0): Mirror
+  1 ( -1): Rocket
+  1 (  0): Lumberjack
+  1 (  0): Bomber
+  1 ( -2): Baby Dragon
+--------------------------------------------------------------------------------
+Snapshot #10
+Decks:
+ 14: Cannon, Goblin Barrel, Guards, Miner, Mini P.E.K.K.A, Poison, Princess, Zap
+ 11: Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Prince, Zap
+  5: Goblins, Ice Spirit, Miner, Mini P.E.K.K.A, Minion Horde, Poison, Princess, Zap
+  5: Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Princess, Zap
+  4: Elixir Collector, Guards, Knight, Miner, Minions, Poison, Three Musketeers, Zap
+  3: Elixir Collector, Giant, Guards, Miner, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  3: Bowler, Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  3: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Spear Goblins, Zap
+  2: Cannon, Guards, Miner, Mini P.E.K.K.A, Minions, Poison, Princess, Zap
+  2: Cannon, Elixir Collector, Guards, Ice Spirit, Miner, Mini P.E.K.K.A, Poison, Zap
+  2: Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Valkyrie, Zap
+  2: Freeze, Goblins, Guards, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Zap
+  2: Arrows, Balloon, Barbarians, Elixir Collector, Giant, Minions, Princess, Skeletons
+  2: Cannon, Elixir Collector, Hog Rider, Ice Spirit, Musketeer, Poison, Valkyrie, Zap
+  2: Furnace, Guards, Ice Spirit, Miner, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  2: Cannon, Elixir Collector, Hog Rider, Musketeer, Poison, Skeletons, Valkyrie, Zap
+  2: Cannon, Elixir Collector, Guards, Knight, Miner, Poison, Three Musketeers, Zap
+  2: Dark Prince, Elixir Collector, Lightning, Mini P.E.K.K.A, Minion Horde, P.E.K.K.A, Princess, Zap
+  1: Elixir Collector, Guards, Ice Spirit, Miner, Mini P.E.K.K.A, Poison, Skeletons, Zap
+  1: Guards, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Princess, Rocket, Zap
+  1: Elixir Collector, Guards, Ice Spirit, Miner, Poison, Prince, Princess, Zap
+  1: Elixir Collector, Goblins, Minion Horde, P.E.K.K.A, Princess, Rage, Three Musketeers, Zap
+  1: Cannon, Goblin Barrel, Guards, Miner, Mini P.E.K.K.A, Minions, Poison, Zap
+  1: Cannon, Guards, Ice Spirit, Miner, Mini P.E.K.K.A, Poison, Princess, Zap
+  1: Elixir Collector, Guards, Ice Spirit, Miner, Mini P.E.K.K.A, Poison, Princess, Zap
+  1: Elixir Collector, Fireball, Giant, Guards, Ice Wizard, Mini P.E.K.K.A, Three Musketeers, Zap
+  1: Cannon, Guards, Ice Wizard, Miner, Mini P.E.K.K.A, Minions, Poison, Zap
+  1: Elixir Collector, Hog Rider, Ice Wizard, Inferno Tower, Poison, Skeletons, Valkyrie, Zap
+  1: Elixir Collector, Fire Spirits, Guards, Ice Spirit, Miner, Mini P.E.K.K.A, Poison, Zap
+  1: Elixir Collector, Golem, Mini P.E.K.K.A, Minions, Poison, Princess, Skeletons, Zap
+  1: Fireball, Guards, Hog Rider, Miner, Mini P.E.K.K.A, Minions, Princess, Zap
+  1: Bowler, Elixir Collector, P.E.K.K.A, Poison, Prince, Princess, Witch, Zap
+  1: Elixir Collector, Hog Rider, Ice Spirit, Inferno Tower, Musketeer, Poison, Valkyrie, Zap
+  1: Goblins, Mini P.E.K.K.A, Minions, Rage, Skeleton Army, Skeletons, Spear Goblins, Zap
+  1: Barbarians, Fireball, Ice Spirit, Miner, Mini P.E.K.K.A, Minions, Princess, Zap
+  1: Barbarians, Elixir Collector, Ice Wizard, Minion Horde, Mortar, Princess, Royal Giant, Zap
+  1: Cannon, Goblin Barrel, Guards, Miner, Mini P.E.K.K.A, Poison, Spear Goblins, Zap
+  1: Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Poison, Prince, Witch, Zap
+  1: Barbarians, Goblin Barrel, Goblins, Inferno Tower, Miner, Minion Horde, Princess, Zap
+  1: Elixir Collector, Ice Spirit, Knight, Miner, Poison, Skeletons, Three Musketeers, Zap
+  1: Guards, Lava Hound, Miner, Mini P.E.K.K.A, Minions, Poison, Princess, Zap
+  1: Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Poison, Princess, Three Musketeers, Zap
+  1: Guards, Ice Wizard, Miner, Mini P.E.K.K.A, Minions, Poison, Princess, Zap
+  1: Elixir Collector, Giant, Guards, Ice Spirit, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  1: Barbarians, Cannon, Elixir Collector, Hog Rider, Musketeer, Poison, Skeletons, Zap
+  1: Elixir Collector, Giant, Ice Wizard, Miner, Mini P.E.K.K.A, Minions, Sparky, Zap
+  1: Barbarians, Goblins, Hog Rider, Ice Wizard, Miner, Minions, Princess, Zap
+  1: Elixir Collector, Hog Rider, Ice Spirit, Ice Wizard, Inferno Tower, Poison, Valkyrie, Zap
+  1: Elixir Collector, Golem, Guards, Mini P.E.K.K.A, Musketeer, Poison, Skeletons, Zap
+  1: Bomber, Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Zap
+Cards:
+ 98 ( 20): Zap
+ 81 ( 21): Poison
+ 77 ( 22): Mini P.E.K.K.A
+ 70 ( 49): Guards
+ 63 (  0): Elixir Collector
+ 53 ( 20): Miner
+ 50 ( -2): Princess
+ 35 ( -3): Musketeer
+ 32 ( -2): Cannon
+ 32 (  4): Giant
+ 22 ( 16): Ice Spirit
+ 20 (-11): Minions
+ 17 (  3): Goblin Barrel
+ 14 (  4): Prince
+ 13 (-20): Hog Rider
+ 13 (  6): Minion Horde
+ 11 (-14): Skeletons
+ 11 ( -3): Goblins
+ 10 (  4): Three Musketeers
+  9 (-19): Ice Wizard
+  9 (-18): Valkyrie
+  7 (  0): Knight
+  7 ( -7): Barbarians
+  5 (-12): Spear Goblins
+  4 ( -7): P.E.K.K.A
+  4 ( -2): Inferno Tower
+  4 (  3): Bowler
+  3 ( -6): Fireball
+  2 (  1): Rage
+  2 (-11): Freeze
+  2 (  0): Golem
+  2 ( -9): Arrows
+  2 (  0): Balloon
+  2 ( -6): Witch
+  2 (-16): Furnace
+  2 (  1): Lightning
+  2 ( -7): Dark Prince
+  1 (  0): Rocket
+  1 ( -3): Fire Spirits
+  1 (  0): Skeleton Army
+  1 (  0): Mortar
+  1 ( -2): Royal Giant
+  1 (  0): Lava Hound
+  1 (  0): Sparky
+  1 (  0): Bomber
+--------------------------------------------------------------------------------
+Snapshot #11
+Decks:
+ 18: Bowler, Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  9: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Spear Goblins, Zap
+  8: Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Prince, Zap
+  5: Furnace, Guards, Miner, Mini P.E.K.K.A, Minions, Musketeer, Poison, Zap
+  5: Arrows, Bomber, Freeze, Guards, Hog Rider, Ice Spirit, Minions, Musketeer
+  4: Barbarians, Elixir Collector, Giant, Guards, Ice Wizard, Musketeer, Poison, Zap
+  4: Bowler, Guards, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Rocket, Zap
+  4: Arrows, Dark Prince, Elixir Collector, Freeze, Minion Horde, P.E.K.K.A, Prince, Princess
+  4: Elixir Collector, Ice Spirit, Knight, Miner, Poison, Princess, Skeletons, Three Musketeers
+  3: Elixir Collector, Hog Rider, Ice Spirit, Inferno Tower, Musketeer, Poison, Valkyrie, Zap
+  2: Arrows, Cannon, Elixir Collector, Freeze, Hog Rider, Musketeer, Skeletons, Valkyrie
+  2: Arrows, Cannon, Elixir Collector, Golem, Miner, Minion Horde, Minions, Prince
+  2: Baby Dragon, Elixir Collector, Goblin Barrel, Guards, Ice Wizard, Inferno Tower, Prince, Rocket
+  2: Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Princess, Zap
+  2: Arrows, Balloon, Barbarians, Elixir Collector, Giant, Minions, Princess, Skeletons
+  1: Arrows, Bowler, Dark Prince, Elixir Collector, Ice Wizard, P.E.K.K.A, Prince, Princess
+  1: Freeze, Guards, Hog Rider, Inferno Tower, Mini P.E.K.K.A, Minions, Princess, Zap
+  1: Arrows, Barbarians, Cannon, Elixir Collector, Fireball, Goblins, Minion Horde, Mortar
+  1: Elixir Collector, Giant, Guards, Ice Spirit, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  1: Arrows, Barbarians, Freeze, Goblins, Hog Rider, Minion Horde, Princess, Tombstone
+  1: Arrows, Dark Prince, Elixir Collector, Freeze, Guards, P.E.K.K.A, Prince, Rocket
+  1: Cannon, Elixir Collector, Hog Rider, Ice Spirit, Musketeer, Poison, Valkyrie, Zap
+  1: Guards, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Princess, Rocket, Zap
+  1: Cannon, Elixir Collector, Goblins, Hog Rider, Musketeer, Poison, Valkyrie, Zap
+  1: Arrows, Baby Dragon, Barbarians, Elixir Collector, Ice Spirit, Ice Wizard, P.E.K.K.A, Three Musketeers
+  1: Cannon, Elixir Collector, Hog Rider, Musketeer, Poison, Skeletons, Valkyrie, Zap
+  1: Elixir Collector, Golem, Ice Spirit, Lumberjack, Mini P.E.K.K.A, Minions, Poison, The Log
+  1: Baby Dragon, Elixir Collector, Goblins, Golem, Ice Spirit, Minions, Poison, Three Musketeers
+  1: Arrows, Dark Prince, Elixir Collector, Freeze, Lumberjack, Miner, Minion Horde, P.E.K.K.A
+  1: Barbarians, Fire Spirits, Freeze, Giant, Ice Wizard, Inferno Tower, Three Musketeers, Zap
+  1: Elixir Collector, Giant, Guards, Ice Wizard, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  1: Elixir Collector, Guards, Ice Wizard, Miner, P.E.K.K.A, Poison, Three Musketeers, Zap
+  1: Goblin Barrel, Goblins, Hog Rider, Mini P.E.K.K.A, Minion Horde, Rage, Skeleton Army, Skeletons
+  1: Arrows, Balloon, Barbarians, Elixir Collector, Giant, Ice Spirit, Minions, Princess
+  1: Elixir Collector, Guards, Ice Wizard, Inferno Tower, Miner, Mini P.E.K.K.A, Poison, Zap
+  1: Guards, Hog Rider, Ice Spirit, Inferno Tower, Minion Horde, Poison, Tombstone, Zap
+  1: Elixir Collector, Guards, Ice Spirit, Miner, Poison, Princess, Skeletons, Three Musketeers
+  1: Elixir Collector, Guards, Ice Wizard, Miner, Minion Horde, P.E.K.K.A, Three Musketeers, Zap
+  1: Goblins, Ice Spirit, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Skeletons, Zap
+  1: Cannon, Elixir Collector, Guards, Hog Rider, Ice Wizard, Poison, Valkyrie, Zap
+  1: Cannon, Fire Spirits, Goblin Barrel, Guards, Miner, Poison, Prince, Princess
+Cards:
+ 78 ( 15): Elixir Collector
+ 67 (-31): Zap
+ 60 (-10): Guards
+ 57 (-24): Poison
+ 54 (-23): Mini P.E.K.K.A
+ 52 ( 17): Musketeer
+ 38 (  6): Giant
+ 29 (-21): Princess
+ 27 (-26): Miner
+ 26 (  4): Ice Spirit
+ 23 ( 19): Bowler
+ 23 ( 10): Hog Rider
+ 22 (  9): Minion Horde
+ 22 ( 20): Arrows
+ 19 (-13): Cannon
+ 19 ( 10): Ice Wizard
+ 19 (  5): Prince
+ 18 ( -2): Minions
+ 16 ( 14): Freeze
+ 12 (  1): Skeletons
+ 11 (  4): Barbarians
+ 10 (  6): P.E.K.K.A
+ 10 (  0): Three Musketeers
+  9 (  4): Spear Goblins
+  9 (  5): Inferno Tower
+  9 (  0): Valkyrie
+  8 (  7): Rocket
+  7 (  5): Dark Prince
+  6 ( -5): Goblins
+  5 (  3): Furnace
+  5 (  4): Bomber
+  4 (  2): Golem
+  4 (-13): Goblin Barrel
+  4 (  0): Baby Dragon
+  4 ( -3): Knight
+  3 (  1): Balloon
+  2 (  0): Tombstone
+  2 (  0): Lumberjack
+  2 (  1): Fire Spirits
+  1 (  0): Mortar
+  1 ( -2): Fireball
+  1 (  0): The Log
+  1 (  0): Skeleton Army
+  1 ( -1): Rage
+--------------------------------------------------------------------------------
+Snapshot #12
+Decks:
+ 12: Elixir Collector, Giant, Guards, Ice Spirit, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  7: Elixir Collector, Giant, Ice Spirit, Minions, Musketeer, Poison, Prince, Zap
+  6: Elixir Collector, Freeze, Guards, Hog Rider, Ice Wizard, Inferno Tower, Valkyrie, Zap
+  6: Elixir Collector, Guards, Ice Spirit, Miner, Minions, P.E.K.K.A, Three Musketeers, Zap
+  5: Archers, Barbarians, Cannon, Elixir Collector, Freeze, Hog Rider, Knight, Poison
+  5: Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Prince, Zap
+  4: Cannon, Elixir Collector, Guards, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
+  3: Bowler, Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  3: Bowler, Elixir Collector, Guards, Ice Spirit, Inferno Tower, Miner, Poison, Zap
+  3: Bowler, Elixir Collector, Giant, Ice Spirit, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  2: Fire Spirits, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Prince, Princess, Rocket, Zap
+  2: Bowler, Elixir Collector, Giant, Ice Spirit, Musketeer, Poison, Prince, Zap
+  2: Arrows, Cannon, Elixir Collector, Freeze, Hog Rider, Musketeer, Skeletons, Valkyrie
+  2: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Spear Goblins, Zap
+  2: Goblin Barrel, Guards, Inferno Tower, Miner, Mini P.E.K.K.A, Minions, Poison, Zap
+  2: Baby Dragon, Elixir Collector, Goblin Barrel, Guards, Inferno Tower, Miner, Poison, Prince
+  2: Arrows, Goblin Barrel, Goblins, Hog Rider, Inferno Tower, Minions, Rocket, Skeleton Army
+  2: Elixir Collector, Hog Rider, Inferno Tower, Musketeer, Poison, Skeletons, Valkyrie, Zap
+  2: Goblin Barrel, Guards, Ice Spirit, Inferno Tower, Miner, Poison, Prince, Princess
+  2: Elixir Collector, Ice Spirit, Ice Wizard, Knight, Miner, Poison, Skeletons, Three Musketeers
+  1: Baby Dragon, Cannon, Goblins, Hog Rider, Ice Wizard, Lightning, Mini P.E.K.K.A, Zap
+  1: Elixir Collector, Ice Spirit, Knight, Miner, Poison, Princess, Skeletons, Three Musketeers
+  1: Arrows, Elixir Collector, Freeze, Miner, Mini P.E.K.K.A, Minions, P.E.K.K.A, Three Musketeers
+  1: Bowler, Elixir Collector, Giant, Ice Wizard, Mini P.E.K.K.A, Minions, Poison, Zap
+  1: Elixir Collector, Guards, Hog Rider, Ice Wizard, Inferno Tower, Poison, Valkyrie, Zap
+  1: Bowler, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Rocket, Tombstone, Zap
+  1: Elixir Collector, Hog Rider, Ice Wizard, Inferno Tower, Mini P.E.K.K.A, Poison, Valkyrie, Zap
+  1: Baby Dragon, Elixir Collector, Golem, Ice Spirit, Minions, Poison, Skeletons, Three Musketeers
+  1: Cannon, Elixir Collector, Goblins, Hog Rider, Musketeer, Poison, Valkyrie, Zap
+  1: Barbarians, Elixir Collector, Ice Wizard, Inferno Tower, Miner, Minion Horde, Princess, Zap
+  1: Arrows, Bowler, Elixir Collector, Giant, Guards, Lumberjack, Musketeer, Poison
+  1: Barbarians, Elixir Collector, Giant, Guards, Minion Horde, Musketeer, Poison, Zap
+  1: Arrows, Balloon, Barbarians, Elixir Collector, Giant, Minions, Princess, Skeletons
+  1: Elixir Collector, Giant, Ice Spirit, Lightning, Mini P.E.K.K.A, Minions, Poison, Three Musketeers
+  1: Dark Prince, Elixir Collector, Freeze, Guards, P.E.K.K.A, Poison, Three Musketeers, Wizard
+  1: Elixir Collector, Goblins, Ice Spirit, Lumberjack, Minion Horde, Musketeer, Skeleton Army, Zap
+  1: Arrows, Bowler, Elixir Collector, Guards, Hog Rider, Ice Spirit, Inferno Tower, Minions
+  1: Elixir Collector, Giant, Guards, Mini P.E.K.K.A, Musketeer, Poison, Princess, Zap
+  1: Baby Dragon, Balloon, Barbarians, Elixir Collector, Freeze, Inferno Tower, Poison, Prince
+  1: Bowler, Fire Spirits, Goblin Barrel, Inferno Tower, Miner, Poison, Spear Goblins, Zap
+  1: Bowler, Goblin Barrel, Ice Spirit, Inferno Tower, Miner, Poison, Spear Goblins, Zap
+  1: Fire Spirits, Goblin Barrel, Inferno Tower, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
+  1: Arrows, Elixir Collector, Hog Rider, Ice Wizard, Inferno Tower, Minions, Poison, Valkyrie
+  1: Arrows, Dark Prince, Elixir Collector, Freeze, Minion Horde, P.E.K.K.A, Prince, Princess
+  1: Elixir Collector, Goblins, Golem, Ice Spirit, Mini P.E.K.K.A, Minions, Poison, Princess
+  1: Arrows, Barbarians, Cannon, Elixir Collector, Goblins, Minion Horde, Mortar, Rocket
+Cards:
+ 87 (  9): Elixir Collector
+ 72 (  5): Zap
+ 66 (  9): Poison
+ 51 ( -9): Guards
+ 47 ( 21): Ice Spirit
+ 42 (-12): Mini P.E.K.K.A
+ 41 (-11): Musketeer
+ 38 (  0): Giant
+ 29 (  2): Miner
+ 28 ( 19): Inferno Tower
+ 25 (  7): Minions
+ 24 (  1): Hog Rider
+ 22 (  3): Prince
+ 17 ( -2): Ice Wizard
+ 17 (-12): Princess
+ 17 ( -6): Bowler
+ 17 (  1): Freeze
+ 16 ( -3): Cannon
+ 14 (  5): Valkyrie
+ 13 (  3): Three Musketeers
+ 12 (-10): Minion Horde
+ 11 (-11): Arrows
+ 11 (  7): Goblin Barrel
+ 10 ( -1): Barbarians
+  9 ( -3): Skeletons
+  9 ( -1): P.E.K.K.A
+  8 (  4): Knight
+  7 (  1): Goblins
+  6 ( -2): Rocket
+  5 (  1): Baby Dragon
+  5 (  0): Archers
+  4 (  2): Fire Spirits
+  4 ( -5): Spear Goblins
+  3 (  2): Skeleton Army
+  2 (  0): Lightning
+  2 ( -2): Golem
+  2 (  0): Lumberjack
+  2 ( -1): Balloon
+  2 ( -5): Dark Prince
+  1 ( -1): Tombstone
+  1 (  0): Wizard
+  1 (  0): Mortar
+--------------------------------------------------------------------------------
+Snapshot #13
+Decks:
+  8: Bowler, Elixir Collector, Giant, Ice Spirit, Musketeer, Poison, Prince, Zap
+  7: Elixir Collector, Giant, Guards, Ice Spirit, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  7: Baby Dragon, Elixir Collector, Goblin Barrel, Guards, Inferno Tower, Miner, Poison, Prince
+  6: Elixir Collector, Giant, Guards, Ice Spirit, Musketeer, Poison, Prince, Zap
+  5: Bowler, Guards, Ice Spirit, Inferno Tower, Miner, Minions, Poison, Zap
+  4: Archers, Barbarians, Cannon, Elixir Collector, Freeze, Hog Rider, Knight, Poison
+  3: Elixir Collector, Hog Rider, Ice Spirit, Inferno Tower, Musketeer, Poison, Valkyrie, Zap
+  2: Elixir Collector, Ice Spirit, Knight, Miner, Poison, Princess, Skeletons, Three Musketeers
+  2: Cannon, Elixir Collector, Guards, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
+  2: Elixir Collector, Giant, Guards, Ice Spirit, Mega Minion, Poison, Prince, Zap
+  2: Arrows, Knight, Lava Hound, Lightning, Mega Minion, Miner, Minions, Tombstone
+  2: Elixir Collector, Giant, Ice Spirit, Mini P.E.K.K.A, Musketeer, Poison, Prince, Zap
+  2: Bowler, Elixir Collector, Giant, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Poison, Zap
+  2: Elixir Collector, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Poison, Princess, Skeletons, Zap
+  2: Elixir Collector, Guards, Ice Spirit, Miner, Minions, P.E.K.K.A, Three Musketeers, Zap
+  1: Guards, Inferno Tower, Mega Minion, Miner, Mini P.E.K.K.A, Poison, Skeletons, Zap
+  1: Elixir Collector, Knight, Lightning, Mega Minion, Miner, Mirror, Princess, Skeletons
+  1: Bowler, Elixir Collector, Guards, Ice Spirit, Inferno Tower, Miner, Poison, Zap
+  1: Bowler, Elixir Collector, Giant, Ice Wizard, Mini P.E.K.K.A, Mirror, Poison, Zap
+  1: Bowler, Elixir Collector, Giant, Ice Spirit, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  1: Bowler, Elixir Collector, Giant, Guards, Musketeer, Poison, Prince, Zap
+  1: Bowler, Elixir Collector, Giant, Guards, Ice Spirit, Mega Minion, Poison, Zap
+  1: Bowler, Elixir Collector, Ice Spirit, Knight, Miner, Skeletons, Three Musketeers, Zap
+  1: Cannon, Hog Rider, Ice Spirit, Musketeer, Poison, The Log, Valkyrie, Zap
+  1: Guards, Ice Spirit, Inferno Tower, Miner, Mini P.E.K.K.A, Poison, Skeletons, Zap
+  1: Bowler, Elixir Collector, Giant, Ice Spirit, Mega Minion, Musketeer, Poison, Zap
+  1: Elixir Collector, Giant, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  1: Elixir Collector, Golem, Mini P.E.K.K.A, Minions, Poison, Princess, Skeletons, Zap
+  1: Arrows, Baby Dragon, Elixir Collector, Knight, Lightning, Minion Horde, Tombstone, X-Bow
+  1: Elixir Collector, Giant, Goblin Barrel, Goblins, Minion Horde, Minions, Rocket, Zap
+  1: Bowler, Giant, Ice Spirit, Ice Wizard, Lightning, Prince, Skeletons, Zap
+  1: Elixir Collector, Freeze, Hog Rider, Mini P.E.K.K.A, Minions, Poison, Princess, Skeletons
+  1: Bowler, Guards, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Poison, Rocket
+  1: Elixir Collector, Giant, Guards, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Poison, Zap
+  1: Bowler, Cannon, Elixir Collector, Freeze, Guards, Hog Rider, Mini P.E.K.K.A, Minions
+  1: Arrows, Barbarians, Fireball, Goblin Barrel, Goblins, Hog Rider, Ice Spirit, Minion Horde
+  1: Elixir Collector, Ice Spirit, Knight, Miner, Mini P.E.K.K.A, Princess, The Log, Three Musketeers
+  1: Bowler, Furnace, Ice Spirit, Inferno Tower, Mega Minion, Poison, Rocket, The Log
+  1: Elixir Collector, Giant, Guards, Mega Minion, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  1: Bowler, Elixir Collector, Giant, Ice Spirit, Mega Minion, Musketeer, Poison, Prince
+  1: Elixir Collector, Ice Spirit, Knight, Miner, Minion Horde, Mirror, The Log, Three Musketeers
+  1: Barbarians, Goblin Barrel, Goblins, Inferno Tower, Miner, Minion Horde, Princess, Zap
+  1: Bowler, Elixir Collector, Giant, Ice Spirit, Mega Minion, Poison, Prince, Zap
+  1: Archers, Arrows, Lava Hound, Lightning, Mega Minion, Miner, Minion Horde, Tombstone
+  1: Arrows, Bowler, Guards, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Rocket
+  1: Elixir Collector, Fireball, Giant, Guards, Minions, Princess, Sparky, Zap
+  1: Elixir Collector, Ice Spirit, Ice Wizard, Knight, Miner, Poison, Skeletons, Three Musketeers
+  1: Barbarians, Elixir Collector, Fire Spirits, Guards, Ice Spirit, Miner, Three Musketeers, Zap
+  1: Fireball, Giant, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Minions, Zap
+  1: Elixir Collector, Fireball, Giant, Ice Wizard, Mega Minion, Mirror, Rage, Witch
+  1: Arrows, Cannon, Elixir Collector, Freeze, Hog Rider, Musketeer, Skeletons, Valkyrie
+  1: Arrows, Balloon, Barbarians, Elixir Collector, Fireball, Giant, Ice Spirit, Mega Minion
+  1: Balloon, Elixir Collector, Fireball, Giant, Mega Minion, Mini P.E.K.K.A, Skeletons, Zap
+  1: Arrows, Barbarians, Freeze, Goblins, Hog Rider, Minion Horde, Princess, Tombstone
+  1: Goblin Barrel, Guards, Ice Spirit, Inferno Tower, Miner, Poison, Prince, Princess
+  1: Barbarians, Elixir Collector, Ice Wizard, Lightning, Minion Horde, Tesla, X-Bow, Zap
+  1: Arrows, Barbarians, Elixir Collector, Fireball, Inferno Tower, Minion Horde, Mortar, Skeletons
+  1: Arrows, Goblin Barrel, Goblins, Hog Rider, Inferno Tower, Minions, Rocket, Skeleton Army
+  1: Guards, Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mini P.E.K.K.A, Princess, Zap
+Cards:
+ 78 ( -9): Elixir Collector
+ 70 (  4): Poison
+ 65 ( -7): Zap
+ 64 ( 17): Ice Spirit
+ 45 ( -6): Guards
+ 44 (  6): Giant
+ 34 ( -7): Musketeer
+ 33 (  4): Miner
+ 30 (  8): Prince
+ 30 (-12): Mini P.E.K.K.A
+ 29 ( 12): Bowler
+ 25 ( -3): Inferno Tower
+ 20 (  0): Mega Minion
+ 19 ( -5): Hog Rider
+ 16 ( -9): Minions
+ 15 (  6): Skeletons
+ 15 ( -2): Princess
+ 14 (  6): Knight
+ 13 (  2): Goblin Barrel
+ 12 (  0): Minion Horde
+ 11 (  1): Barbarians
+ 11 (  0): Arrows
+  9 ( -4): Three Musketeers
+  9 ( -7): Cannon
+  8 (  3): Baby Dragon
+  8 (  6): Lightning
+  8 ( -9): Freeze
+  7 (-10): Ice Wizard
+  7 (  0): Fireball
+  5 (  0): Archers
+  5 (  4): Tombstone
+  5 ( -9): Valkyrie
+  5 ( -2): Goblins
+  5 ( -1): Rocket
+  4 (  0): Mirror
+  4 (  0): The Log
+  3 (  0): Lava Hound
+  2 (  0): X-Bow
+  2 ( -7): P.E.K.K.A
+  2 (  0): Balloon
+  1 ( -1): Golem
+  1 (  0): Furnace
+  1 (  0): Sparky
+  1 ( -3): Fire Spirits
+  1 (  0): Rage
+  1 (  0): Witch
+  1 (  0): Tesla
+  1 (  0): Mortar
+  1 ( -2): Skeleton Army
+--------------------------------------------------------------------------------
+Snapshot #14
+Decks:
+ 15: Elixir Collector, Giant, Guards, Ice Spirit, Mega Minion, Poison, Prince, Zap
+  7: Archers, Barbarians, Cannon, Elixir Collector, Freeze, Hog Rider, Poison, Valkyrie
+  7: Elixir Collector, Guards, Hog Rider, Ice Spirit, Inferno Tower, Poison, Skeletons, Zap
+  6: Elixir Collector, Giant, Guards, Ice Spirit, Musketeer, Poison, Prince, Zap
+  4: Elixir Collector, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Poison, Princess, Skeleton Army
+  3: Elixir Collector, Guards, Ice Spirit, Inferno Tower, Miner, Minion Horde, Poison, Spear Goblins
+  3: Cannon, Elixir Collector, Guards, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
+  3: Elixir Collector, Giant, Ice Spirit, Mega Minion, Musketeer, Poison, Prince, Zap
+  2: Elixir Collector, Guards, Ice Spirit, Ice Wizard, Knight, Miner, Poison, Three Musketeers
+  2: Archers, Barbarians, Cannon, Elixir Collector, Freeze, Hog Rider, Knight, Poison
+  2: Elixir Collector, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Zap
+  2: Elixir Collector, Guards, Ice Spirit, Mega Minion, Miner, P.E.K.K.A, Three Musketeers, Zap
+  1: Elixir Collector, Guards, Ice Spirit, Inferno Tower, Mega Minion, Miner, Poison, Zap
+  1: Elixir Collector, Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mini P.E.K.K.A, Princess, Skeletons
+  1: Cannon, Elixir Collector, Freeze, Hog Rider, Musketeer, Poison, Skeletons, Valkyrie
+  1: Elixir Collector, Fireball, Guards, Ice Spirit, Ice Wizard, Inferno Tower, X-Bow, Zap
+  1: Elixir Collector, Giant, Ice Spirit, Minion Horde, Musketeer, Poison, Prince, Zap
+  1: Elixir Collector, Ice Spirit, Knight, Miner, Mini P.E.K.K.A, Princess, The Log, Three Musketeers
+  1: Elixir Collector, Ice Spirit, Knight, Miner, Minion Horde, Mirror, The Log, Three Musketeers
+  1: Cannon, Freeze, Hog Rider, Ice Spirit, Mega Minion, Musketeer, Poison, Skeletons
+  1: Elixir Collector, Guards, Ice Spirit, Inferno Tower, Miner, Minion Horde, Princess, Zap
+  1: Bowler, Elixir Collector, Giant, Ice Wizard, Minions, Poison, Prince, Zap
+  1: Elixir Collector, Guards, Ice Spirit, Miner, Minions, P.E.K.K.A, Three Musketeers, Zap
+  1: Fireball, Goblin Barrel, Guards, Inferno Tower, Miner, Mirror, Princess, The Log
+  1: Elixir Collector, Guards, Hog Rider, Inferno Tower, Miner, Poison, Skeletons, Zap
+  1: Bowler, Elixir Collector, Giant, Ice Spirit, Musketeer, Poison, Prince, Zap
+  1: Elixir Collector, Ice Spirit, Knight, Miner, Minion Horde, Skeletons, Three Musketeers, Zap
+  1: Elixir Collector, Giant, Ice Spirit, Lumberjack, Mega Minion, Musketeer, Poison, Zap
+  1: Elixir Collector, Giant, Ice Wizard, Mega Minion, Poison, Valkyrie, Wizard, Zap
+  1: Elixir Collector, Ice Spirit, Knight, Miner, Poison, Princess, Skeletons, Three Musketeers
+  1: Goblin Barrel, Inferno Tower, Knight, Miner, Minion Horde, Poison, Skeleton Army, Zap
+  1: Bowler, Elixir Collector, Fireball, Knight, Lightning, Minion Horde, Tombstone, X-Bow
+  1: Freeze, Guards, Hog Rider, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Princess, Rocket
+  1: Barbarians, Elixir Collector, Ice Wizard, Mini P.E.K.K.A, Musketeer, Poison, X-Bow, Zap
+  1: Elixir Collector, Giant, Guards, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Poison, Zap
+  1: Elixir Collector, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Poison, Princess, Skeletons, Zap
+  1: Bowler, Elixir Collector, Giant, Ice Spirit, Mega Minion, Musketeer, Poison, Zap
+  1: Elixir Collector, Giant, Guards, Mega Minion, Miner, Poison, Prince, Zap
+  1: Elixir Collector, Freeze, Guards, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Poison
+  1: Elixir Collector, Furnace, Ice Spirit, Lightning, Miner, Mini P.E.K.K.A, Princess, The Log
+  1: Hog Rider, Ice Spirit, Inferno Tower, Mega Minion, Miner, Minions, Poison, The Log
+  1: Elixir Collector, Inferno Tower, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Spear Goblins, Zap
+  1: Barbarians, Elixir Collector, Hog Rider, Ice Spirit, Inferno Tower, Poison, Skeletons, Zap
+  1: Giant, Guards, Ice Spirit, Ice Wizard, Mega Minion, Poison, Prince, Zap
+  1: Elixir Collector, Giant, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Musketeer, Poison, Zap
+  1: Elixir Collector, Goblin Barrel, Ice Spirit, Inferno Tower, Mini P.E.K.K.A, Skeletons, The Log, Zap
+  1: Baby Dragon, Cannon, Goblins, Guards, Hog Rider, Mega Minion, Poison, Rocket
+  1: Elixir Collector, Giant, Mega Minion, Mirror, Musketeer, Poison, Prince, The Log
+  1: Barbarians, Goblin Barrel, Goblins, Inferno Tower, Miner, Minion Horde, Princess, Zap
+  1: Archers, Cannon, Elixir Collector, Giant, Ice Wizard, Mini P.E.K.K.A, Poison, Zap
+  1: Arrows, Barbarians, Fireball, Goblin Barrel, Goblins, Hog Rider, Ice Spirit, Minion Horde
+  1: Archers, Fire Spirits, Goblins, Ice Spirit, Miner, Skeleton Army, Spear Goblins, Zap
+  1: Elixir Collector, Giant, Ice Spirit, Mega Minion, Poison, Prince, Princess, Zap
+  1: Ice Spirit, Inferno Tower, Mega Minion, Miner, Poison, Princess, Skeletons, The Log
+  1: Elixir Collector, Guards, Ice Spirit, Knight, Miner, Minions, Three Musketeers, Zap
+  1: Dark Prince, Fireball, Knight, Miner, Mirror, Musketeer, Prince, Zap
+Cards:
+ 88 ( 10): Elixir Collector
+ 75 (  5): Poison
+ 67 (  3): Ice Spirit
+ 66 (  1): Zap
+ 51 (  6): Guards
+ 37 ( -7): Giant
+ 35 ( 15): Mega Minion
+ 33 (  0): Miner
+ 32 (  2): Prince
+ 29 ( 10): Hog Rider
+ 27 (  2): Inferno Tower
+ 21 (  6): Princess
+ 19 (  7): Minion Horde
+ 19 (-15): Musketeer
+ 17 (-13): Mini P.E.K.K.A
+ 17 (  2): Skeletons
+ 16 (  7): Cannon
+ 15 (  7): Freeze
+ 13 (  2): Barbarians
+ 12 ( -2): Knight
+ 11 (  6): Archers
+ 10 (  1): Three Musketeers
+  9 (  4): Valkyrie
+  9 ( -4): Goblin Barrel
+  8 (  1): Ice Wizard
+  8 (  4): The Log
+  7 ( -9): Minions
+  6 (  5): Skeleton Army
+  6 (  1): Goblins
+  5 (  0): Spear Goblins
+  5 ( -2): Fireball
+  4 (  0): Mirror
+  4 (-25): Bowler
+  3 ( -5): Lightning
+  3 (  1): X-Bow
+  3 (  1): P.E.K.K.A
+  2 ( -3): Rocket
+  1 (  0): Lumberjack
+  1 (  0): Wizard
+  1 ( -4): Tombstone
+  1 (  0): Furnace
+  1 ( -7): Baby Dragon
+  1 (-10): Arrows
+  1 (  0): Fire Spirits
+  1 (  0): Dark Prince
+--------------------------------------------------------------------------------
+Snapshot #15
+Decks:
+ 11: Arrows, Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone
+  6: Fire Spirits, Ice Spirit, Inferno Tower, Mini P.E.K.K.A, Princess, Skeleton Army, The Log, X-Bow
+  4: Fire Spirits, Ice Spirit, Inferno Tower, Mega Minion, Princess, Skeleton Army, The Log, X-Bow
+  4: Fireball, Hog Rider, Ice Spirit, Inferno Tower, Mega Minion, Princess, Skeletons, The Log
+  3: Goblins, Ice Golem, Ice Spirit, Miner, Skeletons, Spear Goblins, The Log, Zap
+  3: Bowler, Fireball, Hog Rider, Ice Spirit, Inferno Tower, Minions, Skeletons, Zap
+  3: Arrows, Bowler, Giant, Lightning, Mega Minion, Musketeer, Tombstone, Zap
+  3: Hog Rider, Ice Spirit, Ice Wizard, Lightning, Princess, Skeleton Army, Spear Goblins, Zap
+  3: Hog Rider, Ice Spirit, Ice Wizard, Mega Minion, Princess, Rocket, Skeleton Army, The Log
+  3: Fireball, Goblin Barrel, Inferno Tower, Miner, Minions, Princess, Skeleton Army, The Log
+  2: Cannon, Elixir Collector, Guards, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
+  2: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
+  2: Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Skeleton Army, The Log, X-Bow
+  2: Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Royal Giant, Skeleton Army, The Log, Zap
+  2: Arrows, Bowler, Ice Spirit, Knight, Lightning, Minion Horde, Tombstone, X-Bow
+  2: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  2: Archers, Arrows, Lava Hound, Lightning, Mega Minion, Miner, The Log, Tombstone
+  1: Fireball, Ice Spirit, Knight, Mega Minion, Mortar, Princess, Skeletons, The Log
+  1: Arrows, Ice Wizard, Lava Hound, Lightning, Mega Minion, Miner, Minions, Tombstone
+  1: Fire Spirits, Fireball, Ice Spirit, Inferno Tower, Mega Minion, Skeleton Army, The Log, X-Bow
+  1: Fireball, Ice Spirit, Inferno Tower, Mega Minion, Skeleton Army, The Log, X-Bow, Zap
+  1: Bowler, Cannon, Ice Wizard, Lightning, Mega Minion, Princess, Rocket, Zap
+  1: Hog Rider, Ice Spirit, Ice Wizard, Lightning, Mega Minion, Princess, Skeleton Army, The Log
+  1: Elixir Collector, Giant, Guards, Ice Spirit, Mega Minion, Poison, Prince, Zap
+  1: Barbarians, Bowler, Fireball, Giant, Ice Spirit, Mega Minion, Musketeer, Zap
+  1: Ice Wizard, Lava Hound, Lightning, Mega Minion, Miner, Minions, Tombstone, Zap
+  1: Goblin Barrel, Ice Spirit, Mega Minion, Miner, Princess, Skeleton Army, The Log, Zap
+  1: Arrows, Freeze, Furnace, Hog Rider, Knight, Mega Minion, Rocket, The Log
+  1: Fire Spirits, Ice Spirit, Inferno Tower, Knight, Mega Minion, Skeleton Army, The Log, X-Bow
+  1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Princess, Skeletons, The Log
+  1: Baby Dragon, Golem, Ice Wizard, Lightning, Miner, Musketeer, Skeleton Army, Zap
+  1: Elixir Collector, Golem, Minion Horde, Minions, Skeleton Army, The Log, Three Musketeers, Zap
+  1: Guards, Hog Rider, Ice Spirit, Mega Minion, Princess, Rocket, Skeleton Army, The Log
+  1: Guards, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Princess, Rocket, The Log
+  1: Arrows, Lava Hound, Lightning, Mega Minion, Miner, Minions, The Log, Tombstone
+  1: Goblins, Hog Rider, Ice Spirit, Ice Wizard, Mega Minion, Rocket, The Log, Valkyrie
+  1: Arrows, Ice Golem, Ice Spirit, Inferno Tower, Minions, Skeleton Army, The Log, X-Bow
+  1: Bowler, Fire Spirits, Fireball, Inferno Tower, Mega Minion, Miner, Skeleton Army, The Log
+  1: Baby Dragon, Golem, Ice Wizard, Lightning, Mega Minion, Miner, Skeleton Army, Zap
+  1: Goblin Barrel, Inferno Tower, Lightning, Miner, Princess, Skeleton Army, Spear Goblins, Zap
+  1: Hog Rider, Ice Spirit, Ice Wizard, Inferno Tower, Lightning, Princess, The Log, Zap
+  1: Goblin Barrel, Ice Spirit, Miner, Minion Horde, Mirror, Princess, Rocket, The Log
+  1: Furnace, Ice Wizard, Lightning, Miner, Mini P.E.K.K.A, Skeleton Army, Spear Goblins, Zap
+  1: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  1: Bowler, Elixir Collector, Fireball, Guards, Ice Spirit, Inferno Tower, Rocket, Zap
+  1: Bowler, Fireball, Guards, Ice Spirit, Inferno Tower, Miner, Minions, Zap
+  1: Fireball, Goblin Barrel, Inferno Tower, Miner, Princess, Skeleton Army, Spear Goblins, Zap
+  1: Fireball, Ice Spirit, Inferno Tower, Knight, Mega Minion, Mortar, Princess, The Log
+  1: Ice Spirit, Miner, Minion Horde, Minions, Princess, Spear Goblins, Tesla, Zap
+  1: Arrows, Bowler, Hog Rider, Ice Spirit, Ice Wizard, Mega Minion, Rocket, Tombstone
+  1: Fire Spirits, Furnace, Guards, Lightning, Mega Minion, Miner, The Log, X-Bow
+  1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Princess, Skeletons, Zap
+  1: Fire Spirits, Fireball, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  1: Goblin Barrel, Ice Spirit, Inferno Tower, Miner, Minion Horde, Skeleton Army, The Log, Zap
+  1: Arrows, Freeze, Hog Rider, Ice Spirit, Mega Minion, Princess, Skeleton Army, The Log
+  1: Barbarians, Fireball, Freeze, Hog Rider, Ice Spirit, Minion Horde, Skeletons, Tombstone
+  1: Bowler, Fireball, Furnace, Guards, Hog Rider, Ice Spirit, Mega Minion, The Log
+  1: Arrows, Hog Rider, Ice Spirit, Ice Wizard, Lightning, Princess, Skeleton Army, The Log
+  1: Giant, Goblin Hut, Lightning, Mega Minion, Minions, Princess, Skeleton Army, Zap
+  1: Fireball, Ice Spirit, Knight, Minions, Mortar, Princess, Skeleton Army, The Log
+Cards:
+ 68 ( 60): The Log
+ 61 ( -6): Ice Spirit
+ 54 ( 19): Mega Minion
+ 51 ( 30): Princess
+ 46 ( 40): Skeleton Army
+ 40 ( 13): Inferno Tower
+ 37 (-29): Zap
+ 36 ( 33): Lightning
+ 29 ( -4): Miner
+ 28 ( -1): Hog Rider
+ 26 ( 22): Bowler
+ 25 ( 24): Arrows
+ 25 ( 20): Fireball
+ 23 ( 22): Tombstone
+ 19 ( 12): Minions
+ 19 ( 16): X-Bow
+ 18 ( 10): Ice Wizard
+ 17 (-20): Giant
+ 17 ( 16): Fire Spirits
+ 16 ( -3): Musketeer
+ 14 ( -3): Mini P.E.K.K.A
+ 14 ( -3): Skeletons
+ 13 ( -6): Minion Horde
+ 11 (  9): Rocket
+ 11 (  2): Goblin Barrel
+ 10 (  5): Spear Goblins
+  9 (-42): Guards
+  7 ( -5): Knight
+  6 (  0): Ice Golem
+  6 (  0): Goblins
+  5 (-83): Elixir Collector
+  5 (-10): Freeze
+  5 (  0): Lava Hound
+  5 (  4): Furnace
+  3 (-13): Cannon
+  3 (  0): Mortar
+  3 (  0): Golem
+  2 (  0): Royal Giant
+  2 (-11): Barbarians
+  2 (  1): Baby Dragon
+  2 ( -9): Archers
+  1 (-31): Prince
+  1 (-74): Poison
+  1 ( -9): Three Musketeers
+  1 ( -8): Valkyrie
+  1 ( -3): Mirror
+  1 (  0): Tesla
+  1 (  0): Goblin Hut
+--------------------------------------------------------------------------------
 Snapshot #16
 Decks:
-Deck similarity threshold: 0.85
   4: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.940397: Archers, Barbarians, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.933333: Archers, Baby Dragon, Golem, Lightning, Mega Minion, Miner, Tombstone, Zap
-        0.898734: Archers, Baby Dragon, Golem, Ice Golem, Lightning, Mega Minion, The Log, Tombstone
-        0.887417: Archers, Baby Dragon, Bomber, Golem, Lightning, Mega Minion, Tombstone, Zap
   4: Archers, Baby Dragon, Golem, Ice Golem, Lightning, Mega Minion, The Log, Tombstone
-        0.898734: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
   2: Golem, Lightning, Mega Minion, Minions, Musketeer, Skeleton Army, The Log, Tombstone
   2: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
   2: Archers, Golem, Lightning, Lumberjack, Mega Minion, The Log, Tombstone, Zap
   1: Baby Dragon, Lava Hound, Lightning, Lumberjack, Mega Minion, Miner, The Log, Tombstone
   1: Archers, Golem, Graveyard, Ice Golem, Mega Minion, The Log, Tombstone, Zap
-        0.913907: Archers, Arrows, Golem, Graveyard, Ice Golem, Mega Minion, The Log, Tombstone
   1: Archers, Giant, Ice Golem, Lightning, Mega Minion, Musketeer, The Log, Tombstone
   1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Princess, Skeleton Army, The Log
   1: Archers, Baby Dragon, Golem, Lightning, Mega Minion, Miner, Tombstone, Zap
-        0.933333: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.899329: Archers, Baby Dragon, Bomber, Golem, Lightning, Mega Minion, Tombstone, Zap
-        0.872483: Archers, Barbarians, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
   1: Archers, Arrows, Lava Hound, Lightning, Mega Minion, Miner, Minions, Tombstone
   1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mini P.E.K.K.A, Princess, Skeletons, Zap
   1: Bowler, Fireball, Guards, Ice Spirit, Inferno Tower, Mega Minion, The Log, X-Bow
@@ -40,194 +864,124 @@ Deck similarity threshold: 0.85
   1: Archers, Arrows, Ice Golem, Mega Minion, Musketeer, Royal Giant, Skeleton Army, The Log
   1: Guards, Hog Rider, Ice Spirit, Ice Wizard, Mini P.E.K.K.A, Princess, Rocket, The Log
   1: Archers, Baby Dragon, Bomber, Golem, Lightning, Mega Minion, Tombstone, Zap
-        0.899329: Archers, Baby Dragon, Golem, Lightning, Mega Minion, Miner, Tombstone, Zap
-        0.887417: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
   1: Archers, Barbarians, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.927152: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.859060: Archers, Baby Dragon, Golem, Lightning, Mega Minion, Miner, Tombstone, Zap
-        0.853503: Archers, Barbarians, Giant, Ice Spirit, Lightning, Mega Minion, The Log, Tombstone
   1: Fire Spirits, Ice Spirit, Inferno Tower, Mega Minion, Princess, Skeleton Army, The Log, X-Bow
   1: Giant, Ice Wizard, Inferno Tower, Lightning, Mega Minion, Musketeer, Skeleton Army, Zap
   1: Goblin Barrel, Inferno Tower, Miner, Minion Horde, Mirror, Princess, Skeleton Army, Zap
   1: Archers, Barbarians, Giant, Ice Spirit, Lightning, Mega Minion, The Log, Tombstone
-        0.853503: Archers, Barbarians, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
   1: Goblins, Ice Golem, Inferno Tower, Miner, Mini P.E.K.K.A, Princess, The Log, Zap
   1: Archers, Arrows, Golem, Graveyard, Ice Golem, Mega Minion, The Log, Tombstone
-        0.913907: Archers, Golem, Graveyard, Ice Golem, Mega Minion, The Log, Tombstone, Zap
   1: Archers, Furnace, Guards, Ice Spirit, Lightning, Mega Minion, Royal Giant, The Log
   1: Fireball, Giant, Goblins, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Musketeer, Zap
   1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mini P.E.K.K.A, The Log, Zap
   1: Guards, Inferno Dragon, Lava Hound, Lightning, Mega Minion, Miner, Minion Horde, Tombstone
   1: Fire Spirits, Golem, Lightning, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
 Cards:
- 43 (  0): Mega Minion
- 34 (  0): The Log
- 30 (  0): Lightning
- 28 (  0): Tombstone
- 27 (  0): Archers
- 21 (  0): Zap
- 20 (  0): Golem
- 16 (  0): Ice Golem
- 14 (  0): Baby Dragon
- 14 (  0): Ice Spirit
- 13 (  0): Inferno Tower
- 12 (  0): Fireball
- 11 (  0): Skeleton Army
- 10 (  0): Miner
-  9 (  0): Musketeer
-  8 (  0): Lava Hound
-  8 (  0): Minions
-  7 (  0): Princess
-  7 (  0): Arrows
+ 43 (-11): Mega Minion
+ 34 (-34): The Log
+ 30 ( -6): Lightning
+ 28 (  5): Tombstone
+ 27 ( 25): Archers
+ 21 (-16): Zap
+ 20 ( 17): Golem
+ 16 ( 10): Ice Golem
+ 14 ( 12): Baby Dragon
+ 14 (-47): Ice Spirit
+ 13 (-27): Inferno Tower
+ 12 (-13): Fireball
+ 11 (-35): Skeleton Army
+ 10 (-19): Miner
+  9 ( -7): Musketeer
+  8 (  3): Lava Hound
+  8 (-11): Minions
+  7 (-44): Princess
+  7 (-18): Arrows
   6 (  0): Graveyard
-  6 (  0): Mini P.E.K.K.A
+  6 ( -8): Mini P.E.K.K.A
   5 (  0): Lumberjack
-  5 (  0): Giant
-  5 (  0): Hog Rider
-  5 (  0): Guards
-  4 (  0): X-Bow
-  3 (  0): Bowler
-  3 (  0): Minion Horde
-  3 (  0): Fire Spirits
-  3 (  0): Elixir Collector
-  2 (  0): Knight
+  5 (-12): Giant
+  5 (-23): Hog Rider
+  5 ( -4): Guards
+  4 (-15): X-Bow
+  3 (-23): Bowler
+  3 (-10): Minion Horde
+  3 (-14): Fire Spirits
+  3 ( -2): Elixir Collector
+  2 ( -5): Knight
   2 (  0): Inferno Dragon
   2 (  0): Royal Giant
-  2 (  0): Ice Wizard
+  2 (-16): Ice Wizard
   2 (  0): Barbarians
-  2 (  0): Goblins
-  2 (  0): Furnace
-  1 (  0): Skeletons
+  2 ( -4): Goblins
+  2 ( -3): Furnace
+  1 (-13): Skeletons
   1 (  0): Three Musketeers
-  1 (  0): Rocket
+  1 (-10): Rocket
   1 (  0): Bomber
-  1 (  0): Goblin Barrel
+  1 (-10): Goblin Barrel
   1 (  0): Mirror
 --------------------------------------------------------------------------------
 Snapshot #17
 Decks:
-Deck similarity threshold: 0.85
   6: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
-        0.914634: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Tombstone, Zap
-        0.914634: Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone, Zap
-        0.875740: Archers, Hog Rider, Ice Golem, Ice Spirit, Lightning, Mega Minion, The Log, Tombstone
   6: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.910345: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone
-        0.881119: Archers, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone, Zap
-        0.861111: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
-        0.857143: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.855172: Archers, Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Tombstone, Zap
   6: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.951351: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.911111: Fireball, Goblin Barrel, Inferno Tower, Miner, Minions, Princess, Skeleton Army, The Log
   5: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.910256: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
-        0.872483: Archers, Baby Dragon, Cannon, Golem, Lightning, Mega Minion, The Log, Zap
-        0.857143: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
   5: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Miner, Rocket, The Log
   5: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
-        0.861111: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.859060: Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Musketeer, Tombstone, Zap
-        0.855172: Archers, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone, Zap
   4: Barbarians, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Princess, The Log, Zap
   4: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone
-        0.910345: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
   2: Cannon, Elixir Collector, Guards, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Zap
   2: Archers, Cannon, Freeze, Graveyard, Hog Rider, Ice Golem, Mega Minion, Zap
   2: Arrows, Lava Hound, Lightning, Mega Minion, Miner, Minion Horde, Minions, Tombstone
   2: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
   2: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
-        0.880503: Freeze, Guards, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, The Log
   2: Archers, Fireball, Giant, Mega Minion, Minions, The Log, Tombstone, Zap
-        0.853147: Archers, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone, Zap
   2: Fireball, Lava Hound, Mega Minion, Miner, Minion Horde, Minions, Tombstone, Zap
   2: Archers, Barbarian Hut, Fireball, Hog Rider, Ice Golem, Mega Minion, The Log, Three Musketeers
   1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Tombstone, Zap
-        0.914634: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
-        0.887500: Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone, Zap
   1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Skeleton Army, The Log
-        0.872928: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Knight, Mega Minion, The Log
-        0.868132: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
   1: Archers, Barbarian Hut, Ice Golem, Lightning, Mega Minion, Miner, The Log, Zap
-        0.864516: Archers, Barbarian Hut, Fireball, Ice Golem, Mega Minion, Miner, The Log, Zap
   1: Fireball, Furnace, Inferno Tower, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
   1: Ice Golem, Ice Spirit, Mirror, Skeletons, The Log, Tornado, X-Bow, Zap
   1: Bowler, Fireball, Inferno Tower, Mega Minion, Miner, Skeleton Army, The Log, Zap
   1: Archers, Barbarian Hut, Fireball, Ice Golem, Mega Minion, Miner, The Log, Zap
-        0.864516: Archers, Barbarian Hut, Ice Golem, Lightning, Mega Minion, Miner, The Log, Zap
   1: Archers, Bowler, Fireball, Giant, Ice Spirit, Mega Minion, Tombstone, Zap
-        0.859060: Archers, Bowler, Fireball, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
-        0.857143: Archers, Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Tombstone, Zap
   1: Archers, Bowler, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow, Zap
   1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minions, Princess, Skeleton Army, The Log
-        0.961326: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.911111: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.863636: Fireball, Goblin Barrel, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, Zap
   1: Archers, Arrows, Furnace, Lightning, Mini P.E.K.K.A, Royal Giant, Skeleton Army, The Log
   1: Fireball, Furnace, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, The Log
-        0.850575: Fireball, Goblin Barrel, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, Zap
   1: Barbarians, Fireball, Furnace, Ice Spirit, Mega Minion, Royal Giant, The Log, Zap
   1: Archers, Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Tombstone, Zap
-        0.866667: Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Musketeer, Tombstone, Zap
-        0.857143: Archers, Bowler, Fireball, Giant, Ice Spirit, Mega Minion, Tombstone, Zap
-        0.855172: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
   1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Knight, Mega Minion, The Log
-        0.902857: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
-        0.872928: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Skeleton Army, The Log
   1: Fire Spirits, Ice Golem, Inferno Tower, Mega Minion, Princess, Skeleton Army, The Log, X-Bow
   1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
-        0.910256: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
   1: Fireball, Goblin Barrel, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, Zap
-        0.863636: Fireball, Goblin Barrel, Inferno Tower, Miner, Minions, Princess, Skeleton Army, The Log
-        0.862069: Fireball, Furnace, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, The Log
-        0.861878: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
   1: Archers, Hog Rider, Ice Golem, Ice Spirit, Lightning, Mega Minion, The Log, Tombstone
-        0.875740: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
   1: Inferno Tower, Lightning, Mega Minion, Miner, Princess, Skeleton Army, The Log, Zap
   1: Bowler, Fireball, Mega Minion, Miner, Minions, Tesla, The Log, Zap
   1: Archers, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone, Zap
-        0.881119: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.855172: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
-        0.853147: Archers, Fireball, Giant, Mega Minion, Minions, The Log, Tombstone, Zap
   1: Barbarian Hut, Fireball, Lightning, Mega Minion, Musketeer, Royal Giant, Skeleton Army, The Log
   1: Archers, Furnace, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, The Log, Zap
   1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.961326: Fireball, Goblin Barrel, Inferno Tower, Miner, Minions, Princess, Skeleton Army, The Log
-        0.951351: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.861878: Fireball, Goblin Barrel, Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, Zap
   1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone, Zap
-        0.914634: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
-        0.887500: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Tombstone, Zap
   1: Arrows, Barbarians, Lava Hound, Lightning, Mega Minion, Miner, Minions, Tombstone
   1: Hog Rider, Ice Spirit, Ice Wizard, Inferno Tower, Lightning, Skeleton Army, Spear Goblins, Zap
   1: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
-        0.885246: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
   1: Archers, Bowler, Fireball, Graveyard, Inferno Tower, Knight, Mega Minion, The Log
   1: Archers, Arrows, Bowler, Furnace, Lightning, Mega Minion, Royal Giant, The Log
   1: Archers, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log, Zap
-        0.873418: Archers, Furnace, Giant, Lightning, Mega Minion, Skeleton Army, The Log, Zap
   1: Archers, Bowler, Fireball, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
-        0.859060: Archers, Bowler, Fireball, Giant, Ice Spirit, Mega Minion, Tombstone, Zap
   1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
-        0.902857: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Knight, Mega Minion, The Log
-        0.868132: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Skeleton Army, The Log
   1: Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Musketeer, Tombstone, Zap
-        0.866667: Archers, Bowler, Giant, Ice Spirit, Lightning, Mega Minion, Tombstone, Zap
-        0.859060: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
   1: Archers, Baby Dragon, Cannon, Golem, Lightning, Mega Minion, The Log, Zap
-        0.872483: Archers, Baby Dragon, Golem, Lightning, Mega Minion, The Log, Tombstone, Zap
   1: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Minions, Skeleton Army, The Log
-        0.858696: Hog Rider, Ice Spirit, Ice Wizard, Lightning, Mega Minion, Princess, Skeleton Army, The Log
   1: Archers, Furnace, Giant, Lightning, Mega Minion, Skeleton Army, The Log, Zap
-        0.873418: Archers, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log, Zap
   1: Hog Rider, Ice Spirit, Ice Wizard, Lightning, Mega Minion, Princess, Skeleton Army, The Log
-        0.869565: Hog Rider, Ice Spirit, Inferno Tower, Lightning, Mega Minion, Minions, Skeleton Army, The Log
   1: Archers, Arrows, Giant, Graveyard, Mega Minion, Skeleton Army, The Log, Zap
   1: Inferno Tower, Mega Minion, Miner, Princess, Skeleton Army, Spear Goblins, The Log, Zap
   1: Freeze, Guards, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, The Log
-        0.880503: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
   1: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
-        0.885246: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
 Cards:
  84 ( 41): Mega Minion
  79 ( 45): The Log
@@ -278,73 +1032,35 @@ Cards:
 --------------------------------------------------------------------------------
 Snapshot #18
 Decks:
-Deck similarity threshold: 0.85
   7: Archers, Bowler, Cannon, Freeze, Graveyard, Ice Golem, Mega Minion, Zap
-        0.887324: Archers, Bowler, Cannon, Freeze, Hog Rider, Ice Golem, Mega Minion, Zap
-        0.881119: Archers, Bowler, Freeze, Furnace, Graveyard, Ice Golem, Mega Minion, Zap
-        0.868966: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
   6: Archers, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
-        0.931818: Archers, Arrows, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
-        0.888889: Archers, Furnace, Ice Spirit, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
   6: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
-        0.868966: Archers, Bowler, Cannon, Freeze, Graveyard, Ice Golem, Mega Minion, Zap
-        0.863014: Archers, Bowler, Freeze, Furnace, Graveyard, Ice Golem, Mega Minion, Zap
   4: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, The Log, Zap
-        0.923077: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
-        0.883117: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
-        0.868421: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
   4: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.921986: Archers, Bowler, Giant, Lightning, Mega Minion, Poison, Tombstone, Zap
-        0.879433: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, Tombstone, Zap
-        0.861111: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
   3: Archers, Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log
-        0.864198: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.863905: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
   2: Bowler, Fireball, Guards, Inferno Tower, Mega Minion, Miner, The Log, Zap
-        0.853333: Archers, Fireball, Guards, Inferno Tower, Knight, Mega Minion, Miner, The Log
   2: Bowler, Giant, Lightning, Mega Minion, Musketeer, The Log, Tombstone, Zap
-        0.861111: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
   2: Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log, Zap
-        0.922222: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.917127: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
   2: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
-        0.863905: Archers, Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log
   2: Elixir Collector, Giant, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log, Zap
   2: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.864198: Archers, Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log
   2: Archers, Barbarians, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, The Log
   2: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Miner, Rocket, The Log
-        0.881988: Archers, Ice Spirit, Inferno Tower, Knight, Mega Minion, Miner, Rocket, The Log
   2: Archers, Furnace, Ice Spirit, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
-        0.888889: Archers, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
-        0.885057: Archers, Arrows, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
   2: Fireball, Lava Hound, Mega Minion, Miner, Minion Horde, Minions, The Log, Tombstone
-        0.906832: Lava Hound, Mega Minion, Miner, Minion Horde, Minions, The Log, Tombstone, Zap
   2: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
   2: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.951351: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.922222: Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log, Zap
-        0.891304: Fireball, Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Skeleton Army, The Log
-        0.855556: Furnace, Goblin Barrel, Miner, Minion Horde, P.E.K.K.A, Princess, Skeleton Army, The Log
   1: Cannon, Elixir Collector, Miner, Mini P.E.K.K.A, Minion Horde, Princess, Spear Goblins, Zap
   1: Guards, Ice Golem, Inferno Tower, Mega Minion, Miner, Musketeer, Poison, The Log
   1: Archers, Bowler, Cannon, Freeze, Hog Rider, Ice Golem, Mega Minion, Zap
-        0.887324: Archers, Bowler, Cannon, Freeze, Graveyard, Ice Golem, Mega Minion, Zap
   1: Archers, Graveyard, Ice Golem, Inferno Tower, Knight, Mega Minion, Poison, The Log
   1: Freeze, Goblins, Hog Rider, Ice Spirit, Minion Horde, Minions, Princess, Zap
-        0.896104: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
   1: Archers, Arrows, Cannon, Freeze, Graveyard, Mini P.E.K.K.A, Spear Goblins, The Log
   1: Archers, Fireball, Furnace, Giant, Graveyard, Minions, Skeleton Army, Zap
-        0.960000: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
-        0.851351: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
   1: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Skeleton Army, Zap
   1: Archers, Fireball, Hog Rider, Ice Spirit, Knight, Mega Minion, Royal Giant, The Log
   1: Archers, Fireball, Guards, Inferno Tower, Knight, Mega Minion, Miner, The Log
-        0.853333: Bowler, Fireball, Guards, Inferno Tower, Mega Minion, Miner, The Log, Zap
   1: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
-        0.868421: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, The Log, Zap
-        0.868421: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
-        0.864865: Archers, Fireball, Furnace, Giant, Graveyard, Minions, Skeleton Army, Zap
   1: Archers, Furnace, Giant, Ice Spirit, Mega Minion, Minions, Rage, Zap
   1: Barbarians, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Princess, The Log, Zap
   1: Bowler, Fireball, Ice Spirit, Inferno Tower, Mega Minion, Miner, Princess, The Log
@@ -352,60 +1068,31 @@ Deck similarity threshold: 0.85
   1: Cannon, Elixir Collector, Hog Rider, Mega Minion, Musketeer, Poison, Valkyrie, Zap
   1: Guards, Hog Rider, Ice Golem, Ice Wizard, Mini P.E.K.K.A, Princess, Rocket, The Log
   1: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
-        0.923077: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, The Log, Zap
-        0.894737: Archers, Fireball, Giant, Graveyard, Mega Minion, Minions, Tombstone, Zap
-        0.871795: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
   1: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
-        0.896104: Freeze, Goblins, Hog Rider, Ice Spirit, Minion Horde, Minions, Princess, Zap
   1: Archers, Bowler, Hog Rider, Ice Golem, Lightning, Mega Minion, Tombstone, Zap
   1: Archers, Barbarian Hut, Fireball, Graveyard, Ice Golem, Mega Minion, Musketeer, Zap
   1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
   1: Archers, Arrows, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
-        0.931818: Archers, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
-        0.885057: Archers, Furnace, Ice Spirit, Lightning, Mega Minion, Royal Giant, Skeleton Army, The Log
   1: Furnace, Goblin Barrel, Miner, Minion Horde, P.E.K.K.A, Princess, Skeleton Army, The Log
-        0.855556: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
   1: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
   1: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
-        0.960000: Archers, Fireball, Furnace, Giant, Graveyard, Minions, Skeleton Army, Zap
-        0.883117: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, The Log, Zap
-        0.871795: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
-        0.868421: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
   1: Fireball, Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Skeleton Army, The Log
-        0.897297: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.891304: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
   1: Archers, Fireball, Furnace, Mini P.E.K.K.A, Musketeer, Royal Giant, The Log, Zap
   1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log
   1: Archers, Ice Spirit, Inferno Tower, Knight, Mega Minion, Miner, Rocket, The Log
-        0.881988: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Miner, Rocket, The Log
   1: Archers, Fireball, Giant, Ice Spirit, Mega Minion, Minions, The Log, Tombstone
-        0.851613: Archers, Fireball, Golem, Lightning, Mega Minion, Minions, The Log, Tombstone
   1: Archers, Fireball, Golem, Mega Minion, Minions, The Log, Tombstone, Zap
-        0.891892: Archers, Fireball, Golem, Lightning, Mega Minion, Minions, The Log, Tombstone
   1: Furnace, Hog Rider, Ice Spirit, Knight, Minions, Musketeer, Poison, Zap
   1: Archers, Fireball, Giant, Graveyard, Mega Minion, Minions, Tombstone, Zap
-        0.894737: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
   1: Archers, Bowler, Freeze, Furnace, Graveyard, Ice Golem, Mega Minion, Zap
-        0.881119: Archers, Bowler, Cannon, Freeze, Graveyard, Ice Golem, Mega Minion, Zap
-        0.863014: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
   1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.951351: Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
-        0.917127: Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log, Zap
-        0.897297: Fireball, Furnace, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Skeleton Army, The Log
   1: Archers, Bowler, Giant, Lightning, Mega Minion, Poison, Tombstone, Zap
-        0.921986: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
-        0.885714: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, Tombstone, Zap
   1: Archers, Elixir Collector, Giant, Mega Minion, Mini P.E.K.K.A, Poison, The Log, Zap
   1: Fire Spirits, Ice Spirit, Inferno Tower, Knight, Miner, The Log, Three Musketeers, Zap
   1: Lava Hound, Mega Minion, Miner, Minion Horde, Minions, The Log, Tombstone, Zap
-        0.906832: Fireball, Lava Hound, Mega Minion, Miner, Minion Horde, Minions, The Log, Tombstone
   1: Archers, Fireball, Golem, Lightning, Mega Minion, Minions, The Log, Tombstone
-        0.891892: Archers, Fireball, Golem, Mega Minion, Minions, The Log, Tombstone, Zap
-        0.851613: Archers, Fireball, Giant, Ice Spirit, Mega Minion, Minions, The Log, Tombstone
   1: Archers, Baby Dragon, Golem, Mega Minion, Prince, The Log, Tombstone, Zap
   1: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, Tombstone, Zap
-        0.885714: Archers, Bowler, Giant, Lightning, Mega Minion, Poison, Tombstone, Zap
-        0.879433: Archers, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone, Zap
   1: Barbarians, Fireball, Freeze, Hog Rider, Ice Wizard, Miner, Minions, Zap
   1: Fireball, Furnace, Giant, Mega Minion, Minions, The Log, Three Musketeers, Zap
   1: Archers, Hog Rider, Ice Golem, Mega Minion, Minions, Royal Giant, The Log, Tombstone
@@ -460,69 +1147,42 @@ Cards:
 --------------------------------------------------------------------------------
 Snapshot #19
 Decks:
-Deck similarity threshold: 0.85
   9: Fireball, Furnace, Giant, Mega Minion, Minions, Musketeer, Skeleton Army, Zap
-        0.894737: Fireball, Furnace, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Zap
   5: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
   5: Fireball, Lava Hound, Mega Minion, Miner, Minions, Skeleton Army, Tombstone, Zap
-        0.865854: Baby Dragon, Fireball, Lava Hound, Mega Minion, Miner, Skeleton Army, Tombstone, Zap
   5: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
   4: Archers, Elite Barbarians, Fire Spirits, Furnace, Lightning, Mega Minion, Royal Giant, The Log
   4: Archers, Cannon, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
   4: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.941176: Bowler, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.890244: Archers, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.864516: Archers, Cannon, Hog Rider, Ice Golem, Ice Spirit, Lightning, Mega Minion, Zap
   4: Archers, Bowler, Fireball, Giant, Mega Minion, Minions, Tombstone, Zap
-        0.913043: Archers, Bowler, Fireball, Giant, Mega Minion, Minions, The Log, Zap
-        0.863309: Archers, Bowler, Giant, Mega Minion, Minions, The Log, Tombstone, Zap
   3: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
-        0.871795: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
   3: Bowler, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.941176: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
   2: Elite Barbarians, Fireball, Freeze, Furnace, Hog Rider, Ice Golem, Mega Minion, Zap
-        0.882353: Elite Barbarians, Fireball, Furnace, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
   2: Bowler, Elite Barbarians, Fireball, Furnace, Ice Golem, Mega Minion, Musketeer, Zap
-        0.858896: Elite Barbarians, Fireball, Furnace, Ice Golem, Minions, Musketeer, The Log, Zap
   2: Cannon, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Musketeer, Skeleton Army, Zap
   2: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
   2: Elite Barbarians, Fireball, Furnace, Ice Golem, Minions, Musketeer, The Log, Zap
-        0.858896: Bowler, Elite Barbarians, Fireball, Furnace, Ice Golem, Mega Minion, Musketeer, Zap
   2: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
-        0.896552: Archers, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.896552: Elite Barbarians, Fireball, Furnace, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.888889: Bowler, Elite Barbarians, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
   2: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
-        0.871795: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
-        0.868421: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
   1: Elite Barbarians, Elixir Collector, Fireball, Hog Rider, Ice Golem, Minions, Musketeer, Zap
-        0.895028: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Spirit, Minions, Musketeer, Zap
   1: Bowler, Guards, Ice Spirit, Inferno Tower, Miner, Poison, Princess, The Log
   1: Archers, Bowler, Elite Barbarians, Fireball, Graveyard, Ice Golem, Mega Minion, Zap
-        0.898204: Archers, Elite Barbarians, Fireball, Furnace, Graveyard, Ice Golem, Mega Minion, Zap
   1: Archers, Cannon, Hog Rider, Ice Golem, Ice Spirit, Lightning, Mega Minion, Zap
-        0.864516: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
   1: Archers, Fireball, Freeze, Giant, Hog Rider, Mega Minion, Skeleton Army, Zap
   1: Bowler, Freeze, Furnace, Graveyard, Guards, Ice Golem, Mega Minion, Zap
   1: Archers, Bowler, Giant, Mega Minion, Minions, The Log, Tombstone, Zap
-        0.863309: Archers, Bowler, Fireball, Giant, Mega Minion, Minions, Tombstone, Zap
-        0.853147: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
   1: Barbarians, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Princess, The Log, Zap
   1: Archers, Barbarian Hut, Graveyard, Ice Golem, Knight, Mega Minion, Poison, The Log
   1: Guards, Hog Rider, Ice Golem, Ice Wizard, Lightning, Lumberjack, Princess, Zap
   1: Archers, Elite Barbarians, Fireball, Furnace, Graveyard, Ice Golem, Mega Minion, Zap
-        0.898204: Archers, Bowler, Elite Barbarians, Fireball, Graveyard, Ice Golem, Mega Minion, Zap
   1: Archers, Arrows, Balloon, Barbarians, Freeze, Furnace, Giant, Mega Minion
   1: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Spirit, Minions, Musketeer, Zap
-        0.895028: Elite Barbarians, Elixir Collector, Fireball, Hog Rider, Ice Golem, Minions, Musketeer, Zap
   1: Archers, Elite Barbarians, Fireball, Giant, Ice Golem, Mega Minion, The Log, Zap
   1: Elite Barbarians, Elixir Collector, Freeze, Goblins, Ice Golem, Ice Spirit, Mega Minion, Zap
   1: Baby Dragon, Fireball, Lava Hound, Mega Minion, Miner, Skeleton Army, Tombstone, Zap
-        0.865854: Fireball, Lava Hound, Mega Minion, Miner, Minions, Skeleton Army, Tombstone, Zap
   1: Fireball, Guards, Ice Spirit, Inferno Tower, Mega Minion, Miner, Princess, Zap
   1: Bowler, Fireball, Furnace, Graveyard, Ice Golem, Mega Minion, Musketeer, Zap
   1: Fireball, Furnace, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Zap
-        0.881579: Fireball, Furnace, Giant, Mega Minion, Minions, Musketeer, Skeleton Army, Zap
   1: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
   1: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
   1: Guards, Hog Rider, Ice Spirit, Ice Wizard, Lightning, Mini P.E.K.K.A, Princess, Zap
@@ -534,27 +1194,15 @@ Deck similarity threshold: 0.85
   1: Archers, Fireball, Furnace, Golem, Mega Minion, Musketeer, Skeleton Army, Zap
   1: Archers, Golem, Lightning, Lumberjack, Mega Minion, The Log, Tombstone, Zap
   1: Archers, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.896552: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
-        0.896552: Elite Barbarians, Fireball, Furnace, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.890244: Archers, Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.882353: Archers, Cannon, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Mega Minion, Zap
   1: Archers, Bowler, Fireball, Giant, Mega Minion, Minions, The Log, Zap
-        0.913043: Archers, Bowler, Fireball, Giant, Mega Minion, Minions, Tombstone, Zap
   1: Archers, Elite Barbarians, Elixir Collector, Fireball, Freeze, Ice Golem, Mega Minion, Zap
   1: Bowler, Elite Barbarians, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
-        0.888889: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
   1: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
-        0.853147: Archers, Bowler, Giant, Mega Minion, Minions, The Log, Tombstone, Zap
   1: Balloon, Bowler, Elixir Collector, Freeze, Ice Golem, Mega Minion, Princess, Zap
   1: Archers, Fireball, Furnace, Giant, Mega Minion, Skeleton Army, The Log, Zap
-        0.868421: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
   1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
   1: Archers, Cannon, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Mega Minion, Zap
-        0.882353: Archers, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
   1: Elite Barbarians, Fireball, Furnace, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.896552: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Zap
-        0.896552: Archers, Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
-        0.882353: Elite Barbarians, Fireball, Freeze, Furnace, Hog Rider, Ice Golem, Mega Minion, Zap
   1: Elixir Collector, Fireball, Giant, Guards, Minions, Musketeer, Prince, Zap
 Cards:
  83 ( 23): Zap
@@ -607,137 +1255,60 @@ Cards:
 --------------------------------------------------------------------------------
 Snapshot #20
 Decks:
-Deck similarity threshold: 0.85
  11: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
-        0.897959: Archers, Freeze, Giant, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
   6: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
-        0.851852: Balloon, Fireball, Lava Hound, Minions, Musketeer, Skeleton Army, Tombstone, Zap
   4: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
-        0.885246: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
-        0.880435: Elixir Collector, Fireball, Giant, Ice Golem, Mega Minion, Musketeer, Three Musketeers, Zap
   4: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
-        0.945055: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, Zap
-        0.866667: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.861878: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
   4: Bowler, Furnace, Goblin Barrel, Miner, Minion Horde, Princess, Skeleton Army, The Log
   4: Elite Barbarians, Elixir Collector, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Three Musketeers, Zap
-        0.894231: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Three Musketeers, Zap
-        0.875622: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Minions, Mirror, Three Musketeers, Zap
   3: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
-        0.952381: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
-        0.898204: Elite Barbarians, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, The Log, Zap
   3: Balloon, Freeze, Giant, Minions, Musketeer, Skeleton Army, Tombstone, Zap
-        0.875817: Balloon, Fireball, Lava Hound, Minions, Musketeer, Skeleton Army, Tombstone, Zap
   3: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Zap
-        0.897436: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
-        0.883117: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
   3: Archers, Balloon, Cannon, Freeze, Ice Golem, Minions, Skeleton Army, Zap
-        0.959459: Archers, Balloon, Cannon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Zap
-        0.870748: Archers, Balloon, Freeze, Ice Golem, Minions, Skeleton Army, Tombstone, Zap
   3: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Golem, Minions, Musketeer, Zap
-        0.866667: Elite Barbarians, Elixir Collector, Fireball, Golem, Ice Golem, Mega Minion, Musketeer, Zap
   3: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
-        0.891429: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.861878: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
   2: Elite Barbarians, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, The Log, Zap
-        0.898204: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
-        0.887574: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
   2: Balloon, Fireball, Lava Hound, Minions, Musketeer, Skeleton Army, Tombstone, Zap
-        0.875817: Balloon, Freeze, Giant, Minions, Musketeer, Skeleton Army, Tombstone, Zap
-        0.851852: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
   2: Fireball, Giant, Graveyard, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
-        0.875000: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
   2: Archers, Balloon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Tombstone, Zap
-        0.961039: Archers, Balloon, Freeze, Ice Golem, Minions, Skeleton Army, Tombstone, Zap
-        0.877419: Archers, Balloon, Cannon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Zap
   2: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
-        0.897436: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Zap
-        0.890244: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
-        0.875817: Cannon, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, The Log, Zap
-        0.868421: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
   2: Archers, Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log, X-Bow
-        0.892857: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
-        0.857143: Archers, Cannon, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
   2: Elite Barbarians, Fireball, Furnace, Ice Golem, Miner, Minions, Musketeer, Zap
   1: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Minions, Mirror, Three Musketeers, Zap
-        0.905473: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Three Musketeers, Zap
-        0.875622: Elite Barbarians, Elixir Collector, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Three Musketeers, Zap
   1: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
-        0.952381: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
-        0.887574: Elite Barbarians, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, The Log, Zap
-        0.887500: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
-        0.883721: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
   1: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
   1: Bowler, Fireball, Furnace, Giant, Graveyard, Mega Minion, Musketeer, Zap
   1: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
-        0.890244: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
-        0.883721: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
   1: Archers, Freeze, Giant, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
-        0.897959: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
   1: Elite Barbarians, Fireball, Furnace, Mega Minion, Minions, Royal Giant, The Log, Zap
   1: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
-        0.887500: Elite Barbarians, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
-        0.883117: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Zap
-        0.868421: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
   1: Archers, Balloon, Cannon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Zap
-        0.959459: Archers, Balloon, Cannon, Freeze, Ice Golem, Minions, Skeleton Army, Zap
-        0.877419: Archers, Balloon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Tombstone, Zap
   1: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
-        0.895028: Elixir Collector, Fireball, Giant, Ice Golem, Mega Minion, Musketeer, Three Musketeers, Zap
-        0.885246: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
   1: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.891429: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
-        0.866667: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
   1: Cannon, Fire Spirits, Ice Golem, Ice Spirit, Mega Minion, Mirror, Rocket, X-Bow
   1: Archers, Freeze, Furnace, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Zap
   1: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, Zap
-        0.945055: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
   1: Elixir Collector, Fireball, Giant, Ice Golem, Mega Minion, Musketeer, Three Musketeers, Zap
-        0.895028: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
-        0.880435: Elixir Collector, Giant, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Three Musketeers, Zap
   1: Archers, Bowler, Furnace, Giant, Lightning, Mega Minion, The Log, Zap
   1: Cannon, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, The Log, Zap
-        0.875817: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
   1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.955556: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.895028: Elite Barbarians, Elixir Collector, Fireball, Golem, Ice Golem, Mega Minion, Musketeer, Zap
   1: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
-        0.875000: Fireball, Giant, Graveyard, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
-        0.871795: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
   1: Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Minions, The Log, X-Bow
-        0.892857: Archers, Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log, X-Bow
   1: Fireball, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Tombstone, Zap
-        0.950617: Freeze, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Tombstone, Zap
   1: Archers, Cannon, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
-        0.887500: Archers, Fire Spirits, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
-        0.857143: Archers, Fireball, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, The Log, X-Bow
   1: Freeze, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Tombstone, Zap
-        0.950617: Fireball, Graveyard, Ice Golem, Ice Spirit, Mega Minion, Musketeer, Tombstone, Zap
   1: Archers, Fire Spirits, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
-        0.887500: Archers, Cannon, Fireball, Ice Golem, Ice Spirit, Mega Minion, The Log, X-Bow
   1: Archers, Cannon, Fireball, Giant, Ice Spirit, Mega Minion, Minions, Zap
   1: Elite Barbarians, Elixir Collector, Fireball, Golem, Ice Golem, Mega Minion, Musketeer, Zap
-        0.895028: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.866667: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Golem, Minions, Musketeer, Zap
-        0.861878: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
   1: Archers, Balloon, Freeze, Ice Golem, Minions, Skeleton Army, Tombstone, Zap
-        0.961039: Archers, Balloon, Freeze, Ice Golem, Mega Minion, Skeleton Army, Tombstone, Zap
-        0.870748: Archers, Balloon, Cannon, Freeze, Ice Golem, Minions, Skeleton Army, Zap
   1: Bowler, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone, Zap
-        0.851852: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
   1: Arrows, Balloon, Lava Hound, Lightning, Mega Minion, Minions, Skeleton Army, Tombstone
   1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.955556: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.850829: Elite Barbarians, Elixir Collector, Fireball, Golem, Ice Golem, Mega Minion, Musketeer, Zap
   1: Furnace, Ice Golem, Ice Spirit, Miner, Minions, Musketeer, Poison, The Log
   1: Archers, Furnace, Ice Golem, Miner, Musketeer, Poison, Skeleton Army, Tornado
   1: Archers, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone
-        0.851852: Bowler, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, The Log, Tombstone, Zap
   1: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Mega Minion, Skeletons, Three Musketeers, Zap
-        0.905473: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Minions, Mirror, Three Musketeers, Zap
-        0.894231: Elite Barbarians, Elixir Collector, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Three Musketeers, Zap
   1: Archers, Fireball, Furnace, Giant, Graveyard, Mega Minion, Skeleton Army, Zap
-        0.871795: Archers, Fireball, Giant, Graveyard, Mega Minion, Skeleton Army, Tombstone, Zap
 Cards:
  77 ( -6): Zap
  67 ( 15): Ice Golem
@@ -782,118 +1353,51 @@ Cards:
 --------------------------------------------------------------------------------
 Snapshot #21
 Decks:
-Deck similarity threshold: 0.85
  10: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
-        0.866667: Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
-        0.863014: Archers, Balloon, Bowler, Freeze, Ice Golem, Mega Minion, Tombstone, Zap
   6: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, X-Bow
-        0.962500: Archers, Ice Golem, Ice Spirit, Inferno Tower, Minions, Rocket, The Log, X-Bow
-        0.884848: Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, Valkyrie, X-Bow
   6: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Minions, Musketeer, Zap
-        0.890173: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, Musketeer, The Log, Zap
-        0.886364: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Golem, Minions, Musketeer, Zap
-        0.863636: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Mega Minion, Minions, Zap
-        0.858757: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
   6: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
-        0.888889: Balloon, Fireball, Lava Hound, Mega Minion, Musketeer, Skeletons, Tombstone, Zap
   5: Elite Barbarians, Elixir Collector, Freeze, Hog Rider, Ice Golem, Minions, Musketeer, Zap
-        0.886364: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Minions, Musketeer, Zap
   4: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
-        0.868421: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
   4: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
-        0.868421: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
   3: Bowler, Freeze, Graveyard, Ice Golem, Minions, Musketeer, Tombstone, Zap
-        0.959459: Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
   3: Archers, Balloon, Bowler, Freeze, Ice Golem, Mega Minion, Tombstone, Zap
-        0.957143: Archers, Balloon, Bowler, Freeze, Ice Golem, Minions, Tombstone, Zap
-        0.863014: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
   2: Archers, Elite Barbarians, Fireball, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
-        0.905882: Archers, Elite Barbarians, Fireball, Graveyard, Ice Golem, Musketeer, Tombstone, Zap
   2: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
-        0.871508: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.866667: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.861878: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
   2: Elite Barbarians, Freeze, Hog Rider, Ice Golem, Ice Spirit, Minions, Musketeer, Zap
   2: Bowler, Fireball, Giant, Graveyard, Mega Minion, Musketeer, Tombstone, Zap
   2: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.947977: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.896552: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
-        0.871508: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
   2: Elixir Collector, Golem, Guards, Ice Golem, Mega Minion, The Log, Three Musketeers, Zap
-        0.858757: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
   2: Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
-        0.959459: Bowler, Freeze, Graveyard, Ice Golem, Minions, Musketeer, Tombstone, Zap
-        0.866667: Archers, Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
-        0.865854: Elixir Collector, Fireball, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
   2: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, Musketeer, The Log, Zap
-        0.965909: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.920455: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.913295: Elite Barbarians, Elixir Collector, Ice Golem, Minions, Mortar, Musketeer, The Log, Zap
-        0.890173: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Minions, Musketeer, Zap
-        0.857143: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, Poison, Zap
   1: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.947977: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.891429: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
-        0.866667: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
   1: Dart Goblin, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
   1: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Mega Minion, Minions, Zap
-        0.863636: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Minions, Musketeer, Zap
   1: Elite Barbarians, Elixir Collector, Ice Golem, Minions, Mortar, Musketeer, The Log, Zap
-        0.913295: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, Musketeer, The Log, Zap
-        0.881356: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.881356: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
   1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Minions, Rocket, The Log, X-Bow
-        0.962500: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, X-Bow
   1: Balloon, Fireball, Lava Hound, Mega Minion, Musketeer, Skeletons, Tombstone, Zap
-        0.888889: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
-        0.871166: Balloon, Fireball, Ice Golem, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
   1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Miner, Minions, Rocket, Zap
   1: Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Three Musketeers, Zap
-        0.858757: Elixir Collector, Golem, Guards, Ice Golem, Mega Minion, The Log, Three Musketeers, Zap
   1: Archers, Furnace, Ice Golem, Ice Spirit, Mega Minion, Rocket, The Log, X-Bow
   1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Minions, Musketeer, Zap
-        0.905028: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, Poison, Zap
-        0.900000: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.855556: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
   1: Ice Golem, Ice Spirit, Inferno Tower, Miner, Minions, Musketeer, Rocket, The Log
   1: Archers, Balloon, Bowler, Elixir Collector, Freeze, Ice Golem, Mega Minion, Zap
   1: Archers, Balloon, Bowler, Freeze, Ice Golem, Minions, Tombstone, Zap
-        0.957143: Archers, Balloon, Bowler, Freeze, Ice Golem, Mega Minion, Tombstone, Zap
   1: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Minions, Skeletons, Three Musketeers, Zap
-        0.862745: Elite Barbarians, Elixir Collector, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Three Musketeers, Zap
   1: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.965909: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, Musketeer, The Log, Zap
-        0.955556: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.893855: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, Poison, Zap
-        0.881356: Elite Barbarians, Elixir Collector, Ice Golem, Minions, Mortar, Musketeer, The Log, Zap
-        0.858757: Elite Barbarians, Elixir Collector, Fireball, Giant, Ice Golem, Minions, Musketeer, Zap
-        0.855556: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Minions, Musketeer, Zap
   1: Elite Barbarians, Elixir Collector, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Three Musketeers, Zap
-        0.862745: Elite Barbarians, Elixir Collector, Ice Golem, Ice Spirit, Minions, Skeletons, Three Musketeers, Zap
   1: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
-        0.896552: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.891429: Archers, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.861878: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, Spear Goblins, The Log
   1: Bowler, Electro Wizard, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
   1: Archers, Barbarian Hut, Graveyard, Ice Golem, Mega Minion, Musketeer, Poison, The Log
   1: Archers, Elite Barbarians, Fireball, Graveyard, Ice Golem, Musketeer, Tombstone, Zap
-        0.905882: Archers, Elite Barbarians, Fireball, Graveyard, Ice Golem, Mega Minion, Tombstone, Zap
   1: Fireball, Furnace, Graveyard, Ice Golem, Knight, Minions, Musketeer, Zap
-        0.875000: Archers, Fireball, Furnace, Graveyard, Ice Golem, Knight, Musketeer, Zap
   1: Bowler, Furnace, Goblin Barrel, Miner, Minion Horde, Princess, Skeleton Army, The Log
   1: Baby Dragon, Lava Hound, Mega Minion, Minions, Musketeer, Poison, Tombstone, Zap
   1: Elixir Collector, Fireball, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
-        0.865854: Bowler, Freeze, Graveyard, Ice Golem, Mega Minion, Musketeer, Tombstone, Zap
   1: Archers, Fireball, Furnace, Graveyard, Ice Golem, Knight, Musketeer, Zap
-        0.875000: Fireball, Furnace, Graveyard, Ice Golem, Knight, Minions, Musketeer, Zap
   1: Cannon, Dart Goblin, Fireball, Hog Rider, Ice Golem, Ice Spirit, Mega Minion, Zap
   1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, Poison, Zap
-        0.938547: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.905028: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Minions, Musketeer, Zap
-        0.893855: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.857143: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, Musketeer, The Log, Zap
   1: Balloon, Fireball, Ice Golem, Mega Minion, Musketeer, Skeleton Army, Tombstone, Zap
-        0.871166: Balloon, Fireball, Lava Hound, Mega Minion, Musketeer, Skeletons, Tombstone, Zap
   1: Balloon, Barbarians, Elixir Collector, Freeze, Giant, Rocket, Witch, Wizard
   1: Archers, Baby Dragon, Furnace, Golem, Lightning, Mega Minion, The Log, Tombstone
   1: Elixir Collector, Giant, Graveyard, Mega Minion, Musketeer, Skeleton Army, Tornado, Zap
@@ -902,13 +1406,7 @@ Deck similarity threshold: 0.85
   1: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
   1: Bowler, Fireball, Graveyard, Ice Golem, Ice Wizard, Mega Minion, Tombstone, Zap
   1: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.955556: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Mega Minion, Musketeer, The Log, Zap
-        0.938547: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Musketeer, Poison, Zap
-        0.920455: Elite Barbarians, Elixir Collector, Giant, Ice Golem, Minions, Musketeer, The Log, Zap
-        0.900000: Elite Barbarians, Elixir Collector, Golem, Ice Golem, Mega Minion, Minions, Musketeer, Zap
-        0.881356: Elite Barbarians, Elixir Collector, Ice Golem, Minions, Mortar, Musketeer, The Log, Zap
   1: Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, Valkyrie, X-Bow
-        0.884848: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, X-Bow
 Cards:
  77 ( 10): Ice Golem
  76 ( -1): Zap
@@ -964,56 +1462,32 @@ Cards:
 --------------------------------------------------------------------------------
 Snapshot #22
 Decks:
-Deck similarity threshold: 0.85
   8: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
-        0.945055: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, Zap
-        0.884211: Dart Goblin, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
-        0.871508: Goblin Barrel, Guards, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, The Log
-        0.858696: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, Zap
   7: Executioner, Furnace, Giant, Lightning, Mega Minion, Prince, The Log, Zap
-        0.957746: Executioner, Furnace, Giant, Lightning, Minions, Prince, The Log, Zap
   6: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, The Log, Tombstone
   5: Elixir Collector, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Zap
   4: Arrows, Balloon, Dark Prince, Elixir Collector, Golem, Mega Minion, Rage, Skeleton Army
-        0.850575: Arrows, Balloon, Elixir Collector, Executioner, Golem, Mega Minion, Rage, Skeleton Army
   4: Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log, Zap
   3: Bowler, Freeze, Graveyard, Ice Golem, Minions, Musketeer, Tombstone, Zap
   3: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
-        0.942529: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
-        0.906977: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.851852: Bowler, Furnace, Miner, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
   3: Furnace, Giant, Lightning, Mega Minion, Musketeer, Prince, The Log, Zap
-        0.956522: Furnace, Giant, Lightning, Minions, Musketeer, Prince, The Log, Zap
   3: Arrows, Balloon, Bowler, Freeze, Giant, Minions, Musketeer, Tombstone
   3: Furnace, Giant, Lightning, Minions, Musketeer, Prince, The Log, Zap
-        0.956522: Furnace, Giant, Lightning, Mega Minion, Musketeer, Prince, The Log, Zap
   2: Arrows, Balloon, Elixir Collector, Executioner, Golem, Mega Minion, Rage, Skeleton Army
-        0.850575: Arrows, Balloon, Dark Prince, Elixir Collector, Golem, Mega Minion, Rage, Skeleton Army
   2: Dart Goblin, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
-        0.884211: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
   2: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, Zap
-        0.888889: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, Zap
-        0.858696: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
   2: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
-        0.906977: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
-        0.896552: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
   2: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
-        0.922156: Arrows, Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone
   2: Elixir Collector, Fireball, Golem, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Minions, Zap
   2: Arrows, Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone
-        0.922156: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
   1: Goblin Barrel, Inferno Tower, Mega Minion, Miner, Minion Horde, Rocket, Skeleton Army, Zap
   1: Arrows, Lava Hound, Miner, Minion Horde, Minions, Musketeer, Skeleton Army, Tombstone
   1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Minions, Rocket, The Log, X-Bow
-        0.962500: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, X-Bow
   1: Electro Wizard, Elixir Collector, Executioner, Giant, Lightning, Minions, The Log, Tombstone
   1: Fireball, Goblins, Hog Rider, Ice Golem, Musketeer, Skeletons, The Log, Tornado
   1: Archers, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Rocket, The Log, X-Bow
-        0.962500: Archers, Ice Golem, Ice Spirit, Inferno Tower, Minions, Rocket, The Log, X-Bow
   1: Cannon, Guards, Ice Spirit, Mega Minion, Miner, Musketeer, Rocket, The Log
   1: Executioner, Furnace, Giant, Lightning, Minions, Prince, The Log, Zap
-        0.957746: Executioner, Furnace, Giant, Lightning, Mega Minion, Prince, The Log, Zap
-        0.851064: Executioner, Giant, Ice Spirit, Lightning, Minions, Prince, The Log, Zap
   1: Balloon, Fireball, Lava Hound, Mini P.E.K.K.A, Minions, Musketeer, Skeleton Army, Tombstone
   1: Electro Wizard, Elite Barbarians, Elixir Collector, Fireball, Giant, Mega Minion, Three Musketeers, Zap
   1: Arrows, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Tombstone, Tornado
@@ -1031,27 +1505,18 @@ Deck similarity threshold: 0.85
   1: Archers, Goblin Hut, Ice Golem, Ice Spirit, Mortar, Rocket, Skeletons, The Log
   1: Dart Goblin, Elite Barbarians, Executioner, Fireball, Giant, Mega Minion, Musketeer, Zap
   1: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone
-        0.878378: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
   1: Bowler, Furnace, Goblin Barrel, Miner, Minion Horde, Princess, Skeleton Army, The Log
   1: Freeze, Hog Rider, Ice Spirit, Inferno Tower, Mega Minion, Musketeer, Skeletons, The Log
   1: Electro Wizard, Elixir Collector, Executioner, Hog Rider, Ice Golem, The Log, Tornado, Zap
   1: Cannon, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Rocket, The Log, Zap
   1: Arrows, Baby Dragon, Bowler, Giant, Lightning, Minions, The Log, Tombstone
   1: Goblin Barrel, Guards, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, The Log
-        0.871508: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
   1: Arrows, Bowler, Giant, Lightning, Mega Minion, Minions, The Log, Tombstone
-        0.878378: Archers, Arrows, Bowler, Giant, Lightning, Mega Minion, The Log, Tombstone
   1: Cannon, Hog Rider, Ice Golem, Ice Spirit, Lightning, Minions, Musketeer, Zap
   1: Bowler, Furnace, Miner, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
-        0.851852: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
   1: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Princess, Skeleton Army, The Log
-        0.942529: Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Rocket, Skeleton Army, The Log
-        0.896552: Bowler, Fireball, Furnace, Goblin Barrel, Minion Horde, Mirror, Skeleton Army, The Log
   1: Executioner, Giant, Ice Spirit, Lightning, Minions, Prince, The Log, Zap
-        0.851064: Executioner, Furnace, Giant, Lightning, Minions, Prince, The Log, Zap
   1: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, Zap
-        0.945055: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Minions, Princess, Skeleton Army, The Log
-        0.888889: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, Zap
 Cards:
  63 ( 32): The Log
  49 (  9): Minions
@@ -1106,75 +1571,48 @@ Cards:
 --------------------------------------------------------------------------------
 Snapshot #23
 Decks:
-Deck similarity threshold: 0.85
   6: Elixir Collector, Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Musketeer, The Log, X-Bow
-        0.853933: Archers, Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Rocket, The Log, X-Bow
   5: Fire Spirits, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
-        0.885246: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
-        0.876404: Goblin Barrel, Inferno Tower, Knight, Mirror, Princess, Rocket, Skeleton Army, The Log
   4: Executioner, Furnace, Giant, Ice Spirit, Lightning, Prince, The Log, Zap
   4: Fire Spirits, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
-        0.870466: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, The Log
   4: Executioner, Fire Spirits, Furnace, Knight, Lightning, Minions, Royal Giant, The Log
   3: Arrows, Balloon, Lava Hound, Lightning, Mega Minion, Minions, Skeleton Army, Tombstone
-        0.858824: Arrows, Balloon, Lava Hound, Lightning, Minions, Musketeer, Skeleton Army, Tombstone
   3: Fireball, Furnace, Goblin Barrel, Inferno Tower, Minion Horde, Mirror, Skeleton Army, The Log
   3: Arrows, Balloon, Bowler, Freeze, Giant, Mega Minion, Minions, Tombstone
   3: Furnace, Giant, Lightning, Mini P.E.K.K.A, Minions, Musketeer, The Log, Zap
   3: Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log, Zap
-        0.920245: Arrows, Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log
   3: Elixir Collector, Giant, Lightning, Mini P.E.K.K.A, Minion Horde, Minions, The Log, Zap
   2: Elixir Collector, Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Princess, Zap
-        0.877193: Elixir Collector, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Zap
   2: Archers, Bowler, Executioner, Giant, Graveyard, The Log, Tornado, Zap
   2: Elixir Collector, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minions, Princess, Zap
-        0.877193: Elixir Collector, Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Princess, Zap
   2: Arrows, Balloon, Lava Hound, Lightning, Minions, Musketeer, Skeleton Army, Tombstone
-        0.858824: Arrows, Balloon, Lava Hound, Lightning, Mega Minion, Minions, Skeleton Army, Tombstone
   2: Bowler, Executioner, Giant, Graveyard, Mega Minion, The Log, Tornado, Zap
   2: Executioner, Giant, Lightning, Mini P.E.K.K.A, Minions, The Log, Tombstone, Zap
   2: Bowler, Giant, Graveyard, Mega Minion, Tombstone, Tornado, Wizard, Zap
   2: Archers, Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Rocket, The Log, X-Bow
-        0.853933: Elixir Collector, Fire Spirits, Ice Golem, Ice Spirit, Inferno Tower, Musketeer, The Log, X-Bow
   2: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, The Log
-        0.898396: Goblin Barrel, Hog Rider, Inferno Tower, Princess, Rocket, Skeleton Army, Skeletons, The Log
-        0.870466: Fire Spirits, Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, The Log
   2: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, The Log
   1: Electro Wizard, Executioner, Giant, Goblins, Ice Spirit, Lightning, The Log, Tornado
   1: Goblin Barrel, Hog Rider, Inferno Tower, Princess, Rocket, Skeleton Army, Skeletons, The Log
-        0.898396: Goblin Barrel, Hog Rider, Ice Golem, Inferno Tower, Princess, Skeleton Army, Skeletons, The Log
-        0.875676: Goblin Barrel, Hog Rider, Ice Spirit, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
   1: Executioner, Ice Golem, Inferno Tower, Miner, Minions, Rocket, The Log, Tornado
   1: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, The Log
-        0.894737: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log
   1: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Musketeer, The Log, Tombstone
-        0.855615: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log
   1: Bowler, Electro Wizard, Executioner, Hog Rider, Ice Golem, Lightning, The Log, Tornado
   1: Giant, Ice Spirit, Lightning, Mini P.E.K.K.A, Minions, The Log, Wizard, Zap
   1: Barbarians, Fireball, Giant, Graveyard, Minions, Musketeer, The Log, Zap
   1: Elixir Collector, Giant, Mini P.E.K.K.A, Minions, Musketeer, The Log, Three Musketeers, Zap
-        0.879121: Elixir Collector, Giant, Ice Golem, Mini P.E.K.K.A, Minions, The Log, Three Musketeers, Zap
   1: Giant, Ice Spirit, Mega Minion, Mini P.E.K.K.A, Mortar, Musketeer, The Log, Zap
   1: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, Musketeer, The Log
-        0.894737: Archers, Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Mini P.E.K.K.A, The Log
-        0.855615: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Musketeer, The Log, Tombstone
   1: Bowler, Fireball, Giant, Graveyard, Minions, Musketeer, Tornado, Zap
   1: Balloon, Elixir Collector, Freeze, Ice Golem, Inferno Tower, Minions, Skeleton Army, Zap
   1: Goblin Barrel, Inferno Tower, Knight, Mirror, Princess, Rocket, Skeleton Army, The Log
-        0.881356: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
-        0.876404: Fire Spirits, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
-        0.852273: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Miner, Princess, Skeleton Army, The Log
   1: Arrows, Furnace, Giant, Graveyard, Minions, Musketeer, Skeleton Army, Zap
   1: Executioner, Freeze, Graveyard, Ice Golem, Mega Minion, Tombstone, Tornado, Zap
   1: Arrows, Balloon, Freeze, Furnace, Ice Golem, Minions, Musketeer, Skeleton Army
   1: Arrows, Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log
-        0.920245: Furnace, Lightning, Minions, Musketeer, Royal Giant, Skeleton Army, The Log, Zap
   1: Dart Goblin, Goblin Barrel, Ice Golem, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
-        0.897297: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
   1: Balloon, Barbarians, Elixir Collector, Freeze, Giant, Rocket, Witch, Wizard
   1: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Miner, Princess, Skeleton Army, The Log
-        0.917127: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
-        0.852273: Goblin Barrel, Inferno Tower, Knight, Mirror, Princess, Rocket, Skeleton Army, The Log
   1: Cannon, Goblins, Miner, Minion Horde, Princess, Skeleton Army, The Log, Zap
   1: Executioner, Furnace, Ice Spirit, Knight, Lightning, Mega Minion, Royal Giant, The Log
   1: Arrows, Furnace, Giant, Graveyard, Mega Minion, Mini P.E.K.K.A, Minions, Zap
@@ -1182,10 +1620,6 @@ Deck similarity threshold: 0.85
   1: Executioner, Furnace, Goblin Barrel, Mirror, Rocket, Skeleton Army, The Log, Tornado
   1: Cannon, Fire Spirits, Hog Rider, Ice Golem, Musketeer, Rocket, Skeletons, The Log
   1: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
-        0.917127: Dart Goblin, Goblin Barrel, Inferno Tower, Knight, Miner, Princess, Skeleton Army, The Log
-        0.897297: Dart Goblin, Goblin Barrel, Ice Golem, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
-        0.896175: Fire Spirits, Goblin Barrel, Inferno Tower, Knight, Princess, Rocket, Skeleton Army, The Log
-        0.881356: Goblin Barrel, Inferno Tower, Knight, Mirror, Princess, Rocket, Skeleton Army, The Log
   1: Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Minions, Princess, Zap
   1: Balloon, Elixir Collector, Executioner, Golem, Mega Minion, Rage, Skeleton Army, Tornado
   1: Baby Dragon, Bowler, Giant, Graveyard, Musketeer, Tombstone, Tornado, Zap
@@ -1194,9 +1628,7 @@ Deck similarity threshold: 0.85
   1: Executioner, Giant, Knight, Miner, Minion Horde, Minions, The Log, Zap
   1: Barbarians, Clone, Electro Wizard, Golem, Minion Horde, Minions, Skeleton Army, Three Musketeers
   1: Elixir Collector, Giant, Ice Golem, Mini P.E.K.K.A, Minions, The Log, Three Musketeers, Zap
-        0.879121: Elixir Collector, Giant, Mini P.E.K.K.A, Minions, Musketeer, The Log, Three Musketeers, Zap
   1: Goblin Barrel, Hog Rider, Ice Spirit, Inferno Tower, Princess, Rocket, Skeleton Army, The Log
-        0.875676: Goblin Barrel, Hog Rider, Inferno Tower, Princess, Rocket, Skeleton Army, Skeletons, The Log
   1: Arrows, Giant, Miner, Minion Horde, Minions, Musketeer, Skeleton Army, Tombstone
   1: Dark Prince, Executioner, Lightning, Mega Minion, Musketeer, P.E.K.K.A, The Log, Zap
 Cards:

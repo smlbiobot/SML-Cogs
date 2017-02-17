@@ -33,7 +33,7 @@ cardpop_json_path = 'data/cardpop{}.json'
 cardpop_path = 'data/cardpop.json'
 summary_path = 'data/summary.txt'
 
-cardpop_range_min = 16
+cardpop_range_min = 8
 cardpop_range_max = 24
 
 similarity_threshold = 0.85
@@ -122,24 +122,24 @@ def process_data():
         cardpop = dict(sorted(cardpop.items(), key = lambda x: -x[1]["count"]))
 
         # calculate similarity
-        for k, deck in decks.items():
-            similarity = {}
-            for j, deck2 in decks.items():
-                if k != j:
-                    similarity[j] = SequenceMatcher(a=k, b=j).ratio()
-            similarity = dict(sorted(similarity.items(), key = lambda x: -x[1]))
-            deck["similarity"] = similarity
+        # for k, deck in decks.items():
+        #     similarity = {}
+        #     for j, deck2 in decks.items():
+        #         if k != j:
+        #             similarity[j] = SequenceMatcher(a=k, b=j).ratio()
+        #     similarity = dict(sorted(similarity.items(), key = lambda x: -x[1]))
+        #     deck["similarity"] = similarity
         
         prev_cardpop = cardpop
 
         out.append("Decks:")
-        out.append("Deck similarity threshold: {}".format(similarity_threshold))
+        # out.append("Deck similarity threshold: {}".format(similarity_threshold))
         for k, deck in decks.items():
             out.append("{:3d}: {}".format(deck["count"], k))
             # output similarity over threshold
-            for sk, sv in deck["similarity"].items():
-                if sv > similarity_threshold:
-                    out.append("        {:3f}: {}".format(sv, sk))
+            # for sk, sv in deck["similarity"].items():
+            #     if sv > similarity_threshold:
+            #         out.append("        {:3f}: {}".format(sv, sk))
 
         out.append("Cards:")
         for k, v in cardpop.items():
