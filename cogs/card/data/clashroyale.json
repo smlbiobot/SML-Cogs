@@ -88,7 +88,7 @@
             "aka": ["ew", "ewiz", "ewizard"],
             "elixir": 4,
             "rarity": "legendary",
-            "tid": "TID_SPELL_INFO_ELECTRO_WIZARD",
+            "tid": "TID_SPELL_INFO_ELECTRO_WIZARD"
         },
         "elite-barbarians": {
             "aka": ["eb", "ebarb", "ebarbs"],

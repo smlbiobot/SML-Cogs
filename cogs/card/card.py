@@ -24,23 +24,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import discord
-from discord.ext import commands
 from .utils.dataIO import dataIO
 from __main__ import send_cmd_help
-import os
-import datetime
-from random import choice
+from discord.ext import commands
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from random import choice
+import csv
+import datetime
+import discord
 import io
-import string
 import itertools
+import os
+import string
 
 settings_path = "data/card/settings.json"
 crdata_path = "data/card/clashroyale.json"
 cardpop_path = "data/card/cardpop.json"
+crtexts_path = "data/card/crtexts.csv"
 
 def grouper(self, n, iterable, fillvalue=None):
     """
@@ -63,6 +65,7 @@ class Card:
         self.file_path = settings_path
         self.crdata_path = crdata_path
         self.cardpop_path = cardpop_path
+        self.crtexts_path = crtexts_path
 
         self.settings = dataIO.load_json(self.file_path)
         self.crdata = dataIO.load_json(self.crdata_path)
@@ -86,6 +89,13 @@ class Card:
         self.card_thumb_scale = 0.5
         self.card_thumb_w = int(self.card_w * self.card_thumb_scale)
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
+
+        # CR Text data
+        with open(self.crtexts_path, mode='r') as f:
+            reader = csv.reader(f)
+            self.crtexts = { row[0]:row[1] for row in reader}
+
+
 
 
     @commands.group(pass_context=True)
@@ -112,6 +122,7 @@ class Card:
 
         data = discord.Embed(
             title = self.card_to_str(card),
+            description = self.get_card_description(card),
             color = discord.Color(value=color))
         data.set_thumbnail(url=self.get_card_image_url(card))
 
@@ -144,6 +155,15 @@ class Card:
         if card in self.cards_abbrev.keys():
             card = self.cards_abbrev[card]
         return card
+
+    def get_card_description(self, card=None):
+        """
+        Return the description of a card
+        """
+        if card is None:
+            return ""
+        tid = self.crdata["Cards"][card]["tid"]
+        return self.crtexts[tid]
 
     def get_card_image_file(self, card=None):
         """
