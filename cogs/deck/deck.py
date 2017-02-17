@@ -326,6 +326,7 @@ class Deck:
             for k, server_member in server_members.items():
                 member_decks = server_member["Decks"]
                 member_id = server_member["MemberID"]
+                member_display_name = server_member["MemberDisplayName"]
                 member = server.get_member(member_id)
                 for k, member_deck in member_decks.items():
                     cards = member_deck["Deck"]
@@ -334,7 +335,8 @@ class Deck:
                         found_decks.append({
                             "Deck": member_deck["Deck"], 
                             "DeckName": member_deck["DeckName"],
-                            "Member": member })
+                            "Member": member,
+                            "MemberDisplayName": member_display_name })
 
             await self.bot.say("Found {} decks".format(len(found_decks)))
 
@@ -343,7 +345,10 @@ class Deck:
                 deck_id = 1
 
                 for deck in found_decks:
-                    await self.bot.say("**{}. {}** by {}".format(deck_id, deck["DeckName"], deck["Member"].display_name))
+                    await self.bot.say(
+                        "**{}. {}** by {}".format(
+                            deck_id, deck["DeckName"], 
+                            deck["MemberDisplayName"]))
                     await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], deck["Member"])
                     deck_id += 1
 
@@ -542,9 +547,11 @@ class Deck:
         line2 = ', '.join(card_names[4:])
         # card_text = '\n'.join([line0, line1])
 
+        deck_author_name = deck_author.name if deck_author else ""
+
         d_name.text((txt_x_name, txt_y_line1), deck_name, font=font_bold, 
                          fill=(0xff, 0xff, 0xff, 255))
-        d_name.text((txt_x_name, txt_y_line2), deck_author.name, font=font_regular, 
+        d_name.text((txt_x_name, txt_y_line2), deck_author_name, font=font_regular, 
                          fill=(0xff, 0xff, 0xff, 255))
         d.text((txt_x_cards, txt_y_line1), line1, font=font_regular, 
                          fill=(0xff, 0xff, 0xff, 255))
