@@ -193,13 +193,20 @@ class Card:
     def get_cardpop(self, card=None, snapshot_id=None):
         """
         Return card popularity by snapshot id
+        Format: Count (Change)
         """
-        return "---"
-        # return self.cardpop[snapshot_id]["cardpop"]
+        out = "---"
+        snapshot_id = str(snapshot_id)
 
-
-
-
+        if card is not None and snapshot_id is not None:
+            if snapshot_id in self.cardpop:
+                cardpop = self.cardpop[snapshot_id]["cardpop"]
+                cpid = self.crdata["Cards"][card]["cpid"]
+                if cpid in cardpop:
+                    out = "**{}** ({})".format(
+                        cardpop[cpid]["count"],
+                        cardpop[cpid]["change"])
+        return out
 
     def check_member_settings(self, server, member):
         """Init member section if necessary"""
