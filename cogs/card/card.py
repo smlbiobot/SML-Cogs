@@ -225,34 +225,42 @@ class Card:
                                "to send this")
 
     @commands.command(pass_context=True)
-    async def cardtrend(self, ctx:Context, card=None):
+    async def cardtrend(self, ctx:Context, *cards):
         """
         Display trends about a card based on popularity snapshot
         Example: !cardtrend miner
         """
-        if card is None:
+        if cards is None:
             await send_cmd_help(ctx)
 
-        card = self.get_card_name(card)
+        for card in cards:
 
-        if card is None:
-            await self.bot.say("Card name is not valid.")
-            return
+            card = self.get_card_name(card)
 
-        x = range(cardpop_range_min, cardpop_range_max)
-        y = [int(self.get_cardpop_count(card, id)) for id in x]
-        plt.plot(x, y)
+            # if card is None:
+            #     await self.bot.say("Card name is not valid.")
+            #     return
+
+            x = range(cardpop_range_min, cardpop_range_max)
+            y = [int(self.get_cardpop_count(card, id)) for id in x]
+            plt.plot(x, y, 'o-', label=card)
+        plt.legend()
+
+        plot_name = "{}-plot".format("-".join(cards))
+
+        plt.xlabel("Snapshots")
+        plt.ylabel("Count")
 
         with io.BytesIO() as f:
             plt.savefig(f, format="png")
             f.seek(0)
             await ctx.bot.send_file(
                 ctx.message.channel, f,
-                filename="plot.png",
-                content="{}-plot".format(card))
+                filename="{}.png".format(plot_name),
+                content=plot_name)
 
-            plt.clf()
-            plt.cla()
+        plt.clf()
+        plt.cla()
 
     def get_random_color(self):
         """
