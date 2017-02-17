@@ -11,7 +11,7 @@
             "rarity": "common"
         },
         "baby-dragon": {
-            "aka": ["bbd", "babyd"],
+            "aka": ["bbd", "babyd", "bd"],
             "elixir": 4,
             "rarity": "epic"
         },
@@ -21,7 +21,7 @@
             "rarity": "epic"
         },
         "barbarian-hut": {
-            "aka": ["barb-hut"],
+            "aka": ["barb-hut", "bh"],
             "elixir": 7,
             "rarity": "rare"
         },
@@ -71,7 +71,7 @@
             "rarity": "rare"
         },
         "electro-wizard": {
-            "aka": ["ew", "ewiz"],
+            "aka": ["ew", "ewiz", "ewizard"],
             "elixir": 4,
             "rarity": "legendary"
         },
@@ -131,7 +131,7 @@
             "rarity": "rare"
         },
         "goblin-hut": {
-            "aka": ["gob-hut"],
+            "aka": ["gob-hut", "gh"],
             "elixir": 5,
             "rarity": "rare"
         },
@@ -171,7 +171,7 @@
             "rarity": "common"
         },
         "ice-wizard": {
-            "aka": ["iw", "ice-wiz"],
+            "aka": ["iw", "ice-wiz", "iwiz"],
             "elixir": 3,
             "rarity": "legendary"
         },
@@ -281,7 +281,7 @@
             "rarity": "common"
         },
         "skeleton-army": {
-            "aka": ["skarmy"],
+            "aka": ["skarmy", "sa"],
             "elixir": 3,
             "rarity": "epic"
         },
