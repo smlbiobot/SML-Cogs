@@ -26,18 +26,30 @@ DEALINGS IN THE SOFTWARE.
 
 from .utils.dataIO import dataIO
 from __main__ import send_cmd_help
+from asyncio_extras import threadpool
 from discord.ext import commands
+from discord.ext.commands import Context
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from random import choice
+import asyncio
 import discord
 import itertools
-import matplotlib
-matplotlib.use('Agg')
+# import matplotlib
+# matplotlib.use('Agg')
+import io
 import matplotlib.pyplot as plt
 import os
 import string
+
+"""
+buf = BytesIO()
+                plt.savefig(buf, format="png")
+
+                # Don't send 0-byte files
+                buf.seek(0)
+                """
 
 settings_path = "data/card/settings.json"
 crdata_path = "data/card/clashroyale.json"
@@ -97,6 +109,7 @@ class Card:
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
 
         self.plotfigure = 0
+        self.plot_lock = asyncio.Lock()
 
 
     # @commands.group(pass_context=True)
@@ -212,7 +225,7 @@ class Card:
                                "to send this")
 
     @commands.command(pass_context=True)
-    async def cardtrend(self, ctx, card=None):
+    async def cardtrend(self, ctx:Context, card=None):
         """
         Display trends about a card based on popularity snapshot
         Example: !cardtrend miner
@@ -228,23 +241,18 @@ class Card:
 
         x = range(cardpop_range_min, cardpop_range_max)
         y = [int(self.get_cardpop_count(card, id)) for id in x]
-        # ids = [id for id in x]
-        
-        plt.figure(self.plotfigure)
         plt.plot(x, y)
 
-        filename = "data/card/trend-{}.png".format(card)
-        plt.savefig(filename)
+        with io.BytesIO() as f:
+            plt.savefig(f, format="png")
+            f.seek(0)
+            await ctx.bot.send_file(
+                ctx.message.channel, f,
+                filename="plot.png",
+                content="{}-plot".format(card))
 
-        with open(filename, 'rb') as f:
-            await self.bot.upload(f)
-
-        self.plotfigure += 1
-
-
-        
-
-
+            plt.clf()
+            plt.cla()
 
     def get_random_color(self):
         """

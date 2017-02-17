@@ -42,6 +42,8 @@ discord_url = "http://tiny.cc/alphachat"
 welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
               "interested in joining our clans / just visiting?"
 
+changeclan_roles = ["Leader", "Co-Leader", "Elder", "High Elder"]
+
 
 
 class RACF:
@@ -123,17 +125,40 @@ class RACF:
         await self.bot.say("'''{}'''".format(' '.join(untagged_members_mention)))
 
     @commands.command(pass_context=True)
-    @checks.mod_or_permissions(mention_everyone=True)
-    async def racf_bank_deposit(self, ctx):
-        """Hacking the eco system to add points"""
+    @commands.has_any_role(*changeclan_roles)
+    async def changeclan(self, ctx, clan:str=None):
+        """Update clan role when moved to a new clan
+        Example: !changeclan Delta"""
+        clans = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel"]
+        author = ctx.message.author
+        server = ctx.message.server
 
-        # bank = self.bot.get_cog("Economy").bank
+        if clan is None:
+            await send_cmd_help(ctx)
+            return
 
-        # author = ctx.message.author
+        if not clan in clans:
+            await self.bot.say("{} is not a valid clan.".format(clan))
+            return
 
-        # bank.deposit_credits(author, 10)
+        clan_roles = [r for r in server.roles if r.name in clans]
 
-        pass
+        to_remove_roles = set(author.roles) & set(clan_roles)
+        to_add_roles = [r for r in server.roles if r.name == clan]
+
+        await self.bot.add_roles(author, *to_add_roles)
+        await self.bot.say("Added {} for {}".format(
+            ",".join([r.name for r in to_add_roles]),
+            author.display_name))
+        await self.bot.remove_roles(author, *to_remove_roles)
+        await self.bot.say("Removed {} for {}".format(
+            ",".join([r.name for r in to_remove_roles]),
+            author.display_name))
+
+
+        
+        # await self.bot.say(",".join([r.name for r in remove_roles]))
+
 
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(mention_everyone=True)
