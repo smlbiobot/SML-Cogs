@@ -91,8 +91,13 @@ class Card:
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
 
         # CR Text data
+        self.crtexts = {}
         with open(self.crtexts_path, mode='r') as f:
-            reader = csv.reader(f)
+            reader = csv.reader(f, delimiter=',')
+            # for row in reader:
+                # print(row)
+            # for row in reader:
+            #     self.crtexts[row[0]] = row[1]
             self.crtexts = { row[0]:row[1] for row in reader}
 
 
