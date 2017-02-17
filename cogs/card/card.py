@@ -135,15 +135,53 @@ class Card:
                 name="Snapshot {}".format(id),
                 value=self.get_cardpop(card, id))
 
-        # await self.bot.say(embed=data)
-        # await self.bot.say(self.get_card_image_file(card))
         try:
             await self.bot.type()
             await self.bot.say(embed=data)
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
-        
+
+    @card.command(name="decks", pass_context=True)
+    async def card_decks(self, ctx, card=None, snapshot_id=None):
+        """
+        Display decks which uses a particular card in a specific snapshot
+        Syntax: !card decks Miner 23
+        """
+        if snapshot_id is None:
+            snapshot_id = str(cardpop_range_max - 1)
+
+        card = self.get_card_name(card)  
+        if card is None:
+            await self.bot.say("Card name is not valid.")
+            return
+
+        cpid = self.get_card_cpid(card)
+
+        found_decks = []
+
+
+        if snapshot_id in self.cardpop:
+            decks = self.cardpop[snapshot_id]["decks"]
+            for k in decks.keys():
+                if cpid in k:
+                    found_decks.append(k)
+
+        norm_found_decks = []
+
+        for deck in found_decks:
+            cards = deck.split(', ')
+            norm_cards = [self.get_card_from_cpid(c) for c in cards]
+            print(cards)
+            print(norm_cards)
+            # norm_found_decks.append(', '.join(norm_cards))
+
+
+
+        if len(norm_found_decks):
+            await self.bot.say("\n".join(norm_found_decks))
+
+      
 
     def card_to_str(self, card=None):
         """
@@ -201,33 +239,116 @@ class Card:
         if card is not None and snapshot_id is not None:
             if snapshot_id in self.cardpop:
                 cardpop = self.cardpop[snapshot_id]["cardpop"]
-                cpid = self.crdata["Cards"][card]["cpid"]
+                cpid = self.get_card_cpid(card)
                 if cpid in cardpop:
                     out = "**{}** ({})".format(
                         cardpop[cpid]["count"],
                         cardpop[cpid]["change"])
         return out
 
-    def check_member_settings(self, server, member):
-        """Init member section if necessary"""
-        if member.id not in self.settings["Servers"][server.id]["Members"]:
-            self.settings["Servers"][server.id]["Members"][member.id] = {
-                "MemberID": member.id,
-                "MemberDisplayName": member.display_name,
-                "Decks": {}}
-            self.save_settings()
+    def get_card_cpid(self, card=None):
+        """
+        Return the card populairty ID used in data
+        """
+        return self.crdata["Cards"][card]["cpid"]
 
-    def check_server_settings(self, server):
-        """Init server data if necessary"""
-        if server.id not in self.settings["Servers"]:
-            self.settings["Servers"][server.id] = { "ServerName": str(server),
-                                                    "ServerID": str(server.id),
-                                                    "Members": {} }
-            self.save_settings()
+    def get_card_from_cpid(self, cpid=None):
+        """
+        Return the card id from cpid
+        """
+        for k, v in self.crdata["Cards"].items():
+            if cpid == v["cpid"]:
+                return k
+        return None
 
-    def save_settings(self):
-        """Saves data to settings file"""
-        dataIO.save_json(self.file_path, self.settings)
+
+    def get_deck_image(self, deck, deck_name=None, deck_author=None):
+        """Construct the deck with Pillow and return image"""
+
+        card_w = 302
+        card_h = 363
+        card_x = 30
+        card_y = 30
+        font_size = 50
+        txt_y_line1 = 430
+        txt_y_line2 = 500
+        txt_x_name = 50
+        txt_x_cards = 503
+        txt_x_elixir = 1872
+
+        bg_image = Image.open("data/deck/img/deck-bg-b.png")
+        size = bg_image.size
+
+        font_file_regular = "data/deck/fonts/OpenSans-Regular.ttf"
+        font_file_bold = "data/deck/fonts/OpenSans-Bold.ttf"
+
+        image = Image.new("RGBA", size)
+        image.paste(bg_image)
+
+        if not deck_name:
+            deck_name = "Deck"
+
+        # cards
+        for i, card in enumerate(deck):
+            card_image_file = "data/deck/img/cards/{}.png".format(card)
+            card_image = Image.open(card_image_file)
+            # size = (card_w, card_h)
+            # card_image.thumbnail(size)
+            box = (card_x + card_w * i, 
+                   card_y, 
+                   card_x + card_w * (i+1), 
+                   card_h + card_y)
+            image.paste(card_image, box, card_image)
+
+        # elixir
+        total_elixir = 0
+        for card_key, card_value in self.crdata["Cards"].items():
+            if card_key in deck:
+                total_elixir += card_value["elixir"]
+        average_elixir = "{:.3f}".format(total_elixir / 8)
+
+        # text
+        # Take out hyphnens and capitlize the name of each card
+        card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
+
+        txt = Image.new("RGBA", size)
+        txt_name = Image.new("RGBA", (txt_x_cards-30, size[1]))
+        font_regular = ImageFont.truetype(font_file_regular, size=font_size)
+        font_bold = ImageFont.truetype(font_file_bold, size=font_size)
+
+        d = ImageDraw.Draw(txt)
+        d_name = ImageDraw.Draw(txt_name)
+
+        line1 = ', '.join(card_names[:4])
+        line2 = ', '.join(card_names[4:])
+        # card_text = '\n'.join([line0, line1])
+
+        deck_author_name = deck_author.name if deck_author else ""
+
+        d_name.text((txt_x_name, txt_y_line1), deck_name, font=font_bold, 
+                         fill=(0xff, 0xff, 0xff, 255))
+        d_name.text((txt_x_name, txt_y_line2), deck_author_name, font=font_regular, 
+                         fill=(0xff, 0xff, 0xff, 255))
+        d.text((txt_x_cards, txt_y_line1), line1, font=font_regular, 
+                         fill=(0xff, 0xff, 0xff, 255))
+        d.text((txt_x_cards, txt_y_line2), line2, font=font_regular, 
+                         fill=(0xff, 0xff, 0xff, 255))
+        d.text((txt_x_elixir, txt_y_line1), "Avg elixir", font=font_bold,
+               fill=(0xff, 0xff, 0xff, 200))
+        d.text((txt_x_elixir, txt_y_line2), average_elixir, font=font_bold,
+               fill=(0xff, 0xff, 0xff, 255))
+
+        image.paste(txt, (0,0), txt)
+        image.paste(txt_name, (0,0), txt_name)
+
+        # scale down and return
+        scale = 0.5
+        scaled_size = tuple([x * scale for x in image.size])
+        image.thumbnail(scaled_size)
+
+        return image
+
+
 
 
 def check_folder():

@@ -117,7 +117,7 @@
             "elixir": 6,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_ELIXIR_COLLECTOR",
-            "cpid": "Exixir Collector"
+            "cpid": "Elixir Collector"
         },
         "executioner": {
             "aka": ["ex", "exe", "exec"],
