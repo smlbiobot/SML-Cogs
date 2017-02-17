@@ -41,6 +41,9 @@ crdata_path = "data/card/clashroyale.json"
 cardpop_path = "data/card/cardpop.json"
 crtexts_path = "data/card/crtexts.json"
 
+cardpop_range_min = 16
+cardpop_range_max = 24
+
 def grouper(self, n, iterable, fillvalue=None):
     """
     Helper function to split lists
@@ -127,6 +130,11 @@ class Card:
             name="Rarity",
             value=string.capwords(self.crdata["Cards"][card]["rarity"]))
 
+        for id in range(cardpop_range_min, cardpop_range_max):
+            data.add_field(
+                name="Snapshot {}".format(id),
+                value=self.get_cardpop(card, id))
+
         # await self.bot.say(embed=data)
         # await self.bot.say(self.get_card_image_file(card))
         try:
@@ -181,6 +189,14 @@ class Card:
         if card is None:
             return None
         return "https://smlbiobot.github.io/img/cards/{}.png".format(card)
+
+    def get_cardpop(self, card=None, snapshot_id=None):
+        """
+        Return card popularity by snapshot id
+        """
+        return "---"
+        # return self.cardpop[snapshot_id]["cardpop"]
+
 
 
 
