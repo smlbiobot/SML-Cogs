@@ -30,6 +30,7 @@ from .utils.dataIO import dataIO
 from __main__ import send_cmd_help
 import os
 import datetime
+from random import choice
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
@@ -103,6 +104,63 @@ class Card:
         """
         if card is None:
             await send_cmd_help(ctx)
+
+        card = self.get_card_name(card)
+
+        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+        color = int(color, 16)
+
+        data = discord.Embed(
+            title = self.card_to_str(card),
+            color = discord.Color(value=color))
+        data.set_thumbnail(url=self.get_card_image_url(card))
+
+        # await self.bot.say(embed=data)
+        # await self.bot.say(self.get_card_image_file(card))
+        try:
+            await self.bot.type()
+            await self.bot.say(embed=data)
+        except discord.HTTPException:
+            await self.bot.say("I need the `Embed links` permission "
+                               "to send this")
+        
+
+    def card_to_str(self, card=None):
+        """
+        Return name in title case
+        """
+        if card is None:
+            return None
+        return string.capwords(card.replace('-', ' '))
+
+
+    def get_card_name(self, card=None):
+        """
+        Replace abbreviations of card names and return standard name used in data files
+        """
+        if card is None:
+            return None
+        card = card.lower()
+        if card in self.cards_abbrev.keys():
+            card = self.cards_abbrev[card]
+        return card
+
+    def get_card_image_file(self, card=None):
+        """
+        Construct an image of the card
+        """
+        if card is None:
+            return None
+        return "data/card/img/cards/{}.png".format(card) 
+
+    def get_card_image_url(self, card=None):
+        """
+        Return the card image url hosted by smlbiobot
+        """
+        if card is None:
+            return None
+        return "https://smlbiobot.github.io/img/cards/{}.png".format(card)
+
 
 
 
