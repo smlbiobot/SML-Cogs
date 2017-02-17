@@ -29,7 +29,6 @@ from discord.ext import commands
 from .utils import checks
 from random import choice
 from .utils.dataIO import dataIO
-from .general import General
 from __main__ import send_cmd_help
 
 import os

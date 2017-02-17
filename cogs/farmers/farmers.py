@@ -26,12 +26,8 @@ DEALINGS IN THE SOFTWARE.
 
 import discord
 from discord.ext import commands
-from .utils import checks
 from random import choice
-import itertools
 from .utils.dataIO import fileIO
-from .utils.chat_formatting import pagify
-from __main__ import send_cmd_help
 import os
 
 try: # check if BeautifulSoup4 is installed
@@ -64,7 +60,6 @@ class Farmers:
         """
 
         # Parse Data
-        server = ctx.message.server
         # url = self.settings[server.id]["DATA_URL"]
         url = "https://app.nuclino.com/p/Clan-Chest-Farmers-kZCL4FSBYPhSTgmIhDxGPD"
         async with aiohttp.get(url) as response:
@@ -73,7 +68,7 @@ class Farmers:
         # try:
             root = soup.find(class_="ProseMirror")
 
-            header = root.find_all('h1')
+            # header = root.find_all('h1')
             season = root.find_all('h2')
 
             # Parse HTML to find name and trophies
