@@ -1,0 +1,355 @@
+{
+    "Cards": {
+        "archers": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "common"
+        },
+        "arrows": {
+            "aka": ["arrow", "arr"],
+            "elixir": 3,
+            "rarity": "common"
+        },
+        "baby-dragon": {
+            "aka": ["bbd", "babyd", "bd"],
+            "elixir": 4,
+            "rarity": "epic"
+        },
+        "balloon": {
+            "aka": ["loon"],
+            "elixir": 5,
+            "rarity": "epic"
+        },
+        "barbarian-hut": {
+            "aka": ["barb-hut", "bh"],
+            "elixir": 7,
+            "rarity": "rare"
+        },
+        "barbarians": {
+            "aka": ["barb", "barbs"],
+            "elixir": 5,
+            "rarity": "common"
+        },
+        "battle-ram": {
+            "aka": ["br"],
+            "elixir": 4,
+            "rarity": "rare"
+        },
+        "bomb-tower": {
+            "aka": ["bt"],
+            "elixir": 5,
+            "rarity": "rare"
+        },
+        "bomber": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "common"
+        },
+        "bowler": {
+            "aka": [],
+            "elixir": 5,
+            "rarity": "epic"
+        },
+        "cannon": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "common"
+        },
+        "clone": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "epic"
+        },
+        "dark-prince": {
+            "aka": ["dp", "dank-prince"],
+            "elixir": 4,
+            "rarity": "epic"
+        },
+        "dart-goblin": {
+            "aka": ["dg", "dart-gob", "dart-gobs"],
+            "elixir": 3,
+            "rarity": "rare"
+        },
+        "electro-wizard": {
+            "aka": ["ew", "ewiz", "ewizard"],
+            "elixir": 4,
+            "rarity": "legendary"
+        },
+        "elite-barbarians": {
+            "aka": ["eb", "ebarb", "ebarbs"],
+            "elixir": 6,
+            "rarity": "common"
+        },
+        "elixir-collector": {
+            "aka": ["ec", "pump", "collector"],
+            "elixir": 6,
+            "rarity": "rare"
+        },
+        "executioner": {
+            "aka": ["ex", "exe", "exec"],
+            "elixir": 5,
+            "rarity": "epic"
+        },
+        "fire-spirits": {
+            "aka": ["fs"],
+            "elixir": 2,
+            "rarity": "common"
+        },
+        "fireball": {
+            "aka": ["fb"],
+            "elixir": 4,
+            "rarity": "rare"
+        },
+        "freeze": {
+            "aka": [],
+            "elixir": 4,
+            "rarity": "epic"
+        },
+        "furnace": {
+            "aka": [],
+            "elixir": 4,
+            "rarity": "rare"
+        },
+        "giant-skeleton": {
+            "aka": ["gs"],
+            "elixir": 6,
+            "rarity": "epic"
+        },
+        "giant": {
+            "aka": [],
+            "elixir": 5,
+            "rarity": "rare"
+        },
+        "goblin-barrel": {
+            "aka": ["gb", "gob-barrel", "barrel"],
+            "elixir": 3,
+            "rarity": "epic"
+        },
+        "goblin-gang": {
+            "aka": ["gg", "gob-gang"],
+            "elixir": 5,
+            "rarity": "rare"
+        },
+        "goblin-hut": {
+            "aka": ["gob-hut", "gh"],
+            "elixir": 5,
+            "rarity": "rare"
+        },
+        "goblins": {
+            "aka": ["gobs", "gob", "stab-gobs", "stab-gob"],
+            "elixir": 2,
+            "rarity": "common"
+        },
+        "golem": {
+            "aka": [],
+            "elixir": 8,
+            "rarity": "epic"
+        },
+        "graveyard": {
+            "aka": ["gy", "skillyard"],
+            "elixir": 5,
+            "rarity": "legendary"
+        },
+        "guards": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "epic"
+        },
+        "hog-rider": {
+            "aka": ["hog"],
+            "elixir": 4,
+            "rarity": "rare"
+        },
+        "ice-golem": {
+            "aka": ["ig"],
+            "elixir": 2,
+            "rarity": "rare"
+        },
+        "ice-spirit": {
+            "aka": ["is"],
+            "elixir": 1,
+            "rarity": "common"
+        },
+        "ice-wizard": {
+            "aka": ["iw", "ice-wiz", "iwiz"],
+            "elixir": 3,
+            "rarity": "legendary"
+        },
+        "inferno-dragon": {
+            "aka": ["id"],
+            "elixir": 4,
+            "rarity": "legendary"
+        },
+        "inferno-tower": {
+            "aka": ["inferno", "it"],
+            "elixir": 5,
+            "rarity": "rare"
+        },
+        "knight": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "common"
+        },
+        "lava-hound": {
+            "aka": ["lava", "lh", "hound"],
+            "elixir": 7,
+            "rarity": "legendary"
+        },
+        "lightning": {
+            "aka": [],
+            "elixir": 6,
+            "rarity": "epic"
+        },
+        "lumberjack": {
+            "aka": ["lj"],
+            "elixir": 4,
+            "rarity": "legendary"
+        },
+        "mega-minion": {
+            "aka": ["mm", "meta-minion"],
+            "elixir": 3,
+            "rarity": "rare"
+        },
+        "miner": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "legendary"
+        },
+        "mini-pekka": {
+            "aka": ["minip", "mini-p", "mp"],
+            "elixir": 4,
+            "rarity": "rare"
+        },
+        "minion-horde": {
+            "aka": ["mh", "horde"],
+            "elixir": 5,
+            "rarity": "common"
+        },
+        "minions": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "common"
+        },
+        "mirror": {
+            "aka": [],
+            "elixir": 0,
+            "rarity": "epic"
+        },
+        "mortar": {
+            "aka": [],
+            "elixir": 4,
+            "rarity": "common"
+        },
+        "musketeer": {
+            "aka": ["1m", "musk"],
+            "elixir": 4,
+            "rarity": "rare"
+        },
+        "pekka": {
+            "aka": [],
+            "elixir": 7,
+            "rarity": "epic"
+        },
+        "poison": {
+            "aka": [],
+            "elixir": 4,
+            "rarity": "rare"
+        },
+        "prince": {
+            "aka": [],
+            "elixir": 5,
+            "rarity": "epic"
+        },
+        "princess": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "legendary"
+        },
+        "rage": {
+            "aka": [],
+            "elixir": 2,
+            "rarity": "epic"
+        },
+        "rocket": {
+            "aka": [],
+            "elixir": 6,
+            "rarity": "rare"
+        },
+        "royal-giant": {
+            "aka": ["rg", "rgg"],
+            "elixir": 6,
+            "rarity": "common"
+        },
+        "skeleton-army": {
+            "aka": ["skarmy", "sa"],
+            "elixir": 3,
+            "rarity": "epic"
+        },
+        "skeletons": {
+            "aka": [],
+            "elixir": 1,
+            "rarity": "common"
+        },
+        "sparky": {
+            "aka": [],
+            "elixir": 6,
+            "rarity": "legendary"
+        },
+        "spear-goblins": {
+            "aka": ["spear-gobs", "spear-gob"],
+            "elixir": 2,
+            "rarity": "common"
+        },
+        "tesla": {
+            "aka": [],
+            "elixir": 4,
+            "rarity": "common"
+        },
+        "the-log": {
+            "aka": ["log"],
+            "elixir": 2,
+            "rarity": "legendary"
+        },
+        "three-musketeers": {
+            "aka": ["3m", "3musk", "3musks"],
+            "elixir": 9,
+            "rarity": "rare"
+        },
+        "tombstone": {
+            "aka": ["ts"],
+            "elixir": 3,
+            "rarity": "rare"
+        },
+        "tornado": {
+            "aka": ["nado"],
+            "elixir": 3,
+            "rarity": "epic"
+        },
+        "valkyrie": {
+            "aka": ["valk"],
+            "elixir": 4,
+            "rarity": "rare"
+        },
+        "witch": {
+            "aka": [],
+            "elixir": 5,
+            "rarity": "epic"
+        },
+        "wizard": {
+            "aka": ["wiz"],
+            "elixir": 5,
+            "rarity": "rare"
+        },
+        "xbow": {
+            "aka": [],
+            "elixir": 6,
+            "rarity": "epic"
+        },
+        "zap": {
+            "aka": [],
+            "elixir": 2,
+            "rarity": "common"
+        }
+    },
+    "Rarity": ["common", "rare", "epic", "legendary"]
+}

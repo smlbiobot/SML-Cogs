@@ -35,10 +35,20 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import io
 import string
+import itertools
 
 settings_path = "data/card/settings.json"
 crdata_path = "data/card/clashroyale.json"
 
+def grouper(self, n, iterable, fillvalue=None):
+    """
+    Helper function to split lists
+
+    Example:
+    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
+    """
+    args = [iter(iterable)] * n
+    return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
 
 
 class Card:
@@ -73,34 +83,23 @@ class Card:
         self.card_thumb_w = int(self.card_w * self.card_thumb_scale)
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
 
-        # card validation hack
-        self.card_is_valid = False
 
-    def grouper(self, n, iterable, fillvalue=None):
-        """
-        Helper function to split lists
-
-        Example:
-        grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
-        """
-        args = [iter(iterable)] * n
-        return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
-
-
-    @commands.group(pass_context=True, no_pm=True)
+    @commands.group(pass_context=True)
     async def card(self, ctx):
         """
         Clash Royale Decks
-        
-        Example usage:
-        !card add 3m mm ig is fs pump horde knight "3M EBarbs"
-
-        Card list
-        !card cards
-
-        Full help
-        !card help
         """
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @card.command(name="get", pass_context=True)
+    async def card_get(self, ctx, card=None):
+        """
+        Display statistics about a card
+        Example: !card get miner
+        """
+        if card is None:
+            await send_cmd_help(ctx)
 
     def check_member_settings(self, server, member):
         """Init member section if necessary"""
