@@ -31,10 +31,7 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from random import choice
-import csv
-import datetime
 import discord
-import io
 import itertools
 import os
 import string
@@ -42,7 +39,7 @@ import string
 settings_path = "data/card/settings.json"
 crdata_path = "data/card/clashroyale.json"
 cardpop_path = "data/card/cardpop.json"
-crtexts_path = "data/card/crtexts.csv"
+crtexts_path = "data/card/crtexts.json"
 
 def grouper(self, n, iterable, fillvalue=None):
     """
@@ -70,6 +67,7 @@ class Card:
         self.settings = dataIO.load_json(self.file_path)
         self.crdata = dataIO.load_json(self.crdata_path)
         self.cardpop = dataIO.load_json(self.cardpop_path)
+        self.crtexts = dataIO.load_json(self.crtexts_path)
 
         # init card data
         self.cards = []
@@ -89,18 +87,6 @@ class Card:
         self.card_thumb_scale = 0.5
         self.card_thumb_w = int(self.card_w * self.card_thumb_scale)
         self.card_thumb_h = int(self.card_h * self.card_thumb_scale)
-
-        # CR Text data
-        self.crtexts = {}
-        with open(self.crtexts_path, mode='r') as f:
-            reader = csv.reader(f, delimiter=',')
-            # for row in reader:
-                # print(row)
-            # for row in reader:
-            #     self.crtexts[row[0]] = row[1]
-            self.crtexts = { row[0]:row[1] for row in reader}
-
-
 
 
     @commands.group(pass_context=True)
@@ -122,6 +108,10 @@ class Card:
 
         card = self.get_card_name(card)
 
+        if card is None:
+            await self.bot.say("Card name is not valid.")
+            return
+
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
 
@@ -130,6 +120,12 @@ class Card:
             description = self.get_card_description(card),
             color = discord.Color(value=color))
         data.set_thumbnail(url=self.get_card_image_url(card))
+        data.add_field(
+            name="Elixir",
+            value=self.crdata["Cards"][card]["elixir"])
+        data.add_field(
+            name="Rarity",
+            value=string.capwords(self.crdata["Cards"][card]["rarity"]))
 
         # await self.bot.say(embed=data)
         # await self.bot.say(self.get_card_image_file(card))
