@@ -26,7 +26,6 @@ DEALINGS IN THE SOFTWARE.
 
 from .utils.dataIO import dataIO
 from __main__ import send_cmd_help
-from asyncio_extras import threadpool
 from discord.ext import commands
 from discord.ext.commands import Context
 from PIL import Image
@@ -36,20 +35,11 @@ from random import choice
 import asyncio
 import discord
 import itertools
-# import matplotlib
-# matplotlib.use('Agg')
 import io
 import matplotlib.pyplot as plt
 import os
 import string
 
-"""
-buf = BytesIO()
-                plt.savefig(buf, format="png")
-
-                # Don't send 0-byte files
-                buf.seek(0)
-                """
 
 settings_path = "data/card/settings.json"
 crdata_path = "data/card/clashroyale.json"
@@ -111,14 +101,6 @@ class Card:
         self.plotfigure = 0
         self.plot_lock = asyncio.Lock()
 
-
-    # @commands.group(pass_context=True)
-    # async def card(self, ctx):
-    #     """
-    #     Clash Royale Decks
-    #     """
-    #     if ctx.invoked_subcommand is None:
-    #         await send_cmd_help(ctx)
 
     @commands.command(pass_context=True)
     async def card(self, ctx, card=None):
@@ -259,7 +241,9 @@ class Card:
                 plt.plot(x, y, 'o-', label=self.card_to_str(card))
             plt.legend()
 
-            plot_name = "{}-plot".format("-".join(cards))
+            plot_filename = "{}-plot.png".format("-".join(cards))
+            plot_name = "Card Trends: {}".format(
+                ", ".join([self.card_to_str(c) for c in validated_cards]))
 
             plt.xlabel("Snapshots")
             plt.ylabel("Count")
@@ -269,7 +253,7 @@ class Card:
                 f.seek(0)
                 await ctx.bot.send_file(
                     ctx.message.channel, f,
-                    filename="{}.png".format(plot_name),
+                    filename=plot_filename,
                     content=plot_name)
 
         plt.clf()
