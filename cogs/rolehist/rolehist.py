@@ -33,9 +33,21 @@ from .general import General
 from __main__ import send_cmd_help
 import os
 import datetime
+import itertools
 
 
 settings_path = "data/rolehist/settings.json"
+
+def grouper(n, iterable, fillvalue=None):
+    """
+    Helper function to split lists
+
+    Example:
+    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
+    """
+    args = [iter(iterable)] * n
+    return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
+
 
 class RoleHistory:
     """
@@ -50,24 +62,18 @@ class RoleHistory:
         self.bot = bot
         self.file_path = settings_path
         self.settings = dataIO.load_json(self.file_path)
-        # print("rolehist: __init__")
-        # self.remove_old()
 
-    @commands.group(pass_context=True, no_pm=True)
-    async def rolehist(self, ctx):
-        """Role History Management"""
-
-        if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
-
-    @rolehist.command(name="show", pass_context=True, no_pm=True)
-    async def _show_role_hist(self, ctx, user:discord.Member=None):
-        """Display the role history of a user"""
+    @commands.command(pass_context=True)
+    async def rolehist(self, ctx, user:discord.Member=None):
+        """Display the role history of a user
+        
+        Examples:
+        !rolehist
+        !rolehist SML
+        """
 
         author = ctx.message.author
         server = ctx.message.server
-
-        # print("rolehist: _show_role_hist")
 
         if not user:
             user = author
@@ -92,7 +98,9 @@ class RoleHistory:
                     prev_roles = []
 
                     for time_key, time_value in hist:
-                        out.append('**{}**'.format(time_key))
+
+                        line = "• {}: ".format(time_key)
+                        # out.append('**{}**'.format(time_key))
 
                         curr_roles = time_value["Roles"]
                         # display role changes if not the first item
@@ -100,14 +108,21 @@ class RoleHistory:
                             prev_roles_set = set(prev_roles)
                             curr_roles_set = set(curr_roles)
                             if prev_roles_set < curr_roles_set:
-                                out.append('**Added:** {}'.format(list(curr_roles_set - prev_roles_set)[0]))
+                                line += 'Added: {}'.format(list(curr_roles_set - prev_roles_set)[0])
                             else:
-                                out.append('**Removed:** {}'.format(list(prev_roles_set - curr_roles_set)[0]))
-                        out.append(', '.join(curr_roles))
+                                line +='Removed: {}'.format(list(prev_roles_set - curr_roles_set)[0])
+                        
+                        out.append(line)
+                        # out.append(', '.join(curr_roles))
 
                         prev_roles = curr_roles
+
+
+                    # split long outputs because of char limit in messages
+                    split_out = grouper(10, out)
+                    for o in split_out:
+                        await self.bot.say("\n".join(o))
  
-                    await self.bot.say("\n".join(out))
                     found_member = member
 
 
@@ -139,9 +154,9 @@ class RoleHistory:
                 # await self.bot.say("debug: {}".format(str(member)))
                 
                     
-    @rolehist.command(name="init", pass_context=True, no_pm=True)
+    @commands.command(pass_context=True)
     @checks.mod_or_permissions(manage_server=True)
-    async def _init_role_hist(self, ctx):
+    async def rolehistinit(self, ctx):
         """(MOD) Popularize database with current role data"""
 
         server = ctx.message.server
