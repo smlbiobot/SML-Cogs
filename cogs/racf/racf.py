@@ -146,14 +146,16 @@ class RACF:
         to_remove_roles = set(author.roles) & set(clan_roles)
         to_add_roles = [r for r in server.roles if r.name == clan]
 
-        await self.bot.add_roles(author, *to_add_roles)
-        await self.bot.say("Added {} for {}".format(
-            ",".join([r.name for r in to_add_roles]),
-            author.display_name))
         await self.bot.remove_roles(author, *to_remove_roles)
         await self.bot.say("Removed {} for {}".format(
             ",".join([r.name for r in to_remove_roles]),
             author.display_name))
+
+        await self.bot.add_roles(author, *to_add_roles)
+        await self.bot.say("Added {} for {}".format(
+            ",".join([r.name for r in to_add_roles]),
+            author.display_name))
+        
 
 
         
