@@ -259,8 +259,8 @@ class Card:
             ax = fig.add_subplot(111)
 
             ax.set_title('Clash Royale Card Trends', color=titlecolor)
-            ax.set_xlabel('Snpashots')
-            ax.set_ylabel('Count')
+            ax.set_xlabel('Snapshots')
+            ax.set_ylabel('Usage')
 
             for spine in ax.spines.values():
                 spine.set_edgecolor(spinecolor)
