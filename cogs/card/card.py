@@ -95,11 +95,11 @@ class Card:
 
         for card_key, card_value in self.crdata["Cards"].items():
             self.cards.append(card_key)
+            self.cards_abbrev[card_key] = card_key
 
             aka_list = card_value["aka"]
             for aka in aka_list:
                 self.cards_abbrev[aka] = card_key
-
 
         self.card_w = 302
         self.card_h = 363
@@ -228,36 +228,49 @@ class Card:
     async def cardtrend(self, ctx:Context, *cards):
         """
         Display trends about a card based on popularity snapshot
-        Example: !cardtrend miner
+        Examples: 
+        !cardtrend miner
+        !cardtrend princess log
+        !cardtrend giant xbow 3m
         """
-        if cards is None:
+        if not len(cards):
             await send_cmd_help(ctx)
+            return
+
+
+        cards = list(set(cards))
+
+        validated_cards = []
 
         for card in cards:
-
+            c = card
             card = self.get_card_name(card)
+            if card is None:
+                await self.bot.say("**{}** is not a valid card name.".format(c))
+            else:
+                validated_cards.append(card)
 
-            # if card is None:
-            #     await self.bot.say("Card name is not valid.")
-            #     return
+        if len(validated_cards) == len(cards):
+            # process plot only when all the cards are valid
+            for card in validated_cards:
 
-            x = range(cardpop_range_min, cardpop_range_max)
-            y = [int(self.get_cardpop_count(card, id)) for id in x]
-            plt.plot(x, y, 'o-', label=card)
-        plt.legend()
+                x = range(cardpop_range_min, cardpop_range_max)
+                y = [int(self.get_cardpop_count(card, id)) for id in x]
+                plt.plot(x, y, 'o-', label=self.card_to_str(card))
+            plt.legend()
 
-        plot_name = "{}-plot".format("-".join(cards))
+            plot_name = "{}-plot".format("-".join(cards))
 
-        plt.xlabel("Snapshots")
-        plt.ylabel("Count")
+            plt.xlabel("Snapshots")
+            plt.ylabel("Count")
 
-        with io.BytesIO() as f:
-            plt.savefig(f, format="png")
-            f.seek(0)
-            await ctx.bot.send_file(
-                ctx.message.channel, f,
-                filename="{}.png".format(plot_name),
-                content=plot_name)
+            with io.BytesIO() as f:
+                plt.savefig(f, format="png")
+                f.seek(0)
+                await ctx.bot.send_file(
+                    ctx.message.channel, f,
+                    filename="{}.png".format(plot_name),
+                    content=plot_name)
 
         plt.clf()
         plt.cla()
@@ -287,10 +300,9 @@ class Card:
         """
         if card is None:
             return None
-        card = card.lower()
-        if card in self.cards_abbrev.keys():
-            card = self.cards_abbrev[card]
-        return card
+        if card.lower() in self.cards_abbrev:
+            return self.cards_abbrev[card.lower()]
+        return None
 
     def get_card_description(self, card=None):
         """
