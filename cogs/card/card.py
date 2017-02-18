@@ -23,6 +23,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+import matplotlib
+matplotlib.use('Agg')
 
 from .utils.dataIO import dataIO
 from __main__ import send_cmd_help
@@ -36,7 +38,8 @@ import asyncio
 import discord
 import itertools
 import io
-import matplotlib.pyplot as plt
+from matplotlib import pyplot as plt
+# from matplotlib import style
 import os
 import string
 
@@ -64,7 +67,7 @@ def grouper(self, n, iterable, fillvalue=None):
 
 class Card:
     """
-    Clash Royale Card Popularity snapshot util
+    Clash Royale Card Popularity snapshots 
     """
 
     def __init__(self, bot):
@@ -206,7 +209,7 @@ class Card:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=["cardtrends"])
     async def cardtrend(self, ctx:Context, *cards):
         """
         Display trends about a card based on popularity snapshot
@@ -233,6 +236,14 @@ class Card:
                 validated_cards.append(card)
 
         if len(validated_cards) == len(cards):
+            
+            fig = plt.figure(num=1, figsize=(8, 6), dpi=192, facecolor='#363933', edgecolor='#eeeeee')
+            plt.grid(b=True, alpha=0.3)
+            plt.title("Clash Royale Card Trends")
+            # plt.figure(figsize=(8, 4.5), dpi=96, facecolor='#36393e', edgecolor='#eeeeee')
+
+            # style.use('ggplot')
+
             # process plot only when all the cards are valid
             for card in validated_cards:
 
@@ -255,6 +266,8 @@ class Card:
                     ctx.message.channel, f,
                     filename=plot_filename,
                     content=plot_name)
+
+                fig.clf()
 
         plt.clf()
         plt.cla()
