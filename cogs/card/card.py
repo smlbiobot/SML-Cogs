@@ -236,38 +236,74 @@ class Card:
                 validated_cards.append(card)
 
         if len(validated_cards) == len(cards):
-            
-            fig = plt.figure(num=1, figsize=(8, 6), dpi=192, facecolor='#363933', edgecolor='#eeeeee')
-            plt.grid(b=True, alpha=0.3)
-            plt.title("Clash Royale Card Trends")
-            # plt.figure(figsize=(8, 4.5), dpi=96, facecolor='#36393e', edgecolor='#eeeeee')
 
-            # style.use('ggplot')
+            facecolor = '#2a3136'
+            edgecolor = '#eeeeee'
+            spinecolor = '#999999'
+            labelcolor = '#cccccc'
+            tickcolor = '#999999'
+            titlecolor = '#ffffff'
+            
+            fig = plt.figure(
+                num=1, 
+                figsize=(8, 6), 
+                dpi=192, 
+                facecolor=facecolor, 
+                edgecolor=edgecolor)
+            plt.grid(b=True, alpha=0.3)
+            
+
+            ax = fig.add_subplot(111)
+
+            ax.set_title('Clash Royale Card Trends', color=titlecolor)
+            ax.set_xlabel('Snpashots')
+            ax.set_ylabel('Count')
+
+            for spine in ax.spines.values():
+                spine.set_edgecolor(spinecolor)
+
+            ax.xaxis.label.set_color(labelcolor)
+            ax.yaxis.label.set_color(labelcolor)
+            ax.tick_params(axis='x', colors=tickcolor)
+            ax.tick_params(axis='y', colors=tickcolor)
 
             # process plot only when all the cards are valid
             for card in validated_cards:
 
                 x = range(cardpop_range_min, cardpop_range_max)
                 y = [int(self.get_cardpop_count(card, id)) for id in x]
-                plt.plot(x, y, 'o-', label=self.card_to_str(card))
-            plt.legend()
+                ax.plot(x, y, 'o-', label=self.card_to_str(card))
+            
+            ax.legend()
+            ax.annotate('Using data from Woody’s popularity snapshots',  # Your string
+
+                # The point that we'll place the text in relation to 
+                xy=(0, 0), 
+                # Interpret the x as axes coords, and the y as figure coords
+                xycoords=('axes fraction', 'figure fraction'),
+
+                # The distance from the point that the text will be at
+                xytext=(0, 0),  
+                # Interpret `xytext` as an offset in points...
+                textcoords='offset points',
+
+                # Any other text parameters we'd like
+                size=8, ha='left', va='bottom', color=labelcolor)
 
             plot_filename = "{}-plot.png".format("-".join(cards))
             plot_name = "Card Trends: {}".format(
                 ", ".join([self.card_to_str(c) for c in validated_cards]))
 
-            plt.xlabel("Snapshots")
-            plt.ylabel("Count")
 
             with io.BytesIO() as f:
-                plt.savefig(f, format="png")
+                plt.savefig(f, format="png", facecolor=facecolor, edgecolor=edgecolor, transparent=True)
                 f.seek(0)
                 await ctx.bot.send_file(
                     ctx.message.channel, f,
                     filename=plot_filename,
                     content=plot_name)
 
-                fig.clf()
+            fig.clf()
 
         plt.clf()
         plt.cla()
