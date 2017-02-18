@@ -133,10 +133,10 @@ class Card:
             name="Rarity",
             value=string.capwords(self.crdata["Cards"][card]["rarity"]))
 
-        for id in range(cardpop_range_min, cardpop_range_max):
-            data.add_field(
-                name="Snapshot {}".format(id),
-                value=self.get_cardpop(card, id))
+        # for id in range(cardpop_range_min, cardpop_range_max):
+        #     data.add_field(
+        #         name="Snapshot {}".format(id),
+        #         value=self.get_cardpop(card, id))
 
         try:
             await self.bot.type()
@@ -144,6 +144,9 @@ class Card:
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
+
+        # Display card trend of the card
+        await ctx.invoke(Card.cardtrend, card)
 
     @commands.command(pass_context=True)
     async def decks(self, ctx, card=None, snapshot_id=None):
@@ -237,7 +240,7 @@ class Card:
 
         if len(validated_cards) == len(cards):
 
-            facecolor = '#2a3136'
+            facecolor = '#32363b'
             edgecolor = '#eeeeee'
             spinecolor = '#999999'
             labelcolor = '#cccccc'
@@ -275,7 +278,7 @@ class Card:
                 ax.plot(x, y, 'o-', label=self.card_to_str(card))
             
             ax.legend()
-            ax.annotate('Using data from Woody’s popularity snapshots',  # Your string
+            ax.annotate('Compiled with data from Woody’s popularity snapshots',  # Your string
 
                 # The point that we'll place the text in relation to 
                 xy=(0, 0), 
@@ -291,8 +294,9 @@ class Card:
                 size=8, ha='left', va='bottom', color=labelcolor)
 
             plot_filename = "{}-plot.png".format("-".join(cards))
-            plot_name = "Card Trends: {}".format(
-                ", ".join([self.card_to_str(c) for c in validated_cards]))
+            # plot_name = "Card Trends: {}".format(
+            #     ", ".join([self.card_to_str(c) for c in validated_cards]))
+            plot_name = ""
 
 
             with io.BytesIO() as f:
