@@ -90,9 +90,15 @@ class Card:
             self.cards.append(card_key)
             self.cards_abbrev[card_key] = card_key
 
+            if card_key.find('-'):
+                self.cards_abbrev[card_key.replace('-', '')] = card_key
+
             aka_list = card_value["aka"]
             for aka in aka_list:
                 self.cards_abbrev[aka] = card_key
+                if aka.find('-'):
+                    self.cards_abbrev[aka.replace('-', '')] = card_key
+
 
         self.card_w = 302
         self.card_h = 363
@@ -287,10 +293,10 @@ class Card:
                 # The point that we'll place the text in relation to 
                 xy=(0, 0), 
                 # Interpret the x as axes coords, and the y as figure coords
-                xycoords=('axes fraction', 'figure fraction'),
+                xycoords=('figure fraction'),
 
                 # The distance from the point that the text will be at
-                xytext=(0, 10),  
+                xytext=(15, 10),  
                 # Interpret `xytext` as an offset in points...
                 textcoords='offset points',
 
