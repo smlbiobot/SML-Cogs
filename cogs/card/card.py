@@ -163,42 +163,54 @@ class Card:
         await ctx.invoke(Card.decks, card)
 
     @commands.command(pass_context=True)
-    async def decks(self, ctx, card=None, snapshot_id=None):
+    async def decks(self, ctx, *cards, snapshot_id=None):
         """
-        Display decks which uses a particular card in a specific snapshot
-        Syntax: !card decks Miner 23
+        Display top deck with specific card in particular snapshot
+
+        !decks Miner 23
+        displays decks with miner in snapshot 23.
+
+        !decks princess miner 
+        displays decks with both miner and pricness in latest snapshot.
         """
-        if card is None:
+        if cards is None or not len(cards):
             await send_cmd_help(ctx)
             return
+
+        # check last param, if digit, assign as snapshot id
+        if cards[-1].isdigit():
+            snapshot_id = int(cards[-1])
+            cards = cards[:-1]
 
         if snapshot_id is None:
             snapshot_id = str(cardpop_range_max - 1)
 
         is_most_recent_snapshot = int(snapshot_id) == cardpop_range_max - 1
 
+        # await self.bot.say("{}: {}".format(snapshot_id, cards))
 
-        card = self.get_card_name(card)  
-        if card is None:
-            await self.bot.say("Card name is not valid.")
+        card_names_are_valid = True
+        for card in cards:
+            if self.get_card_name(card) is None:
+                await self.bot.say("**{}** is not valid card name.".format(card))
+                card_names_are_valid = False
+        if not card_names_are_valid:
             return
 
-        cpid = self.get_card_cpid(card)
+        # repopulate cards with normalized data
+        cards = [self.get_card_name(c) for c in cards]
+        cpids = [self.get_card_cpid(c) for c in cards]
 
         found_decks = []
-
-
         if snapshot_id in self.cardpop:
             decks = self.cardpop[snapshot_id]["decks"]
             for k in decks.keys():
-                if cpid in k:
+                if all(cpid in k for cpid in cpids):
                     found_decks.append(k)
-
-        # norm_found_decks = []
 
         await self.bot.say("Found {} decks with {} in Snapshot #{}{}.".format(
             len(found_decks), 
-            self.card_to_str(card), 
+            ', '.join([self.card_to_str(card) for card in cards]), 
             snapshot_id,
             ' (most recent)' if is_most_recent_snapshot else ''))
 
@@ -212,7 +224,6 @@ class Card:
                 if i < max_deck_show:
                     cards = deck.split(', ')
                     norm_cards = [self.get_card_from_cpid(c) for c in cards ]
-                    # norm_found_decks.append(', '.join(norm_cards))
 
                     await self.bot.say("**{}**: {}/100: {}".format(
                         i + 1,
@@ -233,7 +244,7 @@ class Card:
                         card6=norm_cards[5],
                         card7=norm_cards[6],
                         card8=norm_cards[7],
-                        deck_name="Top Decks",
+                        deck_name="Top Deck: {}".format(i+1),
                         author=m)
 
     @commands.command(pass_context=True)
