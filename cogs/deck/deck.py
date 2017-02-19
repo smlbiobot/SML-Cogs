@@ -148,7 +148,7 @@ class Deck:
     async def deck_get(self, ctx,
                        card1=None, card2=None, card3=None, card4=None, 
                        card5=None, card6=None, card7=None, card8=None, 
-                       deck_name=None):
+                       deck_name=None, author:discord.Member=None):
         """
         Display a deck with cards and average elixir by entering 8 cards,
         followed by a name. The deck will be named “unnamed deck”
@@ -160,7 +160,8 @@ class Deck:
         """
         if deck_name is None:
             deck_name = 'Deck'
-        author = ctx.message.author
+        if author is None:
+            author = ctx.message.author
 
         member_deck = [card1, card2, card3, card4, card5, card6, card7, card8]
         if not all(member_deck):
