@@ -43,6 +43,8 @@ from matplotlib import pyplot as plt
 import os
 import string
 
+from .deck import Deck
+
 
 settings_path = "data/card/settings.json"
 crdata_path = "data/card/clashroyale.json"
@@ -188,14 +190,20 @@ class Card:
         for deck in found_decks:
             cards = deck.split(', ')
             norm_cards = [self.get_card_from_cpid(c) for c in cards]
-            print(cards)
-            print(norm_cards)
             norm_found_decks.append(', '.join(norm_cards))
 
-
-
-        if len(norm_found_decks):
-            await self.bot.say("\n".join(norm_found_decks))
+            # Show decks
+            await ctx.invoke(
+                Deck.deck_get, 
+                card1=norm_cards[0],
+                card2=norm_cards[1],
+                card3=norm_cards[2],
+                card4=norm_cards[3],
+                card5=norm_cards[4],
+                card6=norm_cards[5],
+                card7=norm_cards[6],
+                card8=norm_cards[7],
+                deck_name="Top Decks")
 
     @commands.command(pass_context=True)
     async def cardimage(self, ctx, card=None):
@@ -425,94 +433,6 @@ class Card:
             if cpid == v["cpid"]:
                 return k
         return None
-
-
-    def get_deck_image(self, deck, deck_name=None, deck_author=None):
-        """Construct the deck with Pillow and return image"""
-
-        card_w = 302
-        card_h = 363
-        card_x = 30
-        card_y = 30
-        font_size = 50
-        txt_y_line1 = 430
-        txt_y_line2 = 500
-        txt_x_name = 50
-        txt_x_cards = 503
-        txt_x_elixir = 1872
-
-        bg_image = Image.open("data/deck/img/deck-bg-b.png")
-        size = bg_image.size
-
-        font_file_regular = "data/deck/fonts/OpenSans-Regular.ttf"
-        font_file_bold = "data/deck/fonts/OpenSans-Bold.ttf"
-
-        image = Image.new("RGBA", size)
-        image.paste(bg_image)
-
-        if not deck_name:
-            deck_name = "Deck"
-
-        # cards
-        for i, card in enumerate(deck):
-            card_image_file = "data/deck/img/cards/{}.png".format(card)
-            card_image = Image.open(card_image_file)
-            # size = (card_w, card_h)
-            # card_image.thumbnail(size)
-            box = (card_x + card_w * i, 
-                   card_y, 
-                   card_x + card_w * (i+1), 
-                   card_h + card_y)
-            image.paste(card_image, box, card_image)
-
-        # elixir
-        total_elixir = 0
-        for card_key, card_value in self.crdata["Cards"].items():
-            if card_key in deck:
-                total_elixir += card_value["elixir"]
-        average_elixir = "{:.3f}".format(total_elixir / 8)
-
-        # text
-        # Take out hyphnens and capitlize the name of each card
-        card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
-
-        txt = Image.new("RGBA", size)
-        txt_name = Image.new("RGBA", (txt_x_cards-30, size[1]))
-        font_regular = ImageFont.truetype(font_file_regular, size=font_size)
-        font_bold = ImageFont.truetype(font_file_bold, size=font_size)
-
-        d = ImageDraw.Draw(txt)
-        d_name = ImageDraw.Draw(txt_name)
-
-        line1 = ', '.join(card_names[:4])
-        line2 = ', '.join(card_names[4:])
-        # card_text = '\n'.join([line0, line1])
-
-        deck_author_name = deck_author.name if deck_author else ""
-
-        d_name.text((txt_x_name, txt_y_line1), deck_name, font=font_bold, 
-                         fill=(0xff, 0xff, 0xff, 255))
-        d_name.text((txt_x_name, txt_y_line2), deck_author_name, font=font_regular, 
-                         fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_cards, txt_y_line1), line1, font=font_regular, 
-                         fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_cards, txt_y_line2), line2, font=font_regular, 
-                         fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_elixir, txt_y_line1), "Avg elixir", font=font_bold,
-               fill=(0xff, 0xff, 0xff, 200))
-        d.text((txt_x_elixir, txt_y_line2), average_elixir, font=font_bold,
-               fill=(0xff, 0xff, 0xff, 255))
-
-        image.paste(txt, (0,0), txt)
-        image.paste(txt_name, (0,0), txt_name)
-
-        # scale down and return
-        scale = 0.5
-        scaled_size = tuple([x * scale for x in image.size])
-        image.thumbnail(scaled_size)
-
-        return image
-
 
 
 
