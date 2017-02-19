@@ -32,6 +32,7 @@ from discord.ext import commands
 from discord.ext.commands import Context
 from matplotlib import pyplot as plt
 from random import choice
+import datetime
 import asyncio
 import discord
 import itertools
@@ -47,6 +48,7 @@ settings_path = "data/card/settings.json"
 crdata_path = "data/card/clashroyale.json"
 cardpop_path = "data/card/cardpop.json"
 crtexts_path = "data/card/crtexts.json"
+dates_path = "data/card/dates.json"
 
 cardpop_range_min = 8
 cardpop_range_max = 24
@@ -77,11 +79,13 @@ class Card:
         self.crdata_path = crdata_path
         self.cardpop_path = cardpop_path
         self.crtexts_path = crtexts_path
+        self.dates_path = dates_path
 
         self.settings = dataIO.load_json(self.file_path)
         self.crdata = dataIO.load_json(self.crdata_path)
         self.cardpop = dataIO.load_json(self.cardpop_path)
         self.crtexts = dataIO.load_json(self.crtexts_path)
+        self.dates = dataIO.load_json(self.dates_path)
 
         # init card data
         self.cards = []
@@ -312,12 +316,26 @@ class Card:
             ax.tick_params(axis='x', colors=tickcolor)
             ax.tick_params(axis='y', colors=tickcolor)
 
+            # create labels using snapshot dates 
+            labels = []
+            for id in range(cardpop_range_min, cardpop_range_max):
+                dt = datetime.datetime.strptime(self.dates[str(id)], '%Y-%m-%d')
+                dtstr = dt.strftime('%b %d, %y')
+                labels.append("{}\n   {}".format(id, dtstr))
+
             # process plot only when all the cards are valid
             for card in validated_cards:
 
                 x = range(cardpop_range_min, cardpop_range_max)
                 y = [int(self.get_cardpop_count(card, id)) for id in x]
                 ax.plot(x, y, 'o-', label=self.card_to_str(card))
+                plt.xticks(x, labels, rotation=70, fontsize=8, ha='right')
+
+            # make tick label font size smaller
+            # for tick in ax.xaxis.get_major_ticks():
+            #     tick.label.set_fontsize(8)
+            
+
             
             leg = ax.legend(facecolor=facecolor, edgecolor=spinecolor)
             for text in leg.get_texts():
