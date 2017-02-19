@@ -243,6 +243,7 @@ class Card:
             facecolor = '#32363b'
             edgecolor = '#eeeeee'
             spinecolor = '#999999'
+            footercolor = '#999999'
             labelcolor = '#cccccc'
             tickcolor = '#999999'
             titlecolor = '#ffffff'
@@ -277,7 +278,10 @@ class Card:
                 y = [int(self.get_cardpop_count(card, id)) for id in x]
                 ax.plot(x, y, 'o-', label=self.card_to_str(card))
             
-            ax.legend()
+            leg = ax.legend(facecolor=facecolor, edgecolor=spinecolor)
+            for text in leg.get_texts():
+                text.set_color(labelcolor)
+
             ax.annotate('Compiled with data from Woody’s popularity snapshots',  # Your string
 
                 # The point that we'll place the text in relation to 
@@ -286,17 +290,20 @@ class Card:
                 xycoords=('axes fraction', 'figure fraction'),
 
                 # The distance from the point that the text will be at
-                xytext=(0, 0),  
+                xytext=(0, 10),  
                 # Interpret `xytext` as an offset in points...
                 textcoords='offset points',
 
                 # Any other text parameters we'd like
-                size=8, ha='left', va='bottom', color=labelcolor)
+                size=8, ha='left', va='bottom', color=footercolor)
+            plt.subplots_adjust(left=0.1, right=0.96, top=0.9, bottom=0.2)
 
             plot_filename = "{}-plot.png".format("-".join(cards))
             # plot_name = "Card Trends: {}".format(
             #     ", ".join([self.card_to_str(c) for c in validated_cards]))
             plot_name = ""
+
+
 
 
             with io.BytesIO() as f:
