@@ -55,6 +55,8 @@ crtexts_path = "data/card/crtexts.json"
 cardpop_range_min = 8
 cardpop_range_max = 24
 
+max_deck_show = 5
+
 discord_ui_bgcolor = discord.Color(value=int('36393e', 16))
 
 def grouper(self, n, iterable, fillvalue=None):
@@ -157,6 +159,9 @@ class Card:
         # Display card trend of the card
         await ctx.invoke(Card.cardtrend, card)
 
+        # Display top decks
+        await ctx.invoke(Card.decks, card)
+
     @commands.command(pass_context=True)
     async def decks(self, ctx, card=None, snapshot_id=None):
         """
@@ -169,6 +174,9 @@ class Card:
 
         if snapshot_id is None:
             snapshot_id = str(cardpop_range_max - 1)
+
+        is_most_recent_snapshot = int(snapshot_id) == cardpop_range_max - 1
+
 
         card = self.get_card_name(card)  
         if card is None:
@@ -186,23 +194,26 @@ class Card:
                 if cpid in k:
                     found_decks.append(k)
 
-        norm_found_decks = []
+        # norm_found_decks = []
 
-        await self.bot.say("Found {} decks with {} in Snapshot #{}".format(
-            len(found_decks), self.card_to_str(card), snapshot_id))
+        await self.bot.say("Found {} decks with {} in Snapshot #{}{}.".format(
+            len(found_decks), 
+            self.card_to_str(card), 
+            snapshot_id,
+            ' (most recent)' if is_most_recent_snapshot else ''))
+        await self.bot.say("Listing top {} decks:".format(max_deck_show))
 
         for i, deck in enumerate(found_decks):
-            cards = deck.split(', ')
-            norm_cards = [self.get_card_from_cpid(c) for c in cards]
-            norm_found_decks.append(', '.join(norm_cards))
-
-            await self.bot.say("**{}**: {}/100: {}".format(
-                i + 1,
-                self.get_deckpop_count(deck, snapshot_id),
-                deck))
-
             # Show top 5 deck images only
-            if i<5:
+            if i < max_deck_show:
+                cards = deck.split(', ')
+                norm_cards = [self.get_card_from_cpid(c) for c in cards ]
+                # norm_found_decks.append(', '.join(norm_cards))
+
+                await self.bot.say("**{}**: {}/100: {}".format(
+                    i + 1,
+                    self.get_deckpop_count(deck, snapshot_id),
+                    deck))
 
                 FakeMember = namedtuple("FakeMember", "name")
                 m = FakeMember(name="Snapshot #{}".format(snapshot_id))
