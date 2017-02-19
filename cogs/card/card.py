@@ -357,8 +357,8 @@ class Card:
 
             fig.clf()
 
-            plt.clf()
-            plt.cla()
+        plt.clf()
+        plt.cla()
 
     def get_random_color(self):
         """
