@@ -44,6 +44,7 @@ import os
 import string
 
 from .deck import Deck
+from collections import namedtuple
 
 
 settings_path = "data/card/settings.json"
@@ -187,23 +188,38 @@ class Card:
 
         norm_found_decks = []
 
-        for deck in found_decks:
+        await self.bot.say("Found {} decks with {} in Snapshot #{}".format(
+            len(found_decks), self.card_to_str(card), snapshot_id))
+
+        for i, deck in enumerate(found_decks):
             cards = deck.split(', ')
             norm_cards = [self.get_card_from_cpid(c) for c in cards]
             norm_found_decks.append(', '.join(norm_cards))
 
-            # Show decks
-            await ctx.invoke(
-                Deck.deck_get, 
-                card1=norm_cards[0],
-                card2=norm_cards[1],
-                card3=norm_cards[2],
-                card4=norm_cards[3],
-                card5=norm_cards[4],
-                card6=norm_cards[5],
-                card7=norm_cards[6],
-                card8=norm_cards[7],
-                deck_name="Top Decks")
+            await self.bot.say("**{}**: {}/100: {}".format(
+                i + 1,
+                self.get_deckpop_count(deck, snapshot_id),
+                deck))
+
+            # Show top 5 deck images only
+            if i<5:
+
+                FakeMember = namedtuple("FakeMember", "name")
+                m = FakeMember(name="Snapshot #{}".format(snapshot_id))
+
+                # Show decks
+                await ctx.invoke(
+                    Deck.deck_get, 
+                    card1=norm_cards[0],
+                    card2=norm_cards[1],
+                    card3=norm_cards[2],
+                    card4=norm_cards[3],
+                    card5=norm_cards[4],
+                    card6=norm_cards[5],
+                    card7=norm_cards[6],
+                    card8=norm_cards[7],
+                    deck_name="Top Decks",
+                    author=m)
 
     @commands.command(pass_context=True)
     async def cardimage(self, ctx, card=None):
@@ -433,6 +449,18 @@ class Card:
             if cpid == v["cpid"]:
                 return k
         return None
+
+    def get_deckpop_count(self, deck=None, snapshot_id=None):
+        """
+        Return the deck popularity by snapshot id
+        """
+        out = 0
+        snapshot_id = str(snapshot_id)
+        if snapshot_id in self.cardpop:
+            decks = self.cardpop[snapshot_id]["decks"]
+            if deck in decks:
+                out = decks[deck]["count"]
+        return out
 
 
 
