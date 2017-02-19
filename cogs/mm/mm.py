@@ -179,6 +179,15 @@ class MemberManagement:
                 await self.bot.say("Copy and paste these in message to mention users listed:"
                                    f"```{' '.join(mention_list)}```")
 
+    # @commands.command(pass_context=True, no_pm=False)
+    # @commands.has_role("Bot Commander")
+    # async def pm2role(self, ctx, msg=None):
+    #     """Send PM to all members with a specific role"""
+    #     server = ctx.message.server
+    #     server_roles = server.roles
+
+    #     await self.bot.whisper("hi")
+
 
 
 

@@ -30,16 +30,12 @@ from .utils.dataIO import dataIO
 from __main__ import send_cmd_help
 from discord.ext import commands
 from discord.ext.commands import Context
-from PIL import Image
-from PIL import ImageDraw
-from PIL import ImageFont
+from matplotlib import pyplot as plt
 from random import choice
 import asyncio
 import discord
 import itertools
 import io
-from matplotlib import pyplot as plt
-# from matplotlib import style
 import os
 import string
 
