@@ -197,36 +197,40 @@ class Card:
             self.card_to_str(card), 
             snapshot_id,
             ' (most recent)' if is_most_recent_snapshot else ''))
-        await self.bot.say("Listing top {} decks:".format(max_deck_show))
 
-        for i, deck in enumerate(found_decks):
-            # Show top 5 deck images only
-            if i < max_deck_show:
-                cards = deck.split(', ')
-                norm_cards = [self.get_card_from_cpid(c) for c in cards ]
-                # norm_found_decks.append(', '.join(norm_cards))
+        if len(found_decks):
+            await self.bot.say(
+                "Listing top {} decks:".format(
+                    min([max_deck_show, len(found_decks)])))
 
-                await self.bot.say("**{}**: {}/100: {}".format(
-                    i + 1,
-                    self.get_deckpop_count(deck, snapshot_id),
-                    deck))
+            for i, deck in enumerate(found_decks):
+                # Show top 5 deck images only
+                if i < max_deck_show:
+                    cards = deck.split(', ')
+                    norm_cards = [self.get_card_from_cpid(c) for c in cards ]
+                    # norm_found_decks.append(', '.join(norm_cards))
 
-                FakeMember = namedtuple("FakeMember", "name")
-                m = FakeMember(name="Snapshot #{}".format(snapshot_id))
+                    await self.bot.say("**{}**: {}/100: {}".format(
+                        i + 1,
+                        self.get_deckpop_count(deck, snapshot_id),
+                        deck))
 
-                # Show decks
-                await ctx.invoke(
-                    Deck.deck_get, 
-                    card1=norm_cards[0],
-                    card2=norm_cards[1],
-                    card3=norm_cards[2],
-                    card4=norm_cards[3],
-                    card5=norm_cards[4],
-                    card6=norm_cards[5],
-                    card7=norm_cards[6],
-                    card8=norm_cards[7],
-                    deck_name="Top Decks",
-                    author=m)
+                    FakeMember = namedtuple("FakeMember", "name")
+                    m = FakeMember(name="Snapshot #{}".format(snapshot_id))
+
+                    # Show decks
+                    await ctx.invoke(
+                        Deck.deck_get, 
+                        card1=norm_cards[0],
+                        card2=norm_cards[1],
+                        card3=norm_cards[2],
+                        card4=norm_cards[3],
+                        card5=norm_cards[4],
+                        card6=norm_cards[5],
+                        card7=norm_cards[6],
+                        card8=norm_cards[7],
+                        deck_name="Top Decks",
+                        author=m)
 
     @commands.command(pass_context=True)
     async def cardimage(self, ctx, card=None):
@@ -353,8 +357,8 @@ class Card:
 
             fig.clf()
 
-        plt.clf()
-        plt.cla()
+            plt.clf()
+            plt.cla()
 
     def get_random_color(self):
         """
