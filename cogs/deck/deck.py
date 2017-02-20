@@ -77,9 +77,7 @@ where deck_id is the number on your deck list.
 
 
 class Deck:
-    """
-    Saves a Clash Royale deck for a user and display them
-    """
+    """Clash Royale Deck Builder."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -168,8 +166,7 @@ class Deck:
                         card1=None, card2=None, card3=None, card4=None,
                         card5=None, card6=None, card7=None, card8=None,
                         deck_name=None):
-        """
-        Add a deck to a personal decklist
+        """Add a deck to a personal decklist.
 
         Example: !deck add bbd mm loon bt is fs gs lh
 
@@ -256,9 +253,7 @@ class Deck:
 
     @deck.command(name="show", pass_context=True, no_pm=True)
     async def deck_show(self, ctx, deck_id=None, member:discord.Member=None):
-        """
-        Show the deck of a user by id
-        """
+        """Show the deck of a user by id."""
         author = ctx.message.author
         server = ctx.message.server
         if not member:
@@ -279,9 +274,7 @@ class Deck:
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
     async def deck_cards(self, ctx):
-        """
-        Display all available cards and acceptable abbreviations
-        """
+        """Display all available cards and acceptable abbreviations."""
         out = []
         for card_key, card_value in self.crdata["Cards"].items():
             names = [card_key]
@@ -301,9 +294,7 @@ class Deck:
 
     @deck.command(name="search", pass_context=True, no_pm=True)
     async def deck_search(self, ctx, *params):
-        """
-        Search through all the decks to find matches in name or card
-        """
+        """Search all decks by cards."""
         server = ctx.message.server
         server_members = self.settings["Servers"][server.id]["Members"]
 
@@ -365,8 +356,8 @@ class Deck:
 
     @deck.command(name="rename", pass_context=True, no_pm=True)
     async def deck_rename(self, ctx, deck_id, new_name):
-        """
-        Rename a deck based on deck id.
+        """Rename a deck based on deck id.
+
         Syntax: !deck rename [deck_id] [new_name]
         where deck_id is the number associated with the deck when you run !deck list
         """
@@ -397,9 +388,7 @@ class Deck:
 
     @deck.command(name="remove", pass_context=True, no_pm=True)
     async def deck_remove(self, ctx, deck_id):
-        """
-        Remove a deck based on deck id, which is the number associated with the deck when you run !deck list
-        """
+        """Remove a deck based on deck id."""
         server = ctx.message.server
         author = ctx.message.author
 
