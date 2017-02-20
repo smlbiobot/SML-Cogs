@@ -351,7 +351,7 @@ class Deck:
                             check=pagination_check)
 
                         if answer is None:
-                            await self.bot.say("Sorry, you took too long.")
+                            await self.bot.say("Search results aborted.")
                             return
 
     @deck.command(name="rename", pass_context=True, no_pm=True)
@@ -388,10 +388,9 @@ class Deck:
 
     @deck.command(name="remove", pass_context=True, no_pm=True)
     async def deck_remove(self, ctx, deck_id):
-        """Remove a deck based on deck id."""
+        """Remove a deck by deck id."""
         server = ctx.message.server
         author = ctx.message.author
-
 
         members = self.settings["Servers"][server.id]["Members"]
 
