@@ -47,8 +47,7 @@ changeclan_roles = ["Leader", "Co-Leader", "Elder", "High Elder"]
 
 
 class RACF:
-    """
-    Display RACF specifc info
+    """Display RACF specifc info.
 
     Note: RACF specific plugin for Red
     """
@@ -58,7 +57,7 @@ class RACF:
 
     @commands.command(pass_context=True)
     async def racf(self, ctx):
-        """RACF Rules + Roles"""
+        """RACF Rules + Roles."""
 
         server = ctx.message.server
 
@@ -68,8 +67,7 @@ class RACF:
         data = discord.Embed(
             color=discord.Color(value=color),
             title="Rules + Roles",
-            description="Important information for all members. Please read."
-            )
+            description="Important information for all members. Please read.")
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
@@ -80,7 +78,8 @@ class RACF:
         try:
             await self.bot.say(embed=data)
         except discord.HTTPException:
-            await self.bot.say("I need the `Embed links` permission to send this.")
+            await self.bot.say(
+                "I need the `Embed links` permission to send this.")
 
         out = []
         out.append("**Rules**")
@@ -95,14 +94,14 @@ class RACF:
 
     @commands.command(pass_context=True)
     async def racfwelcome(self, ctx, member:discord.Member):
-        """Welcome people manually via command"""
+        """Welcome people manually via command."""
         # server = ctx.message.server
         # self.member_join(member)
         await self.bot.say(welcome_msg.format(member.mention))
 
     @commands.command(pass_context=True)
     async def racfwelcomeall(self, ctx):
-        """Find all untagged users and send them the welcome message"""
+        """Find all untagged users and send them the welcome message."""
         server = ctx.message.server
         members = server.members
         online_members = [m for m in members if m.status == discord.Status.online]
@@ -112,7 +111,7 @@ class RACF:
 
     @commands.command(pass_context=True)
     async def alluntaggedusers(self, ctx):
-        """Find all untagged users and send them the welcome message"""
+        """Find all untagged users and send them the welcome message."""
         server = ctx.message.server
         members = server.members
         untagged_members = [m for m in members if len(m.roles) == 1]
@@ -127,8 +126,10 @@ class RACF:
     @commands.command(pass_context=True)
     @commands.has_any_role(*changeclan_roles)
     async def changeclan(self, ctx, clan:str=None):
-        """Update clan role when moved to a new clan
-        Example: !changeclan Delta"""
+        """Update clan role when moved to a new clan.
+
+        Example: !changeclan Delta
+        """
         clans = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel"]
         author = ctx.message.author
         server = ctx.message.server
@@ -155,28 +156,21 @@ class RACF:
         await self.bot.say("Added {} for {}".format(
             ",".join([r.name for r in to_add_roles]),
             author.display_name))
-        
-
-
-        
-        # await self.bot.say(",".join([r.name for r in remove_roles]))
-
 
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(mention_everyone=True)
     async def mentionusers(self, ctx, role:str, *msg):
-        """
-        Mention users by role
+        """Mention users by role.
 
-        Example: !mentionusers Delta Anyone who is 4,300+ please move up to Charlie!
+        Example:
+        !mentionusers Delta Anyone who is 4,300+ please move up to Charlie!
 
         Note: only usable by people with the permission to mention @everyone
-
         """
         server = ctx.message.server
         server_roles_names = [r.name for r in server.roles]
 
-        if not role in server_roles_names:
+        if role not in server_roles_names:
             await self.bot.say("{} is not a valid role on this server.".format(role))
         elif not msg:
             await self.bot.say("You have not entered any messages.")
@@ -192,7 +186,7 @@ class RACF:
 
     @commands.command(pass_context=True)
     async def avatar(self, ctx, member:discord.Member=None):
-        """Display avatar of the user"""
+        """Display avatar of the user."""
         author = ctx.message.author
 
         if member is None:
@@ -219,17 +213,60 @@ class RACF:
         # else:
         #     await self.bot.send_file(message.channel,self.image)
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def serverinfo2(self, ctx):
+        """Shows server's informations specific to RACF"""
+        server = ctx.message.server
+        online = len([m.status for m in server.members
+                      if m.status == discord.Status.online or
+                      m.status == discord.Status.idle])
+        total_users = len(server.members)
+        text_channels = len([x for x in server.channels
+                             if x.type == discord.ChannelType.text])
+        voice_channels = len(server.channels) - text_channels
+        passed = (ctx.message.timestamp - server.created_at).days
+        created_at = ("Since {}. That's over {} days ago!"
+                      "".format(server.created_at.strftime("%d %b %Y %H:%M"),
+                                passed))
 
+        role_names = [
+            "Leader", "Co-Leader", "High Elder", "Elder",
+            "Member", "Honorary Member", "Visitor"]
+        role_count = {}
+        for role_name in role_names:
+            role_count[role_name] = len(
+                [m for m in server.members
+                    if role_name in [r.name for r in m.roles]])
 
+        colour = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+        colour = int(colour, 16)
 
-        
+        data = discord.Embed(
+            description=created_at,
+            colour=discord.Colour(value=colour))
+        data.add_field(name="Region", value=str(server.region))
+        data.add_field(name="Users", value="{}/{}".format(online, total_users))
+        data.add_field(name="Text Channels", value=text_channels)
+        data.add_field(name="Voice Channels", value=voice_channels)
+        data.add_field(name="Roles", value=len(server.roles))
+        data.add_field(name="Owner", value=str(server.owner))
 
+        for role_name in role_names:
+            data.add_field(name=role_name, value=role_count[role_name])
 
+        data.set_footer(text="Server ID: " + server.id)
 
+        if server.icon_url:
+            data.set_author(name=server.name, url=server.icon_url)
+            data.set_thumbnail(url=server.icon_url)
+        else:
+            data.set_author(name=server.name)
 
-
-
-
+        try:
+            await self.bot.say(embed=data)
+        except discord.HTTPException:
+            await self.bot.say("I need the `Embed links` permission "
+                               "to send this")
 
 def setup(bot):
     r = RACF(bot)
