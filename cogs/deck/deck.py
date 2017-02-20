@@ -66,11 +66,11 @@ To see the decks that others have added, type `!deck list <username>`
 
 **Rename**
 To rename a deck, type `!deck rename [deck_id] [new_name]`
-where deck_id is the number on your list, and new_name is the new name, obviously. 
+where deck_id is the number on your list, and new_name is the new name, obviously.
 Remember to quote the name if you want it to contain spaces.
 
 **Remove**
-To remove a deck, type `Deck remove [deck_id]` 
+To remove a deck, type `Deck remove [deck_id]`
 where deck_id is the number on your deck list.
 
 """
@@ -100,7 +100,6 @@ class Deck:
             for aka in aka_list:
                 self.cards_abbrev[aka] = card_key
 
-
         self.card_w = 302
         self.card_h = 363
         self.card_ratio = self.card_w / self.card_h
@@ -112,21 +111,20 @@ class Deck:
         self.deck_is_valid = False
 
     def grouper(self, n, iterable, fillvalue=None):
-        """
-        Helper function to split lists
+        """Helper function to split lists.
 
         Example:
         grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
         """
         args = [iter(iterable)] * n
-        return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
+        return ([e for e in t if e is not None]
+            for t in itertools.zip_longest(*args))
 
 
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
-        """
-        Clash Royale Decks
-        
+        """Clash Royale deck builder.
+
         Example usage:
         !deck add 3m mm ig is fs pump horde knight "3M EBarbs"
 
@@ -137,22 +135,17 @@ class Deck:
         !deck help
         """
 
-        # Disallow command use in #strategy
-        if ctx.message.channel.name == "strategy":
-            await self.bot.say("Sorry, we have received some complaints about excessive use of this command in this channel. Please use #bot-spam for the `!deck` command for now. Thanks!")
-
-        elif ctx.invoked_subcommand is None:
+        if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @deck.command(name="get", pass_context=True, no_pm=True)
     async def deck_get(self, ctx,
-                       card1=None, card2=None, card3=None, card4=None, 
-                       card5=None, card6=None, card7=None, card8=None, 
+                       card1=None, card2=None, card3=None, card4=None,
+                       card5=None, card6=None, card7=None, card8=None,
                        deck_name=None, author:discord.Member=None):
-        """
-        Display a deck with cards and average elixir by entering 8 cards,
-        followed by a name. The deck will be named “unnamed deck”
-        if no name is entered
+        """Display a deck with cards.
+
+        Enter 8 cards followed by a name.
 
         Example: !deck get bbd mm loon bt is fs gs lh
 
@@ -172,11 +165,11 @@ class Deck:
 
     @deck.command(name="add", pass_context=True, no_pm=True)
     async def _deck_add(self, ctx,
-                       card1=None, card2=None, card3=None, card4=None, 
-                       card5=None, card6=None, card7=None, card8=None, 
-                       deck_name=None):
+                        card1=None, card2=None, card3=None, card4=None,
+                        card5=None, card6=None, card7=None, card8=None,
+                        deck_name=None):
         """
-        Add a deck to a personal decklist 
+        Add a deck to a personal decklist
 
         Example: !deck add bbd mm loon bt is fs gs lh
 
@@ -228,14 +221,11 @@ class Deck:
                     decks.pop(t, None)
 
                 self.save_settings()
-            
+
 
     @deck.command(name="list", pass_context=True, no_pm=True)
     async def deck_list(self, ctx, member:discord.Member=None):
-        """
-        List the decks of a user
-
-        """
+        """List the decks of a user."""
         author = ctx.message.author
         server = ctx.message.server
 
@@ -284,7 +274,8 @@ class Deck:
             decks = members[member.id]["Decks"]
             for i, deck in enumerate(decks.values()):
                 if i == deck_id:
-                    await self.deck_upload(ctx, deck["Deck"], deck["DeckName"], member)
+                    await self.deck_upload(ctx, deck["Deck"],
+                                           deck["DeckName"], member)
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
     async def deck_cards(self, ctx):
@@ -300,7 +291,8 @@ class Deck:
             rarity = string.capwords(card_value["rarity"])
             elixir = card_value["elixir"]
             out.append(
-                "**{}** ({}, {} elixir): {}".format(name, rarity, elixir, ", ".join(names)))
+                "**{}** ({}, {} elixir): {}".format(
+                    name, rarity, elixir, ", ".join(names)))
 
         split_out = self.grouper(25, out)
 
@@ -334,7 +326,7 @@ class Deck:
                     # await self.bot.say(set(params))
                     if set(params) < set(cards):
                         found_decks.append({
-                            "Deck": member_deck["Deck"], 
+                            "Deck": member_deck["Deck"],
                             "DeckName": member_deck["DeckName"],
                             "Member": member,
                             "MemberDisplayName": member_display_name })
@@ -343,20 +335,38 @@ class Deck:
 
             if len(found_decks):
 
+                results_max = 3
+
                 deck_id = 1
 
                 for deck in found_decks:
                     await self.bot.say(
                         "**{}. {}** by {}".format(
-                            deck_id, deck["DeckName"], 
+                            deck_id, deck["DeckName"],
                             deck["MemberDisplayName"]))
                     await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], deck["Member"])
                     deck_id += 1
 
+                    if (deck_id - 1) % results_max == 0:
+
+                        def pagination_check(m):
+                            return m.content.lower() == 'y'
+
+                        await self.bot.say("Would you like to see the next results? (Y/N)")
+
+                        answer = await self.bot.wait_for_message(
+                            timeout=5.0,
+                            author=ctx.message.author,
+                            check=pagination_check)
+
+                        if answer is None:
+                            await self.bot.say("Sorry, you took too long.")
+                            return
+
     @deck.command(name="rename", pass_context=True, no_pm=True)
     async def deck_rename(self, ctx, deck_id, new_name):
         """
-        Rename a deck based on deck id. 
+        Rename a deck based on deck id.
         Syntax: !deck rename [deck_id] [new_name]
         where deck_id is the number associated with the deck when you run !deck list
         """
@@ -366,7 +376,7 @@ class Deck:
         members = self.settings["Servers"][server.id]["Members"]
 
         # check member has data
-        if not author.id in members:
+        if author.id not in members:
             self.bot.say("You have not added any decks.")
         elif not deck_id.isdigit():
             await self.bot.say("The deck_id you have entered is not a number.")
@@ -393,7 +403,7 @@ class Deck:
         server = ctx.message.server
         author = ctx.message.author
 
-        
+
         members = self.settings["Servers"][server.id]["Members"]
 
         if not author.id in members:
@@ -417,15 +427,12 @@ class Deck:
 
     @deck.command(name="help", pass_context=True, no_pm=True)
     async def deck_help(self, ctx):
-        """
-        Complete help and tutorial
-        """
+        """Complete help and tutorial."""
         await self.bot.say(help_text)
 
 
     async def deck_upload(self, ctx, member_deck, deck_name:str, member=None):
-        """
-        Upload deck to Discord
+        """Upload deck to Discord.
 
         Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
         """
@@ -468,7 +475,7 @@ class Deck:
         self.deck_is_valid = deck_is_valid
 
     async def upload_deck_image(self, ctx, deck, deck_name, author):
-        """Upload deck image to the server"""
+        """Upload deck image to the server."""
 
         deck_image = self.get_deck_image(deck, deck_name, author)
 
@@ -484,11 +491,11 @@ class Deck:
         with io.BytesIO() as f:
             deck_image.save(f, "PNG")
             f.seek(0)
-            await ctx.bot.send_file(ctx.message.channel, f, 
+            await ctx.bot.send_file(ctx.message.channel, f,
                 filename=filename, content=description)
 
     def get_deck_image(self, deck, deck_name=None, deck_author=None):
-        """Construct the deck with Pillow and return image"""
+        """Construct the deck with Pillow and return image."""
 
         card_w = 302
         card_h = 363
@@ -519,9 +526,9 @@ class Deck:
             card_image = Image.open(card_image_file)
             # size = (card_w, card_h)
             # card_image.thumbnail(size)
-            box = (card_x + card_w * i, 
-                   card_y, 
-                   card_x + card_w * (i+1), 
+            box = (card_x + card_w * i,
+                   card_y,
+                   card_x + card_w * (i+1),
                    card_h + card_y)
             image.paste(card_image, box, card_image)
 
@@ -550,13 +557,13 @@ class Deck:
 
         deck_author_name = deck_author.name if deck_author else ""
 
-        d_name.text((txt_x_name, txt_y_line1), deck_name, font=font_bold, 
+        d_name.text((txt_x_name, txt_y_line1), deck_name, font=font_bold,
                          fill=(0xff, 0xff, 0xff, 255))
-        d_name.text((txt_x_name, txt_y_line2), deck_author_name, font=font_regular, 
+        d_name.text((txt_x_name, txt_y_line2), deck_author_name, font=font_regular,
                          fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_cards, txt_y_line1), line1, font=font_regular, 
+        d.text((txt_x_cards, txt_y_line1), line1, font=font_regular,
                          fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_cards, txt_y_line2), line2, font=font_regular, 
+        d.text((txt_x_cards, txt_y_line2), line2, font=font_regular,
                          fill=(0xff, 0xff, 0xff, 255))
         d.text((txt_x_elixir, txt_y_line1), "Avg elixir", font=font_bold,
                fill=(0xff, 0xff, 0xff, 200))
@@ -575,9 +582,7 @@ class Deck:
 
 
     def normalize_deck_data(self, deck):
-        """
-        Return a deck list which has no abbreviations and uses all lowercase names
-        """
+        """Return a deck list with normalized names."""
         deck = [c.lower() if c is not None else '' for c in deck]
 
         # replace abbreviations
@@ -588,7 +593,7 @@ class Deck:
         return deck
 
     def check_member_settings(self, server, member):
-        """Init member section if necessary"""
+        """Init member section if necessary."""
         if member.id not in self.settings["Servers"][server.id]["Members"]:
             self.settings["Servers"][server.id]["Members"][member.id] = {
                 "MemberID": member.id,
@@ -597,15 +602,16 @@ class Deck:
             self.save_settings()
 
     def check_server_settings(self, server):
-        """Init server data if necessary"""
+        """Init server data if necessary."""
         if server.id not in self.settings["Servers"]:
-            self.settings["Servers"][server.id] = { "ServerName": str(server),
-                                                    "ServerID": str(server.id),
-                                                    "Members": {} }
+            self.settings["Servers"][server.id] = {
+                "ServerName": str(server),
+                "ServerID": str(server.id),
+                "Members": {} }
             self.save_settings()
 
     def save_settings(self):
-        """Saves data to settings file"""
+        """Saves data to settings file."""
         dataIO.save_json(self.file_path, self.settings)
 
 

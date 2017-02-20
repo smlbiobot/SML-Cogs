@@ -392,7 +392,8 @@ class Card:
         plt.cla()
 
     @commands.command(pass_context=True)
-    async def popdata(self, ctx: Context, snapshot_id=str(cardpop_range_max - 1), limit=10):
+    async def popdata(self, ctx: Context,
+        snapshot_id=str(cardpop_range_max - 1), limit=10):
         """Display raw data of the card popularity snapshot."""
         if not snapshot_id.isdigit():
             await self.bot.say("Please enter a number for the snapshot id.")
@@ -438,7 +439,8 @@ class Card:
             await self.bot.say(page)
 
     @commands.command(pass_content=True)
-    async def popdataall(self, ctx: Context, snapshot_id=str(cardpop_range_max - 1)):
+    async def popdataall(self, ctx: Context,
+        snapshot_id=str(cardpop_range_max - 1)):
         """Display raw data of card popularity snapshot without limits."""
         pass
 
