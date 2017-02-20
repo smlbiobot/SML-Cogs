@@ -219,37 +219,53 @@ class Card:
             ' (most recent)' if is_most_recent_snapshot else ''))
 
         if len(found_decks):
-            await self.bot.say(
-                "Listing top {} decks:".format(
-                    min([max_deck_show, len(found_decks)])))
+            # await self.bot.say(
+            #     "Listing top {} decks:".format(
+            #         min([max_deck_show, len(found_decks)])))
 
             for i, deck in enumerate(found_decks):
                 # Show top 5 deck images only
-                if i < max_deck_show:
-                    cards = deck.split(', ')
-                    norm_cards = [self.get_card_from_cpid(c) for c in cards]
+                # if i < max_deck_show:
 
-                    await self.bot.say("**{}**: {}/100: {}".format(
-                        i + 1,
-                        self.get_deckpop_count(deck, snapshot_id),
-                        deck))
+                results_max = 3
 
-                    FakeMember = namedtuple("FakeMember", "name")
-                    m = FakeMember(name="Snapshot #{}".format(snapshot_id))
+                cards = deck.split(', ')
+                norm_cards = [self.get_card_from_cpid(c) for c in cards]
 
-                    # Show decks
-                    await ctx.invoke(
-                        Deck.deck_get,
-                        card1=norm_cards[0],
-                        card2=norm_cards[1],
-                        card3=norm_cards[2],
-                        card4=norm_cards[3],
-                        card5=norm_cards[4],
-                        card6=norm_cards[5],
-                        card7=norm_cards[6],
-                        card8=norm_cards[7],
-                        deck_name="Top Deck: {}".format(i + 1),
-                        author=m)
+                await self.bot.say("**{}**: {}/100: {}".format(
+                    i + 1,
+                    self.get_deckpop_count(deck, snapshot_id),
+                    deck))
+
+                FakeMember = namedtuple("FakeMember", "name")
+                m = FakeMember(name="Snapshot #{}".format(snapshot_id))
+
+                # Show decks
+                await ctx.invoke(
+                    Deck.deck_get,
+                    card1=norm_cards[0],
+                    card2=norm_cards[1],
+                    card3=norm_cards[2],
+                    card4=norm_cards[3],
+                    card5=norm_cards[4],
+                    card6=norm_cards[5],
+                    card7=norm_cards[6],
+                    card8=norm_cards[7],
+                    deck_name="Top Deck: {}".format(i + 1),
+                    author=m)
+
+                if (i+1) % results_max == 0:
+                    def pagination_check(m):
+                        return m.content.lower() == 'y'
+                    await self.bot.say(
+                        "Would you like to see more results? (y/n)")
+                    answer = await self.bot.wait_for_message(
+                        timeout=5.0,
+                        author=ctx.message.author,
+                        check=pagination_check)
+                    if answer is None:
+                        await self.bot.say("Sorry, you took too long.")
+                        return
 
     @commands.command(pass_context=True)
     async def cardimage(self, ctx, card=None):
