@@ -252,7 +252,7 @@ class RACF:
         data.add_field(name="Owner", value=str(server.owner))
 
         for role_name in role_names:
-            data.add_field(name=role_name, value=role_count[role_name])
+            data.add_field(name="{}s".format(role_name), value=role_count[role_name])
 
         data.set_footer(text="Server ID: " + server.id)
 
