@@ -28,8 +28,10 @@ matplotlib.use('Agg')
 
 from .utils.dataIO import dataIO
 from __main__ import send_cmd_help
+from cogs.utils.chat_formatting import pagify, box
 from discord.ext import commands
 from discord.ext.commands import Context
+from itertools import islice
 from matplotlib import pyplot as plt
 from random import choice
 import datetime
@@ -67,6 +69,9 @@ def grouper(self, n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
 
+def take(n, iterable):
+    "Return first n items of the iterable as a list"
+    return list(islice(iterable, n))
 
 class Card:
     """
@@ -388,6 +393,64 @@ class Card:
 
         plt.clf()
         plt.cla()
+
+
+    @commands.command(pass_context=True)
+    async def popdata(self, ctx:Context, snapshot_id=str(cardpop_range_max-1), limit=10):
+        """
+        Display raw data of the card popularity snapshot
+        """
+        if not snapshot_id.isdigit():
+            await self.bot.say("Please enter a number for the snapshot id.")
+            return
+
+
+        if not cardpop_range_min <= int(snapshot_id) < cardpop_range_max:
+            await self.bot.say("Snapshot ID must be between {} and {}.".format(
+                cardpop_range_min, cardpop_range_max))
+            return
+
+        limit = int(limit)
+        if limit <= 0:
+            limit = 10000
+
+        snapshot = self.cardpop[snapshot_id]
+        cards = snapshot["cardpop"]
+        decks = snapshot["decks"]
+
+        dt = datetime.datetime.strptime(self.dates[str(snapshot_id)], '%Y-%m-%d')
+        dtstr = dt.strftime('%b %d, %Y')
+
+        await self.bot.say("**Woody’s Popularity Snapshot #{}** ({})".format(
+            snapshot_id, dtstr))
+
+        await self.bot.say("**Cards:**")
+        out = []
+        for card_key, card_value in take(limit, cards.items()):
+            out.append("{:4d} ({:3d}) {}".format(
+                card_value["count"],
+                card_value["change"],
+                card_key))
+        for page in pagify("\n".join(out), shorten_by=12):
+            await self.bot.say(box(page, lang="py"))
+
+        await self.bot.say("**Decks:**")
+        out = []
+        for deck_key, deck_value in take(limit, decks.items()):
+            out.append("**{:4d}**: {}".format(
+                deck_value["count"],
+                deck_key))
+        for page in pagify("\n".join(out), shorten_by=12):
+            await self.bot.say(page)
+
+    @commands.command(pass_content=True)
+    async def popdataall(self, ctx:Context, snapshot_id=str(cardpop_range_max-1)):
+        """
+        Display raw data of card popularity snapshot without limits
+        """
+
+
+
 
     def get_random_color(self):
         """
