@@ -59,24 +59,26 @@ max_deck_show = 5
 
 discord_ui_bgcolor = discord.Color(value=int('36393e', 16))
 
+
 def grouper(self, n, iterable, fillvalue=None):
     """
-    Helper function to split lists
+    Helper function to split lists.
 
     Example:
     grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
     """
     args = [iter(iterable)] * n
-    return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
+    return ([e for e in t if e is not None]
+            for t in itertools.zip_longest(*args))
+
 
 def take(n, iterable):
-    "Return first n items of the iterable as a list"
+    """Return first n items of the iterable as a list."""
     return list(islice(iterable, n))
 
+
 class Card:
-    """
-    Clash Royale Card Popularity snapshots 
-    """
+    """Clash Royale Card Popularity snapshots."""
 
     def __init__(self, bot):
         self.bot = bot
@@ -109,7 +111,6 @@ class Card:
                 if aka.find('-'):
                     self.cards_abbrev[aka.replace('-', '')] = card_key
 
-
         self.card_w = 302
         self.card_h = 363
         self.card_ratio = self.card_w / self.card_h
@@ -120,11 +121,10 @@ class Card:
         self.plotfigure = 0
         self.plot_lock = asyncio.Lock()
 
-
     @commands.command(pass_context=True)
     async def card(self, ctx, card=None):
-        """
-        Display statistics about a card
+        """Display statistics about a card.
+
         Example: !card get miner
         """
         if card is None:
@@ -136,11 +136,10 @@ class Card:
             await self.bot.say("Card name is not valid.")
             return
 
-
         data = discord.Embed(
-            title = self.card_to_str(card),
-            description = self.get_card_description(card),
-            color = self.get_random_color())
+            title=self.card_to_str(card),
+            description=self.get_card_description(card),
+            color=self.get_random_color())
         data.set_thumbnail(url=self.get_card_image_url(card))
         data.add_field(
             name="Elixir",
@@ -169,13 +168,12 @@ class Card:
 
     @commands.command(pass_context=True)
     async def decks(self, ctx, *cards, snapshot_id=None):
-        """
-        Display top deck with specific card in particular snapshot
+        """Display top deck with specific card in particular snapshot.
 
         !decks Miner 23
         displays decks with miner in snapshot 23.
 
-        !decks princess miner 
+        !decks princess miner
         displays decks with both miner and pricness in latest snapshot.
         """
         if cards is None or not len(cards):
@@ -197,7 +195,8 @@ class Card:
         card_names_are_valid = True
         for card in cards:
             if self.get_card_name(card) is None:
-                await self.bot.say("**{}** is not valid card name.".format(card))
+                await self.bot.say(
+                    "**{}** is not valid card name.".format(card))
                 card_names_are_valid = False
         if not card_names_are_valid:
             return
@@ -214,8 +213,8 @@ class Card:
                     found_decks.append(k)
 
         await self.bot.say("Found {} decks with {} in Snapshot #{}{}.".format(
-            len(found_decks), 
-            ', '.join([self.card_to_str(card) for card in cards]), 
+            len(found_decks),
+            ', '.join([self.card_to_str(card) for card in cards]),
             snapshot_id,
             ' (most recent)' if is_most_recent_snapshot else ''))
 
@@ -228,7 +227,7 @@ class Card:
                 # Show top 5 deck images only
                 if i < max_deck_show:
                     cards = deck.split(', ')
-                    norm_cards = [self.get_card_from_cpid(c) for c in cards ]
+                    norm_cards = [self.get_card_from_cpid(c) for c in cards]
 
                     await self.bot.say("**{}**: {}/100: {}".format(
                         i + 1,
@@ -240,7 +239,7 @@ class Card:
 
                     # Show decks
                     await ctx.invoke(
-                        Deck.deck_get, 
+                        Deck.deck_get,
                         card1=norm_cards[0],
                         card2=norm_cards[1],
                         card3=norm_cards[2],
@@ -249,23 +248,22 @@ class Card:
                         card6=norm_cards[5],
                         card7=norm_cards[6],
                         card8=norm_cards[7],
-                        deck_name="Top Deck: {}".format(i+1),
+                        deck_name="Top Deck: {}".format(i + 1),
                         author=m)
 
     @commands.command(pass_context=True)
     async def cardimage(self, ctx, card=None):
-        """Display the card image"""
-
-        card = self.get_card_name(card)  
+        """Display the card image."""
+        card = self.get_card_name(card)
         if card is None:
             await self.bot.say("Card name is not valid.")
             return
 
         data = discord.Embed(
             # url=self.get_card_image_url(card),
-            color = discord_ui_bgcolor)
+            color=discord_ui_bgcolor)
         data.set_image(url=self.get_card_image_url(card))
-       
+
         try:
             await self.bot.type()
             await self.bot.say(embed=data)
@@ -274,10 +272,10 @@ class Card:
                                "to send this")
 
     @commands.command(pass_context=True, aliases=["cardtrends"])
-    async def cardtrend(self, ctx:Context, *cards):
-        """
-        Display trends about a card based on popularity snapshot
-        Examples: 
+    async def cardtrend(self, ctx: Context, *cards):
+        """Display trends about a card based on popularity snapshot.
+
+        Examples:
         !cardtrend miner
         !cardtrend princess log
         !cardtrend giant xbow 3m
@@ -285,7 +283,6 @@ class Card:
         if not len(cards):
             await send_cmd_help(ctx)
             return
-
 
         cards = list(set(cards))
 
@@ -295,7 +292,8 @@ class Card:
             c = card
             card = self.get_card_name(card)
             if card is None:
-                await self.bot.say("**{}** is not a valid card name.".format(c))
+                await self.bot.say(
+                    "**{}** is not a valid card name.".format(c))
             else:
                 validated_cards.append(card)
 
@@ -308,15 +306,14 @@ class Card:
             labelcolor = '#cccccc'
             tickcolor = '#999999'
             titlecolor = '#ffffff'
-            
+
             fig = plt.figure(
-                num=1, 
-                figsize=(8, 6), 
-                dpi=192, 
-                facecolor=facecolor, 
+                num=1,
+                figsize=(8, 6),
+                dpi=192,
+                facecolor=facecolor,
                 edgecolor=edgecolor)
             plt.grid(b=True, alpha=0.3)
-            
 
             ax = fig.add_subplot(111)
 
@@ -332,10 +329,11 @@ class Card:
             ax.tick_params(axis='x', colors=tickcolor)
             ax.tick_params(axis='y', colors=tickcolor)
 
-            # create labels using snapshot dates 
+            # create labels using snapshot dates
             labels = []
             for id in range(cardpop_range_min, cardpop_range_max):
-                dt = datetime.datetime.strptime(self.dates[str(id)], '%Y-%m-%d')
+                dt = datetime.datetime.strptime(
+                    self.dates[str(id)], '%Y-%m-%d')
                 dtstr = dt.strftime('%b %d, %y')
                 labels.append("{}\n   {}".format(id, dtstr))
 
@@ -350,27 +348,28 @@ class Card:
             # make tick label font size smaller
             # for tick in ax.xaxis.get_major_ticks():
             #     tick.label.set_fontsize(8)
-            
 
-            
             leg = ax.legend(facecolor=facecolor, edgecolor=spinecolor)
             for text in leg.get_texts():
                 text.set_color(labelcolor)
 
-            ax.annotate('Compiled with data from Woody’s popularity snapshots',  # Your string
+            ax.annotate(
+                'Compiled with data from Woody’s popularity snapshots',
 
-                # The point that we'll place the text in relation to 
-                xy=(0, 0), 
-                # Interpret the x as axes coords, and the y as figure coords
+                # The point that we'll place the text in relation to
+                xy=(0, 0),
+                # Interpret the x as axes coords, and the y as figure
+                # coords
                 xycoords=('figure fraction'),
 
                 # The distance from the point that the text will be at
-                xytext=(15, 10),  
+                xytext=(15, 10),
                 # Interpret `xytext` as an offset in points...
                 textcoords='offset points',
 
                 # Any other text parameters we'd like
                 size=8, ha='left', va='bottom', color=footercolor)
+
             plt.subplots_adjust(left=0.1, right=0.96, top=0.9, bottom=0.2)
 
             plot_filename = "{}-plot.png".format("-".join(cards))
@@ -378,11 +377,9 @@ class Card:
             #     ", ".join([self.card_to_str(c) for c in validated_cards]))
             plot_name = ""
 
-
-
-
             with io.BytesIO() as f:
-                plt.savefig(f, format="png", facecolor=facecolor, edgecolor=edgecolor, transparent=True)
+                plt.savefig(f, format="png", facecolor=facecolor,
+                            edgecolor=edgecolor, transparent=True)
                 f.seek(0)
                 await ctx.bot.send_file(
                     ctx.message.channel, f,
@@ -394,16 +391,12 @@ class Card:
         plt.clf()
         plt.cla()
 
-
     @commands.command(pass_context=True)
-    async def popdata(self, ctx:Context, snapshot_id=str(cardpop_range_max-1), limit=10):
-        """
-        Display raw data of the card popularity snapshot
-        """
+    async def popdata(self, ctx: Context, snapshot_id=str(cardpop_range_max - 1), limit=10):
+        """Display raw data of the card popularity snapshot."""
         if not snapshot_id.isdigit():
             await self.bot.say("Please enter a number for the snapshot id.")
             return
-
 
         if not cardpop_range_min <= int(snapshot_id) < cardpop_range_max:
             await self.bot.say("Snapshot ID must be between {} and {}.".format(
@@ -418,7 +411,8 @@ class Card:
         cards = snapshot["cardpop"]
         decks = snapshot["decks"]
 
-        dt = datetime.datetime.strptime(self.dates[str(snapshot_id)], '%Y-%m-%d')
+        dt = datetime.datetime.strptime(
+            self.dates[str(snapshot_id)], '%Y-%m-%d')
         dtstr = dt.strftime('%b %d, %Y')
 
         await self.bot.say("**Woody’s Popularity Snapshot #{}** ({})".format(
@@ -444,37 +438,24 @@ class Card:
             await self.bot.say(page)
 
     @commands.command(pass_content=True)
-    async def popdataall(self, ctx:Context, snapshot_id=str(cardpop_range_max-1)):
-        """
-        Display raw data of card popularity snapshot without limits
-        """
-
-
-
+    async def popdataall(self, ctx: Context, snapshot_id=str(cardpop_range_max - 1)):
+        """Display raw data of card popularity snapshot without limits."""
+        pass
 
     def get_random_color(self):
-        """
-        Return a discord.Color instance of a random color
-        """
+        """Return a discord.Color instance of a random color."""
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
         return discord.Color(value=color)
 
-      
-
     def card_to_str(self, card=None):
-        """
-        Return name in title case
-        """
+        """Return name in title case."""
         if card is None:
             return None
         return string.capwords(card.replace('-', ' '))
 
-
     def get_card_name(self, card=None):
-        """
-        Replace abbreviations of card names and return standard name used in data files
-        """
+        """Return standard name used in data files."""
         if card is None:
             return None
         if card.lower() in self.cards_abbrev:
@@ -482,34 +463,26 @@ class Card:
         return None
 
     def get_card_description(self, card=None):
-        """
-        Return the description of a card
-        """
+        """Return the description of a card."""
         if card is None:
             return ""
         tid = self.crdata["Cards"][card]["tid"]
         return self.crtexts[tid]
 
     def get_card_image_file(self, card=None):
-        """
-        Construct an image of the card
-        """
+        """Construct an image of the card."""
         if card is None:
             return None
-        return "data/card/img/cards/{}.png".format(card) 
+        return "data/card/img/cards/{}.png".format(card)
 
     def get_card_image_url(self, card=None):
-        """
-        Return the card image url hosted by smlbiobot
-        """
+        """Return the card image url hosted by smlbiobot."""
         if card is None:
             return None
         return "https://smlbiobot.github.io/img/cards/{}.png".format(card)
 
     def get_cardpop_count(self, card=None, snapshot_id=None):
-        """
-        Return card popularity count by snapshot id
-        """
+        """Return card popularity count by snapshot id."""
         out = 0
         snapshot_id = str(snapshot_id)
         if card is not None and snapshot_id is not None:
@@ -521,8 +494,8 @@ class Card:
         return out
 
     def get_cardpop(self, card=None, snapshot_id=None):
-        """
-        Return card popularity by snapshot id
+        """Return card popularity by snapshot id.
+
         Format: Count (Change)
         """
         out = "---"
@@ -539,24 +512,18 @@ class Card:
         return out
 
     def get_card_cpid(self, card=None):
-        """
-        Return the card populairty ID used in data
-        """
+        """Return the card populairty ID used in data."""
         return self.crdata["Cards"][card]["cpid"]
 
     def get_card_from_cpid(self, cpid=None):
-        """
-        Return the card id from cpid
-        """
+        """Return the card id from cpid."""
         for k, v in self.crdata["Cards"].items():
             if cpid == v["cpid"]:
                 return k
         return None
 
     def get_deckpop_count(self, deck=None, snapshot_id=None):
-        """
-        Return the deck popularity by snapshot id
-        """
+        """Return the deck popularity by snapshot id."""
         out = 0
         snapshot_id = str(snapshot_id)
         if snapshot_id in self.cardpop:
@@ -566,8 +533,8 @@ class Card:
         return out
 
 
-
 def check_folder():
+    """Check data folders exist. Create if they’re not."""
     folders = ["data/card",
                "data/card/img",
                "data/card/img/cards"]
@@ -576,7 +543,9 @@ def check_folder():
             print("Creating {} folder".format(f))
             os.makedirs(f)
 
+
 def check_file():
+    """Check settings file exists."""
     settings = {
         "Servers": {}
     }
@@ -585,9 +554,10 @@ def check_file():
         print("Creating default card settings.json...")
         dataIO.save_json(f, settings)
 
+
 def setup(bot):
+    """Add cog to bot."""
     check_folder()
     check_file()
     n = Card(bot)
     bot.add_cog(n)
-
