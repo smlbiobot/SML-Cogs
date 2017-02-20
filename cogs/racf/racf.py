@@ -26,9 +26,12 @@ DEALINGS IN THE SOFTWARE.
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import Context
 from .utils import checks
 from random import choice
 from __main__ import send_cmd_help
+import colorsys
+import asyncio
 import os
 import datetime
 import aiohttp
@@ -92,36 +95,36 @@ class RACF:
         out.append("<{}>".format(discord_url))
         await self.bot.say('\n'.join(out))
 
-    @commands.command(pass_context=True)
-    async def racfwelcome(self, ctx, member:discord.Member):
-        """Welcome people manually via command."""
-        # server = ctx.message.server
-        # self.member_join(member)
-        await self.bot.say(welcome_msg.format(member.mention))
+    # @commands.command(pass_context=True)
+    # async def racfwelcome(self, ctx, member:discord.Member):
+    #     """Welcome people manually via command."""
+    #     # server = ctx.message.server
+    #     # self.member_join(member)
+    #     await self.bot.say(welcome_msg.format(member.mention))
 
-    @commands.command(pass_context=True)
-    async def racfwelcomeall(self, ctx):
-        """Find all untagged users and send them the welcome message."""
-        server = ctx.message.server
-        members = server.members
-        online_members = [m for m in members if m.status == discord.Status.online]
-        online_untagged_members = [m for m in online_members if len(m.roles) == 1]
-        online_untagged_members_names = [m.name for m in online_untagged_members]
-        print(', '.join(online_untagged_members_names))
+    # @commands.command(pass_context=True)
+    # async def racfwelcomeall(self, ctx):
+    #     """Find all untagged users and send them the welcome message."""
+    #     server = ctx.message.server
+    #     members = server.members
+    #     online_members = [m for m in members if m.status == discord.Status.online]
+    #     online_untagged_members = [m for m in online_members if len(m.roles) == 1]
+    #     online_untagged_members_names = [m.name for m in online_untagged_members]
+    #     print(', '.join(online_untagged_members_names))
 
-    @commands.command(pass_context=True)
-    async def alluntaggedusers(self, ctx):
-        """Find all untagged users and send them the welcome message."""
-        server = ctx.message.server
-        members = server.members
-        untagged_members = [m for m in members if len(m.roles) == 1]
-        untagged_members_names = [m.name for m in untagged_members]
-        untagged_members_mention = [m.mention for m in untagged_members]
+    # @commands.command(pass_context=True)
+    # async def alluntaggedusers(self, ctx):
+    #     """Find all untagged users and send them the welcome message."""
+    #     server = ctx.message.server
+    #     members = server.members
+    #     untagged_members = [m for m in members if len(m.roles) == 1]
+    #     untagged_members_names = [m.name for m in untagged_members]
+    #     untagged_members_mention = [m.mention for m in untagged_members]
 
-        await self.bot.say("All online but untagged users:")
-        await self.bot.say(', '.join(untagged_members_names))
-        await self.bot.say("Mentions:")
-        await self.bot.say("'''{}'''".format(' '.join(untagged_members_mention)))
+    #     await self.bot.say("All online but untagged users:")
+    #     await self.bot.say(', '.join(untagged_members_names))
+    #     await self.bot.say("Mentions:")
+    #     await self.bot.say("'''{}'''".format(' '.join(untagged_members_mention)))
 
     @commands.command(pass_context=True)
     @commands.has_any_role(*changeclan_roles)
@@ -252,7 +255,8 @@ class RACF:
         data.add_field(name="Owner", value=str(server.owner))
 
         for role_name in role_names:
-            data.add_field(name="{}s".format(role_name), value=role_count[role_name])
+            data.add_field(name="{}s".format(role_name),
+                           value=role_count[role_name])
 
         data.set_footer(text="Server ID: " + server.id)
 
@@ -273,49 +277,7 @@ def setup(bot):
     # bot.add_listener(r.member_join, "on_member_join")
     bot.add_cog(r)
 
-"""
-Sample code for timer events
 
-https://github.com/Rapptz/discord.py/blob/master/examples/background_task.py
-
-import discord
-import asyncio
-
-client = discord.Client()
-
-async def my_background_task():
-    await client.wait_until_ready()
-    counter = 0
-    channel = discord.Object(id='channel_id_here')
-    while not client.is_closed:
-        counter += 1
-        await client.send_message(channel, counter)
-        await asyncio.sleep(60) # task runs every 60 seconds
-
-@client.event
-async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
-
-client.loop.create_task(my_background_task())
-client.run('token')
-
-"""
-"""
-
-https://github.com/tekulvw/Squid-Plugins/blob/master/scheduler/scheduler.py
-
-loop = asyncio.get_event_loop()
-loop.create_task(self.check())
-
-async def check(self):
-    while True:
-        # do some stuff
-        await asyncio.sleep(3600)
-
-"""
 
 
 

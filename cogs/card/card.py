@@ -125,7 +125,7 @@ class Card:
     async def card(self, ctx, card=None):
         """Display statistics about a card.
 
-        Example: !card get miner
+        Example: !card miner
         """
         if card is None:
             await send_cmd_help(ctx)
@@ -167,7 +167,7 @@ class Card:
         await ctx.invoke(Card.decks, card)
 
     @commands.command(pass_context=True)
-    async def decks(self, ctx, *cards, snapshot_id=None):
+    async def decks(self, ctx:Context, *cards, snapshot_id=None):
         """Display top deck with specific card in particular snapshot.
 
         !decks Miner 23
@@ -264,7 +264,7 @@ class Card:
                         author=ctx.message.author,
                         check=pagination_check)
                     if answer is None:
-                        await self.bot.say("Sorry, you took too long.")
+                        await self.bot.say("Search results aborted.")
                         return
 
     @commands.command(pass_context=True)

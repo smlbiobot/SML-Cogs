@@ -66,7 +66,7 @@ class RoleHistory:
     @commands.command(pass_context=True)
     async def rolehist(self, ctx, user:discord.Member=None):
         """Display the role history of a user
-        
+
         Examples:
         !rolehist
         !rolehist SML
@@ -78,13 +78,13 @@ class RoleHistory:
         if not user:
             user = author
 
- 
+
         if server.id in self.settings:
 
             found_member = None
 
             for member_key, member_value in self.settings[server.id]["Members"].items():
-                
+
                 member = server.get_member(member_key)
 
                 # if user == member.display_name:
@@ -111,7 +111,7 @@ class RoleHistory:
                                 line += 'Added: {}'.format(list(curr_roles_set - prev_roles_set)[0])
                             else:
                                 line +='Removed: {}'.format(list(prev_roles_set - curr_roles_set)[0])
-                        
+
                         out.append(line)
                         # out.append(', '.join(curr_roles))
 
@@ -122,7 +122,7 @@ class RoleHistory:
                     split_out = grouper(10, out)
                     for o in split_out:
                         await self.bot.say("\n".join(o))
- 
+
                     found_member = member
 
 
@@ -133,9 +133,9 @@ class RoleHistory:
 
                 member = user
 
-                if member is not None:  
- 
-                    self.settings[server.id]["Members"][member.id] = { 
+                if member is not None:
+
+                    self.settings[server.id]["Members"][member.id] = {
                         "MemberID" : member.id,
                         "History": {
                             f"{self.server_time()}" : self.get_member_data(member)
@@ -152,8 +152,8 @@ class RoleHistory:
                     await self.bot.say("{} is not a valid user on this server.".format(user))
 
                 # await self.bot.say("debug: {}".format(str(member)))
-                
-                    
+
+
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(manage_server=True)
     async def rolehistinit(self, ctx):
@@ -163,7 +163,7 @@ class RoleHistory:
         members = server.members
 
         if server.id not in self.settings:
-            self.settings[server.id] = { 
+            self.settings[server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
                 "Members": {}
@@ -175,7 +175,7 @@ class RoleHistory:
             if member.id not in self.settings[server.id]["Members"]:
 
                 # init member only if not found
-                self.settings[server.id]["Members"][member.id] = { 
+                self.settings[server.id]["Members"][member.id] = {
                     "MemberID" : member.id,
                     "History": {
                         f"{self.server_time()}" : self.get_member_data(member)
@@ -190,7 +190,7 @@ class RoleHistory:
         server = member.server
 
         if server.id not in self.settings:
-            self.settings[server.id] = { 
+            self.settings[server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
                 "Members": {}
@@ -199,7 +199,7 @@ class RoleHistory:
         if member.id not in self.settings[server.id]["Members"]:
 
             # init member only if not found
-            self.settings[server.id]["Members"][member.id] = { 
+            self.settings[server.id]["Members"][member.id] = {
                 "MemberID" : member.id,
                 "History": {
                     f"{self.server_time()}" : self.get_member_data(member)
@@ -215,29 +215,29 @@ class RoleHistory:
 
         # process only on role changes
         if before.roles != after.roles:
- 
+
             if server.id not in self.settings:
-                self.settings[server.id] = { 
+                self.settings[server.id] = {
                     "ServerName": str(server),
                     "ServerID": str(server.id),
                     "Members": {}
                     }
 
-            
+
 
             # Update server name in settings in case they have changed over time
             self.settings[server.id]["ServerName"] = str(server)
 
-            # add member settings if it does not exist 
+            # add member settings if it does not exist
             # initialize with before data
             # using server time as unique id for role changes
             if before.id not in self.settings[server.id]["Members"]:
-                self.settings[server.id]["Members"][before.id] = { 
+                self.settings[server.id]["Members"][before.id] = {
                     "MemberID" : before.id,
                     "History": {
                         f"{self.server_time()}" : self.get_member_data(before)
                         }
-                    
+
                     }
 
             # create values for timestamp as unique key

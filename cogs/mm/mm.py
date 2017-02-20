@@ -89,7 +89,7 @@ class MemberManagement:
         if option_members_without_clan_tag:
             args = ['Member', '-Alpha', '-Bravo', '-Charlie', '-Delta', '-Echo',
                     '-Foxtrot', '-Golf', '-Hotel']
-            
+
 
         role_args = []
         flags = ['+','-']
@@ -141,14 +141,14 @@ class MemberManagement:
 
             suffix = 's' if len(out_members) > 1 else ''
             await self.bot.say(f"**Found {len(out_members)} member{suffix}.**")
- 
+
 
             # embed output
             if not option_output_mentions_only:
                 color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
                 color = int(color, 16)
 
-                # split embed output to multiples of 25 
+                # split embed output to multiples of 25
                 # because embed only supports 25 max fields
 
                 out_members_group = self.grouper(25, out_members)
@@ -157,7 +157,7 @@ class MemberManagement:
 
                     data = discord.Embed(
                         color=discord.Colour(value=color))
-                    
+
                     for m in out_members_list:
                         value = []
                         roles = [r.name for r in m.roles if r.name != "@everyone"]
@@ -166,7 +166,7 @@ class MemberManagement:
                         name = m.display_name
 
                         data.add_field(name=str(name), value=str(''.join(value)))
-                    
+
                     try:
                         await self.bot.say(embed=data)
                     except discord.HTTPException:
@@ -178,6 +178,7 @@ class MemberManagement:
                 mention_list = [m.mention for m in out_members]
                 await self.bot.say("Copy and paste these in message to mention users listed:"
                                    f"```{' '.join(mention_list)}```")
+
 
     # @commands.command(pass_context=True, no_pm=False)
     # @commands.has_role("Bot Commander")
