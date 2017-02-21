@@ -170,14 +170,18 @@ class RACF:
 
         Role name needs be in quotes if it is a multi-word role.
         """
+        disallowed_roles = ["SUPERMOD", "MOD", "Bot Commander", "Higher Power", "AlphaBot"]
+        server = ctx.message.server
         if member is None:
             await self.bot.say("You must specify a member.")
             return
-        if role_name is None:
-            await self.bot.say("Yout must specify a role.")
+        elif role_name is None:
+            await self.bot.say("You must specify a role.")
             return
-        server = ctx.message.server
-        if role_name not in [r.name for r in server.roles]:
+        elif role_name in disallowed_roles:
+            await self.bot.say("You are not allowed to add those roles.")
+            return
+        elif role_name not in [r.name for r in server.roles]:
             await self.bot.say("{} is not a valid role.".format(role_name))
             return
         else:
