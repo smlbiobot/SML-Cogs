@@ -46,6 +46,7 @@ welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
               "interested in joining our clans / just visiting?"
 
 changeclan_roles = ["Leader", "Co-Leader", "Elder", "High Elder"]
+botcommander_role = ["Bot Commander"]
 
 
 
@@ -159,6 +160,55 @@ class RACF:
         await self.bot.say("Added {} for {}".format(
             ",".join([r.name for r in to_add_roles]),
             author.display_name))
+
+    @commands.command(pass_context=True)
+    @commands.has_any_role(*botcommander_role)
+    async def addrole(self, ctx, member:discord.Member=None, role_name:str=None):
+        """Add role to a user.
+
+        Example: !addrole SML Delta
+
+        Role name needs be in quotes if it is a multi-word role.
+        """
+        if member is None:
+            await self.bot.say("You must specify a member.")
+            return
+        if role_name is None:
+            await self.bot.say("Yout must specify a role.")
+            return
+        server = ctx.message.server
+        if role_name not in [r.name for r in server.roles]:
+            await self.bot.say("{} is not a valid role.".format(role_name))
+            return
+        else:
+            to_add_roles = [r for r in server.roles if r.name == role_name]
+            await self.bot.add_roles(member, *to_add_roles)
+            await self.bot.say("Added {} for {}".format(role_name, member.display_name))
+
+    @commands.command(pass_context=True)
+    @commands.has_any_role(*botcommander_role)
+    async def removerole(self, ctx, member:discord.Member=None, role_name:str=None):
+        """Remove role from a user.
+
+        Example: !removerole SML Delta
+
+        Role name needs be in quotes if it is a multi-word role.
+        """
+        if member is None:
+            await self.bot.say("You must specify a member.")
+            return
+        if role_name is None:
+            await self.bot.say("Yout must specify a role.")
+            return
+        server = ctx.message.server
+        if role_name not in [r.name for r in server.roles]:
+            await self.bot.say("{} is not a valid role.".format(role_name))
+            return
+        else:
+            to_remove_roles = [r for r in server.roles if r.name == role_name]
+            await self.bot.remove_roles(member, *to_remove_roles)
+            await self.bot.say("Removed {} from {}".format(role_name, member.display_name))
+
 
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(mention_everyone=True)
