@@ -136,6 +136,14 @@ class Deck:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    async def deck_get_helper(self, ctx,
+                              card1=None, card2=None, card3=None, card4=None,
+                              card5=None, card6=None, card7=None, card8=None,
+                              deck_name=None, author:discord.Member=None):
+        """Abstract command to run deck_get for other modules."""
+        await ctx.invoke(self.deck_get, card1, card2, card3, card4, card5,
+                            card6, card7, card8, deck_name, author)
+
     @deck.command(name="get", pass_context=True, no_pm=True)
     async def deck_get(self, ctx,
                        card1=None, card2=None, card3=None, card4=None,
