@@ -346,7 +346,7 @@ class Deck:
                         await self.bot.say("Would you like to see the next results? (Y/N)")
 
                         answer = await self.bot.wait_for_message(
-                            timeout=5.0,
+                            timeout=10.0,
                             author=ctx.message.author,
                             check=pagination_check)
 

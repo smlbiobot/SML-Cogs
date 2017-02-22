@@ -330,6 +330,21 @@ class RACF:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
 
+    @commands.command(pass_context=True)
+    @checks.mod_or_permissions(administrator=True)
+    async def member2visitor(self, ctx:Context, *members:discord.Member):
+        """Re-assign list of people from members to visitors"""
+        server = ctx.message.server
+        to_remove_roles = [r for r in server.roles if r.name == 'Member']
+        to_add_roles = [r for r in server.roles if r.name == 'Visitor']
+        for member in members:
+            await self.bot.add_roles(member, *to_add_roles)
+            await self.bot.say("Added {} for {}".format(*to_add_roles, member.display_name))
+            await self.bot.remove_roles(member, *to_remove_roles)
+            await self.bot.say("Removed {} from {}".format(*to_remove_roles, member.display_name))
+
+
+
 def setup(bot):
     r = RACF(bot)
     # bot.add_listener(r.member_join, "on_member_join")

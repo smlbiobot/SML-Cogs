@@ -260,7 +260,7 @@ class Card:
                     await self.bot.say(
                         "Would you like to see more results? (y/n)")
                     answer = await self.bot.wait_for_message(
-                        timeout=5.0,
+                        timeout=10.0,
                         author=ctx.message.author,
                         check=pagination_check)
                     if answer is None:
