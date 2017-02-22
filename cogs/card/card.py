@@ -167,11 +167,11 @@ class Card:
         await ctx.invoke(Card.decks, card)
 
     @commands.command(pass_context=True)
-    async def decks(self, ctx:Context, *cards, snapshot_id=None):
+    async def decks(self, ctx:Context, *cards):
         """Display top deck with specific card in particular snapshot.
 
-        !decks Miner 23
-        displays decks with miner in snapshot 23.
+        !decks Miner
+        displays decks with miner in latest sn.
 
         !decks princess miner
         displays decks with both miner and pricness in latest snapshot.
@@ -179,6 +179,9 @@ class Card:
         if cards is None or not len(cards):
             await send_cmd_help(ctx)
             return
+
+        # legacy param - will remove in future updates
+        snapshot_id = None
 
         # check last param, if digit, assign as snapshot id
         if cards[-1].isdigit():
