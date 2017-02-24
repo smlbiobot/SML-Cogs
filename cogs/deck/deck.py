@@ -269,7 +269,9 @@ class Deck:
         self.check_server_settings(server)
         members = self.settings["Servers"][server.id]["Members"]
         if not member.id in members:
-            self.bot.say("You have not added any decks.")
+            await self.bot.say("You have not added any decks.")
+        elif deck_id is None:
+            await self.bot.say("You must enter a deck id.")
         elif not deck_id.isdigit():
             await self.bot.say("The deck_id you have entered is not a number.")
         else:

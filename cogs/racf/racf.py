@@ -96,37 +96,6 @@ class RACF:
         out.append("<{}>".format(discord_url))
         await self.bot.say('\n'.join(out))
 
-    # @commands.command(pass_context=True)
-    # async def racfwelcome(self, ctx, member:discord.Member):
-    #     """Welcome people manually via command."""
-    #     # server = ctx.message.server
-    #     # self.member_join(member)
-    #     await self.bot.say(welcome_msg.format(member.mention))
-
-    # @commands.command(pass_context=True)
-    # async def racfwelcomeall(self, ctx):
-    #     """Find all untagged users and send them the welcome message."""
-    #     server = ctx.message.server
-    #     members = server.members
-    #     online_members = [m for m in members if m.status == discord.Status.online]
-    #     online_untagged_members = [m for m in online_members if len(m.roles) == 1]
-    #     online_untagged_members_names = [m.name for m in online_untagged_members]
-    #     print(', '.join(online_untagged_members_names))
-
-    # @commands.command(pass_context=True)
-    # async def alluntaggedusers(self, ctx):
-    #     """Find all untagged users and send them the welcome message."""
-    #     server = ctx.message.server
-    #     members = server.members
-    #     untagged_members = [m for m in members if len(m.roles) == 1]
-    #     untagged_members_names = [m.name for m in untagged_members]
-    #     untagged_members_mention = [m.mention for m in untagged_members]
-
-    #     await self.bot.say("All online but untagged users:")
-    #     await self.bot.say(', '.join(untagged_members_names))
-    #     await self.bot.say("Mentions:")
-    #     await self.bot.say("'''{}'''".format(' '.join(untagged_members_mention)))
-
     @commands.command(pass_context=True)
     @commands.has_any_role(*changeclan_roles)
     async def changeclan(self, ctx, clan:str=None):
@@ -241,6 +210,19 @@ class RACF:
                 if role in [r.name for r in m.roles]:
                     out_mentions.append(m.mention)
             await self.bot.say("{} {}".format(" ".join(out_mentions), " ".join(msg)))
+
+    # @commands.command(pass_context=True)
+    # @checks.mod_or_permission()
+    # async def setstatus(self, ctx, status:str, member:discord.Member=None):
+    #     """Sets the status for a member (or self if omitted).
+
+    #     Example: !setstatus "Clash Royale" """
+    #     server = ctx.message.server
+
+    #     if member is None:
+    #         member = ctx.message.author
+
+    #     await client.change_presence(game=discord.Game(name='my game'))
 
 
 
