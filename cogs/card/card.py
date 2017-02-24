@@ -243,20 +243,6 @@ class Card:
                 FakeMember = namedtuple("FakeMember", "name")
                 m = FakeMember(name="Snapshot #{}".format(snapshot_id))
 
-                # Show decks
-                # await ctx.invoke(
-                #     Deck.deck_get,
-                #     card1=norm_cards[0],
-                #     card2=norm_cards[1],
-                #     card3=norm_cards[2],
-                #     card4=norm_cards[3],
-                #     card5=norm_cards[4],
-                #     card6=norm_cards[5],
-                #     card7=norm_cards[6],
-                #     card8=norm_cards[7],
-                #     deck_name="Top Deck: {}".format(i + 1),
-                #     author=m)
-
                 await self.bot.get_cog("Deck").deck_get_helper(ctx,
                     card1=norm_cards[0],
                     card2=norm_cards[1],

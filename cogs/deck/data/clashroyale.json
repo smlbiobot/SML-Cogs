@@ -177,7 +177,7 @@
         },
         "goblin-gang": {
             "aka": ["gg", "gob-gang"],
-            "elixir": 5,
+            "elixir": 3,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_GOBLIN_GANG",
             "cpid": "Goblin Gang"

@@ -93,10 +93,16 @@ class Deck:
 
         for card_key, card_value in self.crdata["Cards"].items():
             self.cards.append(card_key)
+            self.cards_abbrev[card_key] = card_key
+
+            if card_key.find('-'):
+                self.cards_abbrev[card_key.replace('-', '')] = card_key
 
             aka_list = card_value["aka"]
             for aka in aka_list:
                 self.cards_abbrev[aka] = card_key
+                if aka.find('-'):
+                    self.cards_abbrev[aka.replace('-', '')] = card_key
 
         self.card_w = 302
         self.card_h = 363
@@ -166,6 +172,8 @@ class Deck:
         if not all(member_deck):
             await self.bot.say("Please enter 8 cards.")
             await send_cmd_help(ctx)
+        elif len(set(member_deck)) < len(member_deck):
+            await self.bot.say("Please enter 8 unique cards.")
         else:
             await self.deck_upload(ctx, member_deck, deck_name, author)
 
