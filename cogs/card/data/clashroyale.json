@@ -1,7 +1,7 @@
 {
     "Cards": {
         "archers": {
-            "aka": [],
+            "aka": ["arch"],
             "elixir": 3,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_ARCHERS",
@@ -178,7 +178,7 @@
         "goblin-gang": {
             "aka": ["gg", "gob-gang"],
             "elixir": 3,
-            "rarity": "rare",
+            "rarity": "common",
             "tid": "TID_SPELL_INFO_GOBLIN_GANG",
             "cpid": "Goblin Gang"
         },
@@ -288,7 +288,7 @@
             "cpid": "Lumberjack"
         },
         "mega-minion": {
-            "aka": ["mm", "meta-minion"],
+            "aka": ["mm", "meta-minion", "mega"],
             "elixir": 3,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_MEGAMINION",
@@ -400,7 +400,7 @@
             "cpid": "Skeleton Army"
         },
         "skeletons": {
-            "aka": [],
+            "aka": ["skele"],
             "elixir": 1,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_SKELETONS",
@@ -414,7 +414,7 @@
             "cpid": "Sparky"
         },
         "spear-goblins": {
-            "aka": ["spear-gobs", "spear-gob"],
+            "aka": ["spear-gobs", "spear-gob", "sgobs", "sgob"],
             "elixir": 2,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_SPEAR_GOBLINS",
