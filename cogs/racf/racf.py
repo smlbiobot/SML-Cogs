@@ -220,12 +220,13 @@ class RACF:
         minus = [r['name'] for r in role_args if r['flag'] == '-']
 
         for role in server.roles:
-            if role.name in minus:
-                await self.bot.remove_roles(member, role)
-                await self.bot.say("Removed {} from {}".format(role.name, member.display_name))
-            if role.name in plus:
-                await self.bot.add_roles(member, role)
-                await self.bot.say("Added {} for {}".format(role.name, member.display_name))
+            if role.name not in disallowed_roles:
+                if role.name in minus:
+                    await self.bot.remove_roles(member, role)
+                    await self.bot.say("Removed {} from {}".format(role.name, member.display_name))
+                if role.name in plus:
+                    await self.bot.add_roles(member, role)
+                    await self.bot.say("Added {} for {}".format(role.name, member.display_name))
 
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(mention_everyone=True)
