@@ -73,6 +73,18 @@ Remember to quote the name if you want it to contain spaces.
 To remove a deck, type `Deck remove [deck_id]`
 where deck_id is the number on your deck list.
 
+**Search**
+To search for decks containing specific card(s) in all saved decks, type
+`!deck search [card] [card] [card]`
+You can enter as many cards as you like. Or enter one.
+Results are paginated and will show 3 at a time. Type Y to page through all results.
+
+**Show**
+To show a specifc deck by yourself or another user, type
+`!deck show [deck_id] [user]`
+where deck_id is the number on your deck list.
+e.g. `!deck show 2` shows the second deck in your deck list.
+
 """
 
 
