@@ -46,6 +46,7 @@ welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
               "interested in joining our clans / just visiting?"
 
 changeclan_roles = ["Leader", "Co-Leader", "Elder", "High Elder"]
+disallowed_roles = ["SUPERMOD", "MOD", "Bot Commander", "Higher Power", "AlphaBot"]
 botcommander_role = ["Bot Commander"]
 
 
@@ -139,7 +140,6 @@ class RACF:
 
         Role name needs be in quotes if it is a multi-word role.
         """
-        disallowed_roles = ["SUPERMOD", "MOD", "Bot Commander", "Higher Power", "AlphaBot"]
         server = ctx.message.server
         if member is None:
             await self.bot.say("You must specify a member.")
@@ -167,7 +167,6 @@ class RACF:
 
         Role name needs be in quotes if it is a multi-word role.
         """
-        disallowed_roles = ["SUPERMOD", "MOD", "Bot Commander", "Higher Power", "AlphaBot"]
         server = ctx.message.server
         if member is None:
             await self.bot.say("You must specify a member.")
@@ -186,6 +185,47 @@ class RACF:
             await self.bot.remove_roles(member, *to_remove_roles)
             await self.bot.say("Removed {} from {}".format(role_name, member.display_name))
 
+    @commands.command(pass_context=True)
+    @commands.has_any_role(*botcommander_role)
+    async def changerole(self, ctx, member:discord.Member=None, *roles:str):
+        """Change roles of a user.
+
+        Example: !changerole SML +Delta "-Foxtrot Lead" "+Delta Lead"
+
+        Multi-word roles must be surrounded by quotes.
+        Operators are used as prefix:
+        + for role addition
+        - for role removal
+        """
+        server = ctx.message.server
+        if member is None:
+            await self.bot.say("You must specify a member")
+            return
+        elif roles is None or not roles:
+            await self.bot.say("You must specify a role.")
+            return
+
+        server_role_names = [r.name for r in server.roles]
+        role_args = []
+        flags = ['+', '-']
+        for role in roles:
+            has_flag = role[0] in flags
+            flag = role[0] if has_flag else '+'
+            name = role[1:] if has_flag else role
+
+            if name in server_role_names:
+                role_args.append({'flag': flag, 'name': name})
+
+        plus  = [r['name'] for r in role_args if r['flag'] == '+']
+        minus = [r['name'] for r in role_args if r['flag'] == '-']
+
+        for role in server.roles:
+            if role.name in minus:
+                await self.bot.remove_roles(member, role)
+                await self.bot.say("Removed {} from {}".format(role.name, member.display_name))
+            if role.name in plus:
+                await self.bot.add_roles(member, role)
+                await self.bot.say("Added {} for {}".format(role.name, member.display_name))
 
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(mention_everyone=True)
@@ -210,19 +250,6 @@ class RACF:
                 if role in [r.name for r in m.roles]:
                     out_mentions.append(m.mention)
             await self.bot.say("{} {}".format(" ".join(out_mentions), " ".join(msg)))
-
-    # @commands.command(pass_context=True)
-    # @checks.mod_or_permission()
-    # async def setstatus(self, ctx, status:str, member:discord.Member=None):
-    #     """Sets the status for a member (or self if omitted).
-
-    #     Example: !setstatus "Clash Royale" """
-    #     server = ctx.message.server
-
-    #     if member is None:
-    #         member = ctx.message.author
-
-    #     await client.change_presence(game=discord.Game(name='my game'))
 
 
 
