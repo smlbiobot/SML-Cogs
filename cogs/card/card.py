@@ -255,7 +255,7 @@ class Card:
                     deck_name="Top Deck: {}".format(i + 1),
                     author=m)
 
-                if (i+1) % results_max == 0:
+                if (i + 1) % results_max == 0 and (i + 1) < len(found_decks):
                     def pagination_check(m):
                         return m.content.lower() == 'y'
                     await self.bot.say(

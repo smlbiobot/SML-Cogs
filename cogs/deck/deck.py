@@ -190,7 +190,7 @@ class Deck:
             await self.deck_upload(ctx, member_deck, deck_name, author)
 
     @deck.command(name="add", pass_context=True, no_pm=True)
-    async def _deck_add(self, ctx,
+    async def deck_add(self, ctx,
                         card1=None, card2=None, card3=None, card4=None,
                         card5=None, card6=None, card7=None, card8=None,
                         deck_name=None):
@@ -366,7 +366,6 @@ class Deck:
                             deck_id, deck["DeckName"],
                             deck["MemberDisplayName"]))
                     await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], deck["Member"])
-                    deck_id += 1
 
                     if (deck_id - 1) % results_max == 0:
 
@@ -383,6 +382,8 @@ class Deck:
                         if answer is None:
                             await self.bot.say("Search results aborted.")
                             return
+
+                    deck_id += 1
 
     @deck.command(name="rename", pass_context=True, no_pm=True)
     async def deck_rename(self, ctx, deck_id, new_name):
