@@ -253,8 +253,6 @@ class RACF:
             await self.bot.say("{} {}".format(" ".join(out_mentions), " ".join(msg)))
 
 
-
-
     @commands.command(pass_context=True)
     async def avatar(self, ctx, member:discord.Member=None):
         """Display avatar of the user."""
@@ -266,23 +264,6 @@ class RACF:
         data = discord.Embed()
         data.set_image(url=avatar_url)
         await self.bot.say(embed=data)
-
-        # image_loaded = False
-
-        # if not simage_loaded:
-        #     try:
-        #         async with aiohttp.get(self.url) as r:
-        #             image = await r.content.read()
-        #         with open('data/sadface/sadface.png','wb') as f:
-        #             f.write(image)
-        #         image_loaded = os.path.exists('data/sadface/sadface.png')
-        #         await self.bot.send_file(message.channel,self.image)
-        #     except Exception as e:
-        #         print(e)
-        #         print("Sadface error D: I couldn't download the file, so we're gonna use the url instead")
-        #         await self.bot.send_message(message.channel,self.url)
-        # else:
-        #     await self.bot.send_file(message.channel,self.image)
 
     @commands.command(pass_context=True, no_pm=True)
     async def serverinfo2(self, ctx):
@@ -321,6 +302,8 @@ class RACF:
         data.add_field(name="Voice Channels", value=voice_channels)
         data.add_field(name="Roles", value=len(server.roles))
         data.add_field(name="Owner", value=str(server.owner))
+        data.add_field(name="\a", value="\a")
+        data.add_field(name="\a", value="\a")
 
         for role_name in role_names:
             data.add_field(name="{}s".format(role_name),
