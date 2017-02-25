@@ -336,6 +336,31 @@ class RACF:
             await self.bot.remove_roles(member, *to_remove_roles)
             await self.bot.say("Removed {} from {}".format(*to_remove_roles, member.display_name))
 
+    @commands.command(pass_context=True)
+    @commands.has_any_role(*botcommander_role)
+    async def dmusers(self, ctx:Context, msg:str=None, *members:discord.Member):
+        """Send a DM to a list of people.
+
+        Example
+        !dmusers "Please move up to Charlie" @SML @6john Meridian
+        """
+        if msg is None:
+            await self.bot.say("Please include a message.")
+        elif not len(members):
+            await self.bot.say("You must include at least one member.")
+        else:
+            data = discord.Embed(description=msg)
+            data.set_author(
+                name=ctx.message.author,
+                icon_url=ctx.message.author.avatar_url)
+            data.set_footer(text=ctx.message.server.name)
+            data.add_field(
+                name="How to reply",
+                value="DM or tag {0.mention} if you want to reply.".format(ctx.message.author))
+            for m in members:
+                await self.bot.send_message(m, embed=data)
+                await self.bot.say("Message sent to {}".format(m.display_name))
+
 
 
 def setup(bot):
