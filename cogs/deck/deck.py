@@ -367,23 +367,26 @@ class Deck:
                             deck["MemberDisplayName"]))
                     await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], deck["Member"])
 
-                    if (deck_id - 1) % results_max == 0:
-
-                        def pagination_check(m):
-                            return m.content.lower() == 'y'
-
-                        await self.bot.say("Would you like to see the next results? (Y/N)")
-
-                        answer = await self.bot.wait_for_message(
-                            timeout=10.0,
-                            author=ctx.message.author,
-                            check=pagination_check)
-
-                        if answer is None:
-                            await self.bot.say("Search results aborted.")
-                            return
-
                     deck_id += 1
+
+                    if (deck_id - 1) % results_max == 0:
+                        if deck_id < len(found_decks):
+
+                            def pagination_check(m):
+                                return m.content.lower() == 'y'
+
+                            await self.bot.say("Would you like to see the next results? (Y/N)")
+
+                            answer = await self.bot.wait_for_message(
+                                timeout=10.0,
+                                author=ctx.message.author,
+                                check=pagination_check)
+
+                            if answer is None:
+                                await self.bot.say("Search results aborted.")
+                                return
+
+
 
     @deck.command(name="rename", pass_context=True, no_pm=True)
     async def deck_rename(self, ctx, deck_id, new_name):
