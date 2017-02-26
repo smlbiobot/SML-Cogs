@@ -37,7 +37,6 @@ import datetime
 import asyncio
 import aiohttp
 import discord
-import datetime
 import os
 
 try:
@@ -106,50 +105,88 @@ class Activity:
         self.save_json()
 
     @commands.command(pass_context=True)
-    async def ranks(self, ctx:Context):
+    async def ranks(self, ctx:Context, top_max:int=None):
         """Shows the activity for this server."""
         server = ctx.message.server
         self.check_server_settings(server)
         time_id = self.get_time_id()
 
+        out = []
+
+        if top_max is None:
+            top_max = self.rank_max
+        else:
+            top_max = int(top_max)
+
+
+        out.append("**{}** (this week)".format(server.name))
+
         # messages
         msg = self.settings[server.id][time_id]["messages"]
         msg = dict(sorted(msg.items(), key = lambda x: -x[1]["messages"] ))
-        out = []
-        out.append("**Most active members** (this week):")
+        out.append("__Most active members__")
         for i, (k, v) in enumerate(msg.items()):
-            if i < self.rank_max:
-                out.append("{}. {} ({} messages)".format(
+            if i < top_max:
+                out.append("`{:>2}.` {} ({} messages)".format(
                     str(i + 1),
                     v["name"],
                     str(v["messages"])))
-        await self.bot.say("\n".join(out))
+
+        # economy
+        out.append("__Richest members__")
+        economy = self.bot.get_cog("Economy")
+        if economy is not None:
+            bank = economy.bank
+            if bank is not None:
+                bank_sorted = sorted(bank.get_server_accounts(server),
+                                     key=lambda x: x.balance, reverse=True)
+                top_accounts = bank_sorted[:top_max]
+                for i, acc in enumerate(top_accounts):
+                    out.append("`{:>2}.` {} ({} credits)".format(
+                        str(i + 1),
+                        acc.name,
+                        acc.balance))
+
 
         # commands
         cmd = self.settings[server.id][time_id]["commands"]
         cmd = dict(sorted(cmd.items(), key = lambda x: -x[1]["count"]))
-        out = []
-        out.append("**Most used commands** (this week):")
+        out.append("__Most used commands__")
         for i, (k, v) in enumerate(cmd.items()):
-            if i < self.rank_max:
-                out.append("{}. {} ({} times)".format(
+            if i < top_max:
+                out.append("`{:>2}.` {} ({} times)".format(
                     str(i + 1),
                     v["name"],
                     str(v["count"])))
-        await self.bot.say("\n".join(out))
 
         # mentions
         mentions = self.settings[server.id][time_id]["mentions"]
         mentions = dict(sorted(mentions.items(), key = lambda x: -x[1]["mentions"]))
-        out = []
-        out.append("**Most mentioned members** (this week):")
+        out.append("__Most mentioned members__")
         for i, (k, v) in enumerate(mentions.items()):
-            if i < self.rank_max:
-                out.append("{}. {} ({} times)".format(
+            if i < top_max:
+                out.append("`{:>2}.` {} ({} times)".format(
                     str(i + 1),
                     v["name"],
                     str(v["mentions"])))
-        await self.bot.say("\n".join(out))
+
+        # channels
+        channels = self.settings[server.id][time_id]["channels"]
+        channels = dict(sorted(channels.items(), key = lambda x: -x[1]["messages"]))
+        out.append("__Most active channels__")
+        for i, (k, v) in enumerate(channels.items()):
+            if i < top_max:
+                out.append("`{}.` {} ({} messages)".format(
+                    str(i + 1),
+                    v["name"],
+                    str(v["messages"])))
+
+
+        # pagify output
+        for page in pagify("\n".join(out), shorten_by=12):
+            await self.bot.say(page)
+
+        # await self.bot.say("\n".join(out))
 
 
     async def on_message(self, message:discord.Message):
@@ -172,26 +209,39 @@ class Activity:
         time_id = self.get_time_id()
 
         if server.id in self.settings:
+            server_settings = self.settings[server.id][time_id]
+
             # log message author
-            if author.id not in self.settings[server.id][time_id]['messages']:
-                self.settings[server.id][time_id]['messages'][author.id] = {
+            if author.id not in server_settings['messages']:
+                server_settings['messages'][author.id] = {
                     'name': author.display_name,
                     'id': author.id,
                     'messages': 0
                 }
-            author_settings = self.settings[server.id][time_id]['messages'][author.id]
+            author_settings = server_settings['messages'][author.id]
             author_settings['messages'] += 1
 
             # log message mentions
             for member in message.mentions:
-                if member.id not in self.settings[server.id][time_id]['mentions']:
-                    self.settings[server.id][time_id]['mentions'][member.id] = {
+                if member.id not in server_settings['mentions']:
+                    server_settings['mentions'][member.id] = {
                         'name': member.display_name,
                         'id': member.id,
                         'mentions': 0
                     }
-                self.settings[server.id][time_id]['mentions'][member.id]['mentions'] += 1
+                server_settings['mentions'][member.id]['mentions'] += 1
 
+            # log channel usage
+            channel = message.channel
+            if channel is not None:
+                if not channel.is_private:
+                    if channel.id not in server_settings['channels']:
+                        server_settings['channels'][channel.id] = {
+                            'name': channel.name,
+                            'id': channel.id,
+                            'messages': 0
+                        }
+                    server_settings['channels'][channel.id]['messages'] += 1
 
         self.save_json()
 
@@ -244,6 +294,8 @@ class Activity:
             server_settings[time_id]['commands'] = {}
         if 'mentions' not in server_settings[time_id]:
             server_settings[time_id]['mentions'] = {}
+        if 'channels' not in server_settings[time_id]:
+            server_settings[time_id]['channels'] = {}
 
         self.save_json()
 
