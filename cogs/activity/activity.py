@@ -133,23 +133,21 @@ class Activity:
                     str(i + 1),
                     v["name"],
                     str(v["messages"])))
-
         # economy
         out.append("__Richest members__")
         economy = self.bot.get_cog("Economy")
         if economy is not None:
             bank = economy.bank
             if bank is not None:
-                bank_sorted = sorted(bank.get_server_accounts(server),
-                                     key=lambda x: x.balance, reverse=True)
-                top_accounts = bank_sorted[:top_max]
-                for i, acc in enumerate(top_accounts):
-                    out.append("`{:>2}.` {} ({} credits)".format(
-                        str(i + 1),
-                        acc.name,
-                        acc.balance))
-
-
+                if server.id in bank.accounts:
+                    accounts = bank.accounts[server.id]
+                    accounts = dict(sorted(accounts.items(), key = lambda x: -x[1]["balance"]))
+                    for i, (k, v) in enumerate(accounts.items()):
+                        if i < top_max:
+                            out.append("`{:>2}.` {} ({} credits)".format(
+                                str(i + 1),
+                                server.get_member(k).display_name,
+                                str(v["balance"])))
         # commands
         cmd = self.settings[server.id][time_id]["commands"]
         cmd = dict(sorted(cmd.items(), key = lambda x: -x[1]["count"]))
@@ -160,10 +158,9 @@ class Activity:
                     str(i + 1),
                     v["name"],
                     str(v["count"])))
-
         # mentions
         mentions = self.settings[server.id][time_id]["mentions"]
-        mentions = dict(sorted(mentions.items(), key = lambda x: -x[1]["mentions"]))
+        mentions = dict(sorted(mentions.items(), key=lambda x: -x[1]["mentions"]))
         out.append("__Most mentioned members__")
         for i, (k, v) in enumerate(mentions.items()):
             if i < top_max:
@@ -174,7 +171,7 @@ class Activity:
 
         # channels
         channels = self.settings[server.id][time_id]["channels"]
-        channels = dict(sorted(channels.items(), key = lambda x: -x[1]["messages"]))
+        channels = dict(sorted(channels.items(), key=lambda x: -x[1]["messages"]))
         out.append("__Most active channels__")
         for i, (k, v) in enumerate(channels.items()):
             if i < top_max:
@@ -185,7 +182,7 @@ class Activity:
 
         # emojis
         emojis = self.settings[server.id][time_id]["emojis"]
-        emojis = dict(sorted(emojis.items(), key = lambda x: -x[1]["count"]))
+        emojis = dict(sorted(emojis.items(), key=lambda x: -x[1]["count"]))
         out.append("__Most used emojis__")
         for i, (k, v) in enumerate(emojis.items()):
             if i < top_max:
@@ -194,23 +191,15 @@ class Activity:
                     "{}".format(v["name"]),
                     str(v["count"])))
 
-                # "<:{0.name}:{0.id}>".format(emoji)
-                # <:joyless:230104023305420801>
-
         # date on start of week
         dt = datetime.datetime.utcnow()
         start = dt - datetime.timedelta(days=dt.weekday())
         out.append("Data since: {} UTC".format(start.isoformat()))
         out.append("Stats data on {} UTC".format(dt.isoformat()))
 
-
-
         # pagify output
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
-
-        # await self.bot.say("\n".join(out))
-
 
     async def on_message(self, message:discord.Message):
         """Logs number of messages sent by an."""
