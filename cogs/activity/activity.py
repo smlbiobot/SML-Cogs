@@ -75,6 +75,7 @@ class Activity:
         self.handles = {}
         self.lock = False
         self.session = aiohttp.ClientSession(loop=self.bot.loop)
+        self.rank_max = 5
 
     def __unload(self):
         self.lock = True
@@ -104,6 +105,53 @@ class Activity:
             await self.bot.say(f"Logging disabled for {server}")
         self.save_json()
 
+    @commands.command(pass_context=True)
+    async def ranks(self, ctx:Context):
+        """Shows the activity for this server."""
+        server = ctx.message.server
+        self.check_server_settings(server)
+        time_id = self.get_time_id()
+
+        # messages
+        msg = self.settings[server.id][time_id]["messages"]
+        msg = dict(sorted(msg.items(), key = lambda x: -x[1]["messages"] ))
+        out = []
+        out.append("**Most active members** (this week):")
+        for i, (k, v) in enumerate(msg.items()):
+            if i < self.rank_max:
+                out.append("{}. {} ({} messages)".format(
+                    str(i + 1),
+                    v["name"],
+                    str(v["messages"])))
+        await self.bot.say("\n".join(out))
+
+        # commands
+        cmd = self.settings[server.id][time_id]["commands"]
+        cmd = dict(sorted(cmd.items(), key = lambda x: -x[1]["count"]))
+        out = []
+        out.append("**Most used commands** (this week):")
+        for i, (k, v) in enumerate(cmd.items()):
+            if i < self.rank_max:
+                out.append("{}. {} ({} times)".format(
+                    str(i + 1),
+                    v["name"],
+                    str(v["count"])))
+        await self.bot.say("\n".join(out))
+
+        # mentions
+        mentions = self.settings[server.id][time_id]["mentions"]
+        mentions = dict(sorted(mentions.items(), key = lambda x: -x[1]["mentions"]))
+        out = []
+        out.append("**Most mentioned members** (this week):")
+        for i, (k, v) in enumerate(mentions.items()):
+            if i < self.rank_max:
+                out.append("{}. {} ({} times)".format(
+                    str(i + 1),
+                    v["name"],
+                    str(v["mentions"])))
+        await self.bot.say("\n".join(out))
+
+
     async def on_message(self, message:discord.Message):
         """Logs number of messages sent by an."""
         author = message.author
@@ -117,9 +165,14 @@ class Activity:
         if not self.settings[server.id]['on_off']:
             return
 
+        # Don’t log bot messages
+        if author is server.me:
+            return
+
         time_id = self.get_time_id()
 
         if server.id in self.settings:
+            # log message author
             if author.id not in self.settings[server.id][time_id]['messages']:
                 self.settings[server.id][time_id]['messages'][author.id] = {
                     'name': author.display_name,
@@ -128,6 +181,17 @@ class Activity:
                 }
             author_settings = self.settings[server.id][time_id]['messages'][author.id]
             author_settings['messages'] += 1
+
+            # log message mentions
+            for member in message.mentions:
+                if member.id not in self.settings[server.id][time_id]['mentions']:
+                    self.settings[server.id][time_id]['mentions'][member.id] = {
+                        'name': member.display_name,
+                        'id': member.id,
+                        'mentions': 0
+                    }
+                self.settings[server.id][time_id]['mentions'][member.id]['mentions'] += 1
+
 
         self.save_json()
 
@@ -178,14 +242,32 @@ class Activity:
             server_settings[time_id]['messages'] = {}
         if 'commands' not in server_settings[time_id]:
             server_settings[time_id]['commands'] = {}
+        if 'mentions' not in server_settings[time_id]:
+            server_settings[time_id]['mentions'] = {}
 
         self.save_json()
 
-    def get_time_id(self):
+    def get_time_id(self, date:datetime.date=None):
         """Return current year, week as a tuple."""
-        today = datetime.date.today()
-        (now_year, now_week, now_day) = today.isocalendar()
+        if date is None:
+            date = datetime.date.today()
+        (now_year, now_week, now_day) = date.isocalendar()
         return "{}, {}".format(now_year, now_week)
+
+    def get_server_messages_settings(self, server:discord.Server,
+                                     time_id:datetime.date=None):
+        """Return the messages dict from settings"""
+        if time_id is None:
+            time_id = self.get_time_id()
+        return self.settings[server.id][time_id]["messages"]
+
+    def get_server_commands_settings(self, server:discord.Server,
+                                     time_id:datetime.date=None):
+        """Return the messages dict from settings"""
+        if time_id is None:
+            time_id = self.get_time_id()
+        return self.settings[server.id][time_id]["commands"]
+
 
     def save_json(self):
         """Save settings."""
