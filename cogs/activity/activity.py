@@ -26,6 +26,9 @@ DEALINGS IN THE SOFTWARE.
 
 from discord.ext import commands
 from discord.ext.commands import Context
+from discord.ext.commands import Command
+from discord import Message
+from discord import Server
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.chat_formatting import box
 from __main__ import send_cmd_help
@@ -83,9 +86,9 @@ class Activity:
         """Sets loggig on or off for server events."""
         server = ctx.message.server
 
-        if server.id not in self.settings:
-            self.settings[server.id] = {}
-        self.settings[server.id]['all'] = on_off
+        self.check_server_settings(server)
+
+        self.settings[server.id]['on_off'] = on_off
 
         if on_off:
             await self.bot.say(f"Logging enabled for {server}")
@@ -93,8 +96,74 @@ class Activity:
             await self.bot.say(f"Logging disabled for {server}")
         self.save_json()
 
-    async def on_message(self, message):
-        pass
+    async def on_message(self, message:Message):
+        """Logs number of messages sent by an."""
+        author = message.author
+        server = message.server
+
+        if server is None:
+            return
+
+        self.check_server_settings(server)
+
+        if not self.settings[server.id]['on_off']:
+            return
+
+        if server.id in self.settings:
+            if author.id not in self.settings[server.id]['messages']:
+                self.settings[server.id]['messages'][author.id] = {
+                    'name': author.display_name,
+                    'id': author.id,
+                    'messages': 0
+                }
+            author_settings = self.settings[server.id]['messages'][author.id]
+            author_settings['messages'] += 1
+
+        self.save_json()
+
+    async def on_command(self, command:Command, ctx:Context):
+        """Logs command used."""
+        server = ctx.message.server
+
+        if server is None:
+            return
+
+        self.check_server_settings(server)
+
+        if not self.settings[server.id]['on_off']:
+            return
+
+        if command.name not in self.settings[server.id]['commands']:
+            self.settings[server.id]['commands'][command.name] = {
+                'name': command.name,
+                'cog_name': command.cog_name,
+                'count': 0
+            }
+        self.settings[server.id]['commands'][command.name]['count'] += 1
+        self.save_json()
+
+    def check_server_settings(self, server:Server):
+        """Verify server settings are available."""
+
+        if server.id not in self.settings:
+            self.settings[server.id] = {}
+
+        server_settings = self.settings[server.id]
+
+        if 'server_id' not in server_settings:
+            server_settings['server_id'] = server.id
+        if 'server_name' not in server_settings:
+            server_settings['server_name'] = server.name
+        if 'on_off' not in server_settings:
+            server_settings['on_off'] = False
+        if 'messages' not in server_settings:
+            server_settings['messages'] = {}
+        if 'commands' not in server_settings:
+            server_settings['commands'] = {}
+
+        self.save_json()
+
+
 
 
     def save_json(self):
@@ -107,7 +176,7 @@ def check_folders():
 def check_files():
     if not dataIO.is_valid_json(JSON):
         defaults = {}
-    dataIO.save_json(JSON, defaults)
+        dataIO.save_json(JSON, defaults)
 
 def setup(bot):
     check_folders()

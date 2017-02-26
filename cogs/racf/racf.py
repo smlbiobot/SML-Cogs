@@ -302,8 +302,7 @@ class RACF:
         data.add_field(name="Voice Channels", value=voice_channels)
         data.add_field(name="Roles", value=len(server.roles))
         data.add_field(name="Owner", value=str(server.owner))
-        data.add_field(name="\a", value="\a")
-        data.add_field(name="\a", value="\a")
+        data.add_field(name="\a", value="\a", inline=False)
 
         for role_name in role_names:
             data.add_field(name="{}s".format(role_name),
