@@ -268,8 +268,6 @@ class Activity:
 
             # log emojis usage
             # Discord emojis: <:joyless:230104023305420801>
-            # Emoji unicode range [\uD83C-\uDBFF\uDC00-\uDFFF]+
-            content = message.content
             emoji_p = re.compile('\<\:.+?\:\d+\>')
             emojis = emoji_p.findall(message.content)
             if len(emojis):
@@ -280,9 +278,21 @@ class Activity:
                             'count': 0
                         }
                     server_settings['emojis'][emoji]['count'] += 1
-
-
-
+            uemoji_p = re.compile(u'['
+                u'\U0001F300-\U0001F64F'
+                u'\U0001F680-\U0001F6FF'
+                u'\uD83C-\uDBFF\uDC00-\uDFFF'
+                u'\u2600-\u26FF\u2700-\u27BF]+',
+                re.UNICODE)
+            emojis = uemoji_p.findall(message.content)
+            if len(emojis):
+                for emoji in emojis:
+                    if emoji not in server_settings['emojis']:
+                        server_settings['emojis'][emoji] = {
+                            'name': emoji,
+                            'count': 0
+                        }
+                    server_settings['emojis'][emoji]['count'] += 1
 
         self.save_json()
 
