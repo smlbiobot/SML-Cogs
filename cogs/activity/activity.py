@@ -37,6 +37,8 @@ import datetime
 import asyncio
 import aiohttp
 import discord
+import re
+import string
 import os
 
 try:
@@ -181,6 +183,27 @@ class Activity:
                     v["name"],
                     str(v["messages"])))
 
+        # emojis
+        emojis = self.settings[server.id][time_id]["emojis"]
+        emojis = dict(sorted(emojis.items(), key = lambda x: -x[1]["count"]))
+        out.append("__Most used emojis__")
+        for i, (k, v) in enumerate(emojis.items()):
+            if i < top_max:
+                out.append("`{}.` {} ({} times)".format(
+                    str(i + 1),
+                    "{}".format(v["name"]),
+                    str(v["count"])))
+
+                # "<:{0.name}:{0.id}>".format(emoji)
+                # <:joyless:230104023305420801>
+
+        # date on start of week
+        dt = datetime.datetime.utcnow()
+        start = dt - datetime.timedelta(days=dt.weekday())
+        out.append("Data since: {} UTC".format(start.isoformat()))
+        out.append("Stats data on {} UTC".format(dt.isoformat()))
+
+
 
         # pagify output
         for page in pagify("\n".join(out), shorten_by=12):
@@ -243,7 +266,34 @@ class Activity:
                         }
                     server_settings['channels'][channel.id]['messages'] += 1
 
+            # log emojis usage
+            # Discord emojis: <:joyless:230104023305420801>
+            # Emoji unicode range [\uD83C-\uDBFF\uDC00-\uDFFF]+
+            content = message.content
+            emoji_p = re.compile('\<\:.+?\:\d+\>')
+            emojis = emoji_p.findall(message.content)
+            if len(emojis):
+                for emoji in emojis:
+                    if emoji not in server_settings['emojis']:
+                        server_settings['emojis'][emoji] = {
+                            'name': emoji,
+                            'count': 0
+                        }
+                    server_settings['emojis'][emoji]['count'] += 1
+
+
+
+
         self.save_json()
+
+    @commands.command(pass_context=True)
+    async def test_emoji(self, ctx:Context):
+        """displays emojis."""
+        emojis = self.bot.get_all_emojis()
+        out = []
+        for emoji in emojis:
+            out.append(" {}".format(emoji))
+        await self.bot.say(", ".join(out))
 
     async def on_command(self, command: Command, ctx: Context):
         """Logs command used."""
@@ -296,13 +346,15 @@ class Activity:
             server_settings[time_id]['mentions'] = {}
         if 'channels' not in server_settings[time_id]:
             server_settings[time_id]['channels'] = {}
+        if 'emojis' not in server_settings[time_id]:
+            server_settings[time_id]['emojis'] = {}
 
         self.save_json()
 
     def get_time_id(self, date:datetime.date=None):
         """Return current year, week as a tuple."""
         if date is None:
-            date = datetime.date.today()
+            date = datetime.datetime.utcnow()
         (now_year, now_week, now_day) = date.isocalendar()
         return "{}, {}".format(now_year, now_week)
 
