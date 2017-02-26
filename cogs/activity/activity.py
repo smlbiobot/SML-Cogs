@@ -25,10 +25,8 @@ DEALINGS IN THE SOFTWARE.
 """
 
 from discord.ext import commands
-from discord.ext.commands import Context
 from discord.ext.commands import Command
-from discord import Message
-from discord import Server
+from discord.ext.commands import Context
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.chat_formatting import box
 from __main__ import send_cmd_help
@@ -39,6 +37,7 @@ import datetime
 import asyncio
 import aiohttp
 import discord
+import datetime
 import os
 
 try:
@@ -59,6 +58,15 @@ class Activity:
     - Most active user by message sent
     - Richest user via bank economy module
     - Server Stats
+
+    Settings
+    - server_id
+      - year, week number
+        - messages
+        - commands
+      - on_off
+      - server_id
+      - server_name
     """
 
     def __init__(self, bot):
@@ -96,7 +104,7 @@ class Activity:
             await self.bot.say(f"Logging disabled for {server}")
         self.save_json()
 
-    async def on_message(self, message:Message):
+    async def on_message(self, message:discord.Message):
         """Logs number of messages sent by an."""
         author = message.author
         server = message.server
@@ -109,19 +117,21 @@ class Activity:
         if not self.settings[server.id]['on_off']:
             return
 
+        time_id = self.get_time_id()
+
         if server.id in self.settings:
-            if author.id not in self.settings[server.id]['messages']:
-                self.settings[server.id]['messages'][author.id] = {
+            if author.id not in self.settings[server.id][time_id]['messages']:
+                self.settings[server.id][time_id]['messages'][author.id] = {
                     'name': author.display_name,
                     'id': author.id,
                     'messages': 0
                 }
-            author_settings = self.settings[server.id]['messages'][author.id]
+            author_settings = self.settings[server.id][time_id]['messages'][author.id]
             author_settings['messages'] += 1
 
         self.save_json()
 
-    async def on_command(self, command:Command, ctx:Context):
+    async def on_command(self, command: Command, ctx: Context):
         """Logs command used."""
         server = ctx.message.server
 
@@ -133,16 +143,18 @@ class Activity:
         if not self.settings[server.id]['on_off']:
             return
 
-        if command.name not in self.settings[server.id]['commands']:
-            self.settings[server.id]['commands'][command.name] = {
+        time_id = self.get_time_id()
+
+        if command.name not in self.settings[server.id][time_id]['commands']:
+            self.settings[server.id][time_id]['commands'][command.name] = {
                 'name': command.name,
                 'cog_name': command.cog_name,
                 'count': 0
             }
-        self.settings[server.id]['commands'][command.name]['count'] += 1
+        self.settings[server.id][time_id]['commands'][command.name]['count'] += 1
         self.save_json()
 
-    def check_server_settings(self, server:Server):
+    def check_server_settings(self, server:discord.Server):
         """Verify server settings are available."""
 
         if server.id not in self.settings:
@@ -156,17 +168,27 @@ class Activity:
             server_settings['server_name'] = server.name
         if 'on_off' not in server_settings:
             server_settings['on_off'] = False
-        if 'messages' not in server_settings:
-            server_settings['messages'] = {}
-        if 'commands' not in server_settings:
-            server_settings['commands'] = {}
+
+        time_id = self.get_time_id()
+
+        if time_id not in server_settings:
+            server_settings[time_id] = {}
+
+        if 'messages' not in server_settings[time_id]:
+            server_settings[time_id]['messages'] = {}
+        if 'commands' not in server_settings[time_id]:
+            server_settings[time_id]['commands'] = {}
 
         self.save_json()
 
-
-
+    def get_time_id(self):
+        """Return current year, week as a tuple."""
+        today = datetime.date.today()
+        (now_year, now_week, now_day) = today.isocalendar()
+        return "{}, {}".format(now_year, now_week)
 
     def save_json(self):
+        """Save settings."""
         dataIO.save_json(JSON, self.settings)
 
 def check_folders():
