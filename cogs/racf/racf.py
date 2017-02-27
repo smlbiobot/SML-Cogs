@@ -39,16 +39,16 @@ import aiohttp
 # from .economy import Economy
 
 
-rules_url = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
-roles_url = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
-discord_url = "http://tiny.cc/alphachat"
+RULES_URL = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
+ROLES_URL = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
+DISCORD_URL = "http://tiny.cc/alphachat"
 
 welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
               "interested in joining our clans / just visiting?"
 
-changeclan_roles = ["Leader", "Co-Leader", "Elder", "High Elder"]
-disallowed_roles = ["SUPERMOD", "MOD", "Bot Commander", "Higher Power", "AlphaBot"]
-botcommander_role = ["Bot Commander"]
+CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder"]
+DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander", "Higher Power", "AlphaBot"]
+BOTCOMMANDER_ROLE = ["Bot Commander"]
 
 
 
@@ -89,17 +89,17 @@ class RACF:
 
         out = []
         out.append("**Rules**")
-        out.append("<{}>".format(rules_url))
+        out.append("<{}>".format(RULES_URL))
         out.append('')
         out.append("**Roles**")
-        out.append("<{}>".format(roles_url))
+        out.append("<{}>".format(ROLES_URL))
         out.append('')
         out.append("**Discord invite**")
-        out.append("<{}>".format(discord_url))
+        out.append("<{}>".format(DISCORD_URL))
         await self.bot.say('\n'.join(out))
 
     @commands.command(pass_context=True)
-    @commands.has_any_role(*changeclan_roles)
+    @commands.has_any_role(*CHANGECLAN_ROLES)
     async def changeclan(self, ctx, clan:str=None):
         """Update clan role when moved to a new clan.
 
@@ -133,7 +133,7 @@ class RACF:
             author.display_name))
 
     @commands.command(pass_context=True)
-    @commands.has_any_role(*botcommander_role)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def addrole(self, ctx, member:discord.Member=None, role_name:str=None):
         """Add role to a user.
 
@@ -144,23 +144,19 @@ class RACF:
         server = ctx.message.server
         if member is None:
             await self.bot.say("You must specify a member.")
-            return
         elif role_name is None:
             await self.bot.say("You must specify a role.")
-            return
-        elif role_name in disallowed_roles:
+        elif role_name in DISALLOWED_ROLES:
             await self.bot.say("You are not allowed to add those roles.")
-            return
         elif role_name not in [r.name for r in server.roles]:
             await self.bot.say("{} is not a valid role.".format(role_name))
-            return
         else:
             to_add_roles = [r for r in server.roles if r.name == role_name]
             await self.bot.add_roles(member, *to_add_roles)
             await self.bot.say("Added {} for {}".format(role_name, member.display_name))
 
     @commands.command(pass_context=True)
-    @commands.has_any_role(*botcommander_role)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def removerole(self, ctx, member:discord.Member=None, role_name:str=None):
         """Remove role from a user.
 
@@ -171,23 +167,19 @@ class RACF:
         server = ctx.message.server
         if member is None:
             await self.bot.say("You must specify a member.")
-            return
         elif role_name is None:
-            await self.bot.say("Yout must specify a role.")
-            return
-        elif role_name in disallowed_roles:
+            await self.bot.say("You must specify a role.")
+        elif role_name in DISALLOWED_ROLES:
             await self.bot.say("You are not allowed to remove those roles.")
-            return
         elif role_name not in [r.name for r in server.roles]:
             await self.bot.say("{} is not a valid role.".format(role_name))
-            return
         else:
             to_remove_roles = [r for r in server.roles if r.name == role_name]
             await self.bot.remove_roles(member, *to_remove_roles)
             await self.bot.say("Removed {} from {}".format(role_name, member.display_name))
 
     @commands.command(pass_context=True)
-    @commands.has_any_role(*botcommander_role)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def changerole(self, ctx, member:discord.Member=None, *roles:str):
         """Change roles of a user.
 
@@ -221,7 +213,7 @@ class RACF:
         minus = [r['name'] for r in role_args if r['flag'] == '-']
 
         for role in server.roles:
-            if role.name not in disallowed_roles:
+            if role.name not in DISALLOWED_ROLES:
                 if role.name in minus:
                     await self.bot.remove_roles(member, role)
                     await self.bot.say("Removed {} from {}".format(role.name, member.display_name))
@@ -267,8 +259,8 @@ class RACF:
         await self.bot.say(embed=data)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def serverinfo2(self, ctx):
-        """Shows server's informations specific to RACF"""
+    async def serverinfo2(self, ctx:Context):
+        """Shows server's informations specific to RACF."""
         server = ctx.message.server
         online = len([m.status for m in server.members
                       if m.status == discord.Status.online or
@@ -337,7 +329,7 @@ class RACF:
             await self.bot.say("Removed {} from {}".format(*to_remove_roles, member.display_name))
 
     @commands.command(pass_context=True)
-    @commands.has_any_role(*botcommander_role)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def dmusers(self, ctx:Context, msg:str=None, *members:discord.Member):
         """Send a DM to a list of people.
 
@@ -391,20 +383,6 @@ class RACF:
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
 
-
-
-
-
-
-
 def setup(bot):
     r = RACF(bot)
-    # bot.add_listener(r.member_join, "on_member_join")
     bot.add_cog(r)
-
-
-
-
-
-
-
