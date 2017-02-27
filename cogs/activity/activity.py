@@ -28,17 +28,13 @@ from discord.ext import commands
 from discord.ext.commands import Command
 from discord.ext.commands import Context
 from cogs.utils.chat_formatting import pagify
-from cogs.utils.chat_formatting import box
 from __main__ import send_cmd_help
 from .utils.dataIO import dataIO
 from .utils import checks
-from random import choice
 import datetime
-import asyncio
 import aiohttp
 import discord
 import re
-import string
 import os
 
 try:
@@ -50,9 +46,9 @@ PATH_LIST = ['data', 'activity']
 PATH = os.path.join(*PATH_LIST)
 JSON = os.path.join(*PATH_LIST, "settings.json")
 
+
 class Activity:
-    """
-    Activity Logger
+    """Activity Logger.
 
     Logs activity of a Discord server.
     Displays:
@@ -86,14 +82,14 @@ class Activity:
 
     @commands.group(pass_context=True)
     @checks.is_owner()
-    async def activityset(self, ctx:Context):
+    async def activityset(self, ctx: Context):
         """Change activity logging settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @activityset.command(name="server", pass_context=True, no_pm=True)
-    async def activityset_server(self, ctx:Context, on_off:bool):
-        """Sets loggig on or off for server events."""
+    async def activityset_server(self, ctx: Context, on_off: bool):
+        """Set loggig on or off for server events."""
         server = ctx.message.server
 
         self.check_server_settings(server)
@@ -107,8 +103,8 @@ class Activity:
         self.save_json()
 
     @commands.command(pass_context=True)
-    async def ranks(self, ctx:Context, top_max:int=None):
-        """Shows the activity for this server."""
+    async def ranks(self, ctx: Context, top_max: int=None):
+        """Show the activity for this server."""
         server = ctx.message.server
         self.check_server_settings(server)
         time_id = self.get_time_id()
@@ -120,17 +116,16 @@ class Activity:
         else:
             top_max = int(top_max)
 
-
         out.append("**{}** (this week)".format(server.name))
 
         # messages
         msg = self.settings[server.id][time_id]["messages"]
-        msg = dict(sorted(msg.items(), key = lambda x: -x[1]["messages"] ))
+        msg = dict(sorted(msg.items(), key=lambda x: -x[1]["messages"]))
         out.append("__Most active members__")
         for i, (k, v) in enumerate(msg.items()):
             if i < top_max:
-                out.append("`{:>2}.` {} ({} messages)".format(
-                    str(i + 1),
+                out.append("`{:4d}.` {} ({} messages)".format(
+                    i + 1,
                     v["name"],
                     str(v["messages"])))
         # economy
@@ -141,7 +136,8 @@ class Activity:
             if bank is not None:
                 if server.id in bank.accounts:
                     accounts = bank.accounts[server.id]
-                    accounts = dict(sorted(accounts.items(), key = lambda x: -x[1]["balance"]))
+                    accounts = dict(sorted(accounts.items(),
+                                           key=lambda x: -x[1]["balance"]))
                     for i, (k, v) in enumerate(accounts.items()):
                         if i < top_max:
                             out.append("`{:>2}.` {} ({} credits)".format(
@@ -150,7 +146,7 @@ class Activity:
                                 str(v["balance"])))
         # commands
         cmd = self.settings[server.id][time_id]["commands"]
-        cmd = dict(sorted(cmd.items(), key = lambda x: -x[1]["count"]))
+        cmd = dict(sorted(cmd.items(), key=lambda x: -x[1]["count"]))
         out.append("__Most used commands__")
         for i, (k, v) in enumerate(cmd.items()):
             if i < top_max:
@@ -160,7 +156,8 @@ class Activity:
                     str(v["count"])))
         # mentions
         mentions = self.settings[server.id][time_id]["mentions"]
-        mentions = dict(sorted(mentions.items(), key=lambda x: -x[1]["mentions"]))
+        mentions = dict(sorted(mentions.items(),
+                               key=lambda x: -x[1]["mentions"]))
         out.append("__Most mentioned members__")
         for i, (k, v) in enumerate(mentions.items()):
             if i < top_max:
@@ -171,7 +168,8 @@ class Activity:
 
         # channels
         channels = self.settings[server.id][time_id]["channels"]
-        channels = dict(sorted(channels.items(), key=lambda x: -x[1]["messages"]))
+        channels = dict(sorted(channels.items(),
+                               key=lambda x: -x[1]["messages"]))
         out.append("__Most active channels__")
         for i, (k, v) in enumerate(channels.items()):
             if i < top_max:
@@ -201,8 +199,8 @@ class Activity:
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
 
-    async def on_message(self, message:discord.Message):
-        """Logs number of messages sent by an."""
+    async def on_message(self, message: discord.Message):
+        """Log number of messages sent by an."""
         author = message.author
         server = message.server
 
@@ -268,11 +266,11 @@ class Activity:
                         }
                     server_settings['emojis'][emoji]['count'] += 1
             uemoji_p = re.compile(u'['
-                u'\U0001F300-\U0001F64F'
-                u'\U0001F680-\U0001F6FF'
-                u'\uD83C-\uDBFF\uDC00-\uDFFF'
-                u'\u2600-\u26FF\u2700-\u27BF]+',
-                re.UNICODE)
+                                  u'\U0001F300-\U0001F64F'
+                                  u'\U0001F680-\U0001F6FF'
+                                  u'\uD83C-\uDBFF\uDC00-\uDFFF'
+                                  u'\u2600-\u26FF\u2700-\u27BF]+',
+                                  re.UNICODE)
             emojis = uemoji_p.findall(message.content)
             if len(emojis):
                 for emoji in emojis:
@@ -285,17 +283,8 @@ class Activity:
 
         self.save_json()
 
-    @commands.command(pass_context=True)
-    async def test_emoji(self, ctx:Context):
-        """displays emojis."""
-        emojis = self.bot.get_all_emojis()
-        out = []
-        for emoji in emojis:
-            out.append(" {}".format(emoji))
-        await self.bot.say(", ".join(out))
-
     async def on_command(self, command: Command, ctx: Context):
-        """Logs command used."""
+        """Log command used."""
         server = ctx.message.server
 
         if server is None:
@@ -308,18 +297,19 @@ class Activity:
 
         time_id = self.get_time_id()
 
-        if command.name not in self.settings[server.id][time_id]['commands']:
-            self.settings[server.id][time_id]['commands'][command.name] = {
+        server_commands = self.settings[server.id][time_id]['commands']
+
+        if command.name not in server_commands:
+            server_commands[command.name] = {
                 'name': command.name,
                 'cog_name': command.cog_name,
                 'count': 0
             }
-        self.settings[server.id][time_id]['commands'][command.name]['count'] += 1
+        server_commands[command.name]['count'] += 1
         self.save_json()
 
-    def check_server_settings(self, server:discord.Server):
+    def check_server_settings(self, server: discord.Server):
         """Verify server settings are available."""
-
         if server.id not in self.settings:
             self.settings[server.id] = {}
 
@@ -350,27 +340,26 @@ class Activity:
 
         self.save_json()
 
-    def get_time_id(self, date:datetime.date=None):
+    def get_time_id(self, date: datetime.date=None):
         """Return current year, week as a tuple."""
         if date is None:
             date = datetime.datetime.utcnow()
         (now_year, now_week, now_day) = date.isocalendar()
         return "{}, {}".format(now_year, now_week)
 
-    def get_server_messages_settings(self, server:discord.Server,
-                                     time_id:datetime.date=None):
-        """Return the messages dict from settings"""
+    def get_server_messages_settings(self, server: discord.Server,
+                                     time_id: datetime.date=None):
+        """Return the messages dict from settings."""
         if time_id is None:
             time_id = self.get_time_id()
         return self.settings[server.id][time_id]["messages"]
 
-    def get_server_commands_settings(self, server:discord.Server,
-                                     time_id:datetime.date=None):
-        """Return the messages dict from settings"""
+    def get_server_commands_settings(self, server: discord.Server,
+                                     time_id: datetime.date=None):
+        """Return the messages dict from settings."""
         if time_id is None:
             time_id = self.get_time_id()
         return self.settings[server.id][time_id]["commands"]
-
 
     def save_json(self):
         """Save settings."""
