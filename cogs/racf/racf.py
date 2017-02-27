@@ -365,12 +365,8 @@ class RACF:
     async def emojis(self, ctx:Context):
         """Show all emojis available on server."""
         server = ctx.message.server
-        emojis = []
-        for emoji in self.bot.get_all_emojis():
-            if emoji and emoji.server and emoji.server == server:
-                emojis.append(emoji)
         out = []
-        for emoji in emojis:
+        for emoji in server.emojis:
             # Discord emojis: <:joyless:230104023305420801>
             emoji_str = "<:{0.name}:{0.id}>".format(emoji)
             out.append("{} `:{}:`".format(emoji_str, emoji.name))
