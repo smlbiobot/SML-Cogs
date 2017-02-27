@@ -167,8 +167,7 @@ class DraftRoyale:
         await self.bot.say(
             f"{admin.mention} How many players? "
             f"({self.min_players}-{self.max_players})")
-        valid_answer = False
-        while not valid_answer:
+        while True:
             answer = await self.bot.wait_for_message(
                 timeout=30.0,
                 author=ctx.message.author,
@@ -177,10 +176,12 @@ class DraftRoyale:
             if self.active_draft is not None:
                 if answer is None:
                     await self.bot.say(f"{admin.mention} Draft aborted.")
-                    await ctx.invoked_subcommand(self.draft_abort)
+                    self.init()
+                    # await ctx.invoked_subcommand(self.draft_abort)
                     return
                 elif not answer.content.isdigit():
-                    await self.bot.say(f"{admin.mention} You must enter a number")
+                    await self.bot.say(f"{admin.mention} "
+                                       f"You must enter a number.")
                 elif int(answer.content) < self.min_players:
                     await self.bot.say(f"{admin.mention} "
                                        f"Number must be at least "
@@ -190,7 +191,13 @@ class DraftRoyale:
                                        f"Number must be no more than "
                                        f"{self.max_players}")
                 else:
-                    valid_answer = True
+                    break
+
+            if answer is None:
+                self.init()
+                await self.bot.say("Timeout. Draft aborted")
+                break
+
         await self.bot.say(f"Number of players: {answer.content}")
         self.active_draft["player_count"] = int(answer.content)
 
