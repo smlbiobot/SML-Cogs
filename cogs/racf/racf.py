@@ -31,13 +31,6 @@ from cogs.utils.chat_formatting import pagify
 from .utils import checks
 from random import choice
 from __main__ import send_cmd_help
-import colorsys
-import asyncio
-import os
-import datetime
-import aiohttp
-# from .economy import Economy
-
 
 RULES_URL = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
 ROLES_URL = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
@@ -47,9 +40,9 @@ welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
               "interested in joining our clans / just visiting?"
 
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder"]
-DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander", "Higher Power", "AlphaBot"]
+DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
+                    "Higher Power", "AlphaBot"]
 BOTCOMMANDER_ROLE = ["Bot Commander"]
-
 
 
 class RACF:
@@ -59,12 +52,12 @@ class RACF:
     """
 
     def __init__(self, bot):
+        """Constructor."""
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def racf(self, ctx):
+    async def racf(self, ctx: Context):
         """RACF Rules + Roles."""
-
         server = ctx.message.server
 
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
@@ -100,12 +93,13 @@ class RACF:
 
     @commands.command(pass_context=True)
     @commands.has_any_role(*CHANGECLAN_ROLES)
-    async def changeclan(self, ctx, clan:str=None):
+    async def changeclan(self, ctx, clan: str=None):
         """Update clan role when moved to a new clan.
 
         Example: !changeclan Delta
         """
-        clans = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel"]
+        clans = ["Alpha", "Bravo", "Charlie", "Delta",
+                 "Echo", "Foxtrot", "Golf", "Hotel"]
         author = ctx.message.author
         server = ctx.message.server
 
@@ -113,7 +107,7 @@ class RACF:
             await send_cmd_help(ctx)
             return
 
-        if not clan in clans:
+        if clan not in clans:
             await self.bot.say("{} is not a valid clan.".format(clan))
             return
 
@@ -134,7 +128,8 @@ class RACF:
 
     @commands.command(pass_context=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def addrole(self, ctx, member:discord.Member=None, role_name:str=None):
+    async def addrole(self, ctx, member: discord.Member=None,
+                      role_name:str=None):
         """Add role to a user.
 
         Example: !addrole SML Delta
@@ -153,11 +148,13 @@ class RACF:
         else:
             to_add_roles = [r for r in server.roles if r.name == role_name]
             await self.bot.add_roles(member, *to_add_roles)
-            await self.bot.say("Added {} for {}".format(role_name, member.display_name))
+            await self.bot.say("Added {} for {}".format(
+                role_name, member.display_name))
 
     @commands.command(pass_context=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def removerole(self, ctx, member:discord.Member=None, role_name:str=None):
+    async def removerole(self, ctx, member: discord.Member=None,
+                         role_name: str=None):
         """Remove role from a user.
 
         Example: !removerole SML Delta
@@ -176,11 +173,12 @@ class RACF:
         else:
             to_remove_roles = [r for r in server.roles if r.name == role_name]
             await self.bot.remove_roles(member, *to_remove_roles)
-            await self.bot.say("Removed {} from {}".format(role_name, member.display_name))
+            await self.bot.say("Removed {} from {}".format(
+                role_name, member.display_name))
 
     @commands.command(pass_context=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def changerole(self, ctx, member:discord.Member=None, *roles:str):
+    async def changerole(self, ctx, member: discord.Member=None, *roles: str):
         """Change roles of a user.
 
         Example: !changerole SML +Delta "-Foxtrot Lead" "+Delta Lead"
@@ -209,21 +207,25 @@ class RACF:
             if name in server_role_names:
                 role_args.append({'flag': flag, 'name': name})
 
-        plus  = [r['name'] for r in role_args if r['flag'] == '+']
+        plus = [r['name'] for r in role_args if r['flag'] == '+']
         minus = [r['name'] for r in role_args if r['flag'] == '-']
 
         for role in server.roles:
             if role.name not in DISALLOWED_ROLES:
                 if role.name in minus:
                     await self.bot.remove_roles(member, role)
-                    await self.bot.say("Removed {} from {}".format(role.name, member.display_name))
+                    await self.bot.say(
+                        "Removed {} from {}".format(
+                            role.name, member.display_name))
                 if role.name in plus:
                     await self.bot.add_roles(member, role)
-                    await self.bot.say("Added {} for {}".format(role.name, member.display_name))
+                    await self.bot.say(
+                        "Added {} for {}".format(
+                            role.name, member.display_name))
 
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(mention_everyone=True)
-    async def mentionusers(self, ctx, role:str, *msg):
+    async def mentionusers(self, ctx, role: str, *msg):
         """Mention users by role.
 
         Example:
@@ -235,7 +237,8 @@ class RACF:
         server_roles_names = [r.name for r in server.roles]
 
         if role not in server_roles_names:
-            await self.bot.say("{} is not a valid role on this server.".format(role))
+            await self.bot.say(
+                "{} is not a valid role on this server.".format(role))
         elif not msg:
             await self.bot.say("You have not entered any messages.")
         else:
@@ -243,11 +246,11 @@ class RACF:
             for m in server.members:
                 if role in [r.name for r in m.roles]:
                     out_mentions.append(m.mention)
-            await self.bot.say("{} {}".format(" ".join(out_mentions), " ".join(msg)))
-
+            await self.bot.say("{} {}".format(" ".join(out_mentions),
+                                              " ".join(msg)))
 
     @commands.command(pass_context=True)
-    async def avatar(self, ctx, member:discord.Member=None):
+    async def avatar(self, ctx, member: discord.Member=None):
         """Display avatar of the user."""
         author = ctx.message.author
 
@@ -259,8 +262,8 @@ class RACF:
         await self.bot.say(embed=data)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def serverinfo2(self, ctx:Context):
-        """Shows server's informations specific to RACF."""
+    async def serverinfo2(self, ctx: Context):
+        """Show server's informations specific to RACF."""
         server = ctx.message.server
         online = len([m.status for m in server.members
                       if m.status == discord.Status.online or
@@ -317,20 +320,23 @@ class RACF:
 
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(administrator=True)
-    async def member2visitor(self, ctx:Context, *members:discord.Member):
-        """Re-assign list of people from members to visitors"""
+    async def member2visitor(self, ctx: Context, *members: discord.Member):
+        """Re-assign list of people from members to visitors."""
         server = ctx.message.server
         to_remove_roles = [r for r in server.roles if r.name == 'Member']
         to_add_roles = [r for r in server.roles if r.name == 'Visitor']
         for member in members:
             await self.bot.add_roles(member, *to_add_roles)
-            await self.bot.say("Added {} for {}".format(*to_add_roles, member.display_name))
+            await self.bot.say("Added {} for {}".format(
+                *to_add_roles, member.display_name))
             await self.bot.remove_roles(member, *to_remove_roles)
-            await self.bot.say("Removed {} from {}".format(*to_remove_roles, member.display_name))
+            await self.bot.say("Removed {} from {}".format(
+                *to_remove_roles, member.display_name))
 
     @commands.command(pass_context=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def dmusers(self, ctx:Context, msg:str=None, *members:discord.Member):
+    async def dmusers(self, ctx: Context, msg: str=None,
+                      *members: discord.Member):
         """Send a DM to a list of people.
 
         Example
@@ -348,13 +354,14 @@ class RACF:
             data.set_footer(text=ctx.message.server.name)
             data.add_field(
                 name="How to reply",
-                value="DM or tag {0.mention} if you want to reply.".format(ctx.message.author))
+                value="DM or tag {0.mention} if you want to reply.".format(
+                    ctx.message.author))
             for m in members:
                 await self.bot.send_message(m, embed=data)
                 await self.bot.say("Message sent to {}".format(m.display_name))
 
     @commands.command(pass_context=True)
-    async def emojis(self, ctx:Context):
+    async def emojis(self, ctx: Context):
         """Show all emojis available on server."""
         server = ctx.message.server
         out = []
@@ -366,7 +373,7 @@ class RACF:
             await self.bot.say(page)
 
     @commands.command(pass_context=True)
-    async def listroles(self, ctx:Context):
+    async def listroles(self, ctx: Context):
         """List all the roles on the server."""
         server = ctx.message.server
         out = []
