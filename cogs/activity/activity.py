@@ -379,4 +379,3 @@ def setup(bot):
     check_files()
     n = Activity(bot)
     bot.add_cog(n)
-
