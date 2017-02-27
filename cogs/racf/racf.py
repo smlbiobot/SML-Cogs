@@ -377,6 +377,28 @@ class RACF:
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
 
+    @commands.command(pass_context=True)
+    async def listroles(self, ctx:Context):
+        """List all the roles on the server."""
+        server = ctx.message.server
+        out = []
+        out.append("__List of roles on {}__".format(server.name))
+        roles = {}
+        for role in server.roles:
+            roles[role.id] = {'role': role, 'count': 0}
+        for member in server.members:
+            for role in member.roles:
+                roles[role.id]['count'] += 1
+        for role in server.role_hierarchy:
+            out.append("**{}** ({} members)".format(role.name,
+                                                    roles[role.id]['count']))
+        for page in pagify("\n".join(out), shorten_by=12):
+            await self.bot.say(page)
+
+
+
+
+
 
 
 def setup(bot):
