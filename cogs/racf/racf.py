@@ -27,6 +27,7 @@ DEALINGS IN THE SOFTWARE.
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
+from cogs.utils.chat_formatting import pagify
 from .utils import checks
 from random import choice
 from __main__ import send_cmd_help
@@ -359,6 +360,22 @@ class RACF:
             for m in members:
                 await self.bot.send_message(m, embed=data)
                 await self.bot.say("Message sent to {}".format(m.display_name))
+
+    @commands.command(pass_context=True)
+    async def emojis(self, ctx:Context):
+        """Show all emojis available on server."""
+        server = ctx.message.server
+        emojis = []
+        for emoji in self.bot.get_all_emojis():
+            if emoji and emoji.server and emoji.server == server:
+                emojis.append(emoji)
+        out = []
+        for emoji in emojis:
+            # Discord emojis: <:joyless:230104023305420801>
+            emoji_str = "<:{0.name}:{0.id}>".format(emoji)
+            out.append("{} `:{}:`".format(emoji_str, emoji.name))
+        for page in pagify("\n".join(out), shorten_by=12):
+            await self.bot.say(page)
 
 
 
