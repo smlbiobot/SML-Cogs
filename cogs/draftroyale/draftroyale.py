@@ -36,7 +36,7 @@ import os
 
 
 CRDATA_PATH = "data/draftroyale/clashroyale.json"
-SETTINGS_PATH = "data/draftroyale/settings.json"
+SETTINGS_PATH = "data/draftroyale/draftroyale.json"
 
 
 class Draft:
@@ -57,17 +57,27 @@ class DraftRoyale:
     This cog is written to facilitate draftin in Clash Royale.
 
     Types of drafts:
-    + 4 players (10 cards)
-    + 8 players (8 cards)
+    - 4 players (10 cards)
+    - 8 players (8 cards)
+    - This system however will allow any number of players (2-8)
+      with number of cards set to card count // players
 
-    Bans
+    Bans:
+
     Some drafts have bans. For example, if graveyard is picked as a banned
     card, then no one can pick it.pick
 
-    Drafting order
+    Drafting order:
+
     Most drafts are snake drafts. They go from first to last then backwards.
     The first and last player gets two picks in a row.
     1 2 3 4 4 3 2 1 1 2 3 4 etc.
+
+    Required files:
+
+    - data/clashroyale.json: card data
+    - data/settings.json: technically not needed but good to
+                          have a human-readable history log
     """
 
     def __init__(self, bot):
@@ -83,6 +93,12 @@ class DraftRoyale:
         self.cards = []
         self.cards_abbrev = {}
 
+        self.min_players = 2
+        self.max_players = 8
+
+        self.active_draft = None
+        # self.valid_answer = False
+
     def init_card_data(self):
         """Initialize card data and popularize acceptable abbreviations."""
         for card_key, card_value in self.crdata["Cards"].items():
@@ -97,6 +113,13 @@ class DraftRoyale:
                 self.cards_abbrev[aka] = card_key
                 if aka.find('-'):
                     self.cards_abbrev[aka.replace('-', '')] = card_key
+
+    def init(self):
+        """Abort all operations."""
+        # Stops the interaction loop
+        # self.valid_answer = True
+        # Get rid of active draft
+        self.active_draft = None
 
     @commands.group(pass_context=True, no_pm=True)
     async def draft(self, ctx: Context):
@@ -115,6 +138,78 @@ class DraftRoyale:
         The author who type this command will be designated as the
         owner / admin of the draft.
         """
+        await self.bot.say("Draft Royale")
+
+        self.init()
+
+        if self.active_draft is not None:
+            await self.bot.say("An active draft is going on. "
+                               "Please finish the current draft "
+                               "before starting another.")
+            return
+
+        admin = ctx.message.author
+
+        await self.bot.say(f"**Draft Admin** set to {admin.display_name}.")
+
+        self.active_draft = {
+            "admin_id": admin.id,
+            "players": []
+        }
+
+        id = datetime.datetime.utcnow().isoformat()
+
+        if "drafts" not in self.settings:
+            self.settings["drafts"] = {}
+        self.settings["drafts"][id] = self.active_draft
+
+        # Input: Number of players
+        await self.bot.say(
+            f"{admin.mention} How many players? "
+            f"({self.min_players}-{self.max_players})")
+        valid_answer = False
+        while not valid_answer:
+            answer = await self.bot.wait_for_message(
+                timeout=30.0,
+                author=ctx.message.author,
+                channel=ctx.message.channel)
+            # don’t do interactive prompts if draft was aborted
+            if self.active_draft is not None:
+                if answer is None:
+                    await self.bot.say(f"{admin.mention} Draft aborted.")
+                    await ctx.invoked_subcommand(self.draft_abort)
+                    return
+                elif not answer.content.isdigit():
+                    await self.bot.say(f"{admin.mention} You must enter a number")
+                elif int(answer.content) < self.min_players:
+                    await self.bot.say(f"{admin.mention} "
+                                       f"Number must be at least "
+                                       f"{self.min_players}")
+                elif int(answer.content) > self.max_players:
+                    await self.bot.say(f"{admin.mention} "
+                                       f"Number must be no more than "
+                                       f"{self.max_players}")
+                else:
+                    valid_answer = True
+        await self.bot.say(f"Number of players: {answer.content}")
+        self.active_draft["player_count"] = int(answer.content)
+
+        # Input: Player Mentions
+
+        self.save_settings()
+
+
+    @draft.command(name="abort", pass_context=True, no_pm=True)
+    async def draft_abort(self, ctx:Context):
+        """Abort an active draft."""
+        self.init()
+        await self.bot.say("Draft Royale aborted.")
+
+
+
+    def save_settings(self):
+        """Save settings to disk."""
+        dataIO.save_json(self.settings_path, self.settings)
 
 
 def check_folder():
