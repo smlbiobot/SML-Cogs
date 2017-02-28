@@ -134,14 +134,13 @@ class DraftRoyale:
 
     def init(self):
         """Abort all operations."""
-        # Stops the interaction loop
-        # self.valid_answer = True
-        # Get rid of active draft
         self.active_draft = None
         self.admin = None
         self.players = []
         self.time_id = datetime.datetime.utcnow().isoformat()
         self.picked_cards = {}
+        self.pick_order = []
+        self.is_snake_draft = True
 
     @commands.group(pass_context=True, no_pm=True)
     async def draft(self, ctx: Context):
@@ -230,6 +229,42 @@ class DraftRoyale:
         await self.list_players()
         self.save_players_settings()
 
+    @draft.command(name="snake", pass_context=True, no_pm=True)
+    async def draft_snake(self, ctx: Context, on_off: bool):
+        """Enable / disable snake draft mode.
+        Example:
+        !draft snake 1
+        !draft snake 0
+        """
+        self.is_snake_draft = on_off
+        if on_off:
+            await self.bot.say("Snake draft enabled.")
+        else:
+            await self.bot.say("Snake draft disabled.")
+
+    @draft.command(name="status", pass_context=True, no_pm=True)
+    async def draft_status(self, ctx: Context):
+        """Display status of the current draft."""
+        data = discord.Embed(
+            title="Clash Royale Drafting System",
+            description="Current Status")
+        data.add_field(name="Admin", value=self.admin.display_name)
+        data.add_field(name="Snake Draft", value=self.is_snake_draft)
+        data.add_field(
+            name="Players",
+            value="\n".join([f"+ {player.display_name}"
+                             for player in self.players]),
+            inline=False)
+        data.add_field(
+            name="Available Cards",
+            value=", ".join(self.get_available_card_names()),
+            inline=False)
+        try:
+            await self.bot.say(embed=data)
+        except discord.HTTPException:
+            await self.bot.say("I need the `Embed links` permission "
+                               "to send this")
+
     @draft.command(name="cards", pass_context=True, no_pm=True)
     async def draft_cards(self, ctx: Context, sort: str=None):
         """Display available cards for picking.
@@ -238,7 +273,10 @@ class DraftRoyale:
         """
         out = []
         out.append("**Available cards**")
-        card_names = [self.card_key_to_name(key) for key in self.cards]
+        card_names = [
+            self.card_key_to_name(key)
+            for key in self.cards
+            if key not in self.picked_cards]
         out.append(", ".join(card_names))
 
         for page in pagify("\n".join(out), shorten_by=12):
@@ -246,7 +284,7 @@ class DraftRoyale:
 
     @draft.command(name="pick", pass_context=True, no_pm=True)
     async def draft_pick(self, ctx: Context):
-        """Start interactive prompt for players to pick cards."""
+        """Player pick cards."""
         pass
 
     @draft.command(name="abort", pass_context=True, no_pm=True)
@@ -254,6 +292,11 @@ class DraftRoyale:
         """Abort an active draft."""
         self.init()
         await self.bot.say("Draft Royale aborted.")
+
+    @draft.command(name="listplayers", pass_context=True, no_pm=True)
+    async def draft_listplayers(self, ctx: Context):
+        """List players in the play order."""
+        await self.list_players()
 
     async def list_players(self):
         """List the players in the play order."""
@@ -279,6 +322,18 @@ class DraftRoyale:
     def card_key_to_name(self, card_key: str):
         """Return card name from card key."""
         return string.capwords(card_key.replace('-', ' '))
+
+    def get_available_cards(self):
+        """Return list of available cards that are not picked yet."""
+        return [
+            card for card in self.cards
+            if card not in self.picked_cards]
+
+    def get_available_card_names(self):
+        """Return list of available card names that are not picked yet."""
+        return [
+            self.card_key_to_name(card)
+            for card in self.get_available_cards()]
 
 
 def check_folder():
