@@ -96,6 +96,8 @@ class DraftRoyale:
         self.min_players = 2
         self.max_players = 8
 
+        self.prompt_timeout = 60.0
+
         self.active_draft = None
         # self.valid_answer = False
 
@@ -131,8 +133,8 @@ class DraftRoyale:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @draft.command(name="init", pass_context=True, no_pm=True)
-    async def draft_init(self, ctx:Context):
+    @draft.command(name="start", pass_context=True, no_pm=True)
+    async def draft_start(self, ctx:Context):
         """Initialize a draft.
 
         The author who type this command will be designated as the
@@ -140,7 +142,8 @@ class DraftRoyale:
         """
         await self.bot.say("Draft Royale")
 
-        self.init()
+        server = ctx.message.server
+        admin = ctx.message.author
 
         if self.active_draft is not None:
             await self.bot.say("An active draft is going on. "
@@ -148,7 +151,7 @@ class DraftRoyale:
                                "before starting another.")
             return
 
-        admin = ctx.message.author
+        self.init()
 
         await self.bot.say(f"**Draft Admin** set to {admin.display_name}.")
 
@@ -167,43 +170,90 @@ class DraftRoyale:
         await self.bot.say(
             f"{admin.mention} How many players? "
             f"({self.min_players}-{self.max_players})")
-        while True:
-            answer = await self.bot.wait_for_message(
-                timeout=30.0,
-                author=ctx.message.author,
-                channel=ctx.message.channel)
-            # don’t do interactive prompts if draft was aborted
-            if self.active_draft is not None:
-                if answer is None:
-                    await self.bot.say(f"{admin.mention} Draft aborted.")
-                    self.init()
-                    # await ctx.invoked_subcommand(self.draft_abort)
-                    return
-                elif not answer.content.isdigit():
-                    await self.bot.say(f"{admin.mention} "
-                                       f"You must enter a number.")
-                elif int(answer.content) < self.min_players:
-                    await self.bot.say(f"{admin.mention} "
-                                       f"Number must be at least "
-                                       f"{self.min_players}")
-                elif int(answer.content) > self.max_players:
-                    await self.bot.say(f"{admin.mention} "
-                                       f"Number must be no more than "
-                                       f"{self.max_players}")
-                else:
-                    break
+        def check(m: discord.Message):
+            if not m.content.isdigit():
+                return False
+            if not int(m.content) in range(self.min_players, self.max_players+1):
+                return False
+            return True
 
-            if answer is None:
-                self.init()
-                await self.bot.say("Timeout. Draft aborted")
-                break
+        answer = await self.bot.wait_for_message(
+            timeout=self.prompt_timeout,
+            author=ctx.message.author,
+            channel=ctx.message.channel,
+            check=check)
+        if answer is None:
+            await self.bot.say(f"{admin.mention} Draft aborted.")
+            self.init()
+            return
+        player_count = int(answer.content)
 
-        await self.bot.say(f"Number of players: {answer.content}")
-        self.active_draft["player_count"] = int(answer.content)
-
-        # Input: Player Mentions
-
+        await self.bot.say(f"Number of players: {player_count}")
+        self.active_draft["player_count"] = player_count
         self.save_settings()
+
+
+        # interactive prompts causes problems. Switch to using check
+        # while True:
+        #     answer = await self.bot.wait_for_message(
+        #         timeout=30.0,
+        #         author=ctx.message.author,
+        #         channel=ctx.message.channel)
+        #     # don’t do interactive prompts if draft was aborted
+        #     if self.active_draft is not None:
+        #         if answer is None:
+        #             await self.bot.say(f"{admin.mention} Draft aborted.")
+        #             self.init()
+        #             # await ctx.invoked_subcommand(self.draft_abort)
+        #             return
+        #         elif not answer.content.isdigit():
+        #             await self.bot.say(f"{admin.mention} "
+        #                                f"You must enter a number.")
+        #         elif int(answer.content) < self.min_players:
+        #             await self.bot.say(f"{admin.mention} "
+        #                                f"Number must be at least "
+        #                                f"{self.min_players}")
+        #         elif int(answer.content) > self.max_players:
+        #             await self.bot.say(f"{admin.mention} "
+        #                                f"Number must be no more than "
+        #                                f"{self.max_players}")
+        #         else:
+        #             break
+
+        #     if answer is None:
+        #         self.init()
+        #         await self.bot.say("Timeout. Draft aborted")
+        #         break
+
+
+
+        # Input: Players
+        # TODO: Check unique plyaers. For development purposes, it is not checked
+        for id in range(player_count):
+            await self.bot.say(f"{admin.mention} Who is Player {id+1}")
+            def check(m: discord.Message):
+                return server.get_member_named(m.content)
+            answer = await self.bot.wait_for_message(
+                timeout=self.prompt_timeout,
+                author=ctx.message.author,
+                channel=ctx.message.channel,
+                check=check)
+            if answer is None:
+                await self.bot.say(f"{admin.mention} Draft aborted.")
+                self.init()
+                return
+            player = server.get_member_named(answer.content)
+            self.active_draft["players"].append({
+                "player_id": id,
+                "user_id": player.id,
+                "user_name": player.display_name})
+            await self.bot.say(f"Player {id+1} set to {player.display_name}.")
+            self.save_settings()
+
+
+        # Dev only: reset draft when done
+        self.init()
+
 
 
     @draft.command(name="abort", pass_context=True, no_pm=True)
