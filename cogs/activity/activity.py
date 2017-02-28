@@ -192,6 +192,7 @@ class Activity:
         # date on start of week
         dt = datetime.datetime.utcnow()
         start = dt - datetime.timedelta(days=dt.weekday())
+        start = start.replace(hour=0, minute=0, second=0, microsecond=0)
         out.append("Data since: {} UTC".format(start.isoformat()))
         out.append("Stats data on {} UTC".format(dt.isoformat()))
 
