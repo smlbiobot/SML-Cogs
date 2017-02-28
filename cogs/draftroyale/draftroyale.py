@@ -33,11 +33,26 @@ from random import choice
 from random import shuffle
 import datetime
 import discord
+import string
 import os
 
 
 CRDATA_PATH = "data/draftroyale/clashroyale.json"
 SETTINGS_PATH = "data/draftroyale/draftroyale.json"
+
+HELP_TEXT = """
+**Draft Royale: Clash Royale draft system**
+
+1. Start a draft
+`!draft start`
+
+2. Pick players
+`!draft players [username...]`
+
+3. Pick cards
+`!draft pick`
+"""
+
 
 
 class Draft:
@@ -100,6 +115,7 @@ class DraftRoyale:
         self.prompt_timeout = 60.0
 
         self.init()
+        self.init_card_data()
 
     def init_card_data(self):
         """Initialize card data and popularize acceptable abbreviations."""
@@ -125,6 +141,7 @@ class DraftRoyale:
         self.admin = None
         self.players = []
         self.time_id = datetime.datetime.utcnow().isoformat()
+        self.picked_cards = {}
 
     @commands.group(pass_context=True, no_pm=True)
     async def draft(self, ctx: Context):
@@ -136,8 +153,13 @@ class DraftRoyale:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @draft.command(name="help", pass_context=True)
+    async def draft_help(self, ctx: Context):
+        """Display help for drating."""
+        await self.bot.say(HELP_TEXT)
+
     @draft.command(name="start", pass_context=True, no_pm=True)
-    async def draft_start(self, ctx:Context):
+    async def draft_start(self, ctx: Context):
         """Initialize a draft.
 
         The author who type this command will be designated as the
@@ -199,14 +221,33 @@ class DraftRoyale:
         await self.list_players()
         self.save_players_settings()
 
-    @draft.command(name="randomorder", pass_context=True, no_pm=True)
-    async def draft_randomorder(self, ctx: Context):
+    @draft.command(name="random", pass_context=True, no_pm=True)
+    async def draft_random(self, ctx: Context):
         """Randomize the player order."""
         shuffle(self.players)
         self.active_draft["players"] = []
 
         await self.list_players()
         self.save_players_settings()
+
+    @draft.command(name="cards", pass_context=True, no_pm=True)
+    async def draft_cards(self, ctx: Context, sort: str=None):
+        """Display available cards for picking.
+
+        Optionally set sort order.
+        """
+        out = []
+        out.append("**Available cards**")
+        card_names = [self.card_key_to_name(key) for key in self.cards]
+        out.append(", ".join(card_names))
+
+        for page in pagify("\n".join(out), shorten_by=12):
+            await self.bot.say(page)
+
+    @draft.command(name="pick", pass_context=True, no_pm=True)
+    async def draft_pick(self, ctx: Context):
+        """Start interactive prompt for players to pick cards."""
+        pass
 
     @draft.command(name="abort", pass_context=True, no_pm=True)
     async def draft_abort(self, ctx: Context):
@@ -227,14 +268,17 @@ class DraftRoyale:
         self.active_draft["players"] = []
         for player in self.players:
             self.active_draft["players"].append({
-                    "user_id": player.id,
-                    "user_name": player.display_name })
-        # self.settings["drafts"][self.time_id] = self.active_draft
+                "user_id": player.id,
+                "user_name": player.display_name})
         self.save_settings()
 
     def save_settings(self):
         """Save settings to disk."""
         dataIO.save_json(self.settings_path, self.settings)
+
+    def card_key_to_name(self, card_key: str):
+        """Return card name from card key."""
+        return string.capwords(card_key.replace('-', ' '))
 
 
 def check_folder():
