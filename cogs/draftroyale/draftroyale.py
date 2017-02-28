@@ -30,6 +30,7 @@ from cogs.utils.chat_formatting import pagify
 from discord.ext import commands
 from discord.ext.commands import Context
 from random import choice
+from random import shuffle
 import datetime
 import discord
 import os
@@ -188,8 +189,6 @@ class DraftRoyale:
 
         # reset players if already set
         self.players = []
-        self.active_draft["players"] = []
-
         for player in players:
             if player not in server.members:
                 await self.bot.say(f"{player.display_name} "
@@ -197,118 +196,41 @@ class DraftRoyale:
             else:
                 self.players.append(player)
 
+        await self.list_players()
+        self.save_players_settings()
+
+    @draft.command(name="randomorder", pass_context=True, no_pm=True)
+    async def draft_randomorder(self, ctx: Context):
+        """Randomize the player order."""
+        shuffle(self.players)
+        self.active_draft["players"] = []
+
+        await self.list_players()
+        self.save_players_settings()
+
+    @draft.command(name="abort", pass_context=True, no_pm=True)
+    async def draft_abort(self, ctx: Context):
+        """Abort an active draft."""
+        self.init()
+        await self.bot.say("Draft Royale aborted.")
+
+    async def list_players(self):
+        """List the players in the play order."""
         out = []
         out.append("Players for this draft:")
         for player in self.players:
             out.append(f"+ {player.display_name}")
         await self.bot.say("\n".join(out))
 
+    def save_players_settings(self):
+        """Save players settings."""
+        self.active_draft["players"] = []
         for player in self.players:
             self.active_draft["players"].append({
                     "user_id": player.id,
                     "user_name": player.display_name })
-
+        # self.settings["drafts"][self.time_id] = self.active_draft
         self.save_settings()
-
-
-
-        # # Input: Number of players
-        # await self.bot.say(
-        #     f"{admin.mention} How many players? "
-        #     f"({self.min_players}-{self.max_players})")
-        # def check(m: discord.Message):
-        #     if not m.content.isdigit():
-        #         return False
-        #     if not int(m.content) in range(self.min_players, self.max_players+1):
-        #         return False
-        #     return True
-
-        # answer = await self.bot.wait_for_message(
-        #     timeout=self.prompt_timeout,
-        #     author=ctx.message.author,
-        #     channel=ctx.message.channel,
-        #     check=check)
-        # if answer is None:
-        #     await self.bot.say(f"{admin.mention} Draft aborted.")
-        #     self.init()
-        #     return
-        # player_count = int(answer.content)
-
-        # await self.bot.say(f"Number of players: {player_count}")
-        # self.active_draft["player_count"] = player_count
-        # self.save_settings()
-
-
-        # interactive prompts causes problems. Switch to using check
-        # while True:
-        #     answer = await self.bot.wait_for_message(
-        #         timeout=30.0,
-        #         author=ctx.message.author,
-        #         channel=ctx.message.channel)
-        #     # don’t do interactive prompts if draft was aborted
-        #     if self.active_draft is not None:
-        #         if answer is None:
-        #             await self.bot.say(f"{admin.mention} Draft aborted.")
-        #             self.init()
-        #             # await ctx.invoked_subcommand(self.draft_abort)
-        #             return
-        #         elif not answer.content.isdigit():
-        #             await self.bot.say(f"{admin.mention} "
-        #                                f"You must enter a number.")
-        #         elif int(answer.content) < self.min_players:
-        #             await self.bot.say(f"{admin.mention} "
-        #                                f"Number must be at least "
-        #                                f"{self.min_players}")
-        #         elif int(answer.content) > self.max_players:
-        #             await self.bot.say(f"{admin.mention} "
-        #                                f"Number must be no more than "
-        #                                f"{self.max_players}")
-        #         else:
-        #             break
-
-        #     if answer is None:
-        #         self.init()
-        #         await self.bot.say("Timeout. Draft aborted")
-        #         break
-
-
-
-        # Input: Players
-        # TODO: Check unique plyaers. For development purposes, it is not checked
-        # for id in range(player_count):
-        #     await self.bot.say(f"{admin.mention} Who is Player {id+1}")
-        #     def check(m: discord.Message):
-        #         return server.get_member_named(m.content)
-        #     answer = await self.bot.wait_for_message(
-        #         timeout=self.prompt_timeout,
-        #         author=ctx.message.author,
-        #         channel=ctx.message.channel,
-        #         check=check)
-        #     if answer is None:
-        #         await self.bot.say(f"{admin.mention} Draft aborted.")
-        #         self.init()
-        #         return
-        #     player = server.get_member_named(answer.content)
-        #     self.active_draft["players"].append({
-        #         "player_id": id,
-        #         "user_id": player.id,
-        #         "user_name": player.display_name})
-        #     await self.bot.say(f"Player {id+1} set to {player.display_name}.")
-        #     self.save_settings()
-
-
-        # # Dev only: reset draft when done
-        # self.init()
-
-
-
-    @draft.command(name="abort", pass_context=True, no_pm=True)
-    async def draft_abort(self, ctx:Context):
-        """Abort an active draft."""
-        self.init()
-        await self.bot.say("Draft Royale aborted.")
-
-
 
     def save_settings(self):
         """Save settings to disk."""
