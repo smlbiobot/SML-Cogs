@@ -201,7 +201,7 @@ class DraftRoyale:
 
         if author != self.admin:
             await self.bot.say("Players must be set by the draft admin.")
-            await self.bot.say(f"Draft admin: {self.admin.mention}")
+            await self.bot.say(f"Draft admin: {self.admin.display_name}")
             return
 
         if players is None:
@@ -223,6 +223,12 @@ class DraftRoyale:
     @draft.command(name="random", pass_context=True, no_pm=True)
     async def draft_random(self, ctx: Context):
         """Randomize the player order."""
+        if ctx.message.author != self.admin:
+            msg = f"Only the draft admin, {self.admin.display_name}, "
+                  f"is allowed to randomize player order."
+            await self.bot.say(msg)
+            return
+
         shuffle(self.players)
         self.active_draft["players"] = []
 
