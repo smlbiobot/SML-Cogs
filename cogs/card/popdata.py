@@ -34,7 +34,7 @@ cardpop_path = 'data/cardpop.json'
 summary_path = 'data/summary.txt'
 
 cardpop_range_min = 8
-cardpop_range_max = 24
+cardpop_range_max = 25
 
 similarity_threshold = 0.85
 
@@ -129,7 +129,7 @@ def process_data():
         #             similarity[j] = SequenceMatcher(a=k, b=j).ratio()
         #     similarity = dict(sorted(similarity.items(), key = lambda x: -x[1]))
         #     deck["similarity"] = similarity
-        
+
         prev_cardpop = cardpop
 
         out.append("Decks:")

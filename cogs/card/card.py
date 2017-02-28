@@ -53,7 +53,7 @@ crtexts_path = "data/card/crtexts.json"
 dates_path = "data/card/dates.json"
 
 cardpop_range_min = 8
-cardpop_range_max = 24
+cardpop_range_max = 25
 
 max_deck_show = 5
 
@@ -418,7 +418,7 @@ class Card:
 
         if not cardpop_range_min <= int(snapshot_id) < cardpop_range_max:
             await self.bot.say("Snapshot ID must be between {} and {}.".format(
-                cardpop_range_min, cardpop_range_max))
+                cardpop_range_min, cardpop_range_max - 1))
             return
 
         limit = int(limit)

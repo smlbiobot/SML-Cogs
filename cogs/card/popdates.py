@@ -30,7 +30,8 @@ import datetime
 data_path = 'data/dates.json'
 
 cardpop_range_min = 8
-cardpop_range_max = 24
+cardpop_range_max = 100
+cardpop_min_date = datetime.date(2016, 7, 17)
 
 def save_json(filename=None, data=None):
     with open(filename, encoding='utf-8', mode='w') as f:
@@ -38,16 +39,27 @@ def save_json(filename=None, data=None):
 
 
 def process_data():
-    id = 23
-    dates = {}
-    dates["23"] = datetime.date(2017, 2, 12)
 
-    while id > cardpop_range_min:
-        date = dates[str(id)] - datetime.timedelta(days=14)
-        dates[str(id - 1)] = date
-        id -= 1
+    dates = {}
+
+    for id in range(cardpop_range_min, cardpop_range_max):
+        season_days = (id - cardpop_range_min) * 14
+        season_timedelta = datetime.timedelta(days=season_days)
+        dates[str(id)] = cardpop_min_date + season_timedelta
+
+    # id = 23
+    # dates = {}
+    # dates["23"] = datetime.date(2017, 2, 12)
+
+    # while id > cardpop_range_min:
+    #     date = dates[str(id)] - datetime.timedelta(days=14)
+    #     dates[str(id - 1)] = date
+    #     id -= 1
 
     data = {k: v.isoformat() for k, v in dates.items()}
+
+    # for id in  range(23, cardpop_range_max):
+    #     date = dates[str(id)] - datetime.timedelta(days=14)
 
     save_json(data_path, data)
 
