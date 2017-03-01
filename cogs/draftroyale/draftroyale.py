@@ -54,7 +54,6 @@ HELP_TEXT = """
 """
 
 
-
 class Draft:
     """Clash Royale drafts."""
 
@@ -64,33 +63,34 @@ class Draft:
         Args:
           admin (discord.Member): administrator of the draft
         """
-
         self.admin = admin
+
 
 class DraftRoyale:
     """Clash Royale drafting bot.
 
-    This cog is written to facilitate draftin in Clash Royale.
+    This cog is written to facilitate drafting in Clash Royale.
 
-    Types of drafts:
+    Types of drafts
+    ---------------
     - 4 players (10 cards)
     - 8 players (8 cards)
     - This system however will allow any number of players (2-8)
       with number of cards set to card count // players
 
-    Bans:
-
+    Bans
+    ----
     Some drafts have bans. For example, if graveyard is picked as a banned
     card, then no one can pick it.pick
 
-    Drafting order:
-
+    Drafting order
+    --------------
     Most drafts are snake drafts. They go from first to last then backwards.
     The first and last player gets two picks in a row.
     1 2 3 4 4 3 2 1 1 2 3 4 etc.
 
-    Required files:
-
+    Required files
+    --------------
     - data/clashroyale.json: card data
     - data/settings.json: technically not needed but good to
                           have a human-readable history log
@@ -141,6 +141,8 @@ class DraftRoyale:
         self.picked_cards = {}
         self.pick_order = []
         self.is_snake_draft = True
+        self.pick_player_id = 0
+        self.pick_direction_is_forward = True
 
     @commands.group(pass_context=True, no_pm=True)
     async def draft(self, ctx: Context):
@@ -176,8 +178,8 @@ class DraftRoyale:
 
         # server = ctx.message.server
         self.admin = ctx.message.author
-        await self.bot.say(f"**Draft Admin** set to "
-                           f"{self.admin.display_name}.")
+        await self.bot.say(
+            f"**Draft Admin** set to {self.admin.display_name}.")
 
         self.active_draft = {
             "admin_id": self.admin.id,
@@ -190,8 +192,9 @@ class DraftRoyale:
 
         self.save_settings()
 
-        await self.bot.say(f"{self.admin.mention} "
-                           f"Run `!draft players` to set the players")
+        await self.bot.say(HELP_TEXT)
+        # await self.bot.say(
+        #     f"{self.admin.mention} Run `!draft players` to set the players.")
 
     @draft.command(name="players", pass_context=True, no_pm=True)
     async def draft_players(self, ctx: Context, *players: discord.Member):
@@ -212,8 +215,8 @@ class DraftRoyale:
         self.players = []
         for player in players:
             if player not in server.members:
-                await self.bot.say(f"{player.display_name} "
-                                   f"is not on this server.")
+                await self.bot.say(
+                    f"{player.display_name} is not on this server.")
             else:
                 self.players.append(player)
 
@@ -224,8 +227,9 @@ class DraftRoyale:
     async def draft_random(self, ctx: Context):
         """Randomize the player order."""
         if ctx.message.author != self.admin:
-            msg = f"Only the draft admin, {self.admin.display_name}, "
-                  f"is allowed to randomize player order."
+            msg = (
+                f"Only the draft admin, {self.admin.display_name}, "
+                f"is allowed to randomize player order.")
             await self.bot.say(msg)
             return
 
@@ -238,6 +242,7 @@ class DraftRoyale:
     @draft.command(name="snake", pass_context=True, no_pm=True)
     async def draft_snake(self, ctx: Context, on_off: bool):
         """Enable / disable snake draft mode.
+
         Example:
         !draft snake 1
         !draft snake 0
@@ -291,7 +296,8 @@ class DraftRoyale:
     @draft.command(name="pick", pass_context=True, no_pm=True)
     async def draft_pick(self, ctx: Context):
         """Player pick cards."""
-        pass
+        player = self.get_next_player_to_pick()
+        await self.bot.say(f"Next player to pick: {player.display_name}")
 
     @draft.command(name="abort", pass_context=True, no_pm=True)
     async def draft_abort(self, ctx: Context):
@@ -303,6 +309,29 @@ class DraftRoyale:
     async def draft_listplayers(self, ctx: Context):
         """List players in the play order."""
         await self.list_players()
+
+    def get_next_player_to_pick(self):
+        """Return the next player to pick cards."""
+        player = self.players[self.pick_player_id]
+
+        next_id = self.pick_player_id
+        if self.pick_direction_is_forward:
+            next_id += 1
+        else:
+            next_id -= 1
+
+        if next_id >= len(self.players):
+            if self.is_snake_draft:
+                next_id = len(self.players) - 1
+                self.pick_direction_is_forward = False
+            else:
+                next_id = 0
+        elif next_id < 0:
+            self.pick_direction_is_forward = True
+            next_id = 0
+        self.pick_player_id = next_id
+
+        return player
 
     async def list_players(self):
         """List the players in the play order."""
@@ -351,6 +380,7 @@ def check_folder():
         if not os.path.exists(f):
             os.makedirs(f)
 
+
 def check_files():
     """Check required data files exists."""
     defaults = {}
@@ -358,12 +388,10 @@ def check_files():
     if not dataIO.is_valid_json(f):
         dataIO.save_json(f, defaults)
 
+
 def setup(bot):
     """Add cog to bot."""
     check_folder()
     check_files()
     n = DraftRoyale(bot)
     bot.add_cog(n)
-
-
-

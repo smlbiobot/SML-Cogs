@@ -108,7 +108,7 @@ class Farmers:
 
                 data.add_field(name=str(name), value=str(value))
 
-             
+
         try:
             await self.bot.type()
             await self.bot.say(embed=data)
