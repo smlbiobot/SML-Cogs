@@ -43,6 +43,7 @@ class Magic:
         self.magic_is_running = False
         self.hue = 0
         self.loop = None
+        self.magic_role = None
 
     async def change_magic_color(self, server):
         """Change magic role color."""
