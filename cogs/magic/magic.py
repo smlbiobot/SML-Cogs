@@ -32,47 +32,30 @@ from random import choice
 from __main__ import send_cmd_help
 import asyncio
 import hsluv
-# from .economy import Economy
 
 
 class Magic:
-    """Magic username"""
+    """Magic username."""
+
     def __init__(self, bot):
+        """Init bot."""
         self.bot = bot
         self.magic_is_running = False
-
-        self.role_color = discord.Color(value=int("242424", 16))
-
         self.hue = 0
+        self.loop = None
 
-
-    @commands.group(pass_context=True)
-    @checks.mod_or_permissions()
-    async def magic(self, ctx:Context):
-        """Magic role with ever changing username color"""
-        if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
-
-    @magic.command(name="start", pass_context=True)
-    @checks.mod_or_permissions()
-    async def magic_start(self, ctx:Context):
-        """Starts the magic role."""
-        server = ctx.message.server
-        magic_role_name = "Magic"
-        magic_role = [
-            r for r in server.roles
-            if r.name == magic_role_name].pop()
-
-        self.magic_is_running = True
-
-
-
+    async def change_magic_color(self, server):
+        """Change magic role color."""
         while self.magic_is_running:
+            magic_role_name = "Magic"
+            magic_role = [
+                r for r in server.roles
+                if r.name == magic_role_name].pop()
             self.hue = self.hue + 10
             self.hue = self.hue % 360
             hex = hsluv.hsluv_to_hex((self.hue, 90, 60))
-            hex = hex[1:] # remove '#'
-            color_int = int(hex, 16)
+            # Remove # sign from hex
+            hex = hex[1:]
             new_color = discord.Color(value=int(hex, 16))
 
             await self.bot.edit_role(
@@ -82,13 +65,26 @@ class Magic:
 
             await asyncio.sleep(0.5)
 
+    @commands.group(pass_context=True)
+    @checks.mod_or_permissions()
+    async def magic(self, ctx: Context):
+        """Magic role with ever changing username color."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @magic.command(name="start", pass_context=True)
+    @checks.mod_or_permissions()
+    async def magic_start(self, ctx: Context):
+        """Start the magic role."""
+        self.magic_is_running = True
+        self.loop = asyncio.get_event_loop()
+        self.loop.create_task(self.change_magic_color(ctx.message.server))
 
     @magic.command(name="stop", pass_context=True)
     @checks.mod_or_permissions()
     async def magic_stop(self, ctx):
-        """Stops magic role"""
+        """Stop magic role color change."""
         self.magic_is_running = False
-
 
     def get_random_color(self):
         """Return a discord.Color instance of a random color."""
@@ -96,12 +92,11 @@ class Magic:
         color = int(color, 16)
         return discord.Color(value=color)
 
+
 def setup(bot):
+    """Add cog to bot."""
     r = Magic(bot)
-    # bot.add_listener(r.member_join, "on_member_join")
     bot.add_cog(r)
-
-
 
 """
 Sample code for timer events
