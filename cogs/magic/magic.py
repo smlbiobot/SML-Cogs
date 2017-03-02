@@ -51,7 +51,7 @@ class Magic:
             magic_role = discord.utils.get(server.roles, name="Magic")
             self.hue = self.hue + 10
             self.hue = self.hue % 360
-            hex = hsluv.hsluv_to_hex((self.hue, 90, 60))
+            hex = hsluv.hsluv_to_hex((self.hue, 100, 60))
             # Remove # sign from hex
             hex = hex[1:]
             new_color = discord.Color(value=int(hex, 16))
