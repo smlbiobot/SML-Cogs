@@ -30,11 +30,7 @@ from discord.ext.commands import Context
 from .utils import checks
 from random import choice
 from __main__ import send_cmd_help
-import colorsys
 import asyncio
-import os
-import datetime
-import aiohttp
 import hsluv
 # from .economy import Economy
 
@@ -48,14 +44,6 @@ class Magic:
         self.role_color = discord.Color(value=int("242424", 16))
 
         self.hue = 0
-
-        # # construct magic color table
-        # self.magic_colors = []
-        # self.magic_color_id = 0
-        # for x in range(0, 360):
-        #     color = colorsys.hsv_to_rgb(x, 0.5, 1)
-        #     self.magic_colors.append(
-        #         tuple(int(i * 255) for i in color))
 
 
     @commands.group(pass_context=True)
@@ -82,10 +70,7 @@ class Magic:
         while self.magic_is_running:
             self.hue = self.hue + 10
             self.hue = self.hue % 360
-            # await self.bot.say("hue: {}".format(self.hue))
-            # await self.bot.say("rgb: {}".format(hsluv.hsluv_to_rgb((self.hue, 50, 50))))
             hex = hsluv.hsluv_to_hex((self.hue, 90, 60))
-            # await self.bot.say("hex: {}".format(hex))
             hex = hex[1:] # remove '#'
             color_int = int(hex, 16)
             new_color = discord.Color(value=int(hex, 16))
@@ -95,11 +80,6 @@ class Magic:
                 magic_role,
                 color=new_color)
 
-            # await self.bot.say(self.role_color)
-            # self.role_color = self.get_next_color(self.role_color)
-
-            # await self.bot.say(self.get_next_color(magic_role.color))
-                # color=self.get_random_color())
             await asyncio.sleep(0.5)
 
 
