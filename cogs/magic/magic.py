@@ -47,10 +47,7 @@ class Magic:
     async def change_magic_color(self, server):
         """Change magic role color."""
         while self.magic_is_running:
-            magic_role_name = "Magic"
-            magic_role = [
-                r for r in server.roles
-                if r.name == magic_role_name].pop()
+            magic_role = discord.utils.get(server.roles, name="Magic")
             self.hue = self.hue + 10
             self.hue = self.hue % 360
             hex = hsluv.hsluv_to_hex((self.hue, 90, 60))
