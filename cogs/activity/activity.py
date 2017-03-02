@@ -140,10 +140,12 @@ class Activity:
                                            key=lambda x: -x[1]["balance"]))
                     for i, (k, v) in enumerate(accounts.items()):
                         if i < top_max:
-                            out.append("`{:>2}.` {} ({} credits)".format(
-                                str(i + 1),
-                                server.get_member(k).display_name,
-                                str(v["balance"])))
+                            member = server.get_member(k)
+                            if member:
+                                out.append("`{:>2}.` {} ({} credits)".format(
+                                    str(i + 1),
+                                    member.display_name,
+                                    str(v["balance"])))
         # commands
         cmd = self.settings[server.id][time_id]["commands"]
         cmd = dict(sorted(cmd.items(), key=lambda x: -x[1]["count"]))
