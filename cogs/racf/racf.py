@@ -361,6 +361,25 @@ class RACF:
                 await self.bot.say("Message sent to {}".format(m.display_name))
 
     @commands.command(pass_context=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def changenick(
+            self, ctx: Context, member: discord.Member, nickname: str):
+        """Change the nickname of a member.
+
+        Example
+        !changenick SML "New Nick"
+        !changenick @SML "New Nick"
+        """
+        # await self.bot.change_nickname(member, nickname)
+        try:
+            await self.bot.change_nickname(member, nickname)
+        except discord.HTTPException:
+            await self.bot.say(
+                "I don’t have permission to do this.")
+        else:
+            await self.bot.say(f"{member.mention} changed to {nickname}.")
+
+    @commands.command(pass_context=True)
     async def emojis(self, ctx: Context):
         """Show all emojis available on server."""
         server = ctx.message.server
