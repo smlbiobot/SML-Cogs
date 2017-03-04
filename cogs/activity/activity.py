@@ -31,6 +31,7 @@ from cogs.utils.chat_formatting import pagify
 from __main__ import send_cmd_help
 from .utils.dataIO import dataIO
 from .utils import checks
+from collections import OrderedDict
 import datetime
 import aiohttp
 import discord
@@ -103,21 +104,75 @@ class Activity:
         self.save_json()
 
     @commands.command(pass_context=True, no_pm=True)
-    async def rankme(self, ctx: Context):
-        """Return the activity level of the caller."""
+    async def rank(self, ctx: Context, member: discord.Member = None):
+        """Return the activity level of the caller or member.
+
+        Example usage
+        !rank
+        !rank SML
+        !rank @SML
+        """
         server = ctx.message.server
         author = ctx.message.author
 
         if server is None:
             return
+        if server.id not in self.settings:
+            return
+        if member is None:
+            member = author
+
         self.check_server_settings(server)
         time_id = self.get_time_id()
 
         out = []
         out.append("**{}** (this week)".format(server.name))
+        out.append("User: {}".format(member.display_name))
 
-        msg = self.settings[server.id][time_id]["messages"]
-        msg = dict(sorted(msg.items(), key=lambda x: -x[1]["messages"]))
+        server_settings = self.settings[server.id][time_id]
+
+        msg = server_settings["messages"]
+        msg_rank = 0
+        msg_count = 0
+        if member.id in server_settings["messages"]:
+            msg = OrderedDict(
+                sorted(msg.items(), key=lambda x: -x[1]["messages"]))
+            for i, (k, v) in enumerate(msg.items()):
+                if member.id == k:
+                    msg_rank = i + 1
+                    msg_count = v["messages"]
+                    break
+
+        if msg_rank:
+            out.append("Message rank: #{} ({} messages sent)".format(
+                msg_rank, msg_count))
+        else:
+            out.append("0 messages sent.")
+
+        mentions = server_settings["mentions"]
+        mention_rank = 0
+        mention_count = 0
+        if member.id in server_settings["mentions"]:
+            mentions = OrderedDict(
+                sorted(mentions.items(), key=lambda x: -x[1]["mentions"]))
+            for i, (k, v) in enumerate(mentions.items()):
+                if member.id == k:
+                    mention_rank = i + 1
+                    mention_count = v["mentions"]
+                    break
+        if mention_rank:
+            out.append("Mentions rank: #{} (Mentioned {} times)".format(
+                mention_rank, mention_count))
+        else:
+            out.append("Not mentioned by anyone.")
+
+
+        for page in pagify("\n".join(out)):
+            await self.bot.say(page)
+
+
+
+
 
 
 
