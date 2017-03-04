@@ -102,6 +102,26 @@ class Activity:
             await self.bot.say(f"Logging disabled for {server}")
         self.save_json()
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def rankme(self, ctx: Context):
+        """Return the activity level of the caller."""
+        server = ctx.message.server
+        author = ctx.message.author
+
+        if server is None:
+            return
+        self.check_server_settings(server)
+        time_id = self.get_time_id()
+
+        out = []
+        out.append("**{}** (this week)".format(server.name))
+
+        msg = self.settings[server.id][time_id]["messages"]
+        msg = dict(sorted(msg.items(), key=lambda x: -x[1]["messages"]))
+
+
+
+
     @commands.command(pass_context=True)
     async def ranks(self, ctx: Context, top_max: int=None):
         """Show the activity for this server."""

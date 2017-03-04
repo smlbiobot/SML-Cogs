@@ -55,7 +55,7 @@ class RACF:
         """Constructor."""
         self.bot = bot
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     async def racf(self, ctx: Context):
         """RACF Rules + Roles."""
         server = ctx.message.server
@@ -91,7 +91,7 @@ class RACF:
         out.append("<{}>".format(DISCORD_URL))
         await self.bot.say('\n'.join(out))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*CHANGECLAN_ROLES)
     async def changeclan(self, ctx, clan: str=None):
         """Update clan role when moved to a new clan.
@@ -126,7 +126,7 @@ class RACF:
             ",".join([r.name for r in to_add_roles]),
             author.display_name))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def addrole(self, ctx, member: discord.Member=None,
                       role_name:str=None):
@@ -151,7 +151,7 @@ class RACF:
             await self.bot.say("Added {} for {}".format(
                 role_name, member.display_name))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def removerole(self, ctx, member: discord.Member=None,
                          role_name: str=None):
@@ -176,7 +176,7 @@ class RACF:
             await self.bot.say("Removed {} from {}".format(
                 role_name, member.display_name))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def changerole(self, ctx, member: discord.Member=None, *roles: str):
         """Change roles of a user.
@@ -223,7 +223,7 @@ class RACF:
                         "Added {} for {}".format(
                             role.name, member.display_name))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(mention_everyone=True)
     async def mentionusers(self, ctx, role: str, *msg):
         """Mention users by role.
@@ -249,7 +249,7 @@ class RACF:
             await self.bot.say("{} {}".format(" ".join(out_mentions),
                                               " ".join(msg)))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     async def avatar(self, ctx, member: discord.Member=None):
         """Display avatar of the user."""
         author = ctx.message.author
@@ -318,7 +318,7 @@ class RACF:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(administrator=True)
     async def member2visitor(self, ctx: Context, *members: discord.Member):
         """Re-assign list of people from members to visitors."""
@@ -333,7 +333,7 @@ class RACF:
             await self.bot.say("Removed {} from {}".format(
                 *to_remove_roles, member.display_name))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def dmusers(self, ctx: Context, msg: str=None,
                       *members: discord.Member):
@@ -360,7 +360,7 @@ class RACF:
                 await self.bot.send_message(m, embed=data)
                 await self.bot.say("Message sent to {}".format(m.display_name))
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def changenick(
             self, ctx: Context, member: discord.Member, nickname: str):
@@ -379,7 +379,7 @@ class RACF:
         else:
             await self.bot.say(f"{member.mention} changed to {nickname}.")
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     async def emojis(self, ctx: Context):
         """Show all emojis available on server."""
         server = ctx.message.server
@@ -391,10 +391,12 @@ class RACF:
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     async def listroles(self, ctx: Context):
         """List all the roles on the server."""
         server = ctx.message.server
+        if server is None:
+            return
         out = []
         out.append("__List of roles on {}__".format(server.name))
         roles = {}

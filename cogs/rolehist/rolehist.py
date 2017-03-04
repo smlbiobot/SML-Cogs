@@ -63,7 +63,7 @@ class RoleHistory:
         self.file_path = settings_path
         self.settings = dataIO.load_json(self.file_path)
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, no_pm=True)
     async def rolehist(self, ctx, user:discord.Member=None):
         """Display the role history of a user
 
@@ -77,6 +77,9 @@ class RoleHistory:
 
         if not user:
             user = author
+
+        if server is None:
+            return
 
 
         if server.id in self.settings:
