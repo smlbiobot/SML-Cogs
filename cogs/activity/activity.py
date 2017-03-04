@@ -138,7 +138,28 @@ class Activity:
 
         out.append("**{}** (this week)".format(server.name))
 
-        # messages
+        out.extend(self.get_message_ranks(server, time_id, top_max))
+        out.extend(self.get_economy_ranks(server, time_id, top_max))
+        out.extend(self.get_command_ranks(server, time_id, top_max))
+        out.extend(self.get_mention_ranks(server, time_id, top_max))
+        out.extend(self.get_channel_ranks(server, time_id, top_max))
+        out.extend(self.get_emoji_ranks(server, time_id, top_max))
+
+        # date on start of week
+        dt = datetime.datetime.utcnow()
+        start = dt - datetime.timedelta(days=dt.weekday())
+        start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+        out.append("Data since: {} UTC".format(start.isoformat()))
+        out.append("Stats data on {} UTC".format(dt.isoformat()))
+
+        # pagify output
+        for page in pagify("\n".join(out), shorten_by=12):
+            await self.bot.say(page)
+
+    def get_message_ranks(
+            self, server: discord.Server, time_id: str, top_max=5):
+        """Return message ranks by time id as a list."""
+        out = []
         msg = self.settings[server.id][time_id]["messages"]
         msg = dict(sorted(msg.items(), key=lambda x: -x[1]["messages"]))
         out.append("__Most active members__")
@@ -148,7 +169,12 @@ class Activity:
                     i + 1,
                     v["name"],
                     str(v["messages"])))
-        # economy
+        return out
+
+    def get_economy_ranks(
+            self, server: discord.Server, time_id: str, top_max=5):
+        """Return economy ranks by time id as a list."""
+        out = []
         out.append("__Richest members__")
         economy = self.bot.get_cog("Economy")
         if economy is not None:
@@ -166,7 +192,12 @@ class Activity:
                                     str(i + 1),
                                     member.display_name,
                                     str(v["balance"])))
-        # commands
+        return out
+
+    def get_command_ranks(
+            self, server: discord.Server, time_id: str, top_max=5):
+        """Return command ranks by time id as a list."""
+        out = []
         cmd = self.settings[server.id][time_id]["commands"]
         cmd = dict(sorted(cmd.items(), key=lambda x: -x[1]["count"]))
         out.append("__Most used commands__")
@@ -176,7 +207,12 @@ class Activity:
                     str(i + 1),
                     v["name"],
                     str(v["count"])))
-        # mentions
+        return out
+
+    def get_mention_ranks(
+            self, server: discord.Server, time_id: str, top_max=5):
+        """Return mentions ranks by time id as a list."""
+        out = []
         mentions = self.settings[server.id][time_id]["mentions"]
         mentions = dict(sorted(mentions.items(),
                                key=lambda x: -x[1]["mentions"]))
@@ -187,8 +223,12 @@ class Activity:
                     str(i + 1),
                     v["name"],
                     str(v["mentions"])))
+        return out
 
-        # channels
+    def get_channel_ranks(
+            self, server: discord.Server, time_id: str, top_max=5):
+        """Return channels ranks by time id as a list."""
+        out = []
         channels = self.settings[server.id][time_id]["channels"]
         channels = dict(sorted(channels.items(),
                                key=lambda x: -x[1]["messages"]))
@@ -199,8 +239,12 @@ class Activity:
                     str(i + 1),
                     v["name"],
                     str(v["messages"])))
+        return out
 
-        # emojis
+    def get_emoji_ranks(
+            self, server: discord.Server, time_id: str, top_max=5):
+        """Return emoji ranks by time as a list."""
+        out = []
         emojis = self.settings[server.id][time_id]["emojis"]
         emojis = dict(sorted(emojis.items(), key=lambda x: -x[1]["count"]))
         out.append("__Most used emojis__")
@@ -210,20 +254,10 @@ class Activity:
                     str(i + 1),
                     "{}".format(v["name"]),
                     str(v["count"])))
-
-        # date on start of week
-        dt = datetime.datetime.utcnow()
-        start = dt - datetime.timedelta(days=dt.weekday())
-        start = start.replace(hour=0, minute=0, second=0, microsecond=0)
-        out.append("Data since: {} UTC".format(start.isoformat()))
-        out.append("Stats data on {} UTC".format(dt.isoformat()))
-
-        # pagify output
-        for page in pagify("\n".join(out), shorten_by=12):
-            await self.bot.say(page)
+        return out
 
     async def on_message(self, message: discord.Message):
-        """Log number of messages sent by an."""
+        """Log number of messages."""
         author = message.author
         server = message.server
 
