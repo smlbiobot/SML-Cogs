@@ -99,7 +99,8 @@ class RACF:
         Example: !changeclan Delta
         """
         clans = ["Alpha", "Bravo", "Charlie", "Delta",
-                 "Echo", "Foxtrot", "Golf", "Hotel"]
+                 "Echo", "Foxtrot", "Golf", "Hotel",
+                 "Nation", "Royale"]
         author = ctx.message.author
         server = ctx.message.server
 
