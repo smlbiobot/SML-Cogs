@@ -30,6 +30,7 @@ from discord.ext.commands import Context
 from cogs.utils.chat_formatting import pagify
 from .utils import checks
 from random import choice
+import math
 from __main__ import send_cmd_help
 
 RULES_URL = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
@@ -411,6 +412,33 @@ class RACF:
                                                     roles[role.id]['count']))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def trophy2rank(self, ctx: Context, trophies:int):
+        """Convert trophies to rank.
+
+        log10(rank) = -2.102e-3 * trophies + 14.245
+        """
+        # log_a(b) = (log_e b / log_e a))
+        # (log_a b = 3 => b = a^3)
+        rank = 10 ** (-2.102e-3 * int(trophies) + 14.245)
+        rank = int(rank)
+        await self.bot.say(
+            f"With {trophies} trophies, the approximate rank you will get is {rank:d}")
+        await self.bot.say("Calculated using 28 data points only so it may not be accurate.")
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def rank2trophy(self, ctx: Context, rank:int):
+        """Convert rank to trophies.
+
+        log10(rank) = -2.102e-3 * trophies + 14.245
+        """
+        trophies = (math.log10(int(rank)) - 14.245) / -2.102e-3
+        trophies = int(trophies)
+        await self.bot.say(
+            f"Rank {rank} will need approximately {trophies:d} trophies.")
+        await self.bot.say("Calculated using 28 data points only so it may not be accurate.")
+
 
 def setup(bot):
     r = RACF(bot)
