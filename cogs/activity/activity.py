@@ -62,6 +62,8 @@ class Activity:
       - year, week number
         - messages
         - commands
+        - mentions
+        - message_time
       - on_off
       - server_id
       - server_name
@@ -169,13 +171,6 @@ class Activity:
 
         for page in pagify("\n".join(out)):
             await self.bot.say(page)
-
-
-
-
-
-
-
 
     @commands.command(pass_context=True)
     async def ranks(self, ctx: Context, top_max: int=None):
@@ -393,6 +388,12 @@ class Activity:
                         }
                     server_settings['emojis'][emoji]['count'] += 1
 
+            # log message time
+            date = datetime.datetime.utcnow()
+            hour = date.strftime("%H")
+            server_settings['message_time'][hour] += 1
+
+
         self.save_json()
 
     async def on_command(self, command: Command, ctx: Context):
@@ -449,6 +450,9 @@ class Activity:
             server_settings[time_id]['channels'] = {}
         if 'emojis' not in server_settings[time_id]:
             server_settings[time_id]['emojis'] = {}
+        if 'message_time' not in server_settings[time_id]:
+            server_settings[time_id]['message_time'] = {
+                '{:02d}'.format(h): 0 for h in range(0, 24)}
 
         self.save_json()
 
