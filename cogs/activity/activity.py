@@ -203,8 +203,21 @@ class Activity:
         out.append("Stats data on {} UTC".format(dt.isoformat()))
 
         # pagify output
-        for page in pagify("\n".join(out), shorten_by=12):
+        pagified = list(pagify("\n".join(out), shorten_by=12))
+        for page in pagified:
             await self.bot.say(page)
+            if not page == pagified[-1]:
+                def pagination_check(m):
+                    return m.content.lower() == 'y'
+                await self.bot.say(
+                    "Would you like to see more results? (y/n)")
+                answer = await self.bot.wait_for_message(
+                    timeout=10.0,
+                    author=ctx.message.author,
+                    check=pagination_check)
+                if answer is None:
+                    await self.bot.say("Results aborted.")
+                    return
 
     def get_message_ranks(
             self, server: discord.Server, time_id: str, top_max=5):
