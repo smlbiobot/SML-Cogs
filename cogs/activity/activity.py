@@ -391,7 +391,8 @@ class Activity:
             # log message time
             date = datetime.datetime.utcnow()
             hour = date.strftime("%H")
-            server_settings['message_time'][hour] += 1
+            day = date.strftime("%w")
+            server_settings['message_time'][day][hour] += 1
 
 
         self.save_json()
@@ -451,10 +452,20 @@ class Activity:
         if 'emojis' not in server_settings[time_id]:
             server_settings[time_id]['emojis'] = {}
         if 'message_time' not in server_settings[time_id]:
-            server_settings[time_id]['message_time'] = {
-                '{:02d}'.format(h): 0 for h in range(0, 24)}
+            server_settings[time_id]['message_time'] = {}
+
+        self.check_message_time_settings(server)
 
         self.save_json()
+
+    def check_message_time_settings(self, server: discord.Server):
+        """Create message time fields if not already set."""
+        time_id = self.get_time_id()
+        setting = self.settings[server.id][time_id]["message_time"]
+        for day in range(0, 7):
+            if str(day) not in setting:
+                setting[str(day)] = {
+                    '{:02d}'.format(h): 0 for h in range(0, 24)}
 
     def get_time_id(self, date: datetime.date=None):
         """Return current year, week as a tuple."""
