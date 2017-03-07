@@ -28,6 +28,8 @@ import discord
 from discord.ext import commands
 from random import choice
 import itertools
+from cogs.utils.chat_formatting import box
+from cogs.utils.chat_formatting import pagify
 
 
 class MemberManagement:
@@ -88,7 +90,7 @@ class MemberManagement:
 
         if option_members_without_clan_tag:
             args = ['Member', '-Alpha', '-Bravo', '-Charlie', '-Delta', '-Echo',
-                    '-Foxtrot', '-Golf', '-Hotel']
+                    '-Foxtrot', '-Golf', '-Hotel', '-Nation', '-Royale']
 
 
         role_args = []
@@ -176,8 +178,12 @@ class MemberManagement:
             # Display a copy-and-pastable list
             if option_output_mentions | option_output_mentions_only:
                 mention_list = [m.mention for m in out_members]
-                await self.bot.say("Copy and paste these in message to mention users listed:"
-                                   f"```{' '.join(mention_list)}```")
+                await self.bot.say(
+                    "Copy and paste these in message to mention users listed:")
+
+                out = ' '.join(mention_list)
+                for page in pagify(out, shorten_by=24):
+                    await self.bot.say(box(page))
 
 
     # @commands.command(pass_context=True, no_pm=False)
