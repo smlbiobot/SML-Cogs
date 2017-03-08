@@ -272,7 +272,7 @@ class Activity:
 
         for ax in axes:
             ax.ylabel = next(days_gen)
-            await self.bot.say(day)
+            # await self.bot.say(day)
             for spine in ax.spines.values():
                 spine.set_edgecolor(spinecolor)
 
