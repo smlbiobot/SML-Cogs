@@ -265,7 +265,14 @@ class Activity:
         # settings[day][hour]
         fig, axes = plt.subplots(7, sharex=True, sharey=True)
 
+        plt.xticks(range(0, 24, 4))
+
+        days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+        days_gen = (d for d in days)
+
         for ax in axes:
+            ax.ylabel = next(days_gen)
+            await self.bot.say(day)
             for spine in ax.spines.values():
                 spine.set_edgecolor(spinecolor)
 
