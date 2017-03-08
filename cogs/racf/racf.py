@@ -32,6 +32,7 @@ from .utils import checks
 from random import choice
 import math
 from __main__ import send_cmd_help
+from cogs.economy import SetParser
 
 RULES_URL = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
 ROLES_URL = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
@@ -439,6 +440,13 @@ class RACF:
             f"Rank {rank} will need approximately {trophies:d} trophies.")
         await self.bot.say("Calculated using 28 data points only so it may not be accurate.")
 
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
+    async def bankset(
+            self, ctx: Context, user: discord.Member, credits: SetParser):
+        """Work around to allow MODs to set bank."""
+        econ = self.bot.get_cog("Economy")
+        await ctx.invoke(econ._set, user, credits)
 
 def setup(bot):
     r = RACF(bot)
