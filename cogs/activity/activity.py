@@ -24,19 +24,28 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import datetime
+import re
+import os
+import io
+import aiohttp
+
+from collections import OrderedDict
+
+import matplotlib
+matplotlib.use('Agg')
+
+import discord
 from discord.ext import commands
 from discord.ext.commands import Command
 from discord.ext.commands import Context
 from cogs.utils.chat_formatting import pagify
+
 from __main__ import send_cmd_help
 from .utils.dataIO import dataIO
 from .utils import checks
-from collections import OrderedDict
-import datetime
-import aiohttp
-import discord
-import re
-import os
+
+from matplotlib import pyplot as plt
 
 try:
     import psutil
@@ -218,6 +227,78 @@ class Activity:
                 if answer is None:
                     await self.bot.say("Results aborted.")
                     return
+
+    @commands.command(pass_context=True)
+    async def plotactivity(self, ctx: Context):
+        """Plot the activity for the week."""
+        # # Three subplots sharing both x/y axes
+        # f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, sharey=True)
+        # ax1.plot(x, y)
+        # ax1.set_title('Sharing both axes')
+        # ax2.scatter(x, y)
+        # ax3.scatter(x, 2 * y ** 2 - 1, color='r')
+        # # Fine-tune figure; make subplots close to each other and hide x ticks for
+        # # all but bottom plot.
+        # f.subplots_adjust(hspace=0)
+        # plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
+
+        server = ctx.message.server
+        self.check_server_settings(server)
+        self.check_message_time_settings(server)
+
+        time_id = self.get_time_id()
+        settings = None
+        if server.id in self.settings:
+            settings = self.settings[server.id][time_id]['message_time']
+
+        if settings is None:
+            return
+
+        facecolor = '#32363b'
+        edgecolor = '#eeeeee'
+        spinecolor = '#999999'
+        footercolor = '#999999'
+        labelcolor = '#cccccc'
+        tickcolor = '#999999'
+        titlecolor = '#ffffff'
+
+        # settings[day][hour]
+        fig, axes = plt.subplots(7, sharex=True, sharey=True)
+
+        for ax in axes:
+            for spine in ax.spines.values():
+                spine.set_edgecolor(spinecolor)
+
+        for i, (k, v) in enumerate(settings.items()):
+            x = [str(k) for k in v.keys()]
+            y = [int(k) for k in v.values()]
+            axes[i].plot(x, y, 'o-')
+            axes[i].tick_params(axis='x', colors=tickcolor)
+            axes[i].tick_params(axis='y', colors=tickcolor)
+
+        fig.subplots_adjust(hspace=0)
+        plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
+
+        plot_filename = 'plot.png'
+        plot_name = ""
+
+        with io.BytesIO() as f:
+            plt.savefig(
+                f, format="png", facecolor=facecolor,
+                edgecolor=edgecolor, transparent=True)
+            f.seek(0)
+            await ctx.bot.send_file(
+                ctx.message.channel,
+                f,
+                filename=plot_filename,
+                content=plot_name)
+
+        fig.clf()
+        plt.clf()
+        plt.cla()
+
+
+
 
     def get_message_ranks(
             self, server: discord.Server, time_id: str, top_max=5):
