@@ -33,7 +33,7 @@ from __main__ import send_cmd_help
 import os
 
 settings_path = "data/trophies/settings.json"
-clans = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel']
+clans = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel', 'nation', 'royale']
 set_allowed_role = 'Bot Commander'
 
 class Trophies:
@@ -62,13 +62,14 @@ class Trophies:
         server = ctx.message.server
 
         if server.id not in self.settings:
-            self.settings[server.id] = { 
+            self.settings[server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
                 "Trophies": { }
                 }
 
-            for c in clans:
+        for c in clans:
+            if c not in self.settings[server.id]["Trophies"]:
                 self.settings[server.id]["Trophies"][c] = "0"
 
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
@@ -95,8 +96,8 @@ class Trophies:
 
         await self.bot.say(embed=data)
 
-        
-                    
+
+
     @trophies.command(name="set", pass_context=True, no_pm=True)
     @commands.has_role(set_allowed_role)
     async def _set_trophies(self, ctx, clan:str, req:str):
@@ -107,13 +108,14 @@ class Trophies:
         clan = clan.lower()
 
         if server.id not in self.settings:
-            self.settings[server.id] = { 
+            self.settings[server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
                 "Trophies": { }
                 }
 
-            for c in clans:
+        for c in clans:
+            if c not in self.settings[server.id]["Trophies"]:
                 self.settings[server.id]["Trophies"][c] = "0"
 
         if clan not in self.settings[server.id]["Trophies"]:
