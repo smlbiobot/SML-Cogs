@@ -90,7 +90,7 @@ class MemberManagement:
 
         if option_members_without_clan_tag:
             args = ['Member', '-Alpha', '-Bravo', '-Charlie', '-Delta', '-Echo',
-                    '-Foxtrot', '-Golf', '-Hotel', '-Nation', '-Royale']
+                    '-Foxtrot', '-Golf', '-Hotel', '-Nation', '-Royale', '-Special']
 
 
         role_args = []
