@@ -31,6 +31,7 @@ import itertools
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 
+BOTCOMMANDER_ROLE = ["Bot Commander"]
 
 class MemberManagement:
     """
@@ -51,6 +52,7 @@ class MemberManagement:
         return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
 
     @commands.command(pass_context=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def mm(self, ctx, *args):
         """
         Member management command.
