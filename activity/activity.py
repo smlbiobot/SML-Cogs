@@ -438,17 +438,23 @@ class Activity:
 
         # datadog log
 
-        channel = message.channel
+        channel = ctx.message.channel
         channel_name = ''
+        channel_id = ''
         if channel is not None:
             if not channel.is_private:
                 channel_name = channel.name
+                channel_id = channel.id
+        server_id = server.id
 
         statsd.increment(
             'bot.msg',
             tags=[
                 'author:' + str(message.author.display_name),
-                'channel:' + str(channel_name)])
+                'channel:' + str(channel_name),
+                'server_id:' + str(server_id),
+                'channel_name:' + str(channel_name),
+                'channel_id:' + str(channel_id)])
 
         # json log
         time_id = self.get_time_id()
@@ -537,6 +543,8 @@ class Activity:
         if not self.settings[server.id]['on_off']:
             return
 
+        # json log
+
         time_id = self.get_time_id()
 
         server_commands = self.settings[server.id][time_id]['commands']
@@ -548,7 +556,29 @@ class Activity:
                 'count': 0
             }
         server_commands[command.name]['count'] += 1
+
         self.save_json()
+
+        # datadog log
+        channel = ctx.message.channel
+        channel_name = ''
+        channel_id = ''
+        if channel is not None:
+            if not channel.is_private:
+                channel_name = channel.name
+                channel_id = channel.id
+        server_id = server.id
+        server_name = server.name
+        statsd.increment(
+            'bot.cmd',
+            tags=[
+                'server_id:' + str(server_id),
+                'server_name:' + str(server_name),
+                'channel_name:' + str(channel_name),
+                'channel_id:' + str(channel_id),
+                'command_name:' + str(command),
+                'cog_name:' + type(ctx.cog).__name__])
+
 
     def check_server_settings(self, server: discord.Server):
         """Verify server settings are available."""
