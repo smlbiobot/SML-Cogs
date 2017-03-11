@@ -438,16 +438,7 @@ class Activity:
 
         # datadog log
 
-        channel = ctx.message.channel
-        channel_name = ''
-        channel_id = ''
-        if channel is not None:
-            if not channel.is_private:
-                channel_name = channel.name
-                channel_id = channel.id
-        server_id = server.id
-
-        mentions = []
+        # datadog - mentions
 
         for member in message.mentions:
             statsd.increment(
@@ -456,6 +447,17 @@ class Activity:
                     'member:' + str(member.display_name),
                     'member_id:' + str(member.id),
                     'member_name:' + str(member.display_name)])
+
+        # datadog - messages (msg)
+
+        channel = message.channel
+        channel_name = ''
+        channel_id = ''
+        if channel is not None:
+            if not channel.is_private:
+                channel_name = channel.name
+                channel_id = channel.id
+        server_id = server.id
 
         statsd.increment(
             'bot.msg',
