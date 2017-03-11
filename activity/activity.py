@@ -420,23 +420,7 @@ class Activity:
 
     async def on_message(self, message: discord.Message):
         """Log number of messages."""
-        # datadog log
 
-        channel = message.channel
-        channel_name = ''
-        if channel is not None:
-            if not channel.is_private:
-                channel_name = channel.name
-
-        statsd.increment(
-            'bot.msg',
-            tags=[
-                'author:' + str(message.author.display_name),
-                'channel:' + str(channel_name)
-                ]
-            )
-
-        # json log
         author = message.author
         server = message.server
 
@@ -452,6 +436,21 @@ class Activity:
         if author is server.me:
             return
 
+        # datadog log
+
+        channel = message.channel
+        channel_name = ''
+        if channel is not None:
+            if not channel.is_private:
+                channel_name = channel.name
+
+        statsd.increment(
+            'bot.msg',
+            tags=[
+                'author:' + str(message.author.display_name),
+                'channel:' + str(channel_name)])
+
+        # json log
         time_id = self.get_time_id()
 
         if server.id in self.settings:
