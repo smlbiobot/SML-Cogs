@@ -286,11 +286,13 @@ class Activity:
                 spine.set_edgecolor(spinecolor)
 
         for i, (k, v) in enumerate(settings.items()):
-            x = [str(k) for k in v.keys()]
-            y = [int(k) for k in v.values()]
-            axes[i].plot(x, y, 'o-')
-            axes[i].tick_params(axis='x', colors=tickcolor)
-            axes[i].tick_params(axis='y', colors=tickcolor)
+            # fix legacy data  issues where v is not a dict
+            if isinstance(v, dict):
+                x = [str(k) for k in v.keys()]
+                y = [int(k) for k in v.values()]
+                axes[i].plot(x, y, 'o-')
+                axes[i].tick_params(axis='x', colors=tickcolor)
+                axes[i].tick_params(axis='y', colors=tickcolor)
 
         fig.subplots_adjust(hspace=0)
         plt.setp([a.get_xticklabels() for a in fig.axes[:-1]], visible=False)
@@ -588,11 +590,19 @@ class Activity:
     def check_message_time_settings(self, server: discord.Server):
         """Create message time fields if not already set."""
         time_id = self.get_time_id()
-        setting = self.settings[server.id][time_id]["message_time"]
+        settings = self.settings[server.id][time_id]["message_time"]
         for day in range(0, 7):
-            if str(day) not in setting:
-                setting[str(day)] = {
+            if str(day) not in settings:
+                settings[str(day)] = {
                     '{:02d}'.format(h): 0 for h in range(0, 24)}
+
+        # legacy get rids of hourly data
+        new_settings = settings.copy()
+        for k, v in settings.items():
+            if len(k) > 1:
+                del new_settings[k]
+        settings = new_settings
+        self.save_json()
 
     def get_time_id(self, date: datetime.date=None):
         """Return current year, week as a tuple."""
