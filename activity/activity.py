@@ -447,10 +447,22 @@ class Activity:
                 channel_id = channel.id
         server_id = server.id
 
+        mentions = []
+
+        for member in message.mentions:
+            statsd.increment(
+                'bot.mentions',
+                tags=[
+                    'member:' + str(member.display_name),
+                    'member_id:' + str(member.id),
+                    'member_name:' + str(member.display_name)])
+
         statsd.increment(
             'bot.msg',
             tags=[
                 'author:' + str(message.author.display_name),
+                'author_id:' + str(message.author.id),
+                'author_name:' + str(message.author.name),
                 'channel:' + str(channel_name),
                 'server_id:' + str(server_id),
                 'channel_name:' + str(channel_name),
