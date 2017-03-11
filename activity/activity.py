@@ -52,10 +52,18 @@ try:
 except:
     psutil = False
 
+
+try:
+    import datadog
+    from datadog import statsd
+except ImportError:
+    raise ImportError('Please install the datadog package from pip') from None
+
+
 PATH_LIST = ['data', 'activity']
 PATH = os.path.join(*PATH_LIST)
 JSON = os.path.join(*PATH_LIST, "settings.json")
-
+HOST = '127.0.0.1'
 
 class Activity:
     """Activity Logger.
@@ -85,6 +93,7 @@ class Activity:
         self.lock = False
         self.session = aiohttp.ClientSession(loop=self.bot.loop)
         self.rank_max = 5
+        datadog.initialize(statsd_host=HOST)
 
     def __unload(self):
         self.lock = True
@@ -409,6 +418,23 @@ class Activity:
 
     async def on_message(self, message: discord.Message):
         """Log number of messages."""
+        # datadog log
+
+        channel = message.channel
+        channel_name = ''
+        if channel is not None:
+            if not channel.is_private:
+                channel_name = channel.name
+
+        statsd.increment(
+            'bot.msg',
+            tags=[
+                'author:' + str(message.author.display_name),
+                'channel:' + str(channel_name)
+                ]
+            )
+
+        # json log
         author = message.author
         server = message.server
 
