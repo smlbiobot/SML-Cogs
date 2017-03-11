@@ -64,6 +64,7 @@ PATH_LIST = ['data', 'activity']
 PATH = os.path.join(*PATH_LIST)
 JSON = os.path.join(*PATH_LIST, "settings.json")
 HOST = '127.0.0.1'
+INTERVAL = 5
 
 class Activity:
     """Activity Logger.
@@ -93,6 +94,7 @@ class Activity:
         self.lock = False
         self.session = aiohttp.ClientSession(loop=self.bot.loop)
         self.rank_max = 5
+        self.task = bot.loop.create_task(self.loop_task())
         datadog.initialize(statsd_host=HOST)
 
     def __unload(self):
@@ -470,6 +472,9 @@ class Activity:
                 'channel_name:' + str(channel_name),
                 'channel_id:' + str(channel_id)])
 
+        # datadog - send stats
+        # self.send_server_roles(server)
+
         # json log
         time_id = self.get_time_id()
 
@@ -542,8 +547,9 @@ class Activity:
             day = date.strftime("%w")
             server_settings['message_time'][day][hour] += 1
 
-
         self.save_json()
+
+
 
     async def on_command(self, command: Command, ctx: Context):
         """Log command used."""
@@ -671,6 +677,46 @@ class Activity:
     def save_json(self):
         """Save settings."""
         dataIO.save_json(JSON, self.settings)
+
+    def send_all(self):
+        """Send all data to DataDog."""
+        self.send_roles()
+
+    def send_roles(self):
+        """Send roles from all servers."""
+        for server in self.bot.servers:
+            self.send_server_roles(server)
+
+    def send_server_roles(self, server: discord.Server):
+        """Log server roles on datadog."""
+        roles = {}
+        for role in server.roles:
+            roles[role.id] = {'role': role, 'count': 0}
+        for member in server.members:
+            for role in member.roles:
+                roles[role.id]['count'] += 1
+
+        for role in server.roles:
+            role_count = roles[role.id]['count']
+            statsd.gauge(
+                'bot.roles.{}'.format(server.id),
+                role_count,
+                tags=[
+                    'role_name:' + role.name,
+                    'role_id:' + role.id,
+                    'server_id:' + server.id,
+                    'server_name:' + server.name])
+
+
+    async def loop_task(self):
+        await self.bot.wait_until_ready()
+        self.tags = ['application:red',
+                     'bot_id:' + self.bot.user.id,
+                     'bot_name:' + self.bot.user.name]
+        self.send_all()
+        await asyncio.sleep(INTERVAL)
+        if self is self.bot.get_cog('Activity'):
+            self.task = self.bot.loop.create_task(self.loop_task())
 
 def check_folders():
     if not os.path.exists(PATH):
