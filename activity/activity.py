@@ -29,6 +29,7 @@ import re
 import os
 import io
 import aiohttp
+import asyncio
 
 from collections import OrderedDict
 
@@ -592,6 +593,9 @@ class Activity:
         statsd.increment(
             'bot.cmd',
             tags=[
+                'author:' + str(ctx.message.author.display_name),
+                'author_id:' + str(ctx.message.author.id),
+                'author_name:' + str(ctx.message.author.name),
                 'server_id:' + str(server_id),
                 'server_name:' + str(server_name),
                 'channel_name:' + str(channel_name),
