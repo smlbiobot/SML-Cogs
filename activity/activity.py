@@ -243,17 +243,6 @@ class Activity:
     @commands.command(pass_context=True)
     async def plotactivity(self, ctx: Context):
         """Plot the activity for the week."""
-        # # Three subplots sharing both x/y axes
-        # f, (ax1, ax2, ax3) = plt.subplots(3, sharex=True, sharey=True)
-        # ax1.plot(x, y)
-        # ax1.set_title('Sharing both axes')
-        # ax2.scatter(x, y)
-        # ax3.scatter(x, 2 * y ** 2 - 1, color='r')
-        # # Fine-tune figure; make subplots close to each other and hide x ticks for
-        # # all but bottom plot.
-        # f.subplots_adjust(hspace=0)
-        # plt.setp([a.get_xticklabels() for a in f.axes[:-1]], visible=False)
-
         server = ctx.message.server
         self.check_server_settings(server)
         self.check_message_time_settings(server)
@@ -440,41 +429,8 @@ class Activity:
             return
 
         # datadog log
-
-        # datadog - mentions
-
-        for member in message.mentions:
-            statsd.increment(
-                'bot.mentions',
-                tags=[
-                    'member:' + str(member.display_name),
-                    'member_id:' + str(member.id),
-                    'member_name:' + str(member.display_name)])
-
-        # datadog - messages (msg)
-
-        channel = message.channel
-        channel_name = ''
-        channel_id = ''
-        if channel is not None:
-            if not channel.is_private:
-                channel_name = channel.name
-                channel_id = channel.id
-        server_id = server.id
-
-        statsd.increment(
-            'bot.msg',
-            tags=[
-                'author:' + str(message.author.display_name),
-                'author_id:' + str(message.author.id),
-                'author_name:' + str(message.author.name),
-                'channel:' + str(channel_name),
-                'server_id:' + str(server_id),
-                'channel_name:' + str(channel_name),
-                'channel_id:' + str(channel_id)])
-
-        # datadog - send stats
-        # self.send_server_roles(server)
+        self.dd_log_mentions(message)
+        self.dd_log_messages(message)
 
         # json log
         time_id = self.get_time_id()
@@ -550,6 +506,40 @@ class Activity:
 
         self.save_json()
 
+    def dd_log_mentions(self, message: discord.Message):
+        """Send mentions to datadog."""
+        for member in message.mentions:
+            statsd.increment(
+                'bot.mentions',
+                tags=[
+                    'member:' + str(member.display_name),
+                    'member_id:' + str(member.id),
+                    'member_name:' + str(member.display_name)])
+
+    def dd_log_messages(self, message: discord.Message):
+        """Send message stats to datadog."""
+        channel = message.channel
+        channel_name = ''
+        channel_id = ''
+        if channel is not None:
+            if not channel.is_private:
+                channel_name = channel.name
+                channel_id = channel.id
+
+        server_id = message.server.id
+        server_name = message.server.name
+
+        statsd.increment(
+            'bot.msg',
+            tags=[
+                'author:' + str(message.author.display_name),
+                'author_id:' + str(message.author.id),
+                'author_name:' + str(message.author.name),
+                'server_id:' + str(server_id),
+                'server_name:' + str(server_name),
+                'channel:' + str(channel_name),
+                'channel_name:' + str(channel_name),
+                'channel_id:' + str(channel_id)])
 
 
     async def on_command(self, command: Command, ctx: Context):
@@ -581,6 +571,11 @@ class Activity:
         self.save_json()
 
         # datadog log
+        self.dd_log_command(command, ctx)
+
+
+    def dd_log_command(self, command: Command, ctx: Context):
+        """Log commands with datadog."""
         channel = ctx.message.channel
         channel_name = ''
         channel_id = ''
@@ -588,6 +583,7 @@ class Activity:
             if not channel.is_private:
                 channel_name = channel.name
                 channel_id = channel.id
+        server = ctx.message.server
         server_id = server.id
         server_name = server.name
         statsd.increment(
