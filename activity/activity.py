@@ -95,8 +95,8 @@ class Activity:
         self.lock = False
         self.session = aiohttp.ClientSession(loop=self.bot.loop)
         self.rank_max = 5
-        self.task = bot.loop.create_task(self.loop_task())
-        datadog.initialize(statsd_host=HOST)
+        # self.task = bot.loop.create_task(self.loop_task())
+        # datadog.initialize(statsd_host=HOST)
 
     def __unload(self):
         self.lock = True
@@ -429,8 +429,8 @@ class Activity:
             return
 
         # datadog log
-        self.dd_log_mentions(message)
-        self.dd_log_messages(message)
+        # self.dd_log_mentions(message)
+        # self.dd_log_messages(message)
 
         # json log
         time_id = self.get_time_id()
@@ -506,40 +506,40 @@ class Activity:
 
         self.save_json()
 
-    def dd_log_mentions(self, message: discord.Message):
-        """Send mentions to datadog."""
-        for member in message.mentions:
-            statsd.increment(
-                'bot.mentions',
-                tags=[
-                    'member:' + str(member.display_name),
-                    'member_id:' + str(member.id),
-                    'member_name:' + str(member.display_name)])
+    # def dd_log_mentions(self, message: discord.Message):
+    #     """Send mentions to datadog."""
+    #     for member in message.mentions:
+    #         statsd.increment(
+    #             'bot.mentions',
+    #             tags=[
+    #                 'member:' + str(member.display_name),
+    #                 'member_id:' + str(member.id),
+    #                 'member_name:' + str(member.display_name)])
 
-    def dd_log_messages(self, message: discord.Message):
-        """Send message stats to datadog."""
-        channel = message.channel
-        channel_name = ''
-        channel_id = ''
-        if channel is not None:
-            if not channel.is_private:
-                channel_name = channel.name
-                channel_id = channel.id
+    # def dd_log_messages(self, message: discord.Message):
+    #     """Send message stats to datadog."""
+    #     channel = message.channel
+    #     channel_name = ''
+    #     channel_id = ''
+    #     if channel is not None:
+    #         if not channel.is_private:
+    #             channel_name = channel.name
+    #             channel_id = channel.id
 
-        server_id = message.server.id
-        server_name = message.server.name
+    #     server_id = message.server.id
+    #     server_name = message.server.name
 
-        statsd.increment(
-            'bot.msg',
-            tags=[
-                'author:' + str(message.author.display_name),
-                'author_id:' + str(message.author.id),
-                'author_name:' + str(message.author.name),
-                'server_id:' + str(server_id),
-                'server_name:' + str(server_name),
-                'channel:' + str(channel_name),
-                'channel_name:' + str(channel_name),
-                'channel_id:' + str(channel_id)])
+    #     statsd.increment(
+    #         'bot.msg',
+    #         tags=[
+    #             'author:' + str(message.author.display_name),
+    #             'author_id:' + str(message.author.id),
+    #             'author_name:' + str(message.author.name),
+    #             'server_id:' + str(server_id),
+    #             'server_name:' + str(server_name),
+    #             'channel:' + str(channel_name),
+    #             'channel_name:' + str(channel_name),
+    #             'channel_id:' + str(channel_id)])
 
 
     async def on_command(self, command: Command, ctx: Context):
@@ -571,33 +571,33 @@ class Activity:
         self.save_json()
 
         # datadog log
-        self.dd_log_command(command, ctx)
+        # self.dd_log_command(command, ctx)
 
 
-    def dd_log_command(self, command: Command, ctx: Context):
-        """Log commands with datadog."""
-        channel = ctx.message.channel
-        channel_name = ''
-        channel_id = ''
-        if channel is not None:
-            if not channel.is_private:
-                channel_name = channel.name
-                channel_id = channel.id
-        server = ctx.message.server
-        server_id = server.id
-        server_name = server.name
-        statsd.increment(
-            'bot.cmd',
-            tags=[
-                'author:' + str(ctx.message.author.display_name),
-                'author_id:' + str(ctx.message.author.id),
-                'author_name:' + str(ctx.message.author.name),
-                'server_id:' + str(server_id),
-                'server_name:' + str(server_name),
-                'channel_name:' + str(channel_name),
-                'channel_id:' + str(channel_id),
-                'command_name:' + str(command),
-                'cog_name:' + type(ctx.cog).__name__])
+    # def dd_log_command(self, command: Command, ctx: Context):
+    #     """Log commands with datadog."""
+    #     channel = ctx.message.channel
+    #     channel_name = ''
+    #     channel_id = ''
+    #     if channel is not None:
+    #         if not channel.is_private:
+    #             channel_name = channel.name
+    #             channel_id = channel.id
+    #     server = ctx.message.server
+    #     server_id = server.id
+    #     server_name = server.name
+    #     statsd.increment(
+    #         'bot.cmd',
+    #         tags=[
+    #             'author:' + str(ctx.message.author.display_name),
+    #             'author_id:' + str(ctx.message.author.id),
+    #             'author_name:' + str(ctx.message.author.name),
+    #             'server_id:' + str(server_id),
+    #             'server_name:' + str(server_name),
+    #             'channel_name:' + str(channel_name),
+    #             'channel_id:' + str(channel_id),
+    #             'command_name:' + str(command),
+    #             'cog_name:' + type(ctx.cog).__name__])
 
 
     def check_server_settings(self, server: discord.Server):
@@ -678,45 +678,45 @@ class Activity:
         """Save settings."""
         dataIO.save_json(JSON, self.settings)
 
-    def send_all(self):
-        """Send all data to DataDog."""
-        self.send_roles()
+    # def send_all(self):
+    #     """Send all data to DataDog."""
+    #     self.send_roles()
 
-    def send_roles(self):
-        """Send roles from all servers."""
-        for server in self.bot.servers:
-            self.send_server_roles(server)
+    # def send_roles(self):
+    #     """Send roles from all servers."""
+    #     for server in self.bot.servers:
+    #         self.send_server_roles(server)
 
-    def send_server_roles(self, server: discord.Server):
-        """Log server roles on datadog."""
-        roles = {}
-        for role in server.roles:
-            roles[role.id] = {'role': role, 'count': 0}
-        for member in server.members:
-            for role in member.roles:
-                roles[role.id]['count'] += 1
+    # def send_server_roles(self, server: discord.Server):
+    #     """Log server roles on datadog."""
+    #     roles = {}
+    #     for role in server.roles:
+    #         roles[role.id] = {'role': role, 'count': 0}
+    #     for member in server.members:
+    #         for role in member.roles:
+    #             roles[role.id]['count'] += 1
 
-        for role in server.roles:
-            role_count = roles[role.id]['count']
-            statsd.gauge(
-                'bot.roles.{}'.format(server.id),
-                role_count,
-                tags=[
-                    'role_name:' + role.name,
-                    'role_id:' + role.id,
-                    'server_id:' + server.id,
-                    'server_name:' + server.name])
+    #     for role in server.roles:
+    #         role_count = roles[role.id]['count']
+    #         statsd.gauge(
+    #             'bot.roles.{}'.format(server.id),
+    #             role_count,
+    #             tags=[
+    #                 'role_name:' + role.name,
+    #                 'role_id:' + role.id,
+    #                 'server_id:' + server.id,
+    #                 'server_name:' + server.name])
 
 
-    async def loop_task(self):
-        await self.bot.wait_until_ready()
-        self.tags = ['application:red',
-                     'bot_id:' + self.bot.user.id,
-                     'bot_name:' + self.bot.user.name]
-        self.send_all()
-        await asyncio.sleep(INTERVAL)
-        if self is self.bot.get_cog('Activity'):
-            self.task = self.bot.loop.create_task(self.loop_task())
+    # async def loop_task(self):
+    #     await self.bot.wait_until_ready()
+    #     self.tags = ['application:red',
+    #                  'bot_id:' + self.bot.user.id,
+    #                  'bot_name:' + self.bot.user.name]
+    #     self.send_all()
+    #     await asyncio.sleep(INTERVAL)
+    #     if self is self.bot.get_cog('Activity'):
+    #         self.task = self.bot.loop.create_task(self.loop_task())
 
 def check_folders():
     if not os.path.exists(PATH):
