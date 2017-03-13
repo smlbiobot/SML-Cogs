@@ -53,7 +53,7 @@ crtexts_path = "data/card/crtexts.json"
 dates_path = "data/card/dates.json"
 
 cardpop_range_min = 8
-cardpop_range_max = 25
+cardpop_range_max = 26
 
 max_deck_show = 5
 

@@ -28,13 +28,13 @@ from openpyxl import load_workbook
 from difflib import SequenceMatcher
 import json
 
-cardpop_xlsx_path = 'data/cardpop{}.xlsx'
-cardpop_json_path = 'data/cardpop{}.json'
-cardpop_path = 'data/cardpop.json'
-summary_path = 'data/summary.txt'
+cardpop_xlsx_path = '../xlsx/cardpop{}.xlsx'
+cardpop_json_path = '../cardpop{}.json'
+cardpop_path = '../cardpop.json'
+summary_path = '../summary.txt'
 
 cardpop_range_min = 8
-cardpop_range_max = 25
+cardpop_range_max = 26
 
 similarity_threshold = 0.85
 
@@ -53,7 +53,6 @@ def process_data():
     prev_cardpop = None
 
     for id in range(cardpop_range_min, cardpop_range_max):
-
 
         wb = load_workbook(cardpop_xlsx_path.format(id))
 

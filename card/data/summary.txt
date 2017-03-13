@@ -1816,3 +1816,133 @@ Cards:
   1 (  0): Valkyrie
   1 (  0): Bomb Tower
   1 (  0): Dark Prince
+--------------------------------------------------------------------------------
+Snapshot #25
+Decks:
+  7: Fireball, Giant, Hog Rider, Minions, Musketeer, Skeletons, The Log, Zap
+  6: Fire Spirits, Fireball, Ice Spirit, Inferno Tower, Minions, Skeletons, The Log, X-Bow
+  6: Fireball, Giant, Miner, Minion Horde, Minions, Musketeer, The Log, Zap
+  5: Baby Dragon, Elixir Collector, Golem, Lightning, Mega Minion, Minions, Skeletons, The Log
+  3: Goblin Barrel, Goblin Gang, Ice Spirit, Inferno Tower, Knight, Princess, Rocket, The Log
+  2: Elixir Collector, Freeze, Goblins, Hog Rider, Ice Spirit, Mini P.E.K.K.A, Princess, Zap
+  2: Arrows, Giant, Graveyard, Mega Minion, Musketeer, Skeleton Army, The Log, Zap
+  2: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, The Log
+  2: Furnace, Knight, Lightning, Minions, Musketeer, Royal Giant, Skeletons, The Log
+  2: Goblin Barrel, Goblin Gang, Hog Rider, Inferno Tower, Princess, Rocket, Skeleton Army, Zap
+  2: Arrows, Bowler, Electro Wizard, Freeze, Graveyard, Knight, Mega Minion, Tombstone
+  2: Balloon, Elixir Collector, Freeze, Ice Golem, Inferno Tower, Mega Minion, Minions, Zap
+  2: Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeleton Army, Tombstone, Zap
+  2: Arrows, Balloon, Elixir Collector, Lava Hound, Lightning, Mega Minion, Minions, Skeletons
+  2: Elixir Collector, Ice Golem, Ice Spirit, Inferno Tower, Mega Minion, Royal Giant, Skeletons, Zap
+  1: Bowler, Electro Wizard, Giant, Graveyard, Minions, Poison, Tombstone, Tornado
+  1: Dart Goblin, Goblin Barrel, Goblin Gang, Inferno Tower, Knight, Princess, Rocket, The Log
+  1: Electro Wizard, Furnace, Knight, Lightning, Minions, Royal Giant, Skeletons, The Log
+  1: Fire Spirits, Furnace, Knight, Lightning, Minions, Musketeer, Royal Giant, The Log
+  1: Baby Dragon, Bowler, Giant, Graveyard, Ice Wizard, Poison, Skeletons, Tornado
+  1: Electro Wizard, Fireball, Giant, Miner, Minion Horde, Minions, Skeletons, Zap
+  1: Baby Dragon, Executioner, Giant, Graveyard, Ice Wizard, Poison, Skeletons, Tornado
+  1: Bowler, Giant, Graveyard, Mega Minion, Musketeer, Poison, Tombstone, Tornado
+  1: Elixir Collector, Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minion Horde, Princess, Zap
+  1: Arrows, Fireball, Lava Hound, Mega Minion, Miner, Minion Horde, Minions, Tombstone
+  1: Ice Spirit, Inferno Tower, Miner, Minions, Poison, Princess, Skeletons, The Log
+  1: Dart Goblin, Goblin Barrel, Goblin Gang, Hog Rider, Inferno Tower, Rocket, Skeleton Army, The Log
+  1: Fire Spirits, Fireball, Ice Golem, Ice Spirit, Inferno Tower, Minions, The Log, X-Bow
+  1: Archers, Elixir Collector, Fireball, Furnace, Knight, Minions, Royal Giant, Zap
+  1: Giant, Mega Minion, Miner, Minion Horde, Minions, Musketeer, The Log, Zap
+  1: Bowler, Executioner, Giant, Graveyard, Mega Minion, Poison, Skeletons, Tornado
+  1: Archers, Baby Dragon, Bowler, Furnace, Ice Spirit, Miner, Rocket, Tornado
+  1: Arrows, Baby Dragon, Bowler, Giant, Graveyard, Ice Wizard, Tombstone, Tornado
+  1: Baby Dragon, Bowler, Giant, Graveyard, Ice Wizard, Poison, Tombstone, Tornado
+  1: Archers, Electro Wizard, Furnace, Graveyard, Knight, Poison, Skeletons, The Log
+  1: Cannon, Fireball, Hog Rider, Ice Golem, Ice Spirit, Musketeer, Skeletons, Zap
+  1: Arrows, Bowler, Goblin Barrel, Goblin Gang, Goblin Hut, Miner, Minion Horde, Poison
+  1: Electro Wizard, Graveyard, Inferno Tower, Knight, Minions, Poison, Skeletons, The Log
+  1: Archers, Arrows, Ice Spirit, Knight, Mortar, Rocket, Skeletons, The Log
+  1: Balloon, Cannon, Fireball, Ice Golem, Lava Hound, Mega Minion, Minions, The Log
+  1: Balloon, Barbarians, Elixir Collector, Freeze, Giant, Rocket, Witch, Wizard
+  1: Executioner, Furnace, Graveyard, Knight, Minions, Poison, Skeletons, Tornado
+  1: Bowler, Executioner, Giant, Graveyard, Musketeer, Poison, The Log, Tornado
+  1: Freeze, Goblins, Hog Rider, Mini P.E.K.K.A, Minion Horde, Princess, Skeletons, Zap
+  1: Hog Rider, Ice Golem, Ice Wizard, Lumberjack, Princess, Rocket, Skeletons, The Log
+  1: Arrows, Balloon, Freeze, Ice Spirit, Knight, Musketeer, Skeletons, Tombstone
+  1: Fireball, Ice Golem, Inferno Tower, Minions, Musketeer, Skeletons, The Log, X-Bow
+  1: Elixir Collector, Fireball, Hog Rider, Knight, Minions, Skeletons, Three Musketeers, Zap
+  1: Arrows, Balloon, Goblin Gang, Lava Hound, Lightning, Mega Minion, Minions, Tombstone
+  1: Baby Dragon, Furnace, Golem, Lightning, Mega Minion, Minions, Skeletons, The Log
+  1: Arrows, Barbarians, Freeze, Hog Rider, Minion Horde, P.E.K.K.A, Rocket, Wizard
+  1: Giant, Graveyard, Mega Minion, Musketeer, Poison, The Log, Tombstone, Zap
+  1: Baby Dragon, Elixir Collector, Golem, Lightning, Minions, Musketeer, Skeletons, The Log
+  1: Baby Dragon, Balloon, Fireball, Lava Hound, Mega Minion, Minions, Skeletons, Zap
+  1: Archers, Furnace, Graveyard, Knight, Musketeer, Poison, Skeletons, The Log
+  1: Elixir Collector, Fire Spirits, Ice Golem, Inferno Tower, Musketeer, Skeletons, The Log, X-Bow
+  1: Battle Ram, Executioner, Graveyard, Knight, Minions, Poison, The Log, Tornado
+  1: Fireball, Goblin Barrel, Inferno Tower, Miner, Minion Horde, Princess, Skeleton Army, The Log
+  1: Bowler, Giant, Graveyard, Minions, Musketeer, Poison, Tombstone, Zap
+  1: Giant, Miner, Minion Horde, Minions, Musketeer, Poison, Tombstone, Zap
+  1: Balloon, Electro Wizard, Ice Golem, Ice Spirit, Princess, Skeletons, Tornado, Zap
+  1: Bowler, Executioner, Freeze, Graveyard, Mega Minion, Skeletons, The Log, Tombstone
+  1: Fireball, Hog Rider, Ice Golem, Ice Spirit, Inferno Tower, Musketeer, Skeletons, The Log
+  1: Arrows, Elite Barbarians, Fire Spirits, Fireball, Inferno Tower, Minions, Mirror, Rocket
+  1: Balloon, Dark Prince, Elixir Collector, Golem, Minions, Musketeer, Rage, Zap
+  1: Arrows, Bowler, Executioner, Freeze, Graveyard, Knight, Minions, Skeletons
+  1: Giant, Hog Rider, Ice Spirit, Minions, Musketeer, Skeletons, The Log, Zap
+  1: Fire Spirits, Fireball, Ice Golem, Inferno Tower, Minions, Skeletons, The Log, X-Bow
+Cards:
+ 58 (  7): Minions
+ 58 (  1): The Log
+ 53 ( 23): Skeletons
+ 39 (  6): Zap
+ 36 ( 13): Fireball
+ 35 (  8): Musketeer
+ 30 ( -3): Giant
+ 27 (-11): Mega Minion
+ 26 (  6): Inferno Tower
+ 24 ( -1): Ice Spirit
+ 22 (  8): Hog Rider
+ 21 (  7): Graveyard
+ 20 ( -7): Elixir Collector
+ 20 ( -2): Knight
+ 17 (  1): Poison
+ 15 ( -5): Tombstone
+ 15 (  7): Arrows
+ 15 (  2): Ice Golem
+ 15 ( -5): Minion Horde
+ 14 ( -2): Princess
+ 14 (  3): Bowler
+ 14 ( -8): Lightning
+ 14 ( -6): Miner
+ 13 (  2): Freeze
+ 13 ( -5): Baby Dragon
+ 13 ( -5): Rocket
+ 13 (  1): Balloon
+ 12 ( -3): Tornado
+ 11 ( -8): Fire Spirits
+ 10 (  1): X-Bow
+ 10 ( -2): Furnace
+  9 ( -1): Goblin Barrel
+  9 (  4): Goblin Gang
+  8 (  5): Electro Wizard
+  8 ( -6): Skeleton Army
+  8 ( -4): Golem
+  8 (  3): Lava Hound
+  7 ( -2): Royal Giant
+  7 ( -3): Executioner
+  5 ( -1): Ice Wizard
+  5 ( -7): Archers
+  4 ( -1): Goblins
+  4 ( -9): Mini P.E.K.K.A
+  4 (  1): Cannon
+  2 (  1): Dart Goblin
+  2 (  0): Wizard
+  2 (  1): Barbarians
+  1 (  0): Goblin Hut
+  1 (  0): Mortar
+  1 (  0): Witch
+  1 (  0): Lumberjack
+  1 ( -4): Three Musketeers
+  1 ( -1): P.E.K.K.A
+  1 (  0): Battle Ram
+  1 (  0): Elite Barbarians
+  1 (  0): Mirror
+  1 (  0): Dark Prince
+  1 (  0): Rage
