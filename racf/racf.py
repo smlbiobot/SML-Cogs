@@ -448,6 +448,47 @@ class RACF:
         econ = self.bot.get_cog("Economy")
         await ctx.invoke(econ._set, user, credits)
 
+    @commands.group(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
+    async def removereaction(self, ctx:Context):
+        """Remove reactions from messages."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @removereaction.command(name="messages", pass_context=True, no_pm=True)
+    async def removereaction_messages(self, ctx: Context, number: int):
+        """Removes reactions from last X messages."""
+
+        channel = ctx.message.channel
+        author = ctx.message.author
+        server = author.server
+        is_bot = self.bot.user.bot
+        has_permissions = channel.permissions_for(server.me).manage_messages
+
+        to_manage = []
+
+        if not has_permissions:
+            await self.bot.say("I’m not allowed to remove reactions.")
+            return
+
+        async for message in self.bot.logs_from(channel, limit=number+1):
+            to_manage.append(message)
+
+        # logger.info(
+        #     "{}({}) removed reactions from {} messages in channel {}"
+        #     "".format(author.name, author.id, number, channel.name))
+
+        await self.mass_remove_reactions(to_manage)
+
+    async def mass_remove_reactions(self, messages):
+        for message in messages:
+            await self.bot.clear_reactions(message)
+            # try:
+            #     await self.bot.remove_reaction(message)
+            # except:
+            #     pass
+
+
 def setup(bot):
     r = RACF(bot)
     bot.add_cog(r)
