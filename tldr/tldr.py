@@ -81,13 +81,16 @@ class TLDR:
         server = ctx.message.server
         message = await self.bot.get_message(channel, message_id)
 
-        stopwords = nltk.corpus.stopwords.words('english')
-        content = [w for w in message.content.split() if w.lower() not in stopwords]
+        # stopwords = nltk.corpus.stopwords.words('english')
+        # content = [w for w in message.content.split() if w.lower() not in stopwords]
+
+        tknzr = nltk.tokenize.casual.TweetTokenizer()
+        out = tknzr.tokenize(message.content)
 
         await self.bot.say("original")
         await self.bot.say(message.content)
         await self.bot.say("transformed")
-        for page in pagify(" ".join(content), shorten_by=12):
+        for page in pagify(str(out), shorten_by=12):
             await self.bot.say(page)
 
 

@@ -28,6 +28,13 @@
             "tid": "TID_SPELL_INFO_BALLOON",
             "cpid": "Balloon"
         },
+        "bandit": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "legendary",
+            "tid": "TID_SPELL_INFO_ASSASSIN",
+            "cpid": "Bandit"
+        }
         "barbarian-hut": {
             "aka": ["barb-hut", "bh"],
             "elixir": 7,
@@ -41,6 +48,13 @@
             "rarity": "common",
             "tid": "TID_SPELL_INFO_BARBARIANS",
             "cpid": "Barbarians"
+        },
+        "bats": {
+            "aka": ["bat"],
+            "elixir": 2,
+            "rarity": "common",
+            "tid": "TID_SPELL_INFO_BATS",
+            "cpid": "Bats"
         },
         "battle-ram": {
             "aka": ["br"],
@@ -217,6 +231,13 @@
             "tid": "TID_SPELL_INFO_SKELETON_WARRIORS",
             "cpid": "Guards"
         },
+        "heal": {
+            "aka": [],
+            "elixir": 3,
+            "rarity": "rare",
+            "tid": "TID_SPELL_INFO_HEAL",
+            "cpid": "Heal"
+        },
         "hog-rider": {
             "aka": ["hog"],
             "elixir": 4,
@@ -342,6 +363,13 @@
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_MUSKETEER",
             "cpid": "Musketeer"
+        },
+        "night-witch": {
+            "aka": ["nwitch", "nw"],
+            "elixir": 4,
+            "rarity": "legendary",
+            "tid": "TID_SPELL_INFO_DARK_WITCH",
+            "cpid": "Night Witch"
         },
         "pekka": {
             "aka": [],
