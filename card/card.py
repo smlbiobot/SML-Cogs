@@ -243,7 +243,8 @@ class Card:
                 FakeMember = namedtuple("FakeMember", "name")
                 m = FakeMember(name="Snapshot #{}".format(snapshot_id))
 
-                await self.bot.get_cog("Deck").deck_get_helper(ctx,
+                await self.bot.get_cog("Deck").deck_get_helper(
+                    ctx,
                     card1=norm_cards[0],
                     card2=norm_cards[1],
                     card3=norm_cards[2],
