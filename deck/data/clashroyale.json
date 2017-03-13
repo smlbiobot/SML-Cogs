@@ -34,7 +34,7 @@
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_ASSASSIN",
             "cpid": "Bandit"
-        }
+        },
         "barbarian-hut": {
             "aka": ["barb-hut", "bh"],
             "elixir": 7,
