@@ -31,4 +31,3 @@ then
 fi
 
 find ${PWD}/${COG} -type f -maxdepth 1 -name '*.py' -exec ln -s {} ${REDFOLDER}/cogs \;
-
