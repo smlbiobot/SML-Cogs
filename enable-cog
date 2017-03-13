@@ -26,8 +26,9 @@ then
   mkdir ${REDFOLDER}/data/${COG}
   cd ${COG}/data
   find . -type d -exec mkdir -p ${REDFOLDER}/data/${COG}/{} \;
-  find . -type f -exec ln -s {} ${REDFOLDER}/data/${COG}/{} \;
+  find . -type f -exec ln -Fs ${PWD}/{} ${REDFOLDER}/data/${COG}/{} \;
   cd -
 fi
 
-find ${PWD}/${COG} -type f -maxdepth 1 -name '*.py' -exec ln -s {} ${REDFOLDER}/cogs \;
+find ${PWD}/${COG} -type f -maxdepth 1 -name '*.py' -exec ln -Fs {} ${REDFOLDER}/cogs \;
+
