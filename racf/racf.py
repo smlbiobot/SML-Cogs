@@ -474,19 +474,13 @@ class RACF:
         async for message in self.bot.logs_from(channel, limit=number+1):
             to_manage.append(message)
 
-        # logger.info(
-        #     "{}({}) removed reactions from {} messages in channel {}"
-        #     "".format(author.name, author.id, number, channel.name))
+        await self.remove_reactions(to_manage)
 
-        await self.mass_remove_reactions(to_manage)
-
-    async def mass_remove_reactions(self, messages):
+    async def remove_reactions(self, messages):
         for message in messages:
             await self.bot.clear_reactions(message)
-            # try:
-            #     await self.bot.remove_reaction(message)
-            # except:
-            #     pass
+
+
 
 
 def setup(bot):

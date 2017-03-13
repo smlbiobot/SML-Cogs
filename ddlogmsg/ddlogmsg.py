@@ -46,6 +46,11 @@ try:
 except ImportError:
     raise ImportError("Please install the datadog package from pip") from None
 
+try:
+    import nltk
+except ImportError:
+    raise ImportError("Please install the nltk package from pip") from None
+
 PATH_LIST = ['data', 'ddlogmsg']
 PATH = os.path.join(*PATH_LIST)
 JSON = os.path.join(*PATH_LIST, "settings.json")
