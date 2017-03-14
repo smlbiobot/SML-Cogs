@@ -164,18 +164,11 @@ class TLDR:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @tldr.command(name="msg", pass_context=True, no_pm=True)
-    async def tldr_message(self, ctx: Context, message_id: str):
+    @tldr.command(name="msgid", pass_context=True, no_pm=True)
+    async def tldr_message_id(self, ctx: Context, message_id: str):
         """Process messsage by message id."""
         channel = ctx.message.channel
-        server = ctx.message.server
         message = await self.bot.get_message(channel, message_id)
-
-        # stopwords = nltk.corpus.stopwords.words('english')
-        # content = [w for w in message.content.split() if w.lower() not in stopwords]
-
-        tknzr = nltk.tokenize.casual.TweetTokenizer()
-        out = tknzr.tokenize(message.content)
 
         rake = RakeKeywordExtractor()
         keywords = rake.extract(message.content, incl_scores=True)
@@ -186,6 +179,23 @@ class TLDR:
         for page in pagify(str(keywords), shorten_by=12):
             await self.bot.say(page)
 
+    @tldr.command(name="msg", pass_context=True, no_pm=True)
+    async def tldr_messages(self, ctx: Context, count: int, top=10):
+        """Extracts keywords from last X messages."""
+        channel = ctx.message.channel
+        messages = []
+        async for message in self.bot.logs_from(channel, limit=count+1):
+            messages.append(message.content)
+
+        rake = RakeKeywordExtractor()
+        keywords = rake.extract(" ".join(messages), incl_scores=True)
+
+        out = []
+        out.append("Found keywords: ")
+        for k in keywords[:top]:
+            out.append("**{}** ({:.2f}), ".format(k[0], k[1]))
+        for page in pagify("".join(out)[:-2], shorten_by=12):
+            await self.bot.say(page)
 
 
 
