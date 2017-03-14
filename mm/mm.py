@@ -173,12 +173,14 @@ class MemberManagement:
                         value.append(f"{', '.join(roles)}")
 
                         name = m.display_name
+                        since_joined = (ctx.message.timestamp - m.joined_at).days
 
                         data.add_field(
                             name=str(name),
                             value=str(
                                 ''.join(value) +
-                                '\n{:%Y-%m-%d %H:%M:%S}'.format(m.joined_at)))
+                                '\n{} days ago'.format(
+                                    since_joined)))
 
                     try:
                         await self.bot.say(embed=data)
