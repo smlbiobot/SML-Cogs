@@ -72,6 +72,9 @@ class MemberManagement:
             Don’t display the long list and only display the list of member mentions
         --members-without-clan-tag
             RACF specific option. Equivalent to typing Member -Alpha -Bravo -Charlie -Delta -Echo -Foxtrot -Golf -Hotel
+        --sort-join
+            Sort list by join date on server
+
 
 
         """
@@ -80,14 +83,13 @@ class MemberManagement:
         option_output_mentions = "--output-mentions" in args
         option_output_mentions_only = "--output-mentions-only" in args
         option_members_without_clan_tag = "--members-without-clan-tag" in args
-
+        option_sort_join = "--sort-join" in args
 
         server = ctx.message.server
         server_roles_names = [r.name for r in server.roles]
 
         # get list of arguments which are valid server role names
         # as dictionary {flag, name}
-
         out=["**Member Management**"]
 
         if option_members_without_clan_tag:
@@ -146,6 +148,9 @@ class MemberManagement:
             suffix = 's' if len(out_members) > 1 else ''
             await self.bot.say(f"**Found {len(out_members)} member{suffix}.**")
 
+            # sort join
+            out_members = list(out_members)
+            out_members.sort(key=lambda x: x.joined_at)
 
             # embed output
             if not option_output_mentions_only:
@@ -169,7 +174,11 @@ class MemberManagement:
 
                         name = m.display_name
 
-                        data.add_field(name=str(name), value=str(''.join(value)))
+                        data.add_field(
+                            name=str(name),
+                            value=str(
+                                ''.join(value) +
+                                '\n{:%Y-%m-%d %H:%M:%S}'.format(m.joined_at)))
 
                     try:
                         await self.bot.say(embed=data)
