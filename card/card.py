@@ -194,14 +194,17 @@ class Card:
 
         # repopulate cards with normalized data
         cards = [self.get_card_name(c) for c in cards]
-        cpids = [self.get_card_cpid(c) for c in cards]
+        # cpids = [self.get_card_cpid(c) for c in cards]
 
         found_decks = []
         if snapshot_id in self.cardpop:
             decks = self.cardpop[snapshot_id]["decks"]
             for k in decks.keys():
-                if all(cpid in k for cpid in cpids):
+                deck = decks[k]["deck"]
+                if all(card in deck for card in cards):
                     found_decks.append(k)
+                # if all(cpid in k for cpid in cpids):
+                #     found_decks.append(k)
 
         await self.bot.say("Found {} decks with {} in Snapshot #{}{}.".format(
             len(found_decks),
@@ -226,7 +229,7 @@ class Card:
                 await self.bot.say("**{}**: {}/100: {}".format(
                     i + 1,
                     self.get_deckpop_count(deck, snapshot_id),
-                    deck))
+                    self.card_to_str(deck)))
 
                 FakeMember = namedtuple("FakeMember", "name")
                 m = FakeMember(name="Snapshot #{}".format(snapshot_id))
@@ -441,7 +444,7 @@ class Card:
             out.append("{:4d} ({:3d}) {}".format(
                 card_value["count"],
                 card_value["change"],
-                card_key))
+                self.card_to_str(card_key)))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(box(page, lang="py"))
 
@@ -450,7 +453,7 @@ class Card:
         for deck_key, deck_value in take(limit, decks.items()):
             out.append("**{:4d}**: {}".format(
                 deck_value["count"],
-                deck_key))
+                self.card_to_str(deck_key)))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
 
