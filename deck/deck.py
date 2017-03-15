@@ -87,6 +87,12 @@ e.g. `!deck show 2` shows the second deck in your deck list.
 
 """
 
+numbs = {
+    "next": "➡",
+    "back": "⬅",
+    "exit": "❌"
+}
+
 
 class Deck:
     """Clash Royale Deck Builder."""
@@ -268,8 +274,9 @@ class Deck:
         deck_id = 1
 
         for k, deck in decks.items():
-            await self.bot.say("**{}**. {}".format(deck_id, deck["DeckName"]))
-            await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], member)
+            await self.upload_deck_image(
+                ctx, deck["Deck"], deck["DeckName"], member,
+                description="**{}**. {}".format(deck_id, deck["DeckName"]))
             deck_id += 1
 
         if not len(decks):
@@ -278,6 +285,76 @@ class Deck:
                                    "Type `!deck add` to add some.")
             else:
                 await self.bot.say("{} hasn’t added any decks yet.".format(member.name))
+
+    @deck.command(name="pagelist", pass_context=True, no_pm=True)
+    async def deck_pagelist(self, ctx, member: discord.Member=None):
+        """List decks of a user with pagination."""
+        author = ctx.message.author
+        server = ctx.message.server
+        member_is_author = False
+        if not member:
+            member = author
+            member_is_author = True
+        self.check_server_settings(server)
+        self.check_member_settings(server, member)
+        decks = self.settings["Servers"][server.id]["Members"][member.id]["Decks"]
+        if not len(decks):
+            if member_is_author:
+                await self.bot.say("You don’t have any decks stored.\n"
+                                   "Type `!deck add` to add some.")
+            else:
+                await self.bot.say("{} hasn’t added any decks yet.".format(member.name))
+            return
+        await self.deck_pagelist_menu(
+            ctx, decks, member, message=None, page=0, timeout=30)
+
+    async def deck_pagelist_menu(
+            self, ctx, decks, member: discord.Member,
+            message: discord.Message=None,
+            page=0, timeout: int=30):
+        """Menu control logic for this taken from
+        https://github.com/Lunar-Dust/Dusty-Cogs/blob/master/menu/menu.py
+        """
+        if isinstance(decks, dict):
+            decks = [v for k, v in decks.items()]
+        deck = decks[page]
+        description = "**{}**. {}".format(page + 1, deck["DeckName"])
+        if not message:
+            message =\
+                await self.upload_deck_image(
+                    ctx, deck["Deck"], deck["DeckName"], member, description)
+            await self.bot.add_reaction(message, "⬅")
+            await self.bot.add_reaction(message, "❌")
+            await self.bot.add_reaction(message, "➡")
+        else:
+            message = await self.bot.edit_message(message)
+        react = await self.bot.wait_for_reaction(
+            message=message, user=ctx.message.author, timeout=timeout,
+            emoji=["➡", "⬅", "❌"])
+        if react is None:
+            try:
+                await self.bot.remove_reaction(message, "⬅", self.bot.user)
+                await self.bot.remove_reaction(message, "❌", self.bot.user)
+                await self.bot.remove_reaction(message, "➡", self.bot.user)
+            except:
+                pass
+            return None
+        reacts = {v: k for k, v in numbs.items()}
+        react = reacts[react.reaction.emoji]
+        if react == "next":
+            next_page = 0
+            if page == len(decks) - 1:
+                next_page = 0
+            else:
+                next_page = page + 1
+            return await self.deck_pagelist_menu(
+                ctx, decks, member, message=message,
+                page=next_page, timeout=timeout)
+        else:
+            try:
+                return await self.bot.delete_message(message)
+            except:
+                pass
 
     @deck.command(name="show", pass_context=True, no_pm=True)
     async def deck_show(self, ctx, deck_id=None, member:discord.Member=None):
@@ -361,11 +438,12 @@ class Deck:
                 deck_id = 1
 
                 for deck in found_decks:
-                    await self.bot.say(
-                        "**{}. {}** by {}".format(
-                            deck_id, deck["DeckName"],
-                            deck["MemberDisplayName"]))
-                    await self.upload_deck_image(ctx, deck["Deck"], deck["DeckName"], deck["Member"])
+                    description = "**{}. {}** by {}".format(
+                        deck_id, deck["DeckName"],
+                        deck["MemberDisplayName"])
+                    await self.upload_deck_image(
+                        ctx, deck["Deck"], deck["DeckName"], deck["Member"],
+                        description=description)
 
                     deck_id += 1
 
@@ -496,7 +574,7 @@ class Deck:
 
         self.deck_is_valid = deck_is_valid
 
-    async def upload_deck_image(self, ctx, deck, deck_name, author):
+    async def upload_deck_image(self, ctx, deck, deck_name, author, description=""):
         """Upload deck image to the server."""
 
         deck_image = self.get_deck_image(deck, deck_name, author)
@@ -508,13 +586,15 @@ class Deck:
         # card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
 
         # description = "Deck: {}".format(', '.join(card_names))
-        description = ""
+        message = None
 
         with io.BytesIO() as f:
             deck_image.save(f, "PNG")
             f.seek(0)
-            await ctx.bot.send_file(ctx.message.channel, f,
+            message = await ctx.bot.send_file(ctx.message.channel, f,
                 filename=filename, content=description)
+
+        return message
 
     def get_deck_image(self, deck, deck_name=None, deck_author=None):
         """Construct the deck with Pillow and return image."""
