@@ -157,7 +157,7 @@ class Card:
         await ctx.invoke(Card.decks, card)
 
     @commands.command(pass_context=True)
-    async def decks(self, ctx:Context, *cards):
+    async def decks(self, ctx: Context, *cards):
         """Display top deck with specific card in particular snapshot.
 
         !decks Miner

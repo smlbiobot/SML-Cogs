@@ -32,13 +32,10 @@ import discord
 from discord import Message
 from discord import Server
 from discord import ChannelType
-from discord.ext import commands
 from discord.ext.commands import Command
 from discord.ext.commands import Context
 
-from __main__ import send_cmd_help
 from cogs.utils.dataIO import dataIO
-from cogs.utils import checks
 
 try:
     import datadog
@@ -87,6 +84,8 @@ class DataDogLog:
         author = message.author
         server = message.server
         # Don’t log bot messages
+        if server is None:
+            return
         if author is server.me:
             return
         self.dd_log_messages(message)
@@ -120,7 +119,7 @@ class DataDogLog:
                          '* %i new members' % len(server.members),
                          '* %i new text channels' % text_channels,
                          '* %i new voice channels' % voice_channels
-                         ]))
+                     ]))
         self.send_servers()
 
     async def on_server_remove(self, server):
@@ -133,7 +132,7 @@ class DataDogLog:
                          '* %i less members' % len(server.members),
                          '* %i less text channels' % text_channels,
                          '* %i less voice channels' % voice_channels
-                         ]))
+                     ]))
         self.send_servers()
 
     async def on_ready(self):
