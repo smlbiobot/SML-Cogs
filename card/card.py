@@ -41,6 +41,7 @@ import itertools
 import io
 import os
 import string
+import pprint
 
 from .deck import Deck
 from collections import namedtuple
@@ -424,6 +425,114 @@ class Card:
             "```python\n" +
             "\n".join(out) +
             "```")
+
+    @commands.command(pass_context=True)
+    async def plotelixir(self, ctx: Context):
+        """Plot elixir trend over time."""
+        # sorted by snapshot id
+        trend = {}
+        # unsorted as list of dict
+        trendall = []
+
+        for snapshot_id, snapshot in self.cardpop.items():
+            decks = snapshot["decks"]
+            # deck_id = 0
+
+            if snapshot_id not in trend:
+                trend[snapshot_id] = []
+
+            for deck_key, deck_v in decks.items():
+                trend[snapshot_id].append({
+                    "elxir": deck_v["elixir"],
+                    "count": deck_v["count"]})
+                trendall.append({
+                    "id": snapshot_id,
+                    "elixir": deck_v["elixir"],
+                    "count": deck_v["count"]
+                    })
+                # deck_id += 1
+
+        # Colors
+        facecolor = '#32363b'
+        edgecolor = '#333333'
+        spinecolor = '#666666'
+        footercolor = '#999999'
+        labelcolor = '#cccccc'
+        tickcolor = '#999999'
+        titlecolor = '#ffffff'
+
+        fig = plt.figure(
+            num=1,
+            figsize=(8, 6),
+            dpi=192,
+            facecolor=facecolor,
+            edgecolor=edgecolor)
+        # plt.grid(b=True, alpha=1)
+
+        ax = fig.add_subplot(111)
+
+        ax.set_title('Clash Royale Elixir Trends', color=titlecolor)
+        ax.set_xlabel('Snapshots')
+        ax.set_ylabel('Elixir')
+
+        for spine in ax.spines.values():
+            spine.set_edgecolor(spinecolor)
+
+        ax.xaxis.label.set_color(labelcolor)
+        ax.yaxis.label.set_color(labelcolor)
+        ax.tick_params(axis='x', colors=tickcolor)
+        ax.tick_params(axis='y', colors=tickcolor)
+
+        # create labels using snapshot dates
+        labels = []
+        # for id in range(cardpop_range_min, cardpop_range_max):
+        for t in trendall:
+            dt = datetime.datetime.strptime(
+                self.dates[str(t["id"])], '%Y-%m-%d')
+            dtstr = dt.strftime('%b %d, %y')
+            labels.append("{}\n   {}".format(t["id"], dtstr))
+
+        # actual plot
+        x = [int(t["id"]) for t in trendall]
+        y = [t["elixir"] for t in trendall]
+        area = [t["count"] * 2 for t in trendall]
+        ax.scatter(x, y, s=area, color="red")
+        plt.xticks(x, labels, rotation=70, fontsize=8, ha='right')
+
+        ax.annotate(
+            'Compiled with data from Woody’s popularity snapshots',
+            xy=(0, 0),
+            xycoords=('figure fraction'),
+            xytext=(15, 10),
+            textcoords='offset points',
+            size=8, ha='left', va='bottom', color=footercolor)
+
+        plt.subplots_adjust(left=0.1, right=0.96, top=0.9, bottom=0.2)
+
+        plot_filename = "elixir-trend-plot.png"
+        # plot_name = "Card Trends: {}".format(
+        #     ", ".join([self.card_to_str(c) for c in validated_cards]))
+        plot_name = ""
+
+        with io.BytesIO() as f:
+            plt.savefig(f, format="png", facecolor=facecolor,
+                        edgecolor=edgecolor, transparent=True)
+            f.seek(0)
+            await ctx.bot.send_file(
+                ctx.message.channel, f,
+                filename=plot_filename,
+                content=plot_name)
+
+        fig.clf()
+        plt.clf()
+        plt.cla()
+
+
+        # print(pprint.pformat(trend))
+
+        # for page in pagify(pprint.pformat(trend["8"]), shorten_by=24):
+        #     await self.bot.say(page)
+
 
 
 
