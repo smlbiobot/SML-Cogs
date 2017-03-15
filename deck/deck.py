@@ -142,7 +142,6 @@ class Deck:
         return ([e for e in t if e is not None]
             for t in itertools.zip_longest(*args))
 
-
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
         """Clash Royale deck builder.
@@ -427,7 +426,7 @@ class Deck:
                             "Deck": member_deck["Deck"],
                             "DeckName": member_deck["DeckName"],
                             "Member": member,
-                            "MemberDisplayName": member_display_name })
+                            "MemberDisplayName": member_display_name})
 
             await self.bot.say("Found {} decks".format(len(found_decks)))
 
@@ -453,7 +452,8 @@ class Deck:
                             def pagination_check(m):
                                 return m.content.lower() == 'y'
 
-                            await self.bot.say("Would you like to see the next results? (Y/N)")
+                            await self.bot.say(
+                                "Would you like to see the next results? (Y/N)")
 
                             answer = await self.bot.wait_for_message(
                                 timeout=10.0,
@@ -630,7 +630,7 @@ class Deck:
             # card_image.thumbnail(size)
             box = (card_x + card_w * i,
                    card_y,
-                   card_x + card_w * (i+1),
+                   card_x + card_w * (i + 1),
                    card_h + card_y)
             image.paste(card_image, box, card_image)
 
@@ -659,18 +659,24 @@ class Deck:
 
         deck_author_name = deck_author.name if deck_author else ""
 
-        d_name.text((txt_x_name, txt_y_line1), deck_name, font=font_bold,
-                         fill=(0xff, 0xff, 0xff, 255))
-        d_name.text((txt_x_name, txt_y_line2), deck_author_name, font=font_regular,
-                         fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_cards, txt_y_line1), line1, font=font_regular,
-                         fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_cards, txt_y_line2), line2, font=font_regular,
-                         fill=(0xff, 0xff, 0xff, 255))
-        d.text((txt_x_elixir, txt_y_line1), "Avg elixir", font=font_bold,
-               fill=(0xff, 0xff, 0xff, 200))
-        d.text((txt_x_elixir, txt_y_line2), average_elixir, font=font_bold,
-               fill=(0xff, 0xff, 0xff, 255))
+        d_name.text(
+            (txt_x_name, txt_y_line1), deck_name, font=font_bold,
+            fill=(0xff, 0xff, 0xff, 255))
+        d_name.text(
+            (txt_x_name, txt_y_line2), deck_author_name, font=font_regular,
+            fill=(0xff, 0xff, 0xff, 255))
+        d.text(
+            (txt_x_cards, txt_y_line1), line1, font=font_regular,
+            fill=(0xff, 0xff, 0xff, 255))
+        d.text(
+            (txt_x_cards, txt_y_line2), line2, font=font_regular,
+            fill=(0xff, 0xff, 0xff, 255))
+        d.text(
+            (txt_x_elixir, txt_y_line1), "Avg elixir", font=font_bold,
+            fill=(0xff, 0xff, 0xff, 200))
+        d.text(
+            (txt_x_elixir, txt_y_line2), average_elixir, font=font_bold,
+            fill=(0xff, 0xff, 0xff, 255))
 
         image.paste(txt, (0,0), txt)
         image.paste(txt_name, (0,0), txt_name)
@@ -709,11 +715,11 @@ class Deck:
             self.settings["Servers"][server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
-                "Members": {} }
+                "Members": {}}
             self.save_settings()
 
     def save_settings(self):
-        """Saves data to settings file."""
+        """Save data to settings file."""
         dataIO.save_json(self.file_path, self.settings)
 
 
@@ -740,4 +746,3 @@ def setup(bot):
     check_file()
     n = Deck(bot)
     bot.add_cog(n)
-
