@@ -57,16 +57,28 @@ def save_json(filename=None, data=None):
 
 crdata = load_json(crdata_path)
 
-def get_card_elixir(cpid=None):
-    """Return card elixir with cpid."""
-    if cpid is None:
-        return 0
-    if cpid in card_elixir:
-        return card_elixir[cpid]
-    for card_id, card_v in crdata["Cards"].items():
-        card_elixir[card_v["cpid"]] = card_v["elixir"]
-    return card_elixir[cpid]
+cpid_dict = {}
 
+def cpid2id(cpid=None):
+    if cpid is None:
+        return ""
+    if cpid in cpid_dict:
+        return cpid_dict[cpid]
+    for card_id, card_v in crdata["Cards"].items():
+        cpid_dict[card_v["cpid"]] = card_id
+    return cpid_dict[cpid]
+
+def get_card_elixir(id=None):
+    """Return card elixir with cpid."""
+    # if cpid is None:
+    #     return 0
+    # if cpid in card_elixir:
+    #     return card_elixir[cpid]
+    # for card_id, card_v in crdata["Cards"].items():
+    #     card_elixir[card_v["cpid"]] = card_v["elixir"]
+    # return card_elixir[cpid]
+
+    return crdata["Cards"][id]["elixir"]
 
 def get_deck_elixir(deck):
     """Calculate average elixir in a deck.
@@ -77,6 +89,8 @@ def get_deck_elixir(deck):
     for card in deck:
         elixir += get_card_elixir(card)
     return elixir/8
+
+
 
 def process_data():
 
@@ -103,8 +117,9 @@ def process_data():
             if i==0:
                 for j, cell in enumerate(row):
                     if j:
-                        cards.append(cell.value)
-                        cardpop[cell.value] = {
+                        card_id = cpid2id(cell.value)
+                        cards.append(card_id)
+                        cardpop[card_id] = {
                             "count": 0,
                             "change": 0
                         }
@@ -114,9 +129,10 @@ def process_data():
                 deck = []
                 for j, cell in enumerate(row):
                     if j>0 and cell.value == 1:
-                        card_name = cards[j-1]
-                        deck.append(card_name)
-                        cardpop[card_name]["count"] += 1
+                        card_id = cards[j-1]
+                        # card_id = cpid2id(card_name)
+                        deck.append(card_id)
+                        cardpop[card_id]["count"] += 1
 
                 deck = sorted(deck)
                 player = {

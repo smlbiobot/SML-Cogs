@@ -531,14 +531,16 @@ class Card:
 
     def get_card_cpid(self, card=None):
         """Return the card populairty ID used in data."""
-        return self.crdata["Cards"][card]["cpid"]
+        # return self.crdata["Cards"][card]["cpid"]
+        return card
 
     def get_card_from_cpid(self, cpid=None):
         """Return the card id from cpid."""
-        for k, v in self.crdata["Cards"].items():
-            if cpid == v["cpid"]:
-                return k
-        return None
+        # for k, v in self.crdata["Cards"].items():
+        #     if cpid == v["cpid"]:
+        #         return k
+        # return None
+        return cpid
 
     def get_deckpop_count(self, deck=None, snapshot_id=None):
         """Return the deck popularity by snapshot id."""
