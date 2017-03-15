@@ -485,7 +485,8 @@ class Card:
 
         ax = fig.add_subplot(111)
 
-        ax.set_title('Clash Royale Elixir Trends', color=titlecolor)
+        ax.set_title(
+            'Clash Royale Decks: Average Elixir Trends', color=titlecolor)
         ax.set_xlabel('Snapshots')
         ax.set_ylabel('Elixir')
 
