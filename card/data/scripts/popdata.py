@@ -32,6 +32,7 @@ cardpop_xlsx_path = '../xlsx/cardpop{}.xlsx'
 cardpop_json_path = '../cardpop{}.json'
 cardpop_path = '../cardpop.json'
 summary_path = '../summary.txt'
+crdata_path = '../clashroyale.json'
 
 cardpop_range_min = 8
 cardpop_range_max = 26
@@ -41,16 +42,47 @@ similarity_threshold = 0.85
 data = {}
 
 out = []
+card_elixir = {}
 
+
+def load_json(filename=None):
+    with open(filename, encoding='utf-8', mode="r") as f:
+        json_data = json.load(f)
+    return json_data
 
 def save_json(filename=None, data=None):
     with open(filename, encoding='utf-8', mode='w') as f:
         json.dump(data, f, indent=4, sort_keys=False, separators=(',',' : '))
 
 
+crdata = load_json(crdata_path)
+
+def get_card_elixir(cpid=None):
+    """Return card elixir with cpid."""
+    if cpid is None:
+        return 0
+    if cpid in card_elixir:
+        return card_elixir[cpid]
+    for card_id, card_v in crdata["Cards"].items():
+        card_elixir[card_v["cpid"]] = card_v["elixir"]
+    return card_elixir[cpid]
+
+
+def get_deck_elixir(deck):
+    """Calculate average elixir in a deck.
+
+    Decks are in CPID so need to find from crdata"""
+    # for card in deck:
+    elixir = 0
+    for card in deck:
+        elixir += get_card_elixir(card)
+    return elixir/8
+
 def process_data():
 
     prev_cardpop = None
+
+
 
     for id in range(cardpop_range_min, cardpop_range_max):
 
@@ -104,6 +136,7 @@ def process_data():
                             "id": deck_id,
                             "deck": deck,
                             "count": 1,
+                            "elixir": get_deck_elixir(deck),
                             "similarity": {}
                             }
                     else:

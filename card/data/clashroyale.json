@@ -40,7 +40,7 @@
             "elixir": 7,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_BARBARIAN_HUT",
-            "cpid": "Barbaian Hut"
+            "cpid": "Barbarian Hut"
         },
         "barbarians": {
             "aka": ["barb", "barbs"],
@@ -376,7 +376,7 @@
             "elixir": 7,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_PEKKA",
-            "cpid": "P.E.K.K.A."
+            "cpid": "P.E.K.K.A"
         },
         "poison": {
             "aka": [],

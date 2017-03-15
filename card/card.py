@@ -60,18 +60,6 @@ max_deck_show = 5
 discord_ui_bgcolor = discord.Color(value=int('36393e', 16))
 
 
-def grouper(self, n, iterable, fillvalue=None):
-    """
-    Helper function to split lists.
-
-    Example:
-    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
-    """
-    args = [iter(iterable)] * n
-    return ([e for e in t if e is not None]
-            for t in itertools.zip_longest(*args))
-
-
 def take(n, iterable):
     """Return first n items of the iterable as a list."""
     return list(islice(iterable, n))
@@ -408,6 +396,16 @@ class Card:
 
         plt.clf()
         plt.cla()
+
+    @commands.command(pass_context=True)
+    async def elixirtrend(self, ctx: Context):
+        """Display average elixir over time."""
+        trend = {}
+
+        for snapshot_id, snapshot in self.cardpop.items():
+            decks = snapshot["decks"]
+
+
 
     @commands.command(pass_context=True)
     async def popdata(self, ctx: Context,
