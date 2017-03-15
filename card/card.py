@@ -42,6 +42,7 @@ import io
 import os
 import string
 import pprint
+import statistics
 
 from .deck import Deck
 from collections import namedtuple
@@ -402,7 +403,7 @@ class Card:
         plt.cla()
 
     @commands.command(pass_context=True)
-    async def elixirtrend(self, ctx: Context):
+    async def elixirlist(self, ctx: Context):
         """Display average elixir over time."""
         trend = {}
 
@@ -427,12 +428,13 @@ class Card:
             "```")
 
     @commands.command(pass_context=True)
-    async def plotelixir(self, ctx: Context):
+    async def elixirtrend(self, ctx: Context):
         """Plot elixir trend over time."""
         # sorted by snapshot id
         trend = {}
         # unsorted as list of dict
         trendall = []
+        stats = []
 
         for snapshot_id, snapshot in self.cardpop.items():
             decks = snapshot["decks"]
@@ -443,14 +445,26 @@ class Card:
 
             for deck_key, deck_v in decks.items():
                 trend[snapshot_id].append({
-                    "elxir": deck_v["elixir"],
-                    "count": deck_v["count"]})
+                    "elixir": deck_v["elixir"],
+                    "count": deck_v["count"]
+                })
                 trendall.append({
                     "id": snapshot_id,
                     "elixir": deck_v["elixir"],
                     "count": deck_v["count"]
-                    })
-                # deck_id += 1
+                })
+
+            # expand count to list for statistics
+            trendstat = []
+            for t in trend[snapshot_id]:
+                trendstat.extend([t["elixir"]] * t["count"])
+            stats.append({
+                "id": snapshot_id,
+                "trend": trendstat,
+                "median": statistics.median(trendstat),
+                "mean": statistics.mean(trendstat)
+            })
+            # print (str(trendstat))
 
         # Colors
         facecolor = '#32363b'
@@ -492,12 +506,24 @@ class Card:
             dtstr = dt.strftime('%b %d, %y')
             labels.append("{}\n   {}".format(t["id"], dtstr))
 
-        # actual plot
+        # cmap=plt.get_cmap(name)
+        # scatter plot datapoints
         x = [int(t["id"]) for t in trendall]
         y = [t["elixir"] for t in trendall]
         area = [t["count"] * 2 for t in trendall]
-        ax.scatter(x, y, s=area, color="red")
+        # ax.scatter(x, y, s=area, c="np.arange(100)", cmap="plasma")
+        ax.scatter(x, y, s=area, c="yellow")
         plt.xticks(x, labels, rotation=70, fontsize=8, ha='right')
+
+        # plot mean and median
+        for p in ["mean", "median"]:
+            x = [s["id"] for s in stats]
+            y = [s[p] for s in stats]
+            ax.plot(x, y, 'o-', label=string.capwords(p))
+
+        leg = ax.legend(facecolor=facecolor, edgecolor=spinecolor)
+        for text in leg.get_texts():
+            text.set_color(labelcolor)
 
         ax.annotate(
             'Compiled with data from Woody’s popularity snapshots',
