@@ -407,6 +407,25 @@ class Card:
 
         for snapshot_id, snapshot in self.cardpop.items():
             decks = snapshot["decks"]
+            deck_count = 0
+            elixir_all = 0
+            for deck_id, deck_v in decks.items():
+                deck_count += deck_v["count"]
+                elixir_all += deck_v["count"] * deck_v["elixir"]
+            trend[snapshot_id] = elixir_all / deck_count
+
+        out = []
+        for id in range(cardpop_range_min, cardpop_range_max):
+            out.append(
+                "Snapshot {:2}: {}"
+                "".format(id, trend[str(id)]))
+
+        await self.bot.say(
+            "```python\n" +
+            "\n".join(out) +
+            "```")
+
+
 
 
 
