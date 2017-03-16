@@ -44,6 +44,10 @@ welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
                     "Higher Power", "AlphaBot"]
+CLANS = [
+    "Alpha", "Bravo", "Charlie", "Delta",
+    "Echo", "Foxtrot", "Golf", "Hotel",
+    "Nation", "Royale"]
 BOTCOMMANDER_ROLE = ["Bot Commander"]
 
 
@@ -100,9 +104,7 @@ class RACF:
 
         Example: !changeclan Delta
         """
-        clans = ["Alpha", "Bravo", "Charlie", "Delta",
-                 "Echo", "Foxtrot", "Golf", "Hotel",
-                 "Nation", "Royale"]
+        clans = [c.lower() for c in CLANS]
         author = ctx.message.author
         server = ctx.message.server
 
@@ -110,14 +112,15 @@ class RACF:
             await send_cmd_help(ctx)
             return
 
-        if clan not in clans:
+        if clan.lower() not in clans:
             await self.bot.say("{} is not a valid clan.".format(clan))
             return
 
-        clan_roles = [r for r in server.roles if r.name in clans]
+        clan_roles = [r for r in server.roles if r.name.lower() in clans]
 
         to_remove_roles = set(author.roles) & set(clan_roles)
-        to_add_roles = [r for r in server.roles if r.name == clan]
+        to_add_roles = [
+            r for r in server.roles if r.name.lower() == clan.lower()]
 
         await self.bot.remove_roles(author, *to_remove_roles)
         await self.bot.say("Removed {} for {}".format(
@@ -131,8 +134,8 @@ class RACF:
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def addrole(self, ctx, member: discord.Member=None,
-                      role_name:str=None):
+    async def addrole(
+            self, ctx, member: discord.Member=None, role_name: str=None):
         """Add role to a user.
 
         Example: !addrole SML Delta
@@ -144,20 +147,22 @@ class RACF:
             await self.bot.say("You must specify a member.")
         elif role_name is None:
             await self.bot.say("You must specify a role.")
-        elif role_name in DISALLOWED_ROLES:
+        elif role_name.lower() in [r.lower() for r in DISALLOWED_ROLES]:
             await self.bot.say("You are not allowed to add those roles.")
-        elif role_name not in [r.name for r in server.roles]:
+        elif role_name.lower() not in [r.name.lower() for r in server.roles]:
             await self.bot.say("{} is not a valid role.".format(role_name))
         else:
-            to_add_roles = [r for r in server.roles if r.name == role_name]
+            to_add_roles = [
+                r for r in server.roles if (
+                    r.name.lower() == role_name.lower())]
             await self.bot.add_roles(member, *to_add_roles)
             await self.bot.say("Added {} for {}".format(
                 role_name, member.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def removerole(self, ctx, member: discord.Member=None,
-                         role_name: str=None):
+    async def removerole(
+            self, ctx, member: discord.Member=None, role_name: str=None):
         """Remove role from a user.
 
         Example: !removerole SML Delta
@@ -169,12 +174,14 @@ class RACF:
             await self.bot.say("You must specify a member.")
         elif role_name is None:
             await self.bot.say("You must specify a role.")
-        elif role_name in DISALLOWED_ROLES:
+        elif role_name.lower() in [r.lower() for r in DISALLOWED_ROLES]:
             await self.bot.say("You are not allowed to remove those roles.")
-        elif role_name not in [r.name for r in server.roles]:
+        elif role_name.lower() not in [r.name.lower() for r in server.roles]:
             await self.bot.say("{} is not a valid role.".format(role_name))
         else:
-            to_remove_roles = [r for r in server.roles if r.name == role_name]
+            to_remove_roles = [
+                r for r in server.roles if (
+                    r.name.lower() == role_name.lower())]
             await self.bot.remove_roles(member, *to_remove_roles)
             await self.bot.say("Removed {} from {}".format(
                 role_name, member.display_name))
@@ -207,20 +214,21 @@ class RACF:
             flag = role[0] if has_flag else '+'
             name = role[1:] if has_flag else role
 
-            if name in server_role_names:
+            if name.lower() in [r.lower() for r in server_role_names]:
                 role_args.append({'flag': flag, 'name': name})
 
-        plus = [r['name'] for r in role_args if r['flag'] == '+']
-        minus = [r['name'] for r in role_args if r['flag'] == '-']
+        plus = [r['name'].lower() for r in role_args if r['flag'] == '+']
+        minus = [r['name'].lower() for r in role_args if r['flag'] == '-']
+        disallowed_roles = [r.lower() for r in DISALLOWED_ROLES]
 
         for role in server.roles:
-            if role.name not in DISALLOWED_ROLES:
-                if role.name in minus:
+            if role.name.lower() not in disallowed_roles:
+                if role.name.lower() in minus:
                     await self.bot.remove_roles(member, role)
                     await self.bot.say(
                         "Removed {} from {}".format(
                             role.name, member.display_name))
-                if role.name in plus:
+                if role.name.lower() in plus:
                     await self.bot.add_roles(member, role)
                     await self.bot.say(
                         "Added {} for {}".format(
