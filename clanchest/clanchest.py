@@ -25,8 +25,9 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import discord
+from discord import Member
 from discord.ext import commands
-from .utils import checks
+from discord.ext.commands import Context
 from random import choice
 from .utils.dataIO import dataIO
 from __main__ import send_cmd_help
@@ -34,7 +35,11 @@ from __main__ import send_cmd_help
 import os
 import datetime
 
-settings_path = "data/clanchest/settings.json"
+PATH_LIST = ['data', 'clanchest']
+PATH = os.path.join(*PATH_LIST)
+JSON = os.path.join(PATH, "settings.json")
+BOTCOMMANDER_ROLE = ["Bot Commander"]
+
 clans = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel']
 start_date = datetime.date(2017, 1, 16)
 
@@ -42,36 +47,32 @@ start_date = datetime.date(2017, 1, 16)
 
 class ClanChests:
     """
-    Manage clan chest data 
+    Manage clan chest data
 
     Note: RACF specific plugin for Red
     """
 
     def __init__(self, bot):
         self.bot = bot
-        self.file_path = settings_path
-        self.settings = dataIO.load_json(self.file_path)
+        self.settings = dataIO.load_json(JSON)
 
-    @commands.group(pass_context=True, no_pm=True)
-    async def clanchest(self, ctx):
-        """Role History Management"""
-
+    @commands.group(pass_context=True, no_pm=True, aliases=["cc"])
+    async def clanchest(self, ctx: Context):
+        """Clan Chest Management."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @clanchest.command(name="show", pass_context=True, no_pm=True)
-    async def _show_clanchest(self, ctx):
-        """Display the clan chest historic data"""
-
+    async def show_clanchest(self, ctx: Context):
+        """Display the clan chest historic data."""
         server = ctx.message.server
 
         if server.id not in self.settings:
-            self.settings[server.id] = { 
+            self.settings[server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
-                "ClanChests": { }
-                }
-
+                "ClanChests": {}
+            }
 
             for c in clans:
                 self.settings[server.id]["ClanChests"][c] = "0"
@@ -82,9 +83,10 @@ class ClanChests:
         data = discord.Embed(
             color=discord.Color(value=color),
             title="Trophy requirements",
-            description="Minimum clanchest to join our clans. "
-                        "Current clanchest required. "
-                        "PB is only used within 12 hours after the clan chest has been completed."
+            description=
+                "Minimum clanchest to join our clans. "
+                "Current clanchest required. "
+                "PB is only used within 12 hours after the clan chest has been completed."
             )
 
         for clan in clans:
@@ -101,26 +103,18 @@ class ClanChests:
 
         await self.bot.say(embed=data)
 
-        
-                    
     @clanchest.command(name="set", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(mention_everyone=True)
-    async def _set_clanchest(self, ctx, clan:str, req:str):
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def set_clanchest(self, ctx, member: Member, crowns: int):
         """Set the crown contribution by members"""
-
-        # hacking the permission settings
-        # mention_everyone=True for all co-leaders and up
-
         server = ctx.message.server
-        members = server.members
-
         clan = clan.lower()
 
         if server.id not in self.settings:
-            self.settings[server.id] = { 
+            self.settings[server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
-                "ClanChests": { }
+                "ClanChests": {}
                 }
 
             for c in clans:
@@ -138,18 +132,16 @@ class ClanChests:
 
 
 def check_folder():
-    if not os.path.exists("data/clanchest"):
+    if not os.path.exists(PATH):
         print("Creating data/clanchest folder...")
-        os.makedirs("data/clanchest")
+        os.makedirs(PATH)
 
 
 def check_file():
     d = {}
-
-    f = settings_path
-    if not dataIO.is_valid_json(f):
+    if not dataIO.is_valid_json(JSON):
         print("Creating default clanchest‘ settings.json...")
-        dataIO.save_json(f, d)
+        dataIO.save_json(PATH, d)
 
 
 def setup(bot):
