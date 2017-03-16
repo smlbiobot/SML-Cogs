@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import Context
 from random import choice
 from .utils.dataIO import fileIO
 import os
@@ -38,12 +39,19 @@ except:
 
 import aiohttp
 
-default_settings = {"DATA_URL": "https://app.nuclino.com/p/Clan-Chest-Farmers-kZCL4FSBYPhSTgmIhDxGPD"}
+DATA_URL =\
+    "https://app.nuclino.com/p/Clan-Chest-Farmers-kZCL4FSBYPhSTgmIhDxGPD"
 settings_path = "data/farmers/settings.json"
 
+numbs = {
+    "next": "➡",
+    "back": "⬅",
+    "exit": "❌"
+}
+
+
 class Farmers:
-    """
-    Grabs Clan Chest Farmers data from Nuclino
+    """Grabs Clan Chest Farmers data from Nuclino
     and display in Discord chat.
 
     Note: RACF specific plugin for Red
@@ -54,14 +62,12 @@ class Farmers:
         self.settings = fileIO(settings_path, "load")
 
     @commands.command(pass_context=True)
-    async def farmers(self, ctx, week=None):
-        """"
-        Fetches list of farmers from Nuclino doc
-        """
+    async def farmers(self, ctx: Context, week=None):
+        """Fetch list of farmers from Nuclino doc."""
 
         # Parse Data
         # url = self.settings[server.id]["DATA_URL"]
-        url = "https://app.nuclino.com/p/Clan-Chest-Farmers-kZCL4FSBYPhSTgmIhDxGPD"
+        url = DATA_URL
         async with aiohttp.get(url) as response:
             soup = BeautifulSoup(await response.text(), "html.parser")
 
@@ -108,13 +114,17 @@ class Farmers:
 
                 data.add_field(name=str(name), value=str(value))
 
-
         try:
             await self.bot.type()
             await self.bot.say(embed=data)
         except discord.HTTPException:
             await self.bot.say("I need the `Embed links` permission "
                                "to send this")
+
+    async def farmers_menu(
+            self, ctx: Context, data: list):
+        """Display data with pagination."""
+        pass
 
 
 
