@@ -51,6 +51,23 @@ class NLP:
         out = blob.translate(to=to_lang)
         await self.bot.say(out)
 
+    @commands.command(pass_context=True)
+    async def sentiment(self, ctx: Context, *, text: str):
+        """Return sentiment analysis of a text."""
+        blob = TextBlob(text)
+        stmt = blob.sentiment
+        await self.bot.say(
+            "Polairty: {0.polarity}\n"
+            "Subjectivity: {0.subjectivity}"
+            "".format(stmt))
+
+    @commands.command(pass_context=True)
+    async def spellcheck(self, ctx: Context, *, text: str):
+        """Auto-correct spelling mistakes."""
+        b = TextBlob(text)
+        await self.bot.say(b.correct())
+
+
 def setup(bot):
     n = NLP(bot)
     bot.add_cog(n)
