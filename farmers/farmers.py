@@ -26,13 +26,13 @@ DEALINGS IN THE SOFTWARE.
 
 import discord
 from discord import Message
+from discord import Reaction
+from discord import User
 from discord.ext import commands
 from discord.ext.commands import Context
-from random import choice
-from .utils.dataIO import fileIO
-import os
 
-try: # check if BeautifulSoup4 is installed
+# check if BeautifulSoup4 is installed
+try:
     from bs4 import BeautifulSoup
     soupAvailable = True
 except:
@@ -42,9 +42,7 @@ import aiohttp
 
 DATA_URL =\
     "https://app.nuclino.com/p/Clan-Chest-Farmers-kZCL4FSBYPhSTgmIhDxGPD"
-settings_path = "data/farmers/settings.json"
-
-numbs = {
+NUMBS = {
     "back": "⬅",
     "exit": "❌",
     "next": "➡"
@@ -52,15 +50,16 @@ numbs = {
 
 
 class Farmers:
-    """Grabs Clan Chest Farmers data from Nuclino
-    and display in Discord chat.
+    """Grab Clan Chest Farmers data.
 
     Note: RACF specific plugin for Red
     """
 
     def __init__(self, bot):
+        """Clan chest farmers init."""
         self.bot = bot
-        self.settings = fileIO(settings_path, "load")
+        self.listen_to_reaction = False
+        self.reaction_messages = {}
 
     async def farmer_embeds(self, ctx: Context):
         """Create list of embeds from data."""
@@ -81,8 +80,6 @@ class Farmers:
                 ul_db.append(li_db)
 
             for week in range(len(ul_db)):
-                # embed output
-                # color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
                 color = 'FF0000'
                 color = int(color, 16)
 
@@ -127,12 +124,11 @@ class Farmers:
                 week = len(embeds) - 1
             else:
                 week = int(week) - 1
-            await self.farmers_menu(
-                ctx, embeds, message=None, page=week, timeout=30)
+            await self.farmers_menu(ctx, embeds, message=None, page=week)
 
     async def farmers_menu(
             self, ctx: Context, embeds: list, message: Message=None,
-            page=0, timeout: int=30):
+            page=0):
         """Display data with pagination.
 
         Menu control logic from
@@ -145,80 +141,80 @@ class Farmers:
             await self.bot.add_reaction(message, "⬅")
             await self.bot.add_reaction(message, "❌")
             await self.bot.add_reaction(message, "➡")
+            self.reaction_messages[message.id] = {
+                "id": message.id,
+                "message": message,
+                "author": ctx.message.author,
+                "author_id": ctx.message.author.id,
+                "page": page,
+                "embeds": embeds,
+                "ctx": ctx
+            }
+            self.listen_to_reaction = True
         else:
             message = await self.bot.edit_message(message, embed=embed)
 
-        react = await self.bot.wait_for_reaction(
-            message=message, user=ctx.message.author, timeout=timeout,
-            emoji=["➡", "⬅", "❌"])
+    async def on_reaction_add(self, reaction: Reaction, user: User):
+        """Event: on_reaction_add."""
+        if not self.listen_to_reaction:
+            return
+        await self.handle_reaction(reaction, user)
 
-        if react is None:
-            try:
-                await self.bot.remove_reaction(message, "⬅", self.bot.user)
-                await self.bot.remove_reaction(message, "❌", self.bot.user)
-                await self.bot.remove_reaction(message, "➡", self.bot.user)
-            except:
-                pass
-            return None
-        reacts = {v: k for k, v in numbs.items()}
-        react = reacts[react.reaction.emoji]
+    async def on_reaction_remove(self, reaction: Reaction, user: User):
+        """Event: on_reaction_remove."""
+        if not self.listen_to_reaction:
+            return
+        await self.handle_reaction(reaction, user)
+
+    async def handle_reaction(self, reaction: Reaction, user: User):
+        """Handle reaction if on farmers menu."""
+        if user == self.bot.user:
+            return
+        if reaction.message.id not in self.reaction_messages:
+            return
+        if reaction.emoji not in NUMBS.values():
+            return
+        msg_settings = self.reaction_messages[reaction.message.id]
+        if user != msg_settings["author"]:
+            return
+
+        message = reaction.message
+        reacts = {v: k for k, v in NUMBS.items()}
+        react = reacts[reaction.emoji]
+
+        page = self.reaction_messages[message.id]["page"]
+        embeds = self.reaction_messages[message.id]["embeds"]
+        ctx = self.reaction_messages[message.id]["ctx"]
+
         if react == "next":
             next_page = 0
             if page == len(embeds) - 1:
                 next_page = 0  # Loop around to the first item
             else:
                 next_page = page + 1
-            return await self.farmers_menu(
+            self.reaction_messages[message.id]["page"] = next_page
+            await self.farmers_menu(
                 ctx, embeds, message=message,
-                page=next_page, timeout=timeout)
+                page=next_page)
         elif react == "back":
             next_page = 0
             if page == 0:
                 next_page = len(embeds) - 1  # Loop around to the last item
             else:
                 next_page = page - 1
-            return await self.farmers_menu(
+            self.reaction_messages[message.id]["page"] = next_page
+            await self.farmers_menu(
                 ctx, embeds, message=message,
-                page=next_page, timeout=timeout)
+                page=next_page)
         else:
-            try:
-                return await\
-                    self.bot.delete_message(message)
-            except:
-                pass
+            del self.reaction_messages[message.id]
+            await self.bot.clear_reactions(message)
+            if not len(self.reaction_messages):
+                self.listen_to_reaction = False
 
-
-
-
-def check_folders():
-    if not os.path.exists("data/farmers"):
-        print("Creating data/farmers folder...")
-        os.makedirs("data/farmers")
-
-
-def check_files():
-    f = settings_path
-    if not fileIO(f, "check"):
-        print("Creating farmers settings.json...")
-        fileIO(f, "save", {})
-    else:  # consistency check
-        current = fileIO(f, "load")
-        for k, v in current.items():
-            if v.keys() != default_settings.keys():
-                for key in default_settings.keys():
-                    if key not in v.keys():
-                        current[k][key] = default_settings[key]
-                        print("Adding " + str(key) +
-                              " field to farmers settings.json")
-        # upgrade. Before GREETING was 1 string
-        for server in current.values():
-            if isinstance(server["DATA_URL"], str):
-                server["DATA_URL"] = [server["DATA_URL"]]
-        fileIO(f, "save", current)
 
 def setup(bot):
-    check_folders()
-    check_files()
+    """Add cog to bog."""
     if soupAvailable:
         bot.add_cog(Farmers(bot))
     else:
