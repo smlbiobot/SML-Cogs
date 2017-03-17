@@ -90,6 +90,7 @@ class DataDogLog:
             return
         self.dd_log_messages(message)
         self.dd_log_mentions(message)
+        self.dd_log_message_author_roles(message)
 
     async def on_command(self, command: Command, ctx: Context):
         """Logs commands."""
@@ -177,6 +178,16 @@ class DataDogLog:
                 'channel:' + str(channel_name),
                 'channel_name:' + str(channel_name),
                 'channel_id:' + str(channel_id)])
+
+    def dd_log_message_author_roles(self, message: discord.Message):
+        """Go through author’s roles and send each."""
+        for r in message.author.roles:
+            if not r.is_everyone:
+                statsd.increment(
+                    'bot.msg.author.role',
+                    tags=[
+                        *self.tags,
+                        'role:' + str(r.name)])
 
     def dd_log_command(self, command: Command, ctx: Context):
         """Log commands with datadog."""
