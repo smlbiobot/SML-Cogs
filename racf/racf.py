@@ -46,8 +46,7 @@ DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
                     "Higher Power", "AlphaBot"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
-    "Echo", "Foxtrot", "Golf", "Hotel",
-    "Nation", "Royale"]
+    "Echo", "Foxtrot", "Golf", "Hotel"]
 BOTCOMMANDER_ROLE = ["Bot Commander"]
 
 
