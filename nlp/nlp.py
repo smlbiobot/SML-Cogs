@@ -24,6 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+from collections import OrderedDict
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
@@ -33,6 +34,55 @@ try:
 except ImportError:
     raise ImportError("Please install the textblob package from pip") from None
 
+LANG = OrderedDict([
+    ("af", "Afrikaans"),
+    ("ar", "Arabic"),
+    ("hy", "Armenian"),
+    ("be", "Belarusian"),
+    ("bg", "Bulgarian"),
+    ("ca", "Catalan"),
+    ("zh-CN", "Chinese (Simplified)"),
+    ("zh-TW", "Chinese (Traditional)"),
+    ("hr", "Croatian"),
+    ("cs", "Czech"),
+    ("da", "Danish"),
+    ("nl", "Dutch"),
+    ("en", "English"),
+    ("eo", "Esperanto"),
+    ("et", "Estonian"),
+    ("tl", "Filipino"),
+    ("fi", "Finnish"),
+    ("fr", "French"),
+    ("de", "German"),
+    ("el", "Greek"),
+    ("iw", "Hebrew"),
+    ("hi", "Hindi"),
+    ("hu", "Hungarian"),
+    ("is", "Icelandic"),
+    ("id", "Indonesian"),
+    ("it", "Italian"),
+    ("ja", "Japanese"),
+    ("ko", "Korean"),
+    ("lv", "Latvian"),
+    ("lt", "Lithuanian"),
+    ("no", "Norwegian"),
+    ("fa", "Persian"),
+    ("pl", "Polis"),
+    ("pt", "Portuguese"),
+    ("ro", "Romanian"),
+    ("ru", "Russian"),
+    ("sr", "Serbian"),
+    ("sk", "Slovak"),
+    ("sl", "Slovenian"),
+    ("es", "Spanish"),
+    ("sw", "Swahili"),
+    ("sv", "Swedish"),
+    ("th", "Thai"),
+    ("tr", "Turkish"),
+    ("uk", "Ukrainian"),
+    ("vi", "Vietnamese")
+])
+
 class NLP:
     """Natural Launguage Processing.
     """
@@ -41,15 +91,26 @@ class NLP:
         self.bot = bot
 
     @commands.command(pass_context=True)
-    async def translate(self, ctx: Context, text: str, to_lang: str):
+    async def translate(self, ctx: Context, to_lang: str, *, text: str):
         """Translate to another language.
 
         Example:
-        !translate "Simple is better than complex." es
+        !translate es Simple is better than complex.
+        will translate sentence to Spanish.
+
+        !translatelang
+        will list all the supported languages
         """
         blob = TextBlob(text)
         out = blob.translate(to=to_lang)
         await self.bot.say(out)
+
+    @commands.command(pass_context=True)
+    async def translatelang(self, ctx: Context):
+        """List the langauge code supported by translation."""
+        out = ["**{}**: {}".format(k, v) for k, v in LANG.items()]
+        await self.bot.say(", ".join(out))
+
 
     @commands.command(pass_context=True)
     async def sentiment(self, ctx: Context, *, text: str):
