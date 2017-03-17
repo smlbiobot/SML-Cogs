@@ -181,12 +181,17 @@ class DataDogLog:
 
     def dd_log_message_author_roles(self, message: discord.Message):
         """Go through author’s roles and send each."""
+        server = message.server
+        server_id = server.id
+        server_name = server.name
         for r in message.author.roles:
             if not r.is_everyone:
                 statsd.increment(
                     'bot.msg.author.role',
                     tags=[
                         *self.tags,
+                        'server_id:' + str(server_id),
+                        'server_name:' + str(server_name),
                         'role:' + str(r.name)])
 
     def dd_log_command(self, command: Command, ctx: Context):

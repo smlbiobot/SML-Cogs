@@ -128,6 +128,15 @@ class NLP:
         b = TextBlob(text)
         await self.bot.say(b.correct())
 
+    @commands.command(pass_context=True)
+    async def grabroles(self, ctx: Context):
+        server = ctx.message.server
+        roles = [
+            r.name.replace(" ", "_").lower()
+            for r in server.roles if not r.is_everyone]
+        roles = ["!role:{}".format(r) for r in roles]
+        await self.bot.say(",".join(roles))
+
 
 def setup(bot):
     n = NLP(bot)
