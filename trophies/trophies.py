@@ -33,7 +33,7 @@ from __main__ import send_cmd_help
 import os
 
 settings_path = "data/trophies/settings.json"
-clans = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel', 'nation', 'royale']
+clans = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel']
 set_allowed_role = 'Bot Commander'
 
 class Trophies:
