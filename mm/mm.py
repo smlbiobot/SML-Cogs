@@ -74,9 +74,8 @@ class MemberManagement:
             RACF specific option. Equivalent to typing Member -Alpha -Bravo -Charlie -Delta -Echo -Foxtrot -Golf -Hotel
         --sort-join
             Sort list by join date on server
-
-
-
+        --everyone
+            Include everyone
         """
 
         # Extract optional arguments if exist
@@ -84,6 +83,7 @@ class MemberManagement:
         option_output_mentions_only = "--output-mentions-only" in args
         option_members_without_clan_tag = "--members-without-clan-tag" in args
         option_sort_join = "--sort-join" in args
+        option_everyone = "--everyone" in args
 
         server = ctx.message.server
         server_roles_names = [r.name for r in server.roles]
@@ -94,21 +94,28 @@ class MemberManagement:
 
         if option_members_without_clan_tag:
             args = ['Member', '-Alpha', '-Bravo', '-Charlie', '-Delta', '-Echo',
-                    '-Foxtrot', '-Golf', '-Hotel', '-Nation', '-Royale', '-Special']
-
+                    '-Foxtrot', '-Golf', '-Hotel', '-Special']
 
         role_args = []
         flags = ['+','-']
-        for arg in args:
-            has_flag = arg[0] in flags
-            flag = arg[0] if has_flag else '+'
-            name = arg[1:] if has_flag else arg
+        if args is not None:
+            for arg in args:
+                has_flag = arg[0] in flags
+                flag = arg[0] if has_flag else '+'
+                name = arg[1:] if has_flag else arg
 
-            if name in server_roles_names:
-                role_args.append({'flag': flag, 'name': name})
+                if name in server_roles_names:
+                    role_args.append({'flag': flag, 'name': name})
 
         plus  = set([r['name'] for r in role_args if r['flag'] == '+'])
         minus = set([r['name'] for r in role_args if r['flag'] == '-'])
+
+        # Used for output only, so it won’t mention everyone in chat
+        plus_out = plus.copy()
+
+        if option_everyone:
+            plus.add('@everyone')
+            plus_out.add('everyone')
 
         help_str = ['Syntax Error: You must include at least one role to display results.',
                     '',
@@ -128,9 +135,11 @@ class MemberManagement:
         if len(plus) < 1:
             out.append('\n'.join(help_str))
         else:
-            out.append(f"Listing members who have these roles: {', '.join(plus)}")
+            out.append("Listing members who have these roles: {}".format(
+                ', '.join(plus_out)))
         if len(minus):
-            out.append(f"but not these roles: {', '.join(minus)}")
+            out.append("but not these roles: {}".format(
+                ', '.join(minus)))
 
         await self.bot.say('\n'.join(out))
 
@@ -141,12 +150,15 @@ class MemberManagement:
             out_members = set()
             for m in server.members:
                 roles = set([r.name for r in m.roles])
+                if option_everyone:
+                    roles.add('@everyone')
                 exclude = len(roles & minus)
                 if not exclude and roles >= plus:
                     out_members.add(m)
 
             suffix = 's' if len(out_members) > 1 else ''
-            await self.bot.say(f"**Found {len(out_members)} member{suffix}.**")
+            await self.bot.say("**Found {} member{}.**".format(
+                len(out_members), suffix))
 
             # sort join
             out_members = list(out_members)
@@ -197,18 +209,6 @@ class MemberManagement:
                 out = ' '.join(mention_list)
                 for page in pagify(out, shorten_by=24):
                     await self.bot.say(box(page))
-
-
-    # @commands.command(pass_context=True, no_pm=False)
-    # @commands.has_role("Bot Commander")
-    # async def pm2role(self, ctx, msg=None):
-    #     """Send PM to all members with a specific role"""
-    #     server = ctx.message.server
-    #     server_roles = server.roles
-
-    #     await self.bot.whisper("hi")
-
-
 
 
 def setup(bot):
