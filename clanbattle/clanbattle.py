@@ -118,18 +118,18 @@ class ClanBattle:
             await send_cmd_help(ctx)
 
     @clanbattle.command(name="create", pass_context=True, no_pm=True)
-    async def clanbattle_create(self, ctx: Context, member: Member=None):
+    async def clanbattle_create(self, ctx: Context):
         """Create clan battle voice channels.
 
         Example:
-        !clanbattle
-        !clanbattle create SML
-        !clanbattle create @SML @vin
+        !clanbattle create
         """
         server = ctx.message.server
         author = ctx.message.author
-        if member is None:
-            member = author
+        # if member is None:
+        #     member = author
+
+        member = author
 
         if server.id not in self.settings:
             self.settings[server.id] = {}
