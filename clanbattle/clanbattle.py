@@ -275,6 +275,10 @@ class ClanBattle:
             return
         if server is None:
             return
+        if server.id not in self.settings:
+            return
+        if member.id not in self.settings[server.id]:
+            return
         del self.settings[server.id][member.id]
         dataIO.save_json(JSON, self.settings)
 
