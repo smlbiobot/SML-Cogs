@@ -30,12 +30,15 @@ from discord.ext import commands
 from discord.ext.commands import Context
 from discord import Member
 from cogs.utils.dataIO import dataIO
+from cogs.utils import checks
 from __main__ import send_cmd_help
 
 PATH_LIST = ['data', 'clanbattle']
 PATH = os.path.join(*PATH_LIST)
 JSON = os.path.join(*PATH_LIST, "settings.json")
-
+CB_ROLES = ["clanbattle"]
+ROLE_PREFIX = "cb_"
+VC_PREFIX = "CB: "
 
 class ClanBattle:
     """Clan battle modules for Clash Royale 2v2 mode."""
@@ -46,13 +49,14 @@ class ClanBattle:
         self.settings = dataIO.load_json(JSON)
 
     @commands.group(aliases=['cb'], pass_context=True, no_pm=True)
+    @commands.has_any_role(*CB_ROLES)
     async def clanbattle(self, ctx: Context):
         """Clan Battles."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @clanbattle.command(name="create", pass_context=True, no_pm=True)
-    async def clanbattle_create(self, ctx: Context, *members: Member):
+    async def clanbattle_create(self, ctx: Context, member: Member=None):
         """Create clan battle voice channels.
 
         Example:
@@ -62,13 +66,152 @@ class ClanBattle:
         """
         server = ctx.message.server
         author = ctx.message.author
-        if members is None:
-            members = [author]
+        if member is None:
+            member = author
 
-        vc_name = "CB: {}".format(author.display_name)
+        if server.id not in self.settings:
+            self.settings[server.id] = {}
+        if member.id in self.settings[server.id]:
+            await self.bot.say("You already have an active clan battle VC.")
+            return
 
-        await self.bot.create_channel(
-            server, vc_name, type=discord.ChannelType.voice)
+        vc_name = "{}{}".format(VC_PREFIX, member.display_name)
+
+        cannot_connect = discord.PermissionOverwrite(connect=False)
+        can_connect = discord.PermissionOverwrite(connect=True)
+
+        cb_role = await self.bot.create_role(
+            server,
+            name="{}{}".format(ROLE_PREFIX, member.display_name))
+
+        await self.bot.add_roles(member, cb_role)
+
+        channel = await self.bot.create_channel(
+            server,
+            vc_name,
+            (server.default_role, cannot_connect),
+            (server.me, can_connect),
+            (cb_role, can_connect),
+            type=discord.ChannelType.voice)
+
+        self.settings[server.id][member.id] = {
+            "channel_id": channel.id,
+            "members": [member.id],
+            "role_id": cb_role.id
+        }
+        dataIO.save_json(JSON, self.settings)
+
+        await self.bot.say("Clan Battle VC for {} created.".format(author.display_name))
+
+    @clanbattle.command(name="add", pass_context=True, no_pm=True)
+    async def clanbattle_add(self, ctx: Context, *members: Member):
+        """Add member(s) to the clan battle VC."""
+        if not len(members):
+            await send_cmd_help(ctx)
+            return
+        server = ctx.message.server
+        author = ctx.message.author
+
+        if server.id not in self.settings:
+            await self.bot.say("You do not have an active clan battle VC.")
+            return
+        if author.id not in self.settings[server.id]:
+            await self.bot.say("You do not have an active clan battle VC.")
+            return
+        author_settings = self.settings[server.id][author.id]
+        role_id = author_settings["role_id"]
+        roles = [r for r in server.roles if r.id == role_id]
+        for member in members:
+            await self.bot.add_roles(member, *roles)
+            if member.id not in author_settings["members"]:
+                author_settings["members"].append(member.id)
+
+        dataIO.save_json(JSON, self.settings)
+
+        await self.bot.say(
+            "{} can now join clan battle VC for {}".format(
+                ', '.join([m.display_name for m in members]),
+                author.display_name))
+
+    @clanbattle.command(name="remove", pass_context=True, no_pm=True)
+    async def clanbattle_remove(self, ctx: Context, *members: Member):
+        """Remove member(s) to the clan battle VC."""
+        if not len(members):
+            await send_cmd_help(ctx)
+            return
+        server = ctx.message.server
+        author = ctx.message.author
+        if server.id not in self.settings:
+            await self.bot.say("You do not have an active clan battle VC.")
+            return
+        if author.id not in self.settings[server.id]:
+            await self.bot.say("You do not have an active clan battle VC.")
+            return
+        author_settings = self.settings[server.id][author.id]
+        role_id = author_settings["role_id"]
+        roles = [r for r in server.roles if r.id == role_id]
+        for member in members:
+            await self.bot.remove_roles(member, *roles)
+            author_settings["members"].remove(member.id)
+
+        dataIO.save_json(JSON, self.settings)
+
+        await self.bot.say(
+            "{} can no longer join the clan battle VC for {}".format(
+                ', '.join([m.display_name for m in members]),
+                author.display_name))
+
+
+
+
+    @clanbattle.command(name="end", pass_context=True, no_pm=True)
+    async def clanbattle_end(self, ctx: Context):
+        """Remove clan battle voice channels."""
+        server = ctx.message.server
+        author = ctx.message.author
+
+        if server.id not in self.settings:
+            return
+        if author.id not in self.settings[server.id]:
+            return
+        author_settings = self.settings[server.id][author.id]
+        channel_id = author_settings["channel_id"]
+        channel = self.bot.get_channel(channel_id)
+        if channel:
+            await self.bot.delete_channel(channel)
+        if "role_id" in author_settings:
+            role_id = author_settings["role_id"]
+            roles = [r for r in server.roles if r.id == role_id]
+            if len(roles):
+                for r in roles:
+                    await self.bot.delete_role(server, r)
+        del self.settings[server.id][author.id]
+        dataIO.save_json(JSON, self.settings)
+
+        await self.bot.say("Clan Battle VC for {} removed.".format(author.display_name))
+
+    @clanbattle.command(name="init", pass_context=True, no_pm=True)
+    @checks.admin_or_permissions()
+    async def clanbattle_init(self, ctx: Context):
+        """Initialize clan battle roles and voice channels.
+
+        Remove VCs starting with CB: prefix.
+        Remove roles starting with cb_ prefix.
+        """
+        server = ctx.message.server
+        roles = [r for r in server.roles if r.name.startswith(ROLE_PREFIX)]
+        if len(roles):
+            for r in roles:
+                await self.bot.delete_role(server, r)
+            await self.bot.say("Removed all clan battle related roles.")
+        channels = [c for c in server.channels if c.name.startswith(VC_PREFIX)]
+        if len(channels):
+            for c in channels:
+                await self.bot.delete_channel(c)
+            await self.bot.say("Removed all clan battle related channels.")
+
+        del self.settings[server.id]
+        dataIO.save_json(JSON, self.settings)
 
 
 
