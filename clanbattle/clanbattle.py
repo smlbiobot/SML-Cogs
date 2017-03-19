@@ -26,6 +26,9 @@ DEALINGS IN THE SOFTWARE.
 
 import os
 import discord
+import asyncio
+from datetime import datetime as dt
+from datetime import timedelta
 from discord.ext import commands
 from discord.ext.commands import Context
 from discord import Member
@@ -39,6 +42,8 @@ JSON = os.path.join(*PATH_LIST, "settings.json")
 CB_ROLES = ["clanbattle"]
 ROLE_PREFIX = "cb_"
 VC_PREFIX = "CB: "
+DT_FORMAT = "%Y-%m-%d %H:%M:%S"
+INTERVAL = 5
 
 class ClanBattle:
     """Clan battle modules for Clash Royale 2v2 mode."""
@@ -47,6 +52,49 @@ class ClanBattle:
         """Clan battle module for Clash Royale 2v2 mode."""
         self.bot = bot
         self.settings = dataIO.load_json(JSON)
+        self.task = self.bot.loop.create_task(self.loop_task())
+
+    async def loop_task(self):
+        """Check for empty VCs. and remove"""
+        await self.bot.wait_until_ready()
+        await self.remove_empty_vc()
+        await asyncio.sleep(INTERVAL)
+        if self is self.bot.get_cog("ClanBattle"):
+            self.task = self.bot.loop.create_task(self.loop_task())
+
+    async def remove_empty_vc(self):
+        """Remove all empty voice channels created by members."""
+        print("remove_empty_vc")
+        for server_id in self.settings:
+            for member_id in self.settings[server_id]:
+                m_settings = self.settings[server_id][member_id]
+                vc_id = m_settings["channel_id"]
+                vc = self.bot.get_channel(vc_id)
+                vc_members = vc.voice_members
+                print("vc_members: {}".format(str(vc_members)))
+                if not len(vc_members):
+                    # print("VC is empty")
+                    time = dt.strptime(m_settings["time"], DT_FORMAT)
+                    now = dt.utcnow()
+                    td = timedelta(seconds=15)
+                    print("-" * 30)
+                    print("time: {}".format(str(time)))
+                    print("now: {}".format(str(now)))
+                    print("now - time: {}".format(str(now-time)))
+                    if now - time > td:
+                        print("over 1 minute")
+                        server = self.bot.get_server(server_id)
+                        member = self.bot.get_member(member_id)
+                        await self.bot.clanbattle_end_member(member, server)
+
+    async def on_voice_state_update(self, before: Member, after: Member):
+        """Update CB VC last accesss time"""
+        for server_id in self.settings:
+            if before.id in self.settings[server_id]:
+                m_settings = self.settings[server_id][before.id]
+                if before.voice.voice_channel != after.voice.voice_channel:
+                    m_settings["time"] = dt.utcnow().strftime(DT_FORMAT)
+                    dataIO.save_json(JSON, self.settings)
 
     @commands.group(aliases=['cb'], pass_context=True, no_pm=True)
     @commands.has_any_role(*CB_ROLES)
@@ -97,7 +145,8 @@ class ClanBattle:
         self.settings[server.id][member.id] = {
             "channel_id": channel.id,
             "members": [member.id],
-            "role_id": cb_role.id
+            "role_id": cb_role.id,
+            "time": dt.utcnow().strftime(DT_FORMAT)
         }
         dataIO.save_json(JSON, self.settings)
 
@@ -169,26 +218,43 @@ class ClanBattle:
         """Remove clan battle voice channels."""
         server = ctx.message.server
         author = ctx.message.author
+        await self.clanbattle_end_member(author, server)
 
+        # if server.id not in self.settings:
+        #     return
+        # if author.id not in self.settings[server.id]:
+        #     return
+
+    async def clanbattle_end_member(self, member: Member=None, server=None):
+        """Remove clan battle voice channels and roles for specific member."""
+        print("clanbattle_end_member")
+        if server is None:
+            return
+        if member is None:
+            return
         if server.id not in self.settings:
             return
-        if author.id not in self.settings[server.id]:
+        if member.id not in self.settings[server.id]:
             return
-        author_settings = self.settings[server.id][author.id]
-        channel_id = author_settings["channel_id"]
+        print("clanbattle_end_member proceed")
+
+        m_settings = self.settings[server.id][member.id]
+        channel_id = m_settings["channel_id"]
         channel = self.bot.get_channel(channel_id)
         if channel:
             await self.bot.delete_channel(channel)
-        if "role_id" in author_settings:
-            role_id = author_settings["role_id"]
+        if "role_id" in m_settings:
+            role_id = m_settings["role_id"]
             roles = [r for r in server.roles if r.id == role_id]
             if len(roles):
                 for r in roles:
                     await self.bot.delete_role(server, r)
-        del self.settings[server.id][author.id]
+        del self.settings[server.id][member.id]
         dataIO.save_json(JSON, self.settings)
 
-        await self.bot.say("Clan Battle VC for {} removed.".format(author.display_name))
+        await self.bot.say("Clan Battle VC for {} removed.".format(member.display_name))
+
+
 
     @clanbattle.command(name="init", pass_context=True, no_pm=True)
     @checks.admin_or_permissions()
