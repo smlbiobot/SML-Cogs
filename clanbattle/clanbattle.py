@@ -201,17 +201,20 @@ class ClanBattle:
         roles = [r for r in server.roles if r.id == role_id]
         for member in members:
             await self.bot.remove_roles(member, *roles)
-            author_settings["members"].remove(member.id)
+            if member.id not in author_settings["members"]:
+                await self.bot.say("{} is not on your team.")
+            elif member.id == author.id:
+                await self.bot.say(
+                    "You can remove yourself from the team."
+                    "\nType `!cb end` to end your session instead.")
+            else:
+                author_settings["members"].remove(member.id)
+                await self.bot.say(
+                    "{} can no longer join the clan battle VC for {}".format(
+                        ', '.join([m.display_name for m in members]),
+                        author.display_name))
 
         dataIO.save_json(JSON, self.settings)
-
-        await self.bot.say(
-            "{} can no longer join the clan battle VC for {}".format(
-                ', '.join([m.display_name for m in members]),
-                author.display_name))
-
-
-
 
     @clanbattle.command(name="end", pass_context=True, no_pm=True)
     async def clanbattle_end(self, ctx: Context):
