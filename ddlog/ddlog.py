@@ -91,6 +91,7 @@ class DataDogLog:
         self.dd_log_messages(message)
         self.dd_log_mentions(message)
         self.dd_log_message_author_roles(message)
+        self.dd_log_clans(message)
 
     async def on_command(self, command: Command, ctx: Context):
         """Logs commands."""
@@ -188,6 +189,23 @@ class DataDogLog:
             if not r.is_everyone:
                 statsd.increment(
                     'bot.msg.author.role',
+                    tags=[
+                        *self.tags,
+                        'server_id:' + str(server_id),
+                        'server_name:' + str(server_name),
+                        'role:' + str(r.name)])
+
+    def dd_log_clans(self, message: discord.Message):
+        """RACF specific. Log only clans."""
+        server = message.server
+        server_id = server.id
+        server_name = server.name
+        clans = ['alpha', 'bravo', 'charlie', 'delta',
+                 'echo', 'foxtrot', 'golf', 'hotel']
+        for r in message.author.roles:
+            if r.name.lower() in clans:
+                statsd.increment(
+                    'bot.msg.clan',
                     tags=[
                         *self.tags,
                         'server_id:' + str(server_id),
