@@ -5,7 +5,7 @@ import os
 import sys
 import datetime
 import string
-
+import argparse
 import matplotlib
 matplotlib.use('Agg')
 
@@ -156,19 +156,10 @@ class Plot:
             plt.subplots_adjust(left=0.1, right=0.96, top=0.9, bottom=0.2)
 
             plot_filename = "{}-plot.png".format("-".join(cards))
-            # plot_name = "Card Trends: {}".format(
-            #     ", ".join([self.card_to_str(c) for c in validated_cards]))
-            # plot_name = ""
 
-            # with io.BytesIO() as f:
             plt.savefig(
                 plot_filename, format="png", facecolor=facecolor,
                 edgecolor=edgecolor, transparent=True)
-            # f.seek(0)
-            # await ctx.bot.send_file(
-            #     ctx.message.channel, f,
-            #     filename=plot_filename,
-            #     content=plot_name)
 
             fig.clf()
 
@@ -226,10 +217,6 @@ class Plot:
 
     def get_card_from_cpid(self, cpid=None):
         """Return the card id from cpid."""
-        # for k, v in self.crdata["Cards"].items():
-        #     if cpid == v["cpid"]:
-        #         return k
-        # return None
         return cpid
 
     def get_deckpop_count(self, deck=None, snapshot_id=None):
@@ -245,21 +232,14 @@ class Plot:
 
 def main(arguments):
     """Main."""
-    # parser = argparse.ArgumentParser(
-    #     description=__doc__,
-    #     formatter_class=argparse.RawDescriptionHelpFormatter)
-    # parser.add_argument(
-    #     'infile', help="Input file", type=argparse.FileType('r'))
-    # parser.add_argument(
-    #     '-o', '--outfile', help="Output file",
-    #     default=sys.stdout, type=argparse.FileType('w'))
-    # parser.add_argument()
-
-    # args = parser.parse_args(arguments)
+    parser = argparse.ArgumentParser(
+        description=__doc__,
+        formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('cards', help='Card names', nargs='*')
+    args = parser.parse_args(arguments)
 
     p = Plot()
-    p.cardtrend(arguments)
-    # print(str(arguments))
+    p.cardtrend(args.cards)
 
 
 if __name__ == '__main__':
