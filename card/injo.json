@@ -1,0 +1,10 @@
+{
+    "AUTHOR" : "SML",
+    "SHORT" : "Clash Royale Card Popularity Snapshot",
+    "DESCRIPTION" : "Display statistics data from Woody’s seasonal card populairty snapshots.",
+    "DISABLED" : false,
+    "NAME" : "Card",
+    "REQUIREMENTS" : ["matplotlib"],
+    "TAGS" : ["clashroyale", "games", "cr", "stats", "data"],
+    "INSTALL_MSG" : "Thank you for installing Clash Roayle Card Popularity Snapshot."
+}
