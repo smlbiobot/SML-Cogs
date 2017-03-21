@@ -61,7 +61,7 @@ class Plot:
 
         self.plotfigure = 0
 
-    def cardtrend(self, cards):
+    def cardtrend(self, cards, filepath=None):
         """Plot graph using cards input."""
         if not len(cards):
             print("Please enter at least one card.")
@@ -156,6 +156,8 @@ class Plot:
             plt.subplots_adjust(left=0.1, right=0.96, top=0.9, bottom=0.2)
 
             plot_filename = "{}-plot.png".format("-".join(cards))
+            if filepath is not None:
+                plot_filename = filepath
 
             plt.savefig(
                 plot_filename, format="png", facecolor=facecolor,
@@ -235,11 +237,16 @@ def main(arguments):
     parser = argparse.ArgumentParser(
         description=__doc__,
         formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument('cards', help='Card names', nargs='*')
+    parser.add_argument(
+        'cards', help='Card names', nargs='*')
+    parser.add_argument(
+        '--out', '-o', help='Output filename', default=None)
+    parser.add_argument(
+        '--open', help='Open file when done', action='store_true')
     args = parser.parse_args(arguments)
 
     p = Plot()
-    p.cardtrend(args.cards)
+    p.cardtrend(args.cards, filepath=args.out)
 
 
 if __name__ == '__main__':
