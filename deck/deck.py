@@ -132,6 +132,9 @@ class Deck:
         # deck validation hack
         self.deck_is_valid = False
 
+        # pagination tracking
+        self.track_pagination = None
+
     def grouper(self, n, iterable, fillvalue=None):
         """Helper function to split lists.
 
@@ -284,6 +287,53 @@ class Deck:
                                    "Type `!deck add` to add some.")
             else:
                 await self.bot.say("{} hasn’t added any decks yet.".format(member.name))
+
+    @deck.command(name="longlist", pass_context=True, no_pm=True)
+    async def deck_longlist(self, ctx, member:discord.Member=None):
+        """List the decks of a user."""
+        author = ctx.message.author
+        server = ctx.message.server
+
+        member_is_author = False
+
+        if not member:
+            member = author
+            member_is_author = True
+
+        self.check_server_settings(server)
+        self.check_member_settings(server, member)
+
+        decks = self.settings["Servers"][server.id]["Members"][member.id]["Decks"]
+
+        if not len(decks):
+            if member_is_author:
+                await self.bot.say("You don’t have any decks stored.\n"
+                                   "Type `!deck add` to add some.")
+            else:
+                await self.bot.say("{} hasn’t added any decks yet.".format(member.name))
+            return
+
+        deck_id = 1
+        results_max = 3
+        for k, deck in decks.items():
+            await self.upload_deck_image(
+                ctx, deck["Deck"], deck["DeckName"], member,
+                description="**{}**. {}".format(deck_id, deck["DeckName"]))
+            deck_id += 1
+
+            if (deck_id - 1) % results_max == 0:
+                if deck_id < len(decks):
+                    def pagination_check(m):
+                        return m.content.lower() == 'y'
+                    await self.bot.say(
+                        'Would you like to see the next results? (y/n)')
+                    answer = await self.bot.wait_for_message(
+                        timeout = 15.0,
+                        author=ctx.message.author,
+                        check=pagination_check)
+                    if answer is None:
+                        await self.bot.say("Results aborted.")
+                        return
 
     @deck.command(name="pagelist", pass_context=True, no_pm=True)
     async def deck_pagelist(self, ctx, member: discord.Member=None):
