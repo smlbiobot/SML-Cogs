@@ -59,6 +59,8 @@ cardpop_range_max = 26
 
 max_deck_show = 5
 
+PAGINATION_TIMEOUT = 20.0
+
 discord_ui_bgcolor = discord.Color(value=int('36393e', 16))
 
 
@@ -255,7 +257,7 @@ class Card:
                     await self.bot.say(
                         "Would you like to see more results? (y/n)")
                     answer = await self.bot.wait_for_message(
-                        timeout=10.0,
+                        timeout=PAGINATION_TIMEOUT,
                         author=ctx.message.author,
                         check=pagination_check)
                     if answer is None:
