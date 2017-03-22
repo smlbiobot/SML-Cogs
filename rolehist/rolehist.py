@@ -27,51 +27,48 @@ DEALINGS IN THE SOFTWARE.
 import discord
 from discord.ext import commands
 from .utils import checks
-from random import choice
 from .utils.dataIO import dataIO
 from .general import General
-from __main__ import send_cmd_help
+from cogs.utils.chat_formatting import pagify
 import os
 import datetime
-import itertools
-
 
 settings_path = "data/rolehist/settings.json"
-
-def grouper(n, iterable, fillvalue=None):
-    """
-    Helper function to split lists
-
-    Example:
-    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
-    """
-    args = [iter(iterable)] * n
-    return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
-
 
 class RoleHistory:
     """
     Edit and store history of user roles.
 
-    Reference: discord.on_member_update
-
-    Note: RACF specific plugin for Red
     """
 
     def __init__(self, bot):
+        """init."""
         self.bot = bot
         self.file_path = settings_path
         self.settings = dataIO.load_json(self.file_path)
 
+    def save_member_data(self, server=None, member=None):
+        """Save member data to settings."""
+        if server is None:
+            return
+        if member is None:
+            return
+        self.settings[server.id]["Members"][member.id] = {
+            "MemberID": member.id,
+            "History": {
+                str(self.server_time()): self.get_member_data(member)
+            }
+        }
+        dataIO.save_json(self.file_path, self.settings)
+
     @commands.command(pass_context=True, no_pm=True)
-    async def rolehist(self, ctx, user:discord.Member=None):
-        """Display the role history of a user
+    async def rolehist(self, ctx, user: discord.Member=None):
+        """Display the role history of a user.
 
         Examples:
         !rolehist
         !rolehist SML
         """
-
         author = ctx.message.author
         server = ctx.message.server
 
@@ -81,16 +78,15 @@ class RoleHistory:
         if server is None:
             return
 
-
         if server.id in self.settings:
 
             found_member = None
 
-            for member_key, member_value in self.settings[server.id]["Members"].items():
+            server_settings = self.settings[server.id]
+            for member_key, member_value in server_settings["Members"].items():
 
                 member = server.get_member(member_key)
 
-                # if user == member.display_name:
                 if user == member:
                     await self.bot.say("Found Member.")
                     await ctx.invoke(General.userinfo, user=member)
@@ -103,7 +99,6 @@ class RoleHistory:
                     for time_key, time_value in hist:
 
                         line = "• {}: ".format(time_key)
-                        # out.append('**{}**'.format(time_key))
 
                         curr_roles = time_value["Roles"]
                         # display role changes if not the first item
@@ -111,23 +106,20 @@ class RoleHistory:
                             prev_roles_set = set(prev_roles)
                             curr_roles_set = set(curr_roles)
                             if prev_roles_set < curr_roles_set:
-                                line += 'Added: {}'.format(list(curr_roles_set - prev_roles_set)[0])
-                            else:
-                                line +='Removed: {}'.format(list(prev_roles_set - curr_roles_set)[0])
+                                line += 'Added: {}'.format(
+                                    list(curr_roles_set - prev_roles_set)[0])
+                            elif prev_roles_set > curr_roles_set:
+                                line += 'Removed: {}'.format(
+                                    list(prev_roles_set - curr_roles_set)[0])
 
                         out.append(line)
-                        # out.append(', '.join(curr_roles))
 
                         prev_roles = curr_roles
 
-
-                    # split long outputs because of char limit in messages
-                    split_out = grouper(10, out)
-                    for o in split_out:
-                        await self.bot.say("\n".join(o))
+                    for page in pagify("\n".join(out)):
+                        await self.bot.say(page)
 
                     found_member = member
-
 
             # if no data found, add record
             if found_member is None:
@@ -137,31 +129,16 @@ class RoleHistory:
                 member = user
 
                 if member is not None:
-
-                    self.settings[server.id]["Members"][member.id] = {
-                        "MemberID" : member.id,
-                        "History": {
-                            f"{self.server_time()}" : self.get_member_data(member)
-                            }
-                        }
-
-                    # save data
-                    # await self.bot.say(str(self.get_member_data(member)))
-
+                    self.save_member_data(server, member)
                     await self.bot.say("Added member to database.")
-                    dataIO.save_json(self.file_path, self.settings)
-
                 else:
-                    await self.bot.say("{} is not a valid user on this server.".format(user))
-
-                # await self.bot.say("debug: {}".format(str(member)))
-
+                    await self.bot.say(
+                        "{} is not a valid user on this server.".format(user))
 
     @commands.command(pass_context=True)
     @checks.mod_or_permissions(manage_server=True)
     async def rolehistinit(self, ctx):
-        """(MOD) Popularize database with current role data"""
-
+        """(MOD) Popularize database with current role data."""
         server = ctx.message.server
         members = server.members
 
@@ -170,26 +147,17 @@ class RoleHistory:
                 "ServerName": str(server),
                 "ServerID": str(server.id),
                 "Members": {}
-                }
-
+            }
 
         for member in members:
-
             if member.id not in self.settings[server.id]["Members"]:
-
                 # init member only if not found
-                self.settings[server.id]["Members"][member.id] = {
-                    "MemberID" : member.id,
-                    "History": {
-                        f"{self.server_time()}" : self.get_member_data(member)
-                        }
-                    }
+                self.save_member_data(server, member)
 
         await self.bot.say("Added all member roles to database.")
-        dataIO.save_json(self.file_path, self.settings)
 
-    async def member_join(self, member):
-        """Add member records when new user join"""
+    async def on_member_join(self, member):
+        """Add member records when new user join."""
         server = member.server
 
         if server.id not in self.settings:
@@ -197,23 +165,15 @@ class RoleHistory:
                 "ServerName": str(server),
                 "ServerID": str(server.id),
                 "Members": {}
-                }
+            }
 
         if member.id not in self.settings[server.id]["Members"]:
+            self.save_member_data(server, member)
 
-            # init member only if not found
-            self.settings[server.id]["Members"][member.id] = {
-                "MemberID" : member.id,
-                "History": {
-                    f"{self.server_time()}" : self.get_member_data(member)
-                    }
-                }
         dataIO.save_json(self.file_path, self.settings)
 
-
-
-
-    async def member_update(self, before, after):
+    async def on_member_update(self, before, after):
+        """Member update event."""
         server = before.server
 
         # process only on role changes
@@ -224,45 +184,34 @@ class RoleHistory:
                     "ServerName": str(server),
                     "ServerID": str(server.id),
                     "Members": {}
-                    }
+                }
 
-
-
-            # Update server name in settings in case they have changed over time
             self.settings[server.id]["ServerName"] = str(server)
 
             # add member settings if it does not exist
             # initialize with before data
             # using server time as unique id for role changes
             if before.id not in self.settings[server.id]["Members"]:
-                self.settings[server.id]["Members"][before.id] = {
-                    "MemberID" : before.id,
-                    "History": {
-                        f"{self.server_time()}" : self.get_member_data(before)
-                        }
-
-                    }
+                self.save_member_data(server, before)
 
             # create values for timestamp as unique key
-            self.settings[server.id]["Members"][after.id]["History"][self.server_time()] = self.get_member_data(after)
+            history = self.settings[server.id]["Members"][after.id]["History"]
+            history[self.server_time()] = self.get_member_data(after)
 
             # save data
             dataIO.save_json(self.file_path, self.settings)
 
     def server_time(self):
-        """Get UTC time instead of server local time so data can be ported between servers"""
+        """Get UTC time instead of server time so data can be ported."""
         return str(datetime.datetime.utcnow())
 
     def get_member_data(self, member):
         """Return data to be stored."""
-        return { "MemberName": member.name,
-                 "DisplayName": member.display_name,
-                 "Roles": [r.name for r in member.roles if r.name != "@everyone"]
-                 }
-
-
-
-
+        return {
+            "MemberName": member.name,
+            "DisplayName": member.display_name,
+            "Roles": [r.name for r in member.roles if r.name != "@everyone"]
+        }
 
 
 def check_folder():
@@ -272,19 +221,14 @@ def check_folder():
 
 
 def check_file():
-    banned = {}
-
+    default = {}
     f = settings_path
     if not dataIO.is_valid_json(f):
         print("Creating default role history’s settings.json...")
-        dataIO.save_json(f, banned)
-
+        dataIO.save_json(f, default)
 
 def setup(bot):
     check_folder()
     check_file()
     n = RoleHistory(bot)
-    bot.add_listener(n.member_join, "on_member_join")
-    bot.add_listener(n.member_update, "on_member_update")
     bot.add_cog(n)
-
