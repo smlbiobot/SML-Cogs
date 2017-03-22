@@ -41,6 +41,8 @@ settings_path = "data/deck/settings.json"
 crdata_path = "data/deck/clashroyale.json"
 max_deck_per_user = 5
 
+PAGINATION_TIMEOUT = 20.0
+
 help_text = f"""
 **Deck**
 The !deck command helps you organize your Clash Royale decks.
@@ -328,7 +330,7 @@ class Deck:
                     await self.bot.say(
                         'Would you like to see the next results? (y/n)')
                     answer = await self.bot.wait_for_message(
-                        timeout = 15.0,
+                        timeout=PAGINATION_TIMEOUT,
                         author=ctx.message.author,
                         check=pagination_check)
                     if answer is None:
