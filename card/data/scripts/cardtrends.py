@@ -61,7 +61,9 @@ class Plot:
 
         self.plotfigure = 0
 
-    def cardtrend(self, cards, filename=None, filepath=None, open=False):
+    def cardtrend(
+            self, cards, filename=None, filepath=None, open=False,
+            fmt='svg'):
         """Plot graph using cards input."""
         if not len(cards):
             print("Please enter at least one card.")
@@ -155,14 +157,14 @@ class Plot:
 
             plt.subplots_adjust(left=0.1, right=0.96, top=0.9, bottom=0.2)
 
-            plot_filename = "{}-plot.svg".format("-".join(cards))
+            plot_filename = "{}-plot.{}".format("-".join(cards), fmt)
             if filepath is not None:
                 plot_filename = os.path.join(filepath, plot_filename)
             elif filename is not None:
                 plot_filename = filename
 
             plt.savefig(
-                plot_filename, format="svg", facecolor=facecolor,
+                plot_filename, format=fmt, facecolor=facecolor,
                 edgecolor=edgecolor, transparent=True)
 
             fig.clf()
@@ -252,11 +254,14 @@ def main(arguments):
         '--path', '-p', help='Path to output', default=None)
     parser.add_argument(
         '--open', help='Open file when done', action='store_true')
+    parser.add_argument(
+        '--format', '-f', help='File format', default='svg')
     args = parser.parse_args(arguments)
 
     p = Plot()
     p.cardtrend(
-        args.cards, filename=args.out, filepath=args.path, open=args.open)
+        args.cards, filename=args.out, filepath=args.path, open=args.open,
+        fmt=args.format)
 
 
 if __name__ == '__main__':
