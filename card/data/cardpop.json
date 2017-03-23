@@ -19958,6 +19958,656 @@
                     "tombstone",
                     "zap"
                 ]
+            },
+            {
+                "rank" : 51,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 52,
+                "deck" : [
+                    "baby-dragon",
+                    "lava-hound",
+                    "lightning",
+                    "lumberjack",
+                    "mega-minion",
+                    "miner",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 53,
+                "deck" : [
+                    "archers",
+                    "golem",
+                    "graveyard",
+                    "ice-golem",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 54,
+                "deck" : [
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "minions",
+                    "musketeer",
+                    "skeleton-army",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 55,
+                "deck" : [
+                    "archers",
+                    "giant",
+                    "ice-golem",
+                    "lightning",
+                    "mega-minion",
+                    "musketeer",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 56,
+                "deck" : [
+                    "fireball",
+                    "ice-golem",
+                    "ice-spirit",
+                    "inferno-tower",
+                    "mega-minion",
+                    "minions",
+                    "the-log",
+                    "xbow"
+                ]
+            },
+            {
+                "rank" : 57,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "golem",
+                    "ice-golem",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 58,
+                "deck" : [
+                    "hog-rider",
+                    "ice-spirit",
+                    "inferno-tower",
+                    "lightning",
+                    "mega-minion",
+                    "princess",
+                    "skeleton-army",
+                    "the-log"
+                ]
+            },
+            {
+                "rank" : 59,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "miner",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 60,
+                "deck" : [
+                    "archers",
+                    "golem",
+                    "lightning",
+                    "lumberjack",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 61,
+                "deck" : [
+                    "archers",
+                    "arrows",
+                    "lava-hound",
+                    "lightning",
+                    "mega-minion",
+                    "miner",
+                    "minions",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 62,
+                "deck" : [
+                    "hog-rider",
+                    "ice-spirit",
+                    "inferno-tower",
+                    "lightning",
+                    "mini-pekka",
+                    "princess",
+                    "skeletons",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 63,
+                "deck" : [
+                    "bowler",
+                    "fireball",
+                    "guards",
+                    "ice-spirit",
+                    "inferno-tower",
+                    "mega-minion",
+                    "the-log",
+                    "xbow"
+                ]
+            },
+            {
+                "rank" : 64,
+                "deck" : [
+                    "arrows",
+                    "bowler",
+                    "giant",
+                    "lightning",
+                    "mega-minion",
+                    "musketeer",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 65,
+                "deck" : [
+                    "guards",
+                    "ice-spirit",
+                    "inferno-tower",
+                    "lightning",
+                    "mega-minion",
+                    "miner",
+                    "princess",
+                    "the-log"
+                ]
+            },
+            {
+                "rank" : 66,
+                "deck" : [
+                    "fireball",
+                    "graveyard",
+                    "ice-golem",
+                    "inferno-tower",
+                    "mega-minion",
+                    "miner",
+                    "skeleton-army",
+                    "the-log"
+                ]
+            },
+            {
+                "rank" : 67,
+                "deck" : [
+                    "arrows",
+                    "ice-golem",
+                    "lava-hound",
+                    "lightning",
+                    "lumberjack",
+                    "minion-horde",
+                    "minions",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 68,
+                "deck" : [
+                    "fireball",
+                    "graveyard",
+                    "lava-hound",
+                    "lumberjack",
+                    "mega-minion",
+                    "minions",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 69,
+                "deck" : [
+                    "archers",
+                    "arrows",
+                    "fireball",
+                    "graveyard",
+                    "knight",
+                    "lava-hound",
+                    "mega-minion",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 70,
+                "deck" : [
+                    "archers",
+                    "golem",
+                    "lightning",
+                    "lumberjack",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 71,
+                "deck" : [
+                    "fireball",
+                    "ice-golem",
+                    "ice-spirit",
+                    "inferno-tower",
+                    "mega-minion",
+                    "minions",
+                    "the-log",
+                    "xbow"
+                ]
+            },
+            {
+                "rank" : 72,
+                "deck" : [
+                    "fire-spirits",
+                    "fireball",
+                    "golem",
+                    "mega-minion",
+                    "mini-pekka",
+                    "minions",
+                    "musketeer",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 73,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "golem",
+                    "ice-golem",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 74,
+                "deck" : [
+                    "archers",
+                    "arrows",
+                    "elixir-collector",
+                    "ice-spirit",
+                    "knight",
+                    "miner",
+                    "the-log",
+                    "three-musketeers"
+                ]
+            },
+            {
+                "rank" : 75,
+                "deck" : [
+                    "baby-dragon",
+                    "elixir-collector",
+                    "fireball",
+                    "inferno-dragon",
+                    "lava-hound",
+                    "mega-minion",
+                    "skeleton-army",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 76,
+                "deck" : [
+                    "archers",
+                    "fireball",
+                    "hog-rider",
+                    "ice-golem",
+                    "ice-spirit",
+                    "inferno-tower",
+                    "mega-minion",
+                    "the-log"
+                ]
+            },
+            {
+                "rank" : 77,
+                "deck" : [
+                    "archers",
+                    "fireball",
+                    "hog-rider",
+                    "ice-golem",
+                    "ice-spirit",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 78,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "elixir-collector",
+                    "lava-hound",
+                    "lightning",
+                    "mega-minion",
+                    "miner",
+                    "skeleton-army"
+                ]
+            },
+            {
+                "rank" : 79,
+                "deck" : [
+                    "archers",
+                    "bowler",
+                    "fireball",
+                    "graveyard",
+                    "ice-golem",
+                    "inferno-tower",
+                    "mega-minion",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 80,
+                "deck" : [
+                    "archers",
+                    "arrows",
+                    "ice-golem",
+                    "mega-minion",
+                    "musketeer",
+                    "royal-giant",
+                    "skeleton-army",
+                    "the-log"
+                ]
+            },
+            {
+                "rank" : 81,
+                "deck" : [
+                    "guards",
+                    "hog-rider",
+                    "ice-spirit",
+                    "ice-wizard",
+                    "mini-pekka",
+                    "princess",
+                    "rocket",
+                    "the-log"
+                ]
+            },
+            {
+                "rank" : 82,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "bomber",
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 83,
+                "deck" : [
+                    "archers",
+                    "barbarians",
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 84,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 85,
+                "deck" : [
+                    "fire-spirits",
+                    "ice-spirit",
+                    "inferno-tower",
+                    "mega-minion",
+                    "princess",
+                    "skeleton-army",
+                    "the-log",
+                    "xbow"
+                ]
+            },
+            {
+                "rank" : 86,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "golem",
+                    "ice-golem",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 87,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 88,
+                "deck" : [
+                    "giant",
+                    "ice-wizard",
+                    "inferno-tower",
+                    "lightning",
+                    "mega-minion",
+                    "musketeer",
+                    "skeleton-army",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 89,
+                "deck" : [
+                    "goblin-barrel",
+                    "inferno-tower",
+                    "miner",
+                    "minion-horde",
+                    "mirror",
+                    "princess",
+                    "skeleton-army",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 90,
+                "deck" : [
+                    "archers",
+                    "barbarians",
+                    "giant",
+                    "ice-spirit",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 91,
+                "deck" : [
+                    "goblins",
+                    "ice-golem",
+                    "inferno-tower",
+                    "miner",
+                    "mini-pekka",
+                    "princess",
+                    "the-log",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 92,
+                "deck" : [
+                    "archers",
+                    "arrows",
+                    "golem",
+                    "graveyard",
+                    "ice-golem",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 93,
+                "deck" : [
+                    "archers",
+                    "furnace",
+                    "guards",
+                    "ice-spirit",
+                    "lightning",
+                    "mega-minion",
+                    "royal-giant",
+                    "the-log"
+                ]
+            },
+            {
+                "rank" : 94,
+                "deck" : [
+                    "fireball",
+                    "giant",
+                    "goblins",
+                    "ice-spirit",
+                    "mega-minion",
+                    "mini-pekka",
+                    "musketeer",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 95,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "furnace",
+                    "golem",
+                    "lightning",
+                    "mini-pekka",
+                    "the-log",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 96,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "golem",
+                    "ice-golem",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 97,
+                "deck" : [
+                    "guards",
+                    "inferno-dragon",
+                    "lava-hound",
+                    "lightning",
+                    "mega-minion",
+                    "miner",
+                    "minion-horde",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 98,
+                "deck" : [
+                    "archers",
+                    "baby-dragon",
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "the-log",
+                    "tombstone",
+                    "zap"
+                ]
+            },
+            {
+                "rank" : 99,
+                "deck" : [
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "minions",
+                    "musketeer",
+                    "skeleton-army",
+                    "the-log",
+                    "tombstone"
+                ]
+            },
+            {
+                "rank" : 100,
+                "deck" : [
+                    "fire-spirits",
+                    "golem",
+                    "lightning",
+                    "mega-minion",
+                    "musketeer",
+                    "skeleton-army",
+                    "tombstone",
+                    "zap"
+                ]
             }
         ],
         "cards" : [
@@ -20018,7 +20668,7 @@
                     "tombstone",
                     "zap"
                 ],
-                "count" : 4,
+                "count" : 8,
                 "elixir" : 3.875,
                 "similarity" : {}
             },
@@ -20034,7 +20684,7 @@
                     "the-log",
                     "tombstone"
                 ],
-                "count" : 4,
+                "count" : 8,
                 "elixir" : 3.875,
                 "similarity" : {}
             },
@@ -20050,7 +20700,7 @@
                     "the-log",
                     "tombstone"
                 ],
-                "count" : 2,
+                "count" : 4,
                 "elixir" : 4.0,
                 "similarity" : {}
             },
@@ -20066,7 +20716,7 @@
                     "the-log",
                     "xbow"
                 ],
-                "count" : 2,
+                "count" : 4,
                 "elixir" : 3.25,
                 "similarity" : {}
             },
@@ -20082,7 +20732,7 @@
                     "tombstone",
                     "zap"
                 ],
-                "count" : 2,
+                "count" : 4,
                 "elixir" : 3.875,
                 "similarity" : {}
             },
@@ -20098,7 +20748,7 @@
                     "the-log",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 4.0,
                 "similarity" : {}
             },
@@ -20114,7 +20764,7 @@
                     "tombstone",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.5,
                 "similarity" : {}
             },
@@ -20130,7 +20780,7 @@
                     "the-log",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.5,
                 "similarity" : {}
             },
@@ -20146,7 +20796,7 @@
                     "skeleton-army",
                     "the-log"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.375,
                 "similarity" : {}
             },
@@ -20162,7 +20812,7 @@
                     "tombstone",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 4.0,
                 "similarity" : {}
             },
@@ -20178,7 +20828,7 @@
                     "minions",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.875,
                 "similarity" : {}
             },
@@ -20194,7 +20844,7 @@
                     "skeletons",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.25,
                 "similarity" : {}
             },
@@ -20210,7 +20860,7 @@
                     "the-log",
                     "xbow"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.625,
                 "similarity" : {}
             },
@@ -20226,7 +20876,7 @@
                     "the-log",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.875,
                 "similarity" : {}
             },
@@ -20242,7 +20892,7 @@
                     "princess",
                     "the-log"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.25,
                 "similarity" : {}
             },
@@ -20258,7 +20908,7 @@
                     "skeleton-army",
                     "the-log"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.375,
                 "similarity" : {}
             },
@@ -20274,7 +20924,7 @@
                     "minions",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 4.125,
                 "similarity" : {}
             },
@@ -20290,7 +20940,7 @@
                     "tombstone",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.875,
                 "similarity" : {}
             },
@@ -20306,7 +20956,7 @@
                     "mega-minion",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.875,
                 "similarity" : {}
             },
@@ -20322,7 +20972,7 @@
                     "musketeer",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.75,
                 "similarity" : {}
             },
@@ -20338,7 +20988,7 @@
                     "the-log",
                     "three-musketeers"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.75,
                 "similarity" : {}
             },
@@ -20354,7 +21004,7 @@
                     "skeleton-army",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 4.125,
                 "similarity" : {}
             },
@@ -20370,7 +21020,7 @@
                     "mega-minion",
                     "the-log"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.0,
                 "similarity" : {}
             },
@@ -20386,7 +21036,7 @@
                     "the-log",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 2.75,
                 "similarity" : {}
             },
@@ -20402,7 +21052,7 @@
                     "miner",
                     "skeleton-army"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 4.375,
                 "similarity" : {}
             },
@@ -20418,7 +21068,7 @@
                     "mega-minion",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.625,
                 "similarity" : {}
             },
@@ -20434,7 +21084,7 @@
                     "skeleton-army",
                     "the-log"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.25,
                 "similarity" : {}
             },
@@ -20450,7 +21100,7 @@
                     "rocket",
                     "the-log"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.25,
                 "similarity" : {}
             },
@@ -20466,7 +21116,7 @@
                     "tombstone",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 4.0,
                 "similarity" : {}
             },
@@ -20482,7 +21132,7 @@
                     "tombstone",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 4.0,
                 "similarity" : {}
             },
@@ -20498,7 +21148,7 @@
                     "the-log",
                     "xbow"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.125,
                 "similarity" : {}
             },
@@ -20514,7 +21164,7 @@
                     "skeleton-army",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.875,
                 "similarity" : {}
             },
@@ -20530,7 +21180,7 @@
                     "skeleton-army",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.0,
                 "similarity" : {}
             },
@@ -20546,7 +21196,7 @@
                     "the-log",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.5,
                 "similarity" : {}
             },
@@ -20562,7 +21212,7 @@
                     "the-log",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 2.875,
                 "similarity" : {}
             },
@@ -20578,7 +21228,7 @@
                     "the-log",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.625,
                 "similarity" : {}
             },
@@ -20594,7 +21244,7 @@
                     "royal-giant",
                     "the-log"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.5,
                 "similarity" : {}
             },
@@ -20610,7 +21260,7 @@
                     "musketeer",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.125,
                 "similarity" : {}
             },
@@ -20626,7 +21276,7 @@
                     "the-log",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 4.125,
                 "similarity" : {}
             },
@@ -20642,7 +21292,7 @@
                     "minion-horde",
                     "tombstone"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 4.25,
                 "similarity" : {}
             },
@@ -20658,183 +21308,183 @@
                     "tombstone",
                     "zap"
                 ],
-                "count" : 1,
+                "count" : 2,
                 "elixir" : 3.875,
                 "similarity" : {}
             }
         },
         "cardpop" : {
             "mega-minion" : {
-                "count" : 43,
-                "change" : -11
+                "count" : 86,
+                "change" : 32
             },
             "the-log" : {
-                "count" : 34,
-                "change" : -34
+                "count" : 68,
+                "change" : 0
             },
             "lightning" : {
-                "count" : 30,
-                "change" : -6
+                "count" : 60,
+                "change" : 24
             },
             "tombstone" : {
-                "count" : 28,
-                "change" : 5
+                "count" : 56,
+                "change" : 33
             },
             "archers" : {
-                "count" : 27,
-                "change" : 25
+                "count" : 54,
+                "change" : 52
             },
             "zap" : {
-                "count" : 21,
-                "change" : -16
+                "count" : 42,
+                "change" : 5
             },
             "golem" : {
-                "count" : 20,
-                "change" : 17
+                "count" : 40,
+                "change" : 37
             },
             "ice-golem" : {
-                "count" : 16,
-                "change" : 10
+                "count" : 32,
+                "change" : 26
             },
             "baby-dragon" : {
-                "count" : 14,
-                "change" : 12
+                "count" : 28,
+                "change" : 26
             },
             "ice-spirit" : {
-                "count" : 14,
-                "change" : -47
+                "count" : 28,
+                "change" : -33
             },
             "inferno-tower" : {
-                "count" : 13,
-                "change" : -27
+                "count" : 26,
+                "change" : -14
             },
             "fireball" : {
-                "count" : 12,
-                "change" : -13
+                "count" : 24,
+                "change" : -1
             },
             "skeleton-army" : {
-                "count" : 11,
-                "change" : -35
+                "count" : 22,
+                "change" : -24
             },
             "miner" : {
-                "count" : 10,
-                "change" : -19
+                "count" : 20,
+                "change" : -9
             },
             "musketeer" : {
-                "count" : 9,
-                "change" : -7
+                "count" : 18,
+                "change" : 2
             },
             "lava-hound" : {
-                "count" : 8,
-                "change" : 3
+                "count" : 16,
+                "change" : 11
             },
             "minions" : {
-                "count" : 8,
-                "change" : -11
+                "count" : 16,
+                "change" : -3
             },
             "princess" : {
-                "count" : 7,
-                "change" : -44
+                "count" : 14,
+                "change" : -37
             },
             "arrows" : {
-                "count" : 7,
-                "change" : -18
+                "count" : 14,
+                "change" : -11
             },
             "graveyard" : {
-                "count" : 6,
+                "count" : 12,
                 "change" : 0
             },
             "mini-pekka" : {
-                "count" : 6,
-                "change" : -8
+                "count" : 12,
+                "change" : -2
             },
             "lumberjack" : {
-                "count" : 5,
+                "count" : 10,
                 "change" : 0
             },
             "giant" : {
-                "count" : 5,
-                "change" : -12
+                "count" : 10,
+                "change" : -7
             },
             "hog-rider" : {
-                "count" : 5,
-                "change" : -23
+                "count" : 10,
+                "change" : -18
             },
             "guards" : {
-                "count" : 5,
-                "change" : -4
+                "count" : 10,
+                "change" : 1
             },
             "xbow" : {
-                "count" : 4,
-                "change" : -15
+                "count" : 8,
+                "change" : -11
             },
             "bowler" : {
-                "count" : 3,
-                "change" : -23
+                "count" : 6,
+                "change" : -20
             },
             "minion-horde" : {
-                "count" : 3,
-                "change" : -10
+                "count" : 6,
+                "change" : -7
             },
             "fire-spirits" : {
-                "count" : 3,
-                "change" : -14
+                "count" : 6,
+                "change" : -11
             },
             "elixir-collector" : {
-                "count" : 3,
-                "change" : -2
+                "count" : 6,
+                "change" : 1
             },
             "knight" : {
-                "count" : 2,
-                "change" : -5
+                "count" : 4,
+                "change" : -3
             },
             "inferno-dragon" : {
-                "count" : 2,
+                "count" : 4,
                 "change" : 0
             },
             "royal-giant" : {
-                "count" : 2,
-                "change" : 0
+                "count" : 4,
+                "change" : 2
             },
             "ice-wizard" : {
-                "count" : 2,
-                "change" : -16
+                "count" : 4,
+                "change" : -14
             },
             "barbarians" : {
-                "count" : 2,
-                "change" : 0
+                "count" : 4,
+                "change" : 2
             },
             "goblins" : {
-                "count" : 2,
-                "change" : -4
+                "count" : 4,
+                "change" : -2
             },
             "furnace" : {
-                "count" : 2,
-                "change" : -3
+                "count" : 4,
+                "change" : -1
             },
             "skeletons" : {
-                "count" : 1,
-                "change" : -13
+                "count" : 2,
+                "change" : -12
             },
             "three-musketeers" : {
-                "count" : 1,
-                "change" : 0
+                "count" : 2,
+                "change" : 1
             },
             "rocket" : {
-                "count" : 1,
-                "change" : -10
+                "count" : 2,
+                "change" : -9
             },
             "bomber" : {
-                "count" : 1,
+                "count" : 2,
                 "change" : 0
             },
             "goblin-barrel" : {
-                "count" : 1,
-                "change" : -10
+                "count" : 2,
+                "change" : -9
             },
             "mirror" : {
-                "count" : 1,
-                "change" : 0
+                "count" : 2,
+                "change" : 1
             }
         }
     },
@@ -23138,115 +23788,115 @@
         "cardpop" : {
             "mega-minion" : {
                 "count" : 84,
-                "change" : 41
+                "change" : -2
             },
             "the-log" : {
                 "count" : 79,
-                "change" : 45
+                "change" : 11
             },
             "zap" : {
                 "count" : 57,
-                "change" : 36
+                "change" : 15
             },
             "archers" : {
                 "count" : 53,
-                "change" : 26
+                "change" : -1
             },
             "tombstone" : {
                 "count" : 44,
-                "change" : 16
+                "change" : -12
             },
             "lightning" : {
                 "count" : 41,
-                "change" : 11
+                "change" : -19
             },
             "ice-spirit" : {
                 "count" : 34,
-                "change" : 20
+                "change" : 6
             },
             "ice-golem" : {
                 "count" : 33,
-                "change" : 17
+                "change" : 1
             },
             "fireball" : {
                 "count" : 32,
-                "change" : 20
+                "change" : 8
             },
             "miner" : {
                 "count" : 28,
-                "change" : 18
+                "change" : 8
             },
             "giant" : {
                 "count" : 27,
-                "change" : 22
+                "change" : 17
             },
             "hog-rider" : {
                 "count" : 26,
-                "change" : 21
+                "change" : 16
             },
             "skeleton-army" : {
                 "count" : 26,
-                "change" : 15
+                "change" : 4
             },
             "inferno-tower" : {
                 "count" : 26,
-                "change" : 13
+                "change" : 0
             },
             "bowler" : {
                 "count" : 24,
-                "change" : 21
+                "change" : 18
             },
             "princess" : {
                 "count" : 23,
-                "change" : 16
+                "change" : 9
             },
             "furnace" : {
                 "count" : 15,
-                "change" : 13
+                "change" : 11
             },
             "minions" : {
                 "count" : 14,
-                "change" : 6
+                "change" : -2
             },
             "minion-horde" : {
                 "count" : 13,
-                "change" : 10
+                "change" : 7
             },
             "arrows" : {
                 "count" : 10,
-                "change" : 3
+                "change" : -4
             },
             "goblin-barrel" : {
                 "count" : 9,
-                "change" : 8
+                "change" : 7
             },
             "musketeer" : {
                 "count" : 9,
-                "change" : 0
+                "change" : -9
             },
             "golem" : {
                 "count" : 8,
-                "change" : -12
+                "change" : -32
             },
             "baby-dragon" : {
                 "count" : 7,
-                "change" : -7
+                "change" : -21
             },
             "mini-pekka" : {
                 "count" : 7,
-                "change" : 1
+                "change" : -5
             },
             "graveyard" : {
                 "count" : 7,
-                "change" : 1
+                "change" : -5
             },
             "barbarians" : {
                 "count" : 6,
-                "change" : 4
+                "change" : 2
             },
             "royal-giant" : {
                 "count" : 6,
-                "change" : 4
+                "change" : 2
             },
             "cannon" : {
                 "count" : 5,
@@ -23262,39 +23912,39 @@
             },
             "rocket" : {
                 "count" : 5,
-                "change" : 4
+                "change" : 3
             },
             "lava-hound" : {
                 "count" : 5,
-                "change" : -3
+                "change" : -11
             },
             "elixir-collector" : {
                 "count" : 4,
-                "change" : 1
+                "change" : -2
             },
             "three-musketeers" : {
                 "count" : 4,
-                "change" : 3
+                "change" : 2
             },
             "guards" : {
                 "count" : 3,
-                "change" : -2
+                "change" : -7
             },
             "xbow" : {
                 "count" : 3,
-                "change" : -1
+                "change" : -5
             },
             "goblins" : {
                 "count" : 2,
-                "change" : 0
+                "change" : -2
             },
             "knight" : {
                 "count" : 2,
-                "change" : 0
+                "change" : -2
             },
             "ice-wizard" : {
                 "count" : 2,
-                "change" : 0
+                "change" : -2
             },
             "spear-goblins" : {
                 "count" : 2,
@@ -23306,15 +23956,15 @@
             },
             "mirror" : {
                 "count" : 1,
-                "change" : 0
+                "change" : -1
             },
             "skeletons" : {
                 "count" : 1,
-                "change" : 0
+                "change" : -1
             },
             "fire-spirits" : {
                 "count" : 1,
-                "change" : -2
+                "change" : -5
             },
             "tesla" : {
                 "count" : 1,

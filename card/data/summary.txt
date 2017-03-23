@@ -835,91 +835,91 @@ Cards:
 --------------------------------------------------------------------------------
 Snapshot #16
 Decks:
-  4: archers, baby-dragon, golem, lightning, mega-minion, the-log, tombstone, zap
-  4: archers, baby-dragon, golem, ice-golem, lightning, mega-minion, the-log, tombstone
-  2: golem, lightning, mega-minion, minions, musketeer, skeleton-army, the-log, tombstone
-  2: fireball, ice-golem, ice-spirit, inferno-tower, mega-minion, minions, the-log, xbow
-  2: archers, golem, lightning, lumberjack, mega-minion, the-log, tombstone, zap
-  1: baby-dragon, lava-hound, lightning, lumberjack, mega-minion, miner, the-log, tombstone
-  1: archers, golem, graveyard, ice-golem, mega-minion, the-log, tombstone, zap
-  1: archers, giant, ice-golem, lightning, mega-minion, musketeer, the-log, tombstone
-  1: hog-rider, ice-spirit, inferno-tower, lightning, mega-minion, princess, skeleton-army, the-log
-  1: archers, baby-dragon, golem, lightning, mega-minion, miner, tombstone, zap
-  1: archers, arrows, lava-hound, lightning, mega-minion, miner, minions, tombstone
-  1: hog-rider, ice-spirit, inferno-tower, lightning, mini-pekka, princess, skeletons, zap
-  1: bowler, fireball, guards, ice-spirit, inferno-tower, mega-minion, the-log, xbow
-  1: arrows, bowler, giant, lightning, mega-minion, musketeer, the-log, tombstone
-  1: guards, ice-spirit, inferno-tower, lightning, mega-minion, miner, princess, the-log
-  1: fireball, graveyard, ice-golem, inferno-tower, mega-minion, miner, skeleton-army, the-log
-  1: arrows, ice-golem, lava-hound, lightning, lumberjack, minion-horde, minions, tombstone
-  1: fireball, graveyard, lava-hound, lumberjack, mega-minion, minions, tombstone, zap
-  1: archers, arrows, fireball, graveyard, knight, lava-hound, mega-minion, tombstone
-  1: fire-spirits, fireball, golem, mega-minion, mini-pekka, minions, musketeer, zap
-  1: archers, arrows, elixir-collector, ice-spirit, knight, miner, the-log, three-musketeers
-  1: baby-dragon, elixir-collector, fireball, inferno-dragon, lava-hound, mega-minion, skeleton-army, zap
-  1: archers, fireball, hog-rider, ice-golem, ice-spirit, inferno-tower, mega-minion, the-log
-  1: archers, fireball, hog-rider, ice-golem, ice-spirit, mega-minion, the-log, tombstone
-  1: archers, baby-dragon, elixir-collector, lava-hound, lightning, mega-minion, miner, skeleton-army
-  1: archers, bowler, fireball, graveyard, ice-golem, inferno-tower, mega-minion, zap
-  1: archers, arrows, ice-golem, mega-minion, musketeer, royal-giant, skeleton-army, the-log
-  1: guards, hog-rider, ice-spirit, ice-wizard, mini-pekka, princess, rocket, the-log
-  1: archers, baby-dragon, bomber, golem, lightning, mega-minion, tombstone, zap
-  1: archers, barbarians, golem, lightning, mega-minion, the-log, tombstone, zap
-  1: fire-spirits, ice-spirit, inferno-tower, mega-minion, princess, skeleton-army, the-log, xbow
-  1: giant, ice-wizard, inferno-tower, lightning, mega-minion, musketeer, skeleton-army, zap
-  1: goblin-barrel, inferno-tower, miner, minion-horde, mirror, princess, skeleton-army, zap
-  1: archers, barbarians, giant, ice-spirit, lightning, mega-minion, the-log, tombstone
-  1: goblins, ice-golem, inferno-tower, miner, mini-pekka, princess, the-log, zap
-  1: archers, arrows, golem, graveyard, ice-golem, mega-minion, the-log, tombstone
-  1: archers, furnace, guards, ice-spirit, lightning, mega-minion, royal-giant, the-log
-  1: fireball, giant, goblins, ice-spirit, mega-minion, mini-pekka, musketeer, zap
-  1: archers, baby-dragon, furnace, golem, lightning, mini-pekka, the-log, zap
-  1: guards, inferno-dragon, lava-hound, lightning, mega-minion, miner, minion-horde, tombstone
-  1: fire-spirits, golem, lightning, mega-minion, musketeer, skeleton-army, tombstone, zap
+  8: archers, baby-dragon, golem, lightning, mega-minion, the-log, tombstone, zap
+  8: archers, baby-dragon, golem, ice-golem, lightning, mega-minion, the-log, tombstone
+  4: golem, lightning, mega-minion, minions, musketeer, skeleton-army, the-log, tombstone
+  4: fireball, ice-golem, ice-spirit, inferno-tower, mega-minion, minions, the-log, xbow
+  4: archers, golem, lightning, lumberjack, mega-minion, the-log, tombstone, zap
+  2: baby-dragon, lava-hound, lightning, lumberjack, mega-minion, miner, the-log, tombstone
+  2: archers, golem, graveyard, ice-golem, mega-minion, the-log, tombstone, zap
+  2: archers, giant, ice-golem, lightning, mega-minion, musketeer, the-log, tombstone
+  2: hog-rider, ice-spirit, inferno-tower, lightning, mega-minion, princess, skeleton-army, the-log
+  2: archers, baby-dragon, golem, lightning, mega-minion, miner, tombstone, zap
+  2: archers, arrows, lava-hound, lightning, mega-minion, miner, minions, tombstone
+  2: hog-rider, ice-spirit, inferno-tower, lightning, mini-pekka, princess, skeletons, zap
+  2: bowler, fireball, guards, ice-spirit, inferno-tower, mega-minion, the-log, xbow
+  2: arrows, bowler, giant, lightning, mega-minion, musketeer, the-log, tombstone
+  2: guards, ice-spirit, inferno-tower, lightning, mega-minion, miner, princess, the-log
+  2: fireball, graveyard, ice-golem, inferno-tower, mega-minion, miner, skeleton-army, the-log
+  2: arrows, ice-golem, lava-hound, lightning, lumberjack, minion-horde, minions, tombstone
+  2: fireball, graveyard, lava-hound, lumberjack, mega-minion, minions, tombstone, zap
+  2: archers, arrows, fireball, graveyard, knight, lava-hound, mega-minion, tombstone
+  2: fire-spirits, fireball, golem, mega-minion, mini-pekka, minions, musketeer, zap
+  2: archers, arrows, elixir-collector, ice-spirit, knight, miner, the-log, three-musketeers
+  2: baby-dragon, elixir-collector, fireball, inferno-dragon, lava-hound, mega-minion, skeleton-army, zap
+  2: archers, fireball, hog-rider, ice-golem, ice-spirit, inferno-tower, mega-minion, the-log
+  2: archers, fireball, hog-rider, ice-golem, ice-spirit, mega-minion, the-log, tombstone
+  2: archers, baby-dragon, elixir-collector, lava-hound, lightning, mega-minion, miner, skeleton-army
+  2: archers, bowler, fireball, graveyard, ice-golem, inferno-tower, mega-minion, zap
+  2: archers, arrows, ice-golem, mega-minion, musketeer, royal-giant, skeleton-army, the-log
+  2: guards, hog-rider, ice-spirit, ice-wizard, mini-pekka, princess, rocket, the-log
+  2: archers, baby-dragon, bomber, golem, lightning, mega-minion, tombstone, zap
+  2: archers, barbarians, golem, lightning, mega-minion, the-log, tombstone, zap
+  2: fire-spirits, ice-spirit, inferno-tower, mega-minion, princess, skeleton-army, the-log, xbow
+  2: giant, ice-wizard, inferno-tower, lightning, mega-minion, musketeer, skeleton-army, zap
+  2: goblin-barrel, inferno-tower, miner, minion-horde, mirror, princess, skeleton-army, zap
+  2: archers, barbarians, giant, ice-spirit, lightning, mega-minion, the-log, tombstone
+  2: goblins, ice-golem, inferno-tower, miner, mini-pekka, princess, the-log, zap
+  2: archers, arrows, golem, graveyard, ice-golem, mega-minion, the-log, tombstone
+  2: archers, furnace, guards, ice-spirit, lightning, mega-minion, royal-giant, the-log
+  2: fireball, giant, goblins, ice-spirit, mega-minion, mini-pekka, musketeer, zap
+  2: archers, baby-dragon, furnace, golem, lightning, mini-pekka, the-log, zap
+  2: guards, inferno-dragon, lava-hound, lightning, mega-minion, miner, minion-horde, tombstone
+  2: fire-spirits, golem, lightning, mega-minion, musketeer, skeleton-army, tombstone, zap
 Cards:
- 43 (-11): mega-minion
- 34 (-34): the-log
- 30 ( -6): lightning
- 28 (  5): tombstone
- 27 ( 25): archers
- 21 (-16): zap
- 20 ( 17): golem
- 16 ( 10): ice-golem
- 14 ( 12): baby-dragon
- 14 (-47): ice-spirit
- 13 (-27): inferno-tower
- 12 (-13): fireball
- 11 (-35): skeleton-army
- 10 (-19): miner
-  9 ( -7): musketeer
-  8 (  3): lava-hound
-  8 (-11): minions
-  7 (-44): princess
-  7 (-18): arrows
-  6 (  0): graveyard
-  6 ( -8): mini-pekka
-  5 (  0): lumberjack
-  5 (-12): giant
-  5 (-23): hog-rider
-  5 ( -4): guards
-  4 (-15): xbow
-  3 (-23): bowler
-  3 (-10): minion-horde
-  3 (-14): fire-spirits
-  3 ( -2): elixir-collector
-  2 ( -5): knight
-  2 (  0): inferno-dragon
-  2 (  0): royal-giant
-  2 (-16): ice-wizard
-  2 (  0): barbarians
-  2 ( -4): goblins
-  2 ( -3): furnace
-  1 (-13): skeletons
-  1 (  0): three-musketeers
-  1 (-10): rocket
-  1 (  0): bomber
-  1 (-10): goblin-barrel
-  1 (  0): mirror
+ 86 ( 32): mega-minion
+ 68 (  0): the-log
+ 60 ( 24): lightning
+ 56 ( 33): tombstone
+ 54 ( 52): archers
+ 42 (  5): zap
+ 40 ( 37): golem
+ 32 ( 26): ice-golem
+ 28 ( 26): baby-dragon
+ 28 (-33): ice-spirit
+ 26 (-14): inferno-tower
+ 24 ( -1): fireball
+ 22 (-24): skeleton-army
+ 20 ( -9): miner
+ 18 (  2): musketeer
+ 16 ( 11): lava-hound
+ 16 ( -3): minions
+ 14 (-37): princess
+ 14 (-11): arrows
+ 12 (  0): graveyard
+ 12 ( -2): mini-pekka
+ 10 (  0): lumberjack
+ 10 ( -7): giant
+ 10 (-18): hog-rider
+ 10 (  1): guards
+  8 (-11): xbow
+  6 (-20): bowler
+  6 ( -7): minion-horde
+  6 (-11): fire-spirits
+  6 (  1): elixir-collector
+  4 ( -3): knight
+  4 (  0): inferno-dragon
+  4 (  2): royal-giant
+  4 (-14): ice-wizard
+  4 (  2): barbarians
+  4 ( -2): goblins
+  4 ( -1): furnace
+  2 (-12): skeletons
+  2 (  1): three-musketeers
+  2 ( -9): rocket
+  2 (  0): bomber
+  2 ( -9): goblin-barrel
+  2 (  1): mirror
 --------------------------------------------------------------------------------
 Snapshot #17
 Decks:
@@ -983,51 +983,51 @@ Decks:
   1: freeze, guards, hog-rider, ice-spirit, mini-pekka, minions, princess, the-log
   1: elixir-collector, giant, ice-golem, ice-spirit, mega-minion, musketeer, three-musketeers, zap
 Cards:
- 84 ( 41): mega-minion
- 79 ( 45): the-log
- 57 ( 36): zap
- 53 ( 26): archers
- 44 ( 16): tombstone
- 41 ( 11): lightning
- 34 ( 20): ice-spirit
- 33 ( 17): ice-golem
- 32 ( 20): fireball
- 28 ( 18): miner
- 27 ( 22): giant
- 26 ( 21): hog-rider
- 26 ( 15): skeleton-army
- 26 ( 13): inferno-tower
- 24 ( 21): bowler
- 23 ( 16): princess
- 15 ( 13): furnace
- 14 (  6): minions
- 13 ( 10): minion-horde
- 10 (  3): arrows
-  9 (  8): goblin-barrel
-  9 (  0): musketeer
-  8 (-12): golem
-  7 ( -7): baby-dragon
-  7 (  1): mini-pekka
-  7 (  1): graveyard
-  6 (  4): barbarians
-  6 (  4): royal-giant
+ 84 ( -2): mega-minion
+ 79 ( 11): the-log
+ 57 ( 15): zap
+ 53 ( -1): archers
+ 44 (-12): tombstone
+ 41 (-19): lightning
+ 34 (  6): ice-spirit
+ 33 (  1): ice-golem
+ 32 (  8): fireball
+ 28 (  8): miner
+ 27 ( 17): giant
+ 26 ( 16): hog-rider
+ 26 (  4): skeleton-army
+ 26 (  0): inferno-tower
+ 24 ( 18): bowler
+ 23 (  9): princess
+ 15 ( 11): furnace
+ 14 ( -2): minions
+ 13 (  7): minion-horde
+ 10 ( -4): arrows
+  9 (  7): goblin-barrel
+  9 ( -9): musketeer
+  8 (-32): golem
+  7 (-21): baby-dragon
+  7 ( -5): mini-pekka
+  7 ( -5): graveyard
+  6 (  2): barbarians
+  6 (  2): royal-giant
   5 (  0): cannon
   5 (  0): freeze
   5 (  0): barbarian-hut
-  5 (  4): rocket
-  5 ( -3): lava-hound
-  4 (  1): elixir-collector
-  4 (  3): three-musketeers
-  3 ( -2): guards
-  3 ( -1): xbow
-  2 (  0): goblins
-  2 (  0): knight
-  2 (  0): ice-wizard
+  5 (  3): rocket
+  5 (-11): lava-hound
+  4 ( -2): elixir-collector
+  4 (  2): three-musketeers
+  3 ( -7): guards
+  3 ( -5): xbow
+  2 ( -2): goblins
+  2 ( -2): knight
+  2 ( -2): ice-wizard
   2 (  0): spear-goblins
   1 (  0): tornado
-  1 (  0): mirror
-  1 (  0): skeletons
-  1 ( -2): fire-spirits
+  1 ( -1): mirror
+  1 ( -1): skeletons
+  1 ( -5): fire-spirits
   1 (  0): tesla
 --------------------------------------------------------------------------------
 Snapshot #18
