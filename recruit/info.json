@@ -1,0 +1,10 @@
+{
+    "AUTHOR" : "SML",
+    "SHORT" : "Recruitment messages",
+    "DESCRIPTION" : "Add and edit recruitment messages for Reddit CR servers.",
+    "DISABLED" : false,
+    "NAME" : "Recruit",
+    "REQUIREMENTS" : [],
+    "TAGS" : ["recruit", "recruitment", "clan", "ad", "advertising"],
+    "INSTALL_MSG" : "Thank you for installing recruitment. Contact SML for help."
+}

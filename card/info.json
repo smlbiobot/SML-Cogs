@@ -6,5 +6,5 @@
     "NAME" : "Card",
     "REQUIREMENTS" : ["matplotlib"],
     "TAGS" : ["clashroyale", "games", "cr", "stats", "data"],
-    "INSTALL_MSG" : "Thank you for installing Clash Roayle Card Popularity Snapshot."
+    "INSTALL_MSG" : "Thank you for installing Clash Royale Card Popularity Snapshot."
 }
