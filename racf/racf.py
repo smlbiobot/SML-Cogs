@@ -44,6 +44,7 @@ welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
                     "Higher Power", "AlphaBot"]
+HEIST_ROLES = ["Heist"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
@@ -486,6 +487,24 @@ class RACF:
     async def remove_reactions(self, messages):
         for message in messages:
             await self.bot.clear_reactions(message)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def addheist(self, ctx: Context):
+        """Self-assign the heist role."""
+        author = ctx.message.author
+        self.bot.add_roles(author, *HEIST_ROLES)
+        self.bot.say(
+            "Added {} role for {}.".format(
+                *HEIST_ROLES, author.display_name))
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def delheist(self, ctx: Context):
+        """Self-remove the heist role."""
+        author = ctx.message.author
+        self.bot.remove_roles(author, *HEIST_ROLES)
+        self.bot.say(
+            "Removed {} role from {}.".format(
+                *HEIST_ROLES, author.display_name))
 
 
 
