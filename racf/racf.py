@@ -44,7 +44,7 @@ welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
                     "Higher Power", "AlphaBot"]
-HEIST_ROLES = ["Heist"]
+HEIST_ROLE = "Heist"
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
@@ -489,24 +489,22 @@ class RACF:
             await self.bot.clear_reactions(message)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def addheist(self, ctx: Context):
-        """Self-assign the heist role."""
+    async def toggleheist(self, ctx: Context):
+        """Self-toggle heist role."""
         author = ctx.message.author
-        self.bot.add_roles(author, *HEIST_ROLES)
-        self.bot.say(
-            "Added {} role for {}.".format(
-                *HEIST_ROLES, author.display_name))
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def delheist(self, ctx: Context):
-        """Self-remove the heist role."""
-        author = ctx.message.author
-        self.bot.remove_roles(author, *HEIST_ROLES)
-        self.bot.say(
-            "Removed {} role from {}.".format(
-                *HEIST_ROLES, author.display_name))
-
-
+        server = ctx.message.server
+        heist_role = discord.utils.get(
+            server.roles, name=HEIST_ROLE)
+        if heist_role in author.roles:
+            await self.bot.remove_roles(author, heist_role)
+            await self.bot.say(
+                "Removed {} role from {}.".format(
+                    HEIST_ROLE, author.display_name))
+        else:
+            await self.bot.add_roles(author, heist_role)
+            await self.bot.say(
+                "Added {} role for {}.".format(
+                    HEIST_ROLE, author.display_name))
 
 
 def setup(bot):
