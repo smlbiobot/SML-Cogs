@@ -141,6 +141,16 @@ class Recruit:
                     author.display_name, clan))
             return
         self.init_server_settings(server.id)
+        server_permit_roles = self.settings[server.id]["roles"]
+        allowed = False
+        for r in server_permit_roles:
+            if discord.utils.get(author.roles, name=r) is not None:
+                allowed = True
+        if not allowed:
+            await self.bot.say(
+                "{} is not permitted to set recruitment messages".format(
+                    author.display_name))
+            return
         self.settings[server.id]["messages"][clan] = str(msg)
         await self.bot.say(
             "Added recruitment messages for {}".format(clan))
