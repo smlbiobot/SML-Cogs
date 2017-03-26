@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 
 import discord
 from discord.ext import commands
+from discord.ext.commands import Context
 from random import choice
 import itertools
 from cogs.utils.chat_formatting import box
