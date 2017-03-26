@@ -248,11 +248,12 @@ class RACF:
                     if rh.index(role) < rh.index(author.top_role):
                         await self.bot.say(
                             "{} does not have permission to edit {}.".format(
-                                author.display_name, role_name))
-                    await self.bot.add_roles(member, role)
-                    await self.bot.say(
-                        "Added {} for {}".format(
-                            role.name, member.display_name))
+                                author.display_name, role.name))
+                    else:
+                        await self.bot.add_roles(member, role)
+                        await self.bot.say(
+                            "Added {} for {}".format(
+                                role.name, member.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(mention_everyone=True)
