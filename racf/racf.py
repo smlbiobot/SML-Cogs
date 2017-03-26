@@ -468,13 +468,11 @@ class RACF:
     @removereaction.command(name="messages", pass_context=True, no_pm=True)
     async def removereaction_messages(self, ctx: Context, number: int):
         """Removes reactions from last X messages."""
-
         channel = ctx.message.channel
         author = ctx.message.author
         server = author.server
         is_bot = self.bot.user.bot
         has_permissions = channel.permissions_for(server.me).manage_messages
-
         to_manage = []
 
         if not has_permissions:
