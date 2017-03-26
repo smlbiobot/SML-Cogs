@@ -143,21 +143,34 @@ class RACF:
         Role name needs be in quotes if it is a multi-word role.
         """
         server = ctx.message.server
+        author = ctx.message.author
         if member is None:
             await self.bot.say("You must specify a member.")
-        elif role_name is None:
+            return
+        if role_name is None:
             await self.bot.say("You must specify a role.")
-        elif role_name.lower() in [r.lower() for r in DISALLOWED_ROLES]:
+            return
+        if role_name.lower() in [r.lower() for r in DISALLOWED_ROLES]:
             await self.bot.say("You are not allowed to add those roles.")
-        elif role_name.lower() not in [r.name.lower() for r in server.roles]:
+            return
+        if role_name.lower() not in [r.name.lower() for r in server.roles]:
             await self.bot.say("{} is not a valid role.".format(role_name))
-        else:
-            to_add_roles = [
-                r for r in server.roles if (
-                    r.name.lower() == role_name.lower())]
-            await self.bot.add_roles(member, *to_add_roles)
-            await self.bot.say("Added {} for {}".format(
-                role_name, member.display_name))
+            return
+
+        desired_role = discord.utils.get(server.roles, name=role_name)
+        rh = server.role_hierarchy
+        if rh.index(desired_role) < rh.index(author.top_role):
+            await self.bot.say(
+                "{} does not have permission to edit {}.".format(
+                    author.display_name, role_name))
+            return
+
+        to_add_roles = [
+            r for r in server.roles if (
+                r.name.lower() == role_name.lower())]
+        await self.bot.add_roles(member, *to_add_roles)
+        await self.bot.say("Added {} for {}".format(
+            role_name, member.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -199,6 +212,7 @@ class RACF:
         - for role removal
         """
         server = ctx.message.server
+        author = ctx.message.author
         if member is None:
             await self.bot.say("You must specify a member")
             return
@@ -229,6 +243,12 @@ class RACF:
                         "Removed {} from {}".format(
                             role.name, member.display_name))
                 if role.name.lower() in plus:
+                    # respect role hiearchy
+                    rh = server.role_hierarchy
+                    if rh.index(role) < rh.index(author.top_role):
+                        await self.bot.say(
+                            "{} does not have permission to edit {}.".format(
+                                author.display_name, role_name))
                     await self.bot.add_roles(member, role)
                     await self.bot.say(
                         "Added {} for {}".format(
@@ -402,25 +422,6 @@ class RACF:
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def listroles(self, ctx: Context):
-        """List all the roles on the server."""
-        server = ctx.message.server
-        if server is None:
-            return
-        out = []
-        out.append("__List of roles on {}__".format(server.name))
-        roles = {}
-        for role in server.roles:
-            roles[role.id] = {'role': role, 'count': 0}
-        for member in server.members:
-            for role in member.roles:
-                roles[role.id]['count'] += 1
-        for role in server.role_hierarchy:
-            out.append("**{}** ({} members)".format(role.name,
-                                                    roles[role.id]['count']))
-        for page in pagify("\n".join(out), shorten_by=12):
-            await self.bot.say(page)
 
     @commands.command(pass_context=True, no_pm=True)
     async def trophy2rank(self, ctx: Context, trophies:int):
