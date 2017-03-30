@@ -1,0 +1,10 @@
+{
+    "AUTHOR" : "SML",
+    "SHORT" : "Ascii art generator",
+    "DESCRIPTION" : "Ascii art generator with figlet.",
+    "DISABLED" : false,
+    "NAME" : "Figlet",
+    "REQUIREMENTS" : ["pyfiglet"],
+    "TAGS" : ["figlet", "ascii", "art", "fun", "text", "pyfiglet"],
+    "INSTALL_MSG" : "Thank you for installing Figlet. Contact SML for help."
+}
