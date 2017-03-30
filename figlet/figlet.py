@@ -74,6 +74,16 @@ class FigletCog:
         for page in pagify(out, shorten_by=24):
             await self.bot.say(box(page))
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def figletrandom(self, ctx: Context, text: str):
+        """Convert text to ascii art using random font."""
+        font = random.choice(FigletFont.getFonts())
+        f = Figlet(font=font)
+        out = f.renderText(text)
+        for page in pagify(out, shorten_by=24):
+            await self.bot.say(box(page))
+        await self.bot.say("Font: {}".format(font))
+
 
 def setup(bot):
     bot.add_cog(FigletCog(bot))
