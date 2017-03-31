@@ -88,11 +88,7 @@ class Challonge:
 
     async def setchallonge_init(self):
         """Init Challonge api."""
-        if "API_USERNAME" not in self.settings:
-            await self.bot.say("Please set api username.")
-            return False
-        if "API_KEY" not in self.settings:
-            await self.bot.say("Please set api key.")
+        if not self.check_credentials():
             return False
         challonge.set_credentials(
             self.settings["API_USERNAME"],
@@ -107,38 +103,35 @@ class Challonge:
 
     @challonge.command(name="show", pass_context=True)
     async def challonge_show(self, ctx: Context, id):
-        """Show the tournament info by id or url"""
+        """Show the tournament info by id or url."""
         await self.setchallonge_init()
         t = challonge.tournaments.show(id)
-        out = ["{}: {}".format(k, v) for k, v in t.items()]
-        await self.bot.say("\n".join(out))
+        # out = ["{}: {}".format(k, v) for k, v in t.items()]
+        # await self.bot.say("\n".join(out))
+        await self.bot.say(embed=self.embed_challonge(t))
 
-    def check_server_settings(self, server: discord.Server):
-        """Add server to settings if it does not exist."""
-        if server.id not in self.settings:
-            self.settings[server.id] = {}
-            dataIO.save_json(JSON, self.settings)
-
-    def check_member_settings(
-            self, server: discord.Server, member: discord.Member):
-        """Add member to settings if it does not exist."""
-        if member.id not in self.settings[server.id]:
-            s = self.settings[server.id][member.id]
-            s[member.id] = {
-                "API_KEY": "",
-                "API_USERNAME": "",
-                "TOURNAMENTS": {}
-            }
-            dataIO.save_json(JSON, self.settings)
-
-    def check_credentials(
-            self, server: discord.Server, user: discord.Member):
+    def check_credentials(self):
         """Check author has set credentials."""
         if "API_USERNAME" not in self.settings:
             return False
         if "API_KEY" not in self.settings:
             return False
         return True
+
+    def embed_challonge(self, tournament):
+        """Return challonge info as Discord embed."""
+        em = discord.Embed(
+            color=discord.Color(value=int('FF0000', 16)),
+            title=tournament["name"])
+        fields = [
+            "id", "url", "description", "tournament-type",
+            "started-at", "completed-at", "full-challonge-url"
+        ]
+        for f in fields:
+            em.add_field(
+                name=f,
+                value=tournament[f])
+        return em
 
 
 def check_folder():
