@@ -65,37 +65,39 @@ class Challonge:
     @setchallonge.command(name="username", pass_context=True)
     async def setchallonge_username(self, ctx: Context, username: str):
         """Set challonge username."""
+        server = ctx.message.server
+        author = ctx.message.author
+        self.check_server_settings(server)
         if username is None:
             await send_cmd_help(ctx)
             return
-        self.settings["API_USERNAME"] = username
+        if author.id not in self.settings[server.id]:
+            self.settings[server.id][author.id] = {}
+        self.settings[server.id][author.id]["API_USERNAME"] = username
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Challonge API username saved.")
-        await self.setchallonge_init()
 
     @setchallonge.command(name="apikey", pass_context=True)
     async def setchallonge_apikey(self, ctx: Context, apikey: str):
         """Set challonge username."""
+        server = ctx.message.server
+        author = ctx.message.author
+        self.check_server_settings(server)
         if apikey is None:
             await send_cmd_help(ctx)
             return
-        self.settings["API_KEY"] = apikey
+        if author.id not in self.settings[server.id]:
+            self.settings[server.id][author.id] = {}
+        self.settings[server.id][author.id]["API_KEY"] = apikey
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Challonge API Key saved.")
-        await self.setchallonge_init()
 
-    async def setchallonge_init(self):
+    def setchallonge_init(self, server, user):
         """Init Challonge api."""
-        if not self.settings["API_USERNAME"]:
-            await self.bot.say("Please set api username.")
-            return
-        if not self.settings["API_KEY"]:
-            await self.bot.say("Please set api key.")
-            return
+        settings = self.settings[server.id][user.id]
         challonge.set_credentials(
-            self.settings["API_USERNAME"],
-            self.settings["API_KEY"])
-
+            settings["API_USERNAME"],
+            settings["API_KEY"])
 
     @commands.group(pass_context=True, no_pm=True)
     async def challonge(self, ctx: Context):
@@ -108,31 +110,49 @@ class Challonge:
             self, ctx: Context,
             name, url, tournament_type="single elimination"):
         """Create new tournament."""
-        await self.setchallonge_init()
+        author = ctx.message.author
         server = ctx.message.server
-        if server.id not in self.settings:
-            self.settings[server.id] = {
-                "TOURNAMENTS": {}
-            }
+        self.check_server_settings(server)
+        if not self.check_user_credentials(server, author):
+            await self.bot.say(
+                "Use !setchallonge to set your api credentials.")
+            return
+        self.setchallonge_init(server, author)
+        settings = self.settings[server.id][author.id]
+        if "TOUNAMENTS" not in settings:
+            settings["TOURNAMENTS"] = {}
         try:
             t = challonge.tournaments.create(name, url, tournament_type)
-            self.settings[server.id]["TOURNAMENTS"][t["id"]] = {
+            settings["TOURNAMENTS"][t["id"]] = {
                 "id": t["id"],
                 "name": t["name"],
                 "url": t["url"],
                 "full-challonge-url": t["full-challonge-url"]
             }
-            s = self.settings[server.id]["TOURNAMENTS"][t["id"]]
+            s = settings["TOURNAMENTS"][t["id"]]
             out = ["{}: {}".format(k, v) for k, v in s.items()]
             await self.bot.say("\n".join(out))
             dataIO.save_json(JSON, self.settings)
         except challonge.api.ChallongeException as e:
             await self.bot.say(e)
 
+    def check_server_settings(self, server: discord.Server):
+        """Add server to settings if it does not exist."""
+        if server.id not in self.settings:
+            self.settings[server.id] = {}
+            dataIO.save_json(JSON, self.settings)
 
-
-
-
+    def check_user_credentials(
+            self, server: discord.Server, user: discord.Member):
+        """Check author has set credentials."""
+        if user.id not in self.settings[server.id]:
+            return False
+        settings = self.settings[server.id][user.id]
+        if "API_USERNAME" not in settings:
+            return False
+        if "API_KEY" not in settings:
+            return False
+        return True
 
 
 def check_folder():
