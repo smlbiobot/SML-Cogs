@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Challonge API",
+	"DESCRIPTION": "Display Challonge tournaments results updates.",
+	"DISABLED": false,
+	"NAME": "Challonge",
+	"REQUIREMENTS": ["pychallonge"],
+	"TAGS": ["challonge", "tourney", "tournament", "api"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
