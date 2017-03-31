@@ -125,6 +125,7 @@ class Challonge:
             s = self.settings[server.id]["TOURNAMENTS"][t["id"]]
             out = ["{}: {}".format(k, v) for k, v in s.items()]
             await self.bot.say("\n".join(out))
+            dataIO.save_json(JSON, self.settings)
         except challonge.api.ChallongeException as e:
             await self.bot.say(e)
 
