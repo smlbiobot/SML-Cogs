@@ -86,7 +86,7 @@ class Challonge:
         await self.bot.say("Challonge API Key saved.")
         await self.setchallonge_init()
 
-    async def setchallonge_init(self):
+    def setchallonge_init(self):
         """Init Challonge api."""
         if not self.check_credentials():
             return False
