@@ -110,6 +110,35 @@ class Challonge:
         # await self.bot.say("\n".join(out))
         await self.bot.say(embed=self.embed_challonge(t))
 
+    @challonge.command(name="create", pass_context=True)
+    @checks.serverowner_or_permissions(manage_server=True)
+    async def challonge_create(
+            self, ctx: Context,
+            name, url, tournament_type="single elimination"):
+        """Create new tournament."""
+        if not self.check_credentials():
+            await self.bot.say(
+                "Use !setchallonge to set your api credentials.")
+            return
+        self.setchallonge_init()
+        server = ctx.message.server
+        if server.id not in self.settings:
+            self.settings[server.id] = {}
+        settings = self.settings[server.id]
+        if "TOUNAMENTS" not in settings:
+            settings["TOURNAMENTS"] = {}
+        try:
+            t = challonge.tournaments.create(name, url, tournament_type)
+            settings["TOURNAMENTS"][t["id"]] = {
+                "id": t["id"],
+                "name": t["name"],
+                "url": t["url"]
+            }
+            await self.bot.say(embed=self.embed_challonge(t))
+            dataIO.save_json(JSON, self.settings)
+        except challonge.api.ChallongeException as e:
+            await self.bot.say(e)
+
     def check_credentials(self):
         """Check author has set credentials."""
         if "API_USERNAME" not in self.settings:
@@ -121,16 +150,21 @@ class Challonge:
     def embed_challonge(self, tournament):
         """Return challonge info as Discord embed."""
         em = discord.Embed(
-            color=discord.Color(value=int('FF0000', 16)),
+            color=discord.Color(value=int('ff7324', 16)),
             title=tournament["name"])
         fields = [
-            "id", "url", "description", "tournament-type",
-            "started-at", "completed-at", "full-challonge-url"
+            ("id", "ID"),
+            ("url", "URL"),
+            ("description", "Description"),
+            ("tournament-type", "Tournament Type"),
+            ("started-at", "Started At"),
+            ("completed-at", "Completed At"),
+            ("full-challonge-url", "URL")
         ]
-        for f in fields:
+        for (k, v) in fields:
             em.add_field(
-                name=f,
-                value=tournament[f])
+                name=v,
+                value=tournament[k])
         return em
 
 
