@@ -25,6 +25,9 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
+import datetime as dt
+import asyncio
+from datetime import timedelta
 
 import discord
 from discord import Message
@@ -38,8 +41,15 @@ from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 
+try:
+    import aiohttp
+except ImportError:
+    raise ImportError("Please install the aiohttp package.") from None
+
 PATH = os.path.join("data", "crdata")
 JSON = os.path.join(PATH, "settings.json")
+
+DATA_UPDATE_INTERVAL = timedelta(days=1).seconds
 
 class CRData:
     """Clash Royale card popularity using Starfi.re"""
@@ -47,7 +57,19 @@ class CRData:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
+        self.task = bot.loop.create_task(self.loop_task())
         self.settings = dataIO.load_json(JSON)
+
+    def __unload(self):
+        self.task.cancel()
+
+    async def loop_task(self):
+        """Loop task: update data daily."""
+        await self.bot.wait_until_read()
+        await self.getdata()
+        await asyncio.sleep(DATA_UPDATE_INTERVAL)
+        if self is self.bot.get_cog('CRData'):
+            self.task = self.bot.loop.create_task(self.loop_task())
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(manage_server=True)
@@ -72,6 +94,48 @@ class CRData:
         self.settings["STARFIRE_PASSWORD"] = password
         await self.bot.say("Starfire password saved.")
         dataIO.save_json(JSON, self.settings)
+
+    @setcrdata.command(name="url", pass_context=True)
+    async def setcrdata_url(self, ctx: Context, url):
+        """Set Starfire url."""
+        self.settings["STARFIRE_URL"] = url
+        await self.bot.say("Starfire URL saved.")
+        dataIO.save_json(JSON, self.settings)
+
+    @setcrdata.command(name="getdata", pass_context=True)
+    async def setcrdata_getdata(self, ctx):
+        """Grab data from Starfire if does not exist."""
+        today = dt.date.today()
+        today_file = "cardpop-{:%Y-%m-%d}.json".format(today)
+        today_path = os.path.join(PATH, today_file)
+        if not os.path.exists(today_path):
+            url = self.settings["STARFIRE_URL"]
+            session = aiohttp.ClientSession(
+                auth=aiohttp.BasicAuth(
+                    login=self.settings["STARFIRE_USERNAME"],
+                    password=self.settings["STARFIRE_PASSWORD"]))
+            resp = await session.get(url)
+            data = await resp.json()
+            dataIO.save_json(today_path, data)
+            await self.bot.say("Saved {}".format(today_path))
+        else:
+            await self.bot.say("Today’s data already downloaded.")
+
+    async def getdata(self):
+        """Grab data from URL."""
+        today = dt.date.today()
+        today_file = "cardpop-{:%Y-%m-%d}.json".format(today)
+        today_path = os.path.join(PATH, today_file)
+        if not os.path.exists(today_path):
+            url = self.settings["STARFIRE_URL"]
+            session = aiohttp.ClientSession(
+                auth=aiohttp.BasicAuth(
+                    login=self.settings["STARFIRE_USERNAME"],
+                    password=self.settings["STARFIRE_PASSWORD"]))
+            resp = await session.get(url)
+            data = await resp.json()
+            dataIO.save_json(today_path, data)
+
 
 def check_folder():
     if not os.path.exists(PATH):

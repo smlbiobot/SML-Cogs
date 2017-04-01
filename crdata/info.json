@@ -4,7 +4,7 @@
 	"DESCRIPTION": "Display Clash Royale data",
 	"DISABLED": false,
 	"NAME": "CRData",
-	"REQUIREMENTS": [],
+	"REQUIREMENTS": ["aiohttp"],
 	"TAGS": ["Clash Royale", "clash royale", "starfire", "data"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
 }
