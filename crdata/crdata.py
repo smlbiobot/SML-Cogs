@@ -41,13 +41,18 @@ from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 
+from cogs.deck import Deck
+from collections import namedtuple
+
 try:
     import aiohttp
 except ImportError:
     raise ImportError("Please install the aiohttp package.") from None
 
 PATH = os.path.join("data", "crdata")
-JSON = os.path.join(PATH, "settings.json")
+SETTINGS_JSON = os.path.join(PATH, "settings.json")
+CR_JSON = os.path.join(PATH, "clashroyale.json")
+CARDPOP_FILE = "cardpop-%Y-%m-%d.json"
 
 DATA_UPDATE_INTERVAL = timedelta(days=1).seconds
 
@@ -58,15 +63,15 @@ class CRData:
         """Init."""
         self.bot = bot
         self.task = bot.loop.create_task(self.loop_task())
-        self.settings = dataIO.load_json(JSON)
+        self.settings = dataIO.load_json(SETTINGS_JSON)
 
     def __unload(self):
         self.task.cancel()
 
     async def loop_task(self):
         """Loop task: update data daily."""
-        await self.bot.wait_until_read()
-        await self.getdata()
+        await self.bot.wait_until_ready()
+        await self.updatedata()
         await asyncio.sleep(DATA_UPDATE_INTERVAL)
         if self is self.bot.get_cog('CRData'):
             self.task = self.bot.loop.create_task(self.loop_task())
@@ -86,45 +91,35 @@ class CRData:
         """Set Starfire username."""
         self.settings["STARFIRE_USERNAME"] = username
         await self.bot.say("Starfire username saved.")
-        dataIO.save_json(JSON, self.settings)
+        dataIO.save_json(SETTINGS_JSON, self.settings)
 
     @setcrdata.command(name="password", pass_context=True)
     async def setcrdata_password(self, ctx: Context, password):
         """Set Starfire username."""
         self.settings["STARFIRE_PASSWORD"] = password
         await self.bot.say("Starfire password saved.")
-        dataIO.save_json(JSON, self.settings)
+        dataIO.save_json(SETTINGS_JSON, self.settings)
 
     @setcrdata.command(name="url", pass_context=True)
     async def setcrdata_url(self, ctx: Context, url):
         """Set Starfire url."""
         self.settings["STARFIRE_URL"] = url
         await self.bot.say("Starfire URL saved.")
-        dataIO.save_json(JSON, self.settings)
+        dataIO.save_json(SETTINGS_JSON, self.settings)
 
-    @setcrdata.command(name="getdata", pass_context=True)
-    async def setcrdata_getdata(self, ctx):
+    @setcrdata.command(name="update", pass_context=True)
+    async def setcrdata_update(self, ctx):
         """Grab data from Starfire if does not exist."""
-        today = dt.date.today()
-        today_file = "cardpop-{:%Y-%m-%d}.json".format(today)
-        today_path = os.path.join(PATH, today_file)
-        if not os.path.exists(today_path):
-            url = self.settings["STARFIRE_URL"]
-            session = aiohttp.ClientSession(
-                auth=aiohttp.BasicAuth(
-                    login=self.settings["STARFIRE_USERNAME"],
-                    password=self.settings["STARFIRE_PASSWORD"]))
-            resp = await session.get(url)
-            data = await resp.json()
-            dataIO.save_json(today_path, data)
-            await self.bot.say("Saved {}".format(today_path))
+        file = await self.update_data()
+        if file is not None:
+            await self.bot.say("Saved {}.".format(file))
         else:
             await self.bot.say("Today’s data already downloaded.")
 
-    async def getdata(self):
+    async def update_data(self):
         """Grab data from URL."""
         today = dt.date.today()
-        today_file = "cardpop-{:%Y-%m-%d}.json".format(today)
+        today_file = today.strftime(CARDPOP_FILE)
         today_path = os.path.join(PATH, today_file)
         if not os.path.exists(today_path):
             url = self.settings["STARFIRE_URL"]
@@ -135,6 +130,21 @@ class CRData:
             resp = await session.get(url)
             data = await resp.json()
             dataIO.save_json(today_path, data)
+            return today_file
+        return None
+
+    def get_today_data(self):
+        """Return today’s data."""
+        today = dt.date.today()
+        return self.get_data(today)
+
+    def get_data(self, date):
+        """Get data as json by date."""
+        file = date.strftime(CARDPOP_FILE)
+        path = os.path.join(PATH, file)
+        if os.path.exists(path):
+            return dataIO.load_json(path)
+        return None
 
 
 def check_folder():
@@ -143,8 +153,8 @@ def check_folder():
 
 def check_file():
     defaults = {}
-    if not dataIO.is_valid_json(JSON):
-        dataIO.save_json(JSON, defaults)
+    if not dataIO.is_valid_json(SETTINGS_JSON):
+        dataIO.save_json(SETTINGS_JSON, defaults)
 
 def setup(bot):
     check_folder()
