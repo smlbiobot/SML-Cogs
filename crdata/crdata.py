@@ -51,10 +51,13 @@ except ImportError:
 
 PATH = os.path.join("data", "crdata")
 SETTINGS_JSON = os.path.join(PATH, "settings.json")
-CR_JSON = os.path.join(PATH, "clashroyale.json")
+CLASHROYALE_JSON = os.path.join(PATH, "clashroyale.json")
 CARDPOP_FILE = "cardpop-%Y-%m-%d.json"
 
 DATA_UPDATE_INTERVAL = timedelta(days=1).seconds
+
+RESULTS_MAX = 3
+PAGINATION_TIMEOUT = 20
 
 class CRData:
     """Clash Royale card popularity using Starfi.re"""
@@ -64,6 +67,7 @@ class CRData:
         self.bot = bot
         self.task = bot.loop.create_task(self.loop_task())
         self.settings = dataIO.load_json(SETTINGS_JSON)
+        self.clashroyale = dataIO.load_json(CLASHROYALE_JSON)
 
     def __unload(self):
         self.task.cancel()
@@ -95,7 +99,7 @@ class CRData:
 
     @setcrdata.command(name="password", pass_context=True)
     async def setcrdata_password(self, ctx: Context, password):
-        """Set Starfire username."""
+        """Set Starfire password."""
         self.settings["STARFIRE_PASSWORD"] = password
         await self.bot.say("Starfire password saved.")
         dataIO.save_json(SETTINGS_JSON, self.settings)
@@ -117,7 +121,7 @@ class CRData:
             await self.bot.say("Today’s data already downloaded.")
 
     async def update_data(self):
-        """Grab data from URL."""
+        """Update data and return filename."""
         today = dt.date.today()
         today_file = today.strftime(CARDPOP_FILE)
         today_path = os.path.join(PATH, today_file)
@@ -145,6 +149,65 @@ class CRData:
         if os.path.exists(path):
             return dataIO.load_json(path)
         return None
+
+    @commands.group(pass_context=True, no_pm=True)
+    async def crdata(self, ctx: Context):
+        """Clash Royale data."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @crdata.command(name="decks", pass_context=True, no_pm=True)
+    async def crdata_decks(self, ctx: Context):
+        """List decks on global 200 leaderboard."""
+        decks = self.get_today_data()["popularDecks"]
+        await self.bot.say(
+            "**Top 200 Decks**: Found {} results.".format(len(decks)))
+        for i, deck in enumerate(decks):
+            cards = deck["key"].split('|')
+            usage = deck["usage"]
+            card_ids = []
+            for card in cards:
+                card_id = self.sfid_to_id(card)
+                card_ids.append(card_id)
+
+            FakeMember = namedtuple("FakeMember", "name")
+
+            await self.bot.get_cog("Deck").deck_get_helper(
+                ctx,
+                card1=card_ids[0],
+                card2=card_ids[1],
+                card3=card_ids[2],
+                card4=card_ids[3],
+                card5=card_ids[4],
+                card6=card_ids[5],
+                card7=card_ids[6],
+                card8=card_ids[7],
+                deck_name="Usage: {}".format(usage),
+                author=FakeMember(name="Top 200 Decks")
+            )
+
+            if (i + 1) % RESULTS_MAX == 0 and (i + 1) < len(decks):
+                def pagination_check(m):
+                    return m.content.lower() == 'y'
+                await self.bot.say(
+                    "Would you like to see more results? (y/n)")
+                answer = await self.bot.wait_for_message(
+                    timeout=PAGINATION_TIMEOUT,
+                    author=ctx.message.author,
+                    check=pagination_check)
+                if answer is None:
+                    await self.bot.say(
+                        "Search results aborted.\n"
+                        "Data provided by <http://starfi.re>")
+                    return
+
+    def sfid_to_id(self, sfid:str):
+        """Convert Starfire ID to Card ID"""
+        cards = self.clashroyale["Cards"]
+        for card_key, card_data in cards.items():
+            if card_data["sfid"] == sfid:
+                return card_key
+
 
 
 def check_folder():
