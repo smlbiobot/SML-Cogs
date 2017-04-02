@@ -269,7 +269,7 @@ class CRData:
             "**Popular Cards** from Top 200 decks.")
         labels = [self.sfid_to_name(card["key"]) for card in cards]
         data = [card["usage"] for card in cards]
-        chart = BarChart(labels, data, 40)
+        chart = BarChart(labels, data, 30)
         await self.bot.say(box(chart.chart()))
         await self.bot.say("{} on {}.".format(SF_CREDITS, dt.date.today()))
 
