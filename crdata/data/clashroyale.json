@@ -719,7 +719,7 @@
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_XBOW",
             "cpid": "X-Bow",
-            "sfid": "xbow"
+            "sfid": "x_bow"
         },
         "zap": {
             "aka": [],
