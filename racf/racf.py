@@ -45,6 +45,8 @@ CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
                     "Higher Power", "AlphaBot"]
 HEIST_ROLE = "Heist"
+TOGGLE_ROLES = ["Member"]
+TOGGLEABLE_ROLES = ["Heist", "RACF-Tourney"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
@@ -505,6 +507,31 @@ class RACF:
             await self.bot.say(
                 "Added {} role for {}.".format(
                     HEIST_ROLE, author.display_name))
+
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*TOGGLE_ROLES)
+    async def togglerole(self, ctx: Context, role_name):
+        """Self-toggle role assignments."""
+        author = ctx.message.author
+        server = ctx.message.server
+        if role_name in TOGGLEABLE_ROLES:
+            role = discord.utils.get(server.roles, name=role_name)
+            if role is not None:
+                if role in author.roles:
+                    await self.bot.remove_roles(author, role)
+                    await self.bot.say(
+                        "Removed {} role from {}.".format(
+                            role_name, author.display_name))
+                else:
+                    await self.bot.add_roles(author, role)
+                    await self.bot.say(
+                        "Added {} role for {}.".format(
+                            role_name, author.display_name))
+            else:
+                await self.bot.say(
+                    "{} is not a valid role on this server.".format(role_name))
+
+
 
 
 def setup(bot):
