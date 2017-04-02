@@ -54,11 +54,70 @@ PATH = os.path.join("data", "crdata")
 SETTINGS_JSON = os.path.join(PATH, "settings.json")
 CLASHROYALE_JSON = os.path.join(PATH, "clashroyale.json")
 CARDPOP_FILE = "cardpop-%Y-%m-%d.json"
+SF_CREDITS = "Data provided by <http://starfi.re>"
 
 DATA_UPDATE_INTERVAL = timedelta(days=1).seconds
 
 RESULTS_MAX = 3
 PAGINATION_TIMEOUT = 20
+
+
+class BarChart:
+    """Plotting bar charts as ASCII.
+
+    Based on https://github.com/mkaz/termgraph
+    """
+
+    def __init__(self, labels, data, width):
+        """Init."""
+        self.tick = '▇'
+        self.sm_tick = '░'
+        self.labels = labels
+        self.data = data
+        self.width = width
+
+    def chart(self):
+        """Plot chart."""
+        # verify data
+        m = len(self.labels)
+        if m != len(self.data):
+            print(">> Error: Label and data array sizes don't match")
+            return None
+
+        # massage data
+        # normalize for graph
+        max_ = 0
+        for i in range(m):
+            if self.data[i] > max_:
+                max_ = self.data[i]
+
+        step = max_ / self.width
+        label_width = max([len(label) for label in self.labels])
+
+        out = []
+        # display graph
+        for i in range(m):
+            out.append(
+                self.chart_blocks(
+                    self.labels[i], self.data[i], step,
+                    label_width))
+
+        return '\n'.join(out)
+
+    def chart_blocks(
+            self, label, count, step,
+            label_width):
+        """Plot each block."""
+        blocks = int(count / step)
+        out = "{0:>16}: ".format(label)
+        if count < step:
+            out += self.sm_tick
+        else:
+            for i in range(blocks):
+                out += self.tick
+        out +='  {}'.format(count)
+        return out
+
 
 class CRData:
     """Clash Royale card popularity using Starfi.re"""
@@ -198,24 +257,21 @@ class CRData:
                     check=pagination_check)
                 if answer is None:
                     await self.bot.say(
-                        "Search results aborted.\n"
-                        "Data provided by <http://starfi.re>")
+                        "Search results aborted.\n{}".format(SF_CREDITS))
                     return
 
     @crdata.command(name="cards", pass_context=True, no_pm=True)
     async def crdata_cards(self, ctx: Context):
         """List popular cards on global 200 leaberboard."""
+        await self.bot.send_typing(ctx.message.channel)
         cards = self.get_today_data()["popularCards"]
         await self.bot.say(
             "**Popular Cards** from Top 200 decks.")
-        em = discord.Embed(
-            color=discord.Color(value=int('ff0000', 16)),
-            title="Clash Royale Popular Cards")
-        for card in cards:
-            em.add_field(
-                name=self.sfid_to_name(card["key"]),
-                value=card["usage"])
-        await self.bot.say(embed=em)
+        labels = [self.sfid_to_name(card["key"]) for card in cards]
+        data = [card["usage"] for card in cards]
+        chart = BarChart(labels, data, 40)
+        await self.bot.say(box(chart.chart()))
+        await self.bot.say("{} on {}.".format(SF_CREDITS, dt.date.today()))
 
     def sfid_to_id(self, sfid:str):
         """Convert Starfire ID to Card ID"""
