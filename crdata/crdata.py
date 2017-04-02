@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 
 import os
 import datetime as dt
+import string
 import asyncio
 from datetime import timedelta
 
@@ -75,7 +76,7 @@ class CRData:
     async def loop_task(self):
         """Loop task: update data daily."""
         await self.bot.wait_until_ready()
-        await self.updatedata()
+        await self.update_data()
         await asyncio.sleep(DATA_UPDATE_INTERVAL)
         if self is self.bot.get_cog('CRData'):
             self.task = self.bot.loop.create_task(self.loop_task())
@@ -201,12 +202,33 @@ class CRData:
                         "Data provided by <http://starfi.re>")
                     return
 
+    @crdata.command(name="cards", pass_context=True, no_pm=True)
+    async def crdata_cards(self, ctx: Context):
+        """List popular cards on global 200 leaberboard."""
+        cards = self.get_today_data()["popularCards"]
+        await self.bot.say(
+            "**Popular Cards** from Top 200 decks.")
+        em = discord.Embed(
+            color=discord.Color(value=int('ff0000', 16)),
+            title="Clash Royale Popular Cards")
+        for card in cards:
+            em.add_field(
+                name=self.sfid_to_name(card["key"]),
+                value=card["usage"])
+        await self.bot.say(embed=em)
+
     def sfid_to_id(self, sfid:str):
         """Convert Starfire ID to Card ID"""
         cards = self.clashroyale["Cards"]
         for card_key, card_data in cards.items():
             if card_data["sfid"] == sfid:
                 return card_key
+
+    def sfid_to_name(self, sfid:str):
+        """Convert Starfire ID to Name"""
+        s = sfid.replace('_', ' ')
+        s = string.capwords(s)
+        return s
 
 
 
