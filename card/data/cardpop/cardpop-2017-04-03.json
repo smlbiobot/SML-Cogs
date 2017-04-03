@@ -1,0 +1,7200 @@
+{
+    "decks" : [
+        [
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 12
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "valkyrie",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "poison",
+                "level" : 7
+            },
+            {
+                "key" : "graveyard",
+                "level" : 3
+            },
+            {
+                "key" : "furnace",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "furnace",
+                "level" : 11
+            },
+            {
+                "key" : "freeze",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "miner",
+                "level" : 4
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 7
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "battle_ram",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "battle_ram",
+                "level" : 11
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "valkyrie",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "graveyard",
+                "level" : 3
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "cannon",
+                "level" : 13
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 10
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 6
+            },
+            {
+                "key" : "rocket",
+                "level" : 10
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "skeleton_army",
+                "level" : 7
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "dart_goblin",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "miner",
+                "level" : 4
+            },
+            {
+                "key" : "the_log",
+                "level" : 3
+            },
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 10
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "cannon",
+                "level" : 13
+            },
+            {
+                "key" : "freeze",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "tombstone",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "bandit",
+                "level" : 2
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "ice_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "graveyard",
+                "level" : 3
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 4
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "furnace",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "mirror",
+                "level" : 8
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "barbarians",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "lightning",
+                "level" : 7
+            },
+            {
+                "key" : "balloon",
+                "level" : 7
+            }
+        ],
+        [
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "tombstone",
+                "level" : 11
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "x_bow",
+                "level" : 8
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "tombstone",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "freeze",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "cannon",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "furnace",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "mini_pekka",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "freeze",
+                "level" : 7
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 12
+            },
+            {
+                "key" : "golem",
+                "level" : 8
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "balloon",
+                "level" : 7
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "clone",
+                "level" : 7
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 9
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "battle_ram",
+                "level" : 11
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 12
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 2
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "tombstone",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 7
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "pekka",
+                "level" : 7
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 7
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "golem",
+                "level" : 8
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "mirror",
+                "level" : 8
+            },
+            {
+                "key" : "furnace",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            },
+            {
+                "key" : "battle_ram",
+                "level" : 11
+            },
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "cannon",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "freeze",
+                "level" : 8
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "golem",
+                "level" : 8
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 7
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "tombstone",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "mortar",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "cannon",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "mini_pekka",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "furnace",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "mini_pekka",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "freeze",
+                "level" : 7
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "graveyard",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "bandit",
+                "level" : 5
+            },
+            {
+                "key" : "battle_ram",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 7
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 4
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "cannon",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "lightning",
+                "level" : 7
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "golem",
+                "level" : 7
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 7
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 9
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 7
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 7
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "golem",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "balloon",
+                "level" : 7
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "barbarian_hut",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "mortar",
+                "level" : 13
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "barbarian_hut",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "graveyard",
+                "level" : 3
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 7
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "x_bow",
+                "level" : 8
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 6
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "royal_giant",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "graveyard",
+                "level" : 3
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "barbarian_hut",
+                "level" : 9
+            }
+        ],
+        [
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "battle_ram",
+                "level" : 11
+            },
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "tornado",
+                "level" : 6
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "freeze",
+                "level" : 8
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "battle_ram",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "x_bow",
+                "level" : 8
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "dart_goblin",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 9
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 7
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "balloon",
+                "level" : 7
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "miner",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "balloon",
+                "level" : 7
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 10
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "graveyard",
+                "level" : 3
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 7
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 10
+            },
+            {
+                "key" : "fireball",
+                "level" : 10
+            },
+            {
+                "key" : "the_log",
+                "level" : 3
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 7
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 7
+            },
+            {
+                "key" : "princess",
+                "level" : 4
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "golem",
+                "level" : 8
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "freeze",
+                "level" : 8
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "mini_pekka",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "golem",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "golem",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "cannon",
+                "level" : 13
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "freeze",
+                "level" : 8
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "battle_ram",
+                "level" : 9
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 10
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 6
+            },
+            {
+                "key" : "bandit",
+                "level" : 2
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "the_log",
+                "level" : 3
+            },
+            {
+                "key" : "miner",
+                "level" : 3
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "x_bow",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 6
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 7
+            },
+            {
+                "key" : "miner",
+                "level" : 3
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "valkyrie",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "golem",
+                "level" : 7
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 4
+            },
+            {
+                "key" : "inferno_dragon",
+                "level" : 1
+            },
+            {
+                "key" : "elite_barbarians",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "graveyard",
+                "level" : 3
+            },
+            {
+                "key" : "bowler",
+                "level" : 7
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 5
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "poison",
+                "level" : 7
+            }
+        ],
+        [
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "tombstone",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 4
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "barbarians",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "x_bow",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "valkyrie",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "cannon",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "freeze",
+                "level" : 8
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "mini_pekka",
+                "level" : 11
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "inferno_tower",
+                "level" : 10
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "tombstone",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "furnace",
+                "level" : 11
+            },
+            {
+                "key" : "executioner",
+                "level" : 8
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 7
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "golem",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 6
+            },
+            {
+                "key" : "barbarian_hut",
+                "level" : 9
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "x_bow",
+                "level" : 8
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "furnace",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "bowler",
+                "level" : 7
+            },
+            {
+                "key" : "x_bow",
+                "level" : 7
+            },
+            {
+                "key" : "clone",
+                "level" : 6
+            },
+            {
+                "key" : "executioner",
+                "level" : 5
+            },
+            {
+                "key" : "tornado",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "poison",
+                "level" : 7
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 7
+            }
+        ],
+        [
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "ice_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "inferno_dragon",
+                "level" : 5
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "sparky",
+                "level" : 5
+            },
+            {
+                "key" : "inferno_dragon",
+                "level" : 5
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "ice_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "lumberjack",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "x_bow",
+                "level" : 7
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "golem",
+                "level" : 8
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 3
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "three_musketeers",
+                "level" : 11
+            },
+            {
+                "key" : "battle_ram",
+                "level" : 11
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "freeze",
+                "level" : 8
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "minion_horde",
+                "level" : 13
+            },
+            {
+                "key" : "miner",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "cannon",
+                "level" : 13
+            },
+            {
+                "key" : "freeze",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "x_bow",
+                "level" : 8
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "arrows",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "skeleton_army",
+                "level" : 8
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "goblin_barrel",
+                "level" : 7
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 3
+            },
+            {
+                "key" : "bowler",
+                "level" : 5
+            },
+            {
+                "key" : "battle_ram",
+                "level" : 10
+            },
+            {
+                "key" : "poison",
+                "level" : 6
+            },
+            {
+                "key" : "graveyard",
+                "level" : 3
+            }
+        ],
+        [
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "balloon",
+                "level" : 8
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_dragon",
+                "level" : 4
+            }
+        ],
+        [
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "graveyard",
+                "level" : 4
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "tornado",
+                "level" : 7
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "rocket",
+                "level" : 11
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "bandit",
+                "level" : 4
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "golem",
+                "level" : 8
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "archers",
+                "level" : 13
+            },
+            {
+                "key" : "pekka",
+                "level" : 8
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "tombstone",
+                "level" : 11
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "fire_spirits",
+                "level" : 13
+            },
+            {
+                "key" : "x_bow",
+                "level" : 8
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            }
+        ],
+        [
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 12
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "ice_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "lumberjack",
+                "level" : 5
+            },
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "inferno_dragon",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "goblin_barrel",
+                "level" : 8
+            },
+            {
+                "key" : "goblin_gang",
+                "level" : 13
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "goblins",
+                "level" : 13
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "knight",
+                "level" : 13
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "tornado",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 4
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "mega_minion",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "lightning",
+                "level" : 8
+            },
+            {
+                "key" : "baby_dragon",
+                "level" : 8
+            },
+            {
+                "key" : "elixir_collector",
+                "level" : 11
+            },
+            {
+                "key" : "golem",
+                "level" : 8
+            }
+        ],
+        [
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "fireball",
+                "level" : 11
+            },
+            {
+                "key" : "zap",
+                "level" : 13
+            },
+            {
+                "key" : "musketeer",
+                "level" : 11
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "hog_rider",
+                "level" : 11
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "giant",
+                "level" : 11
+            }
+        ],
+        [
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "skeletons",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "ice_spirit",
+                "level" : 13
+            },
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "miner",
+                "level" : 5
+            },
+            {
+                "key" : "lava_hound",
+                "level" : 5
+            },
+            {
+                "key" : "ice_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "princess",
+                "level" : 5
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 4
+            },
+            {
+                "key" : "inferno_dragon",
+                "level" : 2
+            },
+            {
+                "key" : "lumberjack",
+                "level" : 4
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            }
+        ],
+        [
+            {
+                "key" : "inferno_tower",
+                "level" : 11
+            },
+            {
+                "key" : "ice_golem",
+                "level" : 11
+            },
+            {
+                "key" : "electro_wizard",
+                "level" : 5
+            },
+            {
+                "key" : "minions",
+                "level" : 13
+            },
+            {
+                "key" : "the_log",
+                "level" : 5
+            },
+            {
+                "key" : "poison",
+                "level" : 8
+            },
+            {
+                "key" : "graveyard",
+                "level" : 5
+            },
+            {
+                "key" : "bowler",
+                "level" : 8
+            }
+        ]
+    ],
+    "popularCards" : [
+        {
+            "key" : "the_log",
+            "usage" : 119
+        },
+        {
+            "key" : "skeletons",
+            "usage" : 97
+        },
+        {
+            "key" : "zap",
+            "usage" : 70
+        },
+        {
+            "key" : "inferno_tower",
+            "usage" : 70
+        },
+        {
+            "key" : "knight",
+            "usage" : 69
+        },
+        {
+            "key" : "minions",
+            "usage" : 61
+        },
+        {
+            "key" : "hog_rider",
+            "usage" : 56
+        },
+        {
+            "key" : "goblin_gang",
+            "usage" : 56
+        },
+        {
+            "key" : "mega_minion",
+            "usage" : 56
+        },
+        {
+            "key" : "electro_wizard",
+            "usage" : 56
+        },
+        {
+            "key" : "fireball",
+            "usage" : 54
+        },
+        {
+            "key" : "ice_spirit",
+            "usage" : 52
+        },
+        {
+            "key" : "princess",
+            "usage" : 46
+        },
+        {
+            "key" : "goblin_barrel",
+            "usage" : 43
+        },
+        {
+            "key" : "graveyard",
+            "usage" : 43
+        },
+        {
+            "key" : "poison",
+            "usage" : 39
+        },
+        {
+            "key" : "baby_dragon",
+            "usage" : 39
+        },
+        {
+            "key" : "elixir_collector",
+            "usage" : 38
+        },
+        {
+            "key" : "miner",
+            "usage" : 38
+        },
+        {
+            "key" : "tornado",
+            "usage" : 36
+        },
+        {
+            "key" : "arrows",
+            "usage" : 34
+        },
+        {
+            "key" : "rocket",
+            "usage" : 33
+        },
+        {
+            "key" : "musketeer",
+            "usage" : 32
+        },
+        {
+            "key" : "balloon",
+            "usage" : 32
+        },
+        {
+            "key" : "skeleton_army",
+            "usage" : 31
+        },
+        {
+            "key" : "giant",
+            "usage" : 29
+        },
+        {
+            "key" : "lava_hound",
+            "usage" : 24
+        },
+        {
+            "key" : "bowler",
+            "usage" : 24
+        },
+        {
+            "key" : "lightning",
+            "usage" : 21
+        },
+        {
+            "key" : "ice_golem",
+            "usage" : 18
+        },
+        {
+            "key" : "minion_horde",
+            "usage" : 17
+        },
+        {
+            "key" : "archers",
+            "usage" : 16
+        },
+        {
+            "key" : "goblins",
+            "usage" : 13
+        },
+        {
+            "key" : "golem",
+            "usage" : 13
+        },
+        {
+            "key" : "freeze",
+            "usage" : 12
+        },
+        {
+            "key" : "three_musketeers",
+            "usage" : 10
+        },
+        {
+            "key" : "battle_ram",
+            "usage" : 10
+        },
+        {
+            "key" : "fire_spirits",
+            "usage" : 10
+        },
+        {
+            "key" : "x_bow",
+            "usage" : 10
+        },
+        {
+            "key" : "cannon",
+            "usage" : 9
+        },
+        {
+            "key" : "furnace",
+            "usage" : 8
+        },
+        {
+            "key" : "tombstone",
+            "usage" : 8
+        },
+        {
+            "key" : "inferno_dragon",
+            "usage" : 6
+        },
+        {
+            "key" : "ice_wizard",
+            "usage" : 5
+        },
+        {
+            "key" : "mini_pekka",
+            "usage" : 5
+        },
+        {
+            "key" : "valkyrie",
+            "usage" : 4
+        },
+        {
+            "key" : "bandit",
+            "usage" : 4
+        },
+        {
+            "key" : "barbarian_hut",
+            "usage" : 4
+        },
+        {
+            "key" : "lumberjack",
+            "usage" : 3
+        },
+        {
+            "key" : "dart_goblin",
+            "usage" : 2
+        },
+        {
+            "key" : "mirror",
+            "usage" : 2
+        },
+        {
+            "key" : "barbarians",
+            "usage" : 2
+        },
+        {
+            "key" : "clone",
+            "usage" : 2
+        },
+        {
+            "key" : "pekka",
+            "usage" : 2
+        },
+        {
+            "key" : "mortar",
+            "usage" : 2
+        },
+        {
+            "key" : "executioner",
+            "usage" : 2
+        },
+        {
+            "key" : "royal_giant",
+            "usage" : 1
+        },
+        {
+            "key" : "elite_barbarians",
+            "usage" : 1
+        },
+        {
+            "key" : "sparky",
+            "usage" : 1
+        }
+    ],
+    "popularDecks" : [
+        {
+            "key" : "goblin_barrel|goblin_gang|ice_spirit|inferno_tower|knight|princess|rocket|the_log",
+            "usage" : 10
+        },
+        {
+            "key" : "baby_dragon|bowler|graveyard|knight|mega_minion|poison|skeletons|tornado",
+            "usage" : 8
+        },
+        {
+            "key" : "arrows|goblin_barrel|goblin_gang|hog_rider|inferno_tower|princess|rocket|skeleton_army",
+            "usage" : 6
+        },
+        {
+            "key" : "baby_dragon|balloon|elixir_collector|fireball|lava_hound|mega_minion|skeletons|zap",
+            "usage" : 5
+        },
+        {
+            "key" : "balloon|electro_wizard|ice_spirit|knight|miner|skeletons|tornado|zap",
+            "usage" : 5
+        },
+        {
+            "key" : "fireball|giant|miner|minion_horde|minions|musketeer|the_log|zap",
+            "usage" : 5
+        },
+        {
+            "key" : "electro_wizard|fireball|hog_rider|ice_spirit|inferno_tower|knight|skeletons|the_log",
+            "usage" : 4
+        },
+        {
+            "key" : "fireball|giant|hog_rider|minions|musketeer|skeletons|the_log|zap",
+            "usage" : 4
+        },
+        {
+            "key" : "electro_wizard|fireball|goblin_barrel|goblin_gang|goblins|hog_rider|inferno_tower|the_log",
+            "usage" : 4
+        },
+        {
+            "key" : "arrows|balloon|elixir_collector|lava_hound|lightning|mega_minion|minions|skeletons",
+            "usage" : 3
+        },
+        {
+            "key" : "electro_wizard|fireball|giant|hog_rider|minions|skeletons|the_log|zap",
+            "usage" : 3
+        },
+        {
+            "key" : "goblin_barrel|goblin_gang|hog_rider|inferno_tower|poison|princess|skeleton_army|the_log",
+            "usage" : 3
+        },
+        {
+            "key" : "fire_spirits|ice_golem|inferno_tower|mega_minion|rocket|skeletons|the_log|x_bow",
+            "usage" : 3
+        },
+        {
+            "key" : "fireball|hog_rider|ice_golem|ice_spirit|inferno_tower|musketeer|skeletons|the_log",
+            "usage" : 3
+        },
+        {
+            "key" : "goblin_barrel|goblin_gang|hog_rider|inferno_tower|princess|rocket|skeleton_army|zap",
+            "usage" : 3
+        },
+        {
+            "key" : "baby_dragon|electro_wizard|elixir_collector|golem|lightning|mega_minion|skeletons|the_log",
+            "usage" : 3
+        },
+        {
+            "key" : "arrows|electro_wizard|giant|graveyard|minions|skeletons|the_log|zap",
+            "usage" : 3
+        },
+        {
+            "key" : "fire_spirits|fireball|ice_spirit|inferno_tower|minions|skeletons|the_log|x_bow",
+            "usage" : 3
+        },
+        {
+            "key" : "baby_dragon|elixir_collector|golem|lightning|mega_minion|minions|skeletons|the_log",
+            "usage" : 3
+        },
+        {
+            "key" : "fireball|hog_rider|ice_spirit|knight|musketeer|skeletons|tornado|zap",
+            "usage" : 2
+        },
+        {
+            "key" : "arrows|giant|graveyard|mega_minion|musketeer|skeletons|the_log|zap",
+            "usage" : 2
+        },
+        {
+            "key" : "archers|electro_wizard|furnace|graveyard|knight|poison|skeletons|the_log",
+            "usage" : 2
+        },
+        {
+            "key" : "elixir_collector|ice_golem|ice_spirit|knight|miner|skeletons|the_log|three_musketeers",
+            "usage" : 2
+        },
+        {
+            "key" : "elixir_collector|ice_spirit|knight|miner|minion_horde|skeletons|the_log|three_musketeers",
+            "usage" : 2
+        },
+        {
+            "key" : "electro_wizard|fireball|goblin_barrel|goblin_gang|hog_rider|inferno_tower|skeleton_army|the_log",
+            "usage" : 2
+        },
+        {
+            "key" : "goblin_barrel|goblin_gang|hog_rider|inferno_tower|princess|rocket|skeleton_army|the_log",
+            "usage" : 2
+        },
+        {
+            "key" : "arrows|balloon|lava_hound|lightning|mega_minion|minions|skeleton_army|tombstone",
+            "usage" : 2
+        },
+        {
+            "key" : "balloon|fireball|lava_hound|mega_minion|minions|skeleton_army|tombstone|zap",
+            "usage" : 2
+        },
+        {
+            "key" : "archers|arrows|balloon|cannon|freeze|ice_spirit|knight|skeletons",
+            "usage" : 2
+        },
+        {
+            "key" : "baby_dragon|elixir_collector|goblin_gang|golem|lightning|mega_minion|minions|the_log",
+            "usage" : 2
+        },
+        {
+            "key" : "battle_ram|elixir_collector|knight|minions|skeletons|the_log|three_musketeers|zap",
+            "usage" : 2
+        },
+        {
+            "key" : "arrows|giant|graveyard|mega_minion|musketeer|skeleton_army|the_log|zap",
+            "usage" : 2
+        },
+        {
+            "key" : "battle_ram|elixir_collector|fire_spirits|goblin_gang|knight|miner|the_log|three_musketeers",
+            "usage" : 2
+        },
+        {
+            "key" : "archers|barbarian_hut|electro_wizard|graveyard|knight|poison|skeletons|the_log",
+            "usage" : 2
+        },
+        {
+            "key" : "baby_dragon|bowler|graveyard|ice_spirit|knight|mega_minion|poison|tornado",
+            "usage" : 2
+        },
+        {
+            "key" : "elixir_collector|freeze|goblins|hog_rider|mini_pekka|minions|princess|zap",
+            "usage" : 2
+        },
+        {
+            "key" : "archers|fireball|ice_spirit|inferno_tower|knight|skeletons|the_log|x_bow",
+            "usage" : 2
+        },
+        {
+            "key" : "goblin_barrel|goblin_gang|hog_rider|ice_golem|inferno_tower|princess|skeleton_army|the_log",
+            "usage" : 2
+        },
+        {
+            "key" : "electro_wizard|ice_golem|ice_spirit|inferno_tower|miner|poison|skeletons|the_log",
+            "usage" : 2
+        }
+    ]
+}
