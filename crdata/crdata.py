@@ -289,6 +289,51 @@ class CRData:
         await self.bot.say(box(chart.chart()))
         await self.bot.say("{} on {}.".format(SF_CREDITS, dt.date.today()))
 
+    @crdata.command(name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
+    async def crdata_cards(self, ctx: Context):
+        """List decks from leaderboard sorted by rank."""
+        decks = self.get_today_data()["decks"]
+        for i, deck in enumerate(decks, start=1):
+            cards = [self.sfid_to_id(card["key"]) for card in deck]
+            levels = [card["level"] for card in deck]
+
+            desc = "**Rank {}: **".format(i)
+            for j, card in enumerate(cards):
+                desc += "{} ".format(self.id_to_name(card))
+                desc += "({}), ".format(levels[j])
+
+            await self.bot.say(desc[:-1])
+
+            FakeMember = namedtuple("FakeMember", "name")
+
+            await self.bot.get_cog("Deck").deck_get_helper(
+                ctx,
+                card1=cards[0],
+                card2=cards[1],
+                card3=cards[2],
+                card4=cards[3],
+                card5=cards[4],
+                card6=cards[5],
+                card7=cards[6],
+                card8=cards[7],
+                deck_name="Rank {}".format(i),
+                author=FakeMember(name="Top 200 Decks")
+            )
+
+            if i % RESULTS_MAX == 0 and i < len(decks):
+                def pagination_check(m):
+                    return m.content.lower() == 'y'
+                await self.bot.say(
+                    "Would you like to see more results? (y/n)")
+                answer = await self.bot.wait_for_message(
+                    timeout=PAGINATION_TIMEOUT,
+                    author=ctx.message.author,
+                    check=pagination_check)
+                if answer is None:
+                    await self.bot.say(
+                        "Search results aborted.\n{}".format(SF_CREDITS))
+                    return
+
     def sfid_to_id(self, sfid:str):
         """Convert Starfire ID to Card ID"""
         cards = self.clashroyale["Cards"]
@@ -302,6 +347,11 @@ class CRData:
         s = string.capwords(s)
         return s
 
+    def id_to_name(self, id:str):
+        """Convert ID to Name"""
+        s = id.replace('-', ' ')
+        s = string.capwords(s)
+        return s
 
 
 def check_folder():
