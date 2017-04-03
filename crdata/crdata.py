@@ -180,6 +180,22 @@ class CRData:
         else:
             await self.bot.say("Today’s data already downloaded.")
 
+    @setcrdata.command(name="forceupdate", pass_context=True)
+    async def setcrdata_forceupdate(self, ctx):
+        """Update data even if exists."""
+        today = dt.date.today()
+        today_file = today.strftime(CARDPOP_FILE)
+        today_path = os.path.join(PATH, today_file)
+        url = self.settings["STARFIRE_URL"]
+        session = aiohttp.ClientSession(
+            auth=aiohttp.BasicAuth(
+                login=self.settings["STARFIRE_USERNAME"],
+                password=self.settings["STARFIRE_PASSWORD"]))
+        resp = await session.get(url)
+        data = await resp.json()
+        dataIO.save_json(today_path, data)
+        await self.bot.say("Saved {}.".format(today_file))
+
     async def update_data(self):
         """Update data and return filename."""
         today = dt.date.today()
