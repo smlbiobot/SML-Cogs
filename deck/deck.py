@@ -35,59 +35,14 @@ from PIL import ImageDraw
 from PIL import ImageFont
 import io
 import string
-import itertools
+from cogs.utils.chat_formatting import pagify
 
 settings_path = "data/deck/settings.json"
 crdata_path = "data/deck/clashroyale.json"
 max_deck_per_user = 5
 
 PAGINATION_TIMEOUT = 20.0
-
-help_text = f"""
-**Deck**
-The !deck command helps you organize your Clash Royale decks.
-
-**Deck image**
-To get an image of the deck, type:
-`!deck get 3M EB MM IG knight IS zap pump`
-
-To optionally add a name to your deck, type:
-`!deck get 3M EB MM IG knight IS zap pump "3M Ebarbs"`
-
-**Card Names**
-You can type the card names in full or use abbreviations. Common abbreviations have been added. For the full list of available cards and acceptable abbreviations, type `!deck cards`
-
-**Database**
-You can save your decks. To add a deck to your personal collection, type:
-`!deck add 3M EB MM IG knight IS zap pump "3M Ebarbs"`
-You can have up to {max_deck_per_user} decks in your personal collection.
-
-**List**
-To see the decks you have added, type `!deck list`
-To see the decks that others have added, type `!deck list <username>`
-
-**Rename**
-To rename a deck, type `!deck rename [deck_id] [new_name]`
-where deck_id is the number on your list, and new_name is the new name, obviously.
-Remember to quote the name if you want it to contain spaces.
-
-**Remove**
-To remove a deck, type `Deck remove [deck_id]`
-where deck_id is the number on your deck list.
-
-**Search**
-To search for decks containing specific card(s) in all saved decks, type
-`!deck search [card] [card] [card]`
-You can enter as many cards as you like. Or enter one.
-Results are paginated and will show 3 at a time. Type Y to page through all results.
-
-**Show**
-To show a specifc deck by yourself or another user, type
-`!deck show [deck_id] [user]`
-where deck_id is the number on your deck list.
-e.g. `!deck show 2` shows the second deck in your deck list.
-
-"""
+HELP_URL = "https://github.com/smlbiobot/SML-Cogs/wiki/Deck#usage"
 
 numbs = {
     "next": "➡",
@@ -100,6 +55,7 @@ class Deck:
     """Clash Royale Deck Builder."""
 
     def __init__(self, bot):
+        """Init."""
         self.bot = bot
         self.file_path = settings_path
         self.crdata_path = crdata_path
@@ -136,16 +92,6 @@ class Deck:
 
         # pagination tracking
         self.track_pagination = None
-
-    def grouper(self, n, iterable, fillvalue=None):
-        """Helper function to split lists.
-
-        Example:
-        grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
-        """
-        args = [iter(iterable)] * n
-        return ([e for e in t if e is not None]
-            for t in itertools.zip_longest(*args))
 
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
@@ -201,9 +147,9 @@ class Deck:
 
     @deck.command(name="add", pass_context=True, no_pm=True)
     async def deck_add(self, ctx,
-                        card1=None, card2=None, card3=None, card4=None,
-                        card5=None, card6=None, card7=None, card8=None,
-                        deck_name=None):
+                       card1=None, card2=None, card3=None, card4=None,
+                       card5=None, card6=None, card7=None, card8=None,
+                       deck_name=None):
         """Add a deck to a personal decklist.
 
         Example: !deck add bbd mm loon bt is fs gs lh
@@ -445,10 +391,8 @@ class Deck:
                 "**{}** ({}, {} elixir): {}".format(
                     name, rarity, elixir, ", ".join(names)))
 
-        split_out = self.grouper(25, out)
-
-        for o in split_out:
-            await self.bot.say('\n'.join(o))
+        for page in pagify("\n".join(out), shorten_by=24):
+            await self.bot.say(page)
 
     @deck.command(name="search", pass_context=True, no_pm=True)
     async def deck_search(self, ctx, *params):
@@ -580,15 +524,11 @@ class Deck:
     @deck.command(name="help", pass_context=True, no_pm=True)
     async def deck_help(self, ctx):
         """Complete help and tutorial."""
-        await self.bot.say(help_text)
-
+        await self.bot.say(
+            "Please visit {} for an illustrated guide.".format(HELP_URL))
 
     async def deck_upload(self, ctx, member_deck, deck_name:str, member=None):
-        """Upload deck to Discord.
-
-        Example: !deck set archers arrows baby-dragon balloon barbarian-hut barbarians battle-ram bomb-tower
-        """
-
+        """Upload deck to Discord."""
         author = ctx.message.author
         server = ctx.message.server
 
@@ -643,15 +583,14 @@ class Deck:
         with io.BytesIO() as f:
             deck_image.save(f, "PNG")
             f.seek(0)
-            message = await ctx.bot.send_file(ctx.message.channel, f,
+            message = await ctx.bot.send_file(
+                ctx.message.channel, f,
                 filename=filename, content=description)
 
         return message
 
     def get_deck_image(self, deck, deck_name=None, deck_author=None):
         """Construct the deck with Pillow and return image."""
-
-        card_w = 302
         card_h = 363
         card_x = 30
         card_y = 30
@@ -698,7 +637,7 @@ class Deck:
         card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
 
         txt = Image.new("RGBA", size)
-        txt_name = Image.new("RGBA", (txt_x_cards-30, size[1]))
+        txt_name = Image.new("RGBA", (txt_x_cards - 30, size[1]))
         font_regular = ImageFont.truetype(font_file_regular, size=font_size)
         font_bold = ImageFont.truetype(font_file_bold, size=font_size)
 
@@ -730,8 +669,8 @@ class Deck:
             (txt_x_elixir, txt_y_line2), average_elixir, font=font_bold,
             fill=(0xff, 0xff, 0xff, 255))
 
-        image.paste(txt, (0,0), txt)
-        image.paste(txt_name, (0,0), txt_name)
+        image.paste(txt, (0, 0), txt)
+        image.paste(txt_name, (0, 0), txt_name)
 
         # scale down and return
         scale = 0.5
@@ -739,7 +678,6 @@ class Deck:
         image.thumbnail(scaled_size)
 
         return image
-
 
     def normalize_deck_data(self, deck):
         """Return a deck list with normalized names."""
