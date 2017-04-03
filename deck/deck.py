@@ -591,6 +591,7 @@ class Deck:
 
     def get_deck_image(self, deck, deck_name=None, deck_author=None):
         """Construct the deck with Pillow and return image."""
+        card_w = 302
         card_h = 363
         card_x = 30
         card_y = 30
