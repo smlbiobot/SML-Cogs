@@ -290,7 +290,7 @@ class CRData:
         await self.bot.say("{} on {}.".format(SF_CREDITS, dt.date.today()))
 
     @crdata.command(name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
-    async def crdata_cards(self, ctx: Context):
+    async def crdata_leaderboard(self, ctx: Context):
         """List decks from leaderboard sorted by rank."""
         decks = self.get_today_data()["decks"]
         for i, deck in enumerate(decks, start=1):
