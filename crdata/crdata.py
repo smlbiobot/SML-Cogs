@@ -53,10 +53,10 @@ except ImportError:
 PATH = os.path.join("data", "crdata")
 SETTINGS_JSON = os.path.join(PATH, "settings.json")
 CLASHROYALE_JSON = os.path.join(PATH, "clashroyale.json")
-CARDPOP_FILE = "cardpop-%Y-%m-%d.json"
+CARDPOP_FILE = "cardpop-%Y-%m-%d-%H.json"
 SF_CREDITS = "Data provided by <http://starfi.re>"
 
-DATA_UPDATE_INTERVAL = timedelta(days=1).seconds
+DATA_UPDATE_INTERVAL = timedelta(hours=1).seconds
 
 RESULTS_MAX = 3
 PAGINATION_TIMEOUT = 20
@@ -115,12 +115,12 @@ class BarChart:
         else:
             for i in range(blocks):
                 out += self.tick
-        out +='  {}'.format(count)
+        out += '  {}'.format(count)
         return out
 
 
 class CRData:
-    """Clash Royale card popularity using Starfi.re"""
+    """Clash Royale card popularity using Starfi.re."""
 
     def __init__(self, bot):
         """Init."""
@@ -178,14 +178,14 @@ class CRData:
         if file is not None:
             await self.bot.say("Saved {}.".format(file))
         else:
-            await self.bot.say("Today’s data already downloaded.")
+            await self.bot.say("Data already downloaded.")
 
     @setcrdata.command(name="forceupdate", pass_context=True)
     async def setcrdata_forceupdate(self, ctx):
         """Update data even if exists."""
-        today = dt.date.today()
-        today_file = today.strftime(CARDPOP_FILE)
-        today_path = os.path.join(PATH, today_file)
+        now = dt.datetime.utcnow()
+        now_file = now.strftime(CARDPOP_FILE)
+        now_path = os.path.join(PATH, now_file)
         url = self.settings["STARFIRE_URL"]
         session = aiohttp.ClientSession(
             auth=aiohttp.BasicAuth(
@@ -193,15 +193,15 @@ class CRData:
                 password=self.settings["STARFIRE_PASSWORD"]))
         resp = await session.get(url)
         data = await resp.json()
-        dataIO.save_json(today_path, data)
-        await self.bot.say("Saved {}.".format(today_file))
+        dataIO.save_json(now_path, data)
+        await self.bot.say("Saved {}.".format(now_file))
 
     async def update_data(self):
         """Update data and return filename."""
-        today = dt.date.today()
-        today_file = today.strftime(CARDPOP_FILE)
-        today_path = os.path.join(PATH, today_file)
-        if not os.path.exists(today_path):
+        now = dt.datetime.utcnow()
+        now_file = now.strftime(CARDPOP_FILE)
+        now_path = os.path.join(PATH, now_file)
+        if not os.path.exists(now_path):
             url = self.settings["STARFIRE_URL"]
             session = aiohttp.ClientSession(
                 auth=aiohttp.BasicAuth(
@@ -209,18 +209,18 @@ class CRData:
                     password=self.settings["STARFIRE_PASSWORD"]))
             resp = await session.get(url)
             data = await resp.json()
-            dataIO.save_json(today_path, data)
-            return today_file
+            dataIO.save_json(now_path, data)
+            return now_file
         return None
 
-    def get_today_data(self):
-        """Return today’s data."""
-        today = dt.date.today()
-        return self.get_data(today)
+    def get_now_data(self):
+        """Return data at this hour."""
+        now = dt.datetime.utcnow()
+        return self.get_data(now)
 
-    def get_data(self, date):
-        """Get data as json by date."""
-        file = date.strftime(CARDPOP_FILE)
+    def get_data(self, datetime_):
+        """Get data as json by date and hour."""
+        file = datetime_.strftime(CARDPOP_FILE)
         path = os.path.join(PATH, file)
         if os.path.exists(path):
             return dataIO.load_json(path)
@@ -235,7 +235,7 @@ class CRData:
     @crdata.command(name="decks", pass_context=True, no_pm=True)
     async def crdata_decks(self, ctx: Context):
         """List decks on global 200 leaderboard."""
-        decks = self.get_today_data()["popularDecks"]
+        decks = self.get_now_data()["popularDecks"]
         await self.bot.say(
             "**Top 200 Decks**: Found {} results.".format(len(decks)))
         for i, deck in enumerate(decks):
@@ -280,7 +280,7 @@ class CRData:
     async def crdata_cards(self, ctx: Context):
         """List popular cards on global 200 leaberboard."""
         await self.bot.send_typing(ctx.message.channel)
-        cards = self.get_today_data()["popularCards"]
+        cards = self.get_now_data()["popularCards"]
         await self.bot.say(
             "**Popular Cards** from Top 200 decks.")
         labels = [self.sfid_to_name(card["key"]) for card in cards]
@@ -292,7 +292,8 @@ class CRData:
     @crdata.command(name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
     async def crdata_leaderboard(self, ctx: Context):
         """List decks from leaderboard sorted by rank."""
-        decks = self.get_today_data()["decks"]
+        decks = self.get_now_data()["decks"]
+        decks.reverse()
         for i, deck in enumerate(decks, start=1):
             cards = [self.sfid_to_id(card["key"]) for card in deck]
             levels = [card["level"] for card in deck]
