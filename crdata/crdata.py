@@ -293,7 +293,6 @@ class CRData:
     async def crdata_leaderboard(self, ctx: Context):
         """List decks from leaderboard sorted by rank."""
         decks = self.get_now_data()["decks"]
-        decks.reverse()
         for i, deck in enumerate(decks, start=1):
             cards = [self.sfid_to_id(card["key"]) for card in deck]
             levels = [card["level"] for card in deck]
