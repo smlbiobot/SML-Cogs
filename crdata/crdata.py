@@ -270,6 +270,7 @@ class CRData:
         name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
     async def crdata_leaderboard(self, ctx: Context):
         """List decks from leaderboard sorted by rank."""
+        await self.bot.say("**Global 200 Leaderboard Decks**")
         data = await self.get_now_data()
         decks = data["decks"]
         for i, deck in enumerate(decks):
