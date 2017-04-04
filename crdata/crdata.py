@@ -176,33 +176,24 @@ class CRData:
         """Grab data from Starfire if does not exist."""
         data = await self.update_data()
         if data is not None:
-            await self.bot.say("Saved data.")
+            await self.bot.say("Data saved.")
         else:
             await self.bot.say("Data already downloaded.")
 
     @setcrdata.command(name="forceupdate", pass_context=True)
     async def setcrdata_forceupdate(self, ctx):
         """Update data even if exists."""
-        now = dt.datetime.utcnow()
-        now_file = now.strftime(CARDPOP_FILE)
-        now_path = os.path.join(PATH, now_file)
-        url = self.settings["STARFIRE_URL"]
-        async with aiohttp.ClientSession(
-            auth=aiohttp.BasicAuth(
-                login=self.settings["STARFIRE_USERNAME"],
-                password=self.settings["STARFIRE_PASSWORD"])) as session:
-            resp = await session.get(url)
-            data = await resp.json()
-            dataIO.save_json(now_path, data)
-        await self.bot.say("Saved {}.".format(now_file))
+        await self.update_data(forceupdate=True)
+        await self.bot.say("Data saved.")
 
-    async def update_data(self):
+    async def update_data(self, forceupdate=False):
         """Update data and return data."""
         now = dt.datetime.utcnow()
         now_file = now.strftime(CARDPOP_FILE)
         now_path = os.path.join(PATH, now_file)
         data = None
-        if not os.path.exists(now_path):
+        will_update = forceupdate or (not os.path.exists(now_path))
+        if will_update:
             url = self.settings["STARFIRE_URL"]
             async with aiohttp.ClientSession(
                 auth=aiohttp.BasicAuth(
