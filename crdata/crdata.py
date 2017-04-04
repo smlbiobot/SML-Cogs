@@ -241,35 +241,16 @@ class CRData:
                 card_id = self.sfid_to_id(card)
                 card_ids.append(card_id)
 
-            FakeMember = namedtuple("FakeMember", "name")
-
-            await self.bot.get_cog("Deck").deck_get_helper(
+            show_next = await self.show_result_row(
                 ctx,
-                card1=card_ids[0],
-                card2=card_ids[1],
-                card3=card_ids[2],
-                card4=card_ids[3],
-                card5=card_ids[4],
-                card6=card_ids[5],
-                card7=card_ids[6],
-                card8=card_ids[7],
+                card_ids,
+                i,
+                len(decks),
                 deck_name="Usage: {}".format(usage),
-                author=FakeMember(name="Top 200 Decks")
-            )
+                author="Top 200 Decks")
 
-            if (i + 1) % RESULTS_MAX == 0 and (i + 1) < len(decks):
-                def pagination_check(m):
-                    return m.content.lower() == 'y'
-                await self.bot.say(
-                    "Would you like to see more results? (y/n)")
-                answer = await self.bot.wait_for_message(
-                    timeout=PAGINATION_TIMEOUT,
-                    author=ctx.message.author,
-                    check=pagination_check)
-                if answer is None:
-                    await self.bot.say(
-                        "Search results aborted.\n{}".format(SF_CREDITS))
-                    return
+            if not show_next:
+                return
 
     @crdata.command(name="cards", pass_context=True, no_pm=True)
     async def crdata_cards(self, ctx: Context):
@@ -291,62 +272,82 @@ class CRData:
         """List decks from leaderboard sorted by rank."""
         data = await self.get_now_data()
         decks = data["decks"]
-        for i, deck in enumerate(decks, start=1):
+        for i, deck in enumerate(decks):
             cards = [self.sfid_to_id(card["key"]) for card in deck]
             levels = [card["level"] for card in deck]
 
-            desc = "**Rank {}: **".format(i)
+            desc = "**Rank {}: **".format(i + 1)
             for j, card in enumerate(cards):
                 desc += "{} ".format(self.id_to_name(card))
                 desc += "({}), ".format(levels[j])
 
-            await self.bot.say(desc[:-1])
-
-            FakeMember = namedtuple("FakeMember", "name")
-
-            await self.bot.get_cog("Deck").deck_get_helper(
+            show_next = await self.show_result_row(
                 ctx,
-                card1=cards[0],
-                card2=cards[1],
-                card3=cards[2],
-                card4=cards[3],
-                card5=cards[4],
-                card6=cards[5],
-                card7=cards[6],
-                card8=cards[7],
+                cards,
+                i,
+                len(decks),
                 deck_name="Rank {}".format(i),
-                author=FakeMember(name="Top 200 Decks")
-            )
+                author="Top 200 Decks",
+                description=desc[:-1])
 
-            if i % RESULTS_MAX == 0 and i < len(decks):
-                def pagination_check(m):
-                    return m.content.lower() == 'y'
+            if not show_next:
+                return
+
+    async def show_result_row(
+            self, ctx: Context, cards, row_id, total_rows,
+            deck_name="", author="", description=None):
+        """Display results of deck.
+
+        Return True if continue.
+        Return False if abort.
+        """
+        if description is not None:
+            await self.bot.say(description)
+        FakeMember = namedtuple("FakeMember", "name")
+        await self.bot.get_cog("Deck").deck_get_helper(
+            ctx,
+            card1=cards[0],
+            card2=cards[1],
+            card3=cards[2],
+            card4=cards[3],
+            card5=cards[4],
+            card6=cards[5],
+            card7=cards[6],
+            card8=cards[7],
+            deck_name=deck_name,
+            author=FakeMember(name=author)
+        )
+
+        if (row_id + 1) % RESULTS_MAX == 0 and (row_id + 1) < total_rows:
+            def pagination_check(m):
+                return m.content.lower() == 'y'
+            await self.bot.say(
+                "Would you like to see more results? (y/n)")
+            answer = await self.bot.wait_for_message(
+                timeout=PAGINATION_TIMEOUT,
+                author=ctx.message.author,
+                check=pagination_check)
+            if answer is None:
                 await self.bot.say(
-                    "Would you like to see more results? (y/n)")
-                answer = await self.bot.wait_for_message(
-                    timeout=PAGINATION_TIMEOUT,
-                    author=ctx.message.author,
-                    check=pagination_check)
-                if answer is None:
-                    await self.bot.say(
-                        "Search results aborted.\n{}".format(SF_CREDITS))
-                    return
+                    "Search results aborted.\n{}".format(SF_CREDITS))
+                return False
+        return True
 
     def sfid_to_id(self, sfid:str):
-        """Convert Starfire ID to Card ID"""
+        """Convert Starfire ID to Card ID."""
         cards = self.clashroyale["Cards"]
         for card_key, card_data in cards.items():
             if card_data["sfid"] == sfid:
                 return card_key
 
     def sfid_to_name(self, sfid:str):
-        """Convert Starfire ID to Name"""
+        """Convert Starfire ID to Name."""
         s = sfid.replace('_', ' ')
         s = string.capwords(s)
         return s
 
     def id_to_name(self, id:str):
-        """Convert ID to Name"""
+        """Convert ID to Name."""
         s = id.replace('-', ' ')
         s = string.capwords(s)
         return s
