@@ -187,13 +187,13 @@ class CRData:
         now_file = now.strftime(CARDPOP_FILE)
         now_path = os.path.join(PATH, now_file)
         url = self.settings["STARFIRE_URL"]
-        session = aiohttp.ClientSession(
+        async with aiohttp.ClientSession(
             auth=aiohttp.BasicAuth(
                 login=self.settings["STARFIRE_USERNAME"],
-                password=self.settings["STARFIRE_PASSWORD"]))
-        resp = await session.get(url)
-        data = await resp.json()
-        dataIO.save_json(now_path, data)
+                password=self.settings["STARFIRE_PASSWORD"])) as session:
+            resp = await session.get(url)
+            data = await resp.json()
+            dataIO.save_json(now_path, data)
         await self.bot.say("Saved {}.".format(now_file))
 
     async def update_data(self):
@@ -201,22 +201,25 @@ class CRData:
         now = dt.datetime.utcnow()
         now_file = now.strftime(CARDPOP_FILE)
         now_path = os.path.join(PATH, now_file)
+        data = None
         if not os.path.exists(now_path):
             url = self.settings["STARFIRE_URL"]
-            session = aiohttp.ClientSession(
+            async with aiohttp.ClientSession(
                 auth=aiohttp.BasicAuth(
                     login=self.settings["STARFIRE_USERNAME"],
-                    password=self.settings["STARFIRE_PASSWORD"]))
-            resp = await session.get(url)
-            data = await resp.json()
-            dataIO.save_json(now_path, data)
-            return data
-        return None
+                    password=self.settings["STARFIRE_PASSWORD"])) as session:
+                resp = await session.get(url)
+                data = await resp.json()
+                dataIO.save_json(now_path, data)
+        return data
 
-    def get_now_data(self):
+    async def get_now_data(self):
         """Return data at this hour."""
         now = dt.datetime.utcnow()
-        return self.get_data(now)
+        data = self.get_data(now)
+        if data is None:
+            data = await self.update_data()
+        return data
 
     def get_data(self, datetime_):
         """Get data as json by date and hour."""
@@ -235,7 +238,8 @@ class CRData:
     @crdata.command(name="decks", pass_context=True, no_pm=True)
     async def crdata_decks(self, ctx: Context):
         """List decks on global 200 leaderboard."""
-        decks = self.get_now_data()["popularDecks"]
+        data = await self.get_now_data()
+        decks = data["popularDecks"]
         await self.bot.say(
             "**Top 200 Decks**: Found {} results.".format(len(decks)))
         for i, deck in enumerate(decks):
@@ -280,7 +284,8 @@ class CRData:
     async def crdata_cards(self, ctx: Context):
         """List popular cards on global 200 leaberboard."""
         await self.bot.send_typing(ctx.message.channel)
-        cards = self.get_now_data()["popularCards"]
+        data = await self.get_now_data()
+        cards = data["popularCards"]
         await self.bot.say(
             "**Popular Cards** from Top 200 decks.")
         labels = [self.sfid_to_name(card["key"]) for card in cards]
@@ -289,14 +294,12 @@ class CRData:
         await self.bot.say(box(chart.chart()))
         await self.bot.say("{} on {}.".format(SF_CREDITS, dt.date.today()))
 
-    @crdata.command(name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
+    @crdata.command(
+        name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
     async def crdata_leaderboard(self, ctx: Context):
         """List decks from leaderboard sorted by rank."""
-        data = self.get_now_data()
-        if data is None:
-            data = await self.update_data()
-
-        decks = self.get_now_data()["decks"]
+        data = await self.get_now_data()
+        decks = data["decks"]
         for i, deck in enumerate(decks, start=1):
             cards = [self.sfid_to_id(card["key"]) for card in deck]
             levels = [card["level"] for card in deck]
