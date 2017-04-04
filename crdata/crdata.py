@@ -174,9 +174,9 @@ class CRData:
     @setcrdata.command(name="update", pass_context=True)
     async def setcrdata_update(self, ctx):
         """Grab data from Starfire if does not exist."""
-        file = await self.update_data()
-        if file is not None:
-            await self.bot.say("Saved {}.".format(file))
+        data = await self.update_data()
+        if data is not None:
+            await self.bot.say("Saved data.")
         else:
             await self.bot.say("Data already downloaded.")
 
@@ -197,7 +197,7 @@ class CRData:
         await self.bot.say("Saved {}.".format(now_file))
 
     async def update_data(self):
-        """Update data and return filename."""
+        """Update data and return data."""
         now = dt.datetime.utcnow()
         now_file = now.strftime(CARDPOP_FILE)
         now_path = os.path.join(PATH, now_file)
@@ -210,7 +210,7 @@ class CRData:
             resp = await session.get(url)
             data = await resp.json()
             dataIO.save_json(now_path, data)
-            return now_file
+            return data
         return None
 
     def get_now_data(self):
@@ -292,6 +292,10 @@ class CRData:
     @crdata.command(name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
     async def crdata_leaderboard(self, ctx: Context):
         """List decks from leaderboard sorted by rank."""
+        data = self.get_now_data()
+        if data is None:
+            data = await self.update_data()
+
         decks = self.get_now_data()["decks"]
         for i, deck in enumerate(decks, start=1):
             cards = [self.sfid_to_id(card["key"]) for card in deck]
