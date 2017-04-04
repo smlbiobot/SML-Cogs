@@ -419,10 +419,13 @@ class Deck:
                     # await self.bot.say(set(params))
                     if set(params) < set(cards):
                         found_decks.append({
+                            "UTC": k,
                             "Deck": member_deck["Deck"],
                             "DeckName": member_deck["DeckName"],
                             "Member": member,
                             "MemberDisplayName": member_display_name})
+            found_decks = sorted(
+                found_decks, key=lambda x: x["UTC"], reverse=True)
 
             await self.bot.say("Found {} decks".format(len(found_decks)))
 
@@ -433,9 +436,12 @@ class Deck:
                 deck_id = 1
 
                 for deck in found_decks:
-                    description = "**{}. {}** by {}".format(
+                    timestamp = deck["UTC"][:19]
+
+                    description = "**{}. {}** by {} — {}".format(
                         deck_id, deck["DeckName"],
-                        deck["MemberDisplayName"])
+                        deck["MemberDisplayName"],
+                        timestamp)
                     await self.upload_deck_image(
                         ctx, deck["Deck"], deck["DeckName"], deck["Member"],
                         description=description)
