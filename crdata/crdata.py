@@ -56,7 +56,7 @@ CLASHROYALE_JSON = os.path.join(PATH, "clashroyale.json")
 CARDPOP_FILE = "cardpop-%Y-%m-%d-%H.json"
 SF_CREDITS = "Data provided by <http://starfi.re>"
 
-DATA_UPDATE_INTERVAL = timedelta(hours=1).seconds
+DATA_UPDATE_INTERVAL = timedelta(minutes=5).seconds
 
 RESULTS_MAX = 3
 PAGINATION_TIMEOUT = 20
