@@ -287,7 +287,7 @@ class CRData:
                 cards,
                 i,
                 len(decks),
-                deck_name="Rank {}".format(i),
+                deck_name="Rank {}".format(i + 1),
                 author="Top 200 Decks",
                 description=desc[:-1])
 
