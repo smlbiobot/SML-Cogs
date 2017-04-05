@@ -46,7 +46,7 @@ DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
                     "Higher Power", "AlphaBot"]
 HEIST_ROLE = "Heist"
 TOGGLE_ROLES = ["Member"]
-TOGGLEABLE_ROLES = ["Heist", "RACF-Tourney", "Practice"]
+TOGGLEABLE_ROLES = ["Heist", "Practice"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
@@ -531,9 +531,11 @@ class RACF:
                 await self.bot.say(
                     "{} is not a valid role on this server.".format(role_name))
         else:
-            await self.bot.say("{} is not a toggleable role.".format(role_name))
-
-
+            out = []
+            out.append("{} is not a toggleable role.".format(role_name))
+            out.append(
+                "Toggleable roles: {}.".format(", ".join(TOGGLEABLE_ROLES)))
+            await self.bot.say("\n".join(out))
 
 
 def setup(bot):
