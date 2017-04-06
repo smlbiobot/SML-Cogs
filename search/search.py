@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
+from itertools import islice
 
 import discord
 from discord import Message
@@ -149,6 +150,8 @@ class Search:
         """Imgur search."""
         search_id = 0
 
+        await self.bot.send_typing(ctx.message.channel)
+
         try:
             client_id = self.settings["imgur"]["id"]
             client_secret = self.settings["imgur"]["secret"]
@@ -161,26 +164,24 @@ class Search:
         except KeyError:
             self.settings["imgur"]["search_id"] = 0
 
-        count = 0
-        max = 3
+        # count = 0
         client = ImgurClient(client_id, client_secret)
         results = client.gallery_search(query)
-        for result in results:
-            # await self.bot.say(str(dir(album)))
-            count += 1
-            if count < search_id:
-                continue
 
-            search_id = count + 1
-
+        try:
+            result = next(islice(results, search_id, None))
             if result.is_album:
                 img = client.get_image(result.cover)
             else:
                 img = result
             await self.bot.say(str(img.link))
-            self.settings["imgur"]["search_id"] = search_id
-            dataIO.save_json(JSON, self.settings)
-            break
+            search_id += 1
+        except StopIteration:
+            search_id = 0
+
+        self.settings["imgur"]["search_id"] = search_id
+        dataIO.save_json(JSON, self.settings)
+
 
 
 def check_folder():
