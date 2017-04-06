@@ -46,7 +46,7 @@ DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
                     "Higher Power", "AlphaBot"]
 HEIST_ROLE = "Heist"
 TOGGLE_ROLES = ["Member"]
-TOGGLEABLE_ROLES = ["Heist", "Practice"]
+TOGGLEABLE_ROLES = ["Heist", "Practice", "RACF-Tourney"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
