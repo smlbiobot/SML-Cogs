@@ -88,22 +88,25 @@ class CRInfo:
     @setcrinfo.command(name="update", pass_context=True, no_pm=True)
     async def setcrinfo_update(self):
         """Load and return data according to key."""
-        for k, v in FILES.items():
-            url = urljoin(CSV_LOGIC_BASE, FILES[k])
+        url = (
+            "https://raw.githubusercontent.com/smlbiobot"
+            "/cr/master/apk/1.8.2/com.supercell.clashroyale-1.8.2-decoded"
+            "/assets/csv_logic/"
+            "treasure_chests.decoded.csv")
 
-            conn = aiohttp.TCPConnector()
-            session = aiohttp.ClientSession(connector=conn)
-            async with session.get(url) as r:
-                text = await r.text()
-            session.close()
+        conn = aiohttp.TCPConnector()
+        session = aiohttp.ClientSession(connector=conn)
+        async with session.get(url) as r:
+            text = await r.text()
+        session.close()
 
-            dr = csv.DictReader(text)
-            for i, row in enumerate(dr):
-                out = []
-                out.append(str(i))
-                for k, v in row.items():
-                    out.append('{}: {}'.format(k, v))
-                print(' | '.join(out))
+        dr = csv.DictReader(text)
+        for i, row in enumerate(dr):
+            out = []
+            out.append(str(i))
+            for k, v in row.items():
+                out.append('{}: {}'.format(k, v))
+            print(' | '.join(out))
 
     @commands.group(pass_context=True, no_pm=True)
     async def crinfo(self, ctx: Context):
