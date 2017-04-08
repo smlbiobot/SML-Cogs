@@ -24,6 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 import csv
+import io
 import os
 import datetime as dt
 import string
@@ -93,19 +94,16 @@ class CRInfo:
             "/cr/master/apk/1.8.2/com.supercell.clashroyale-1.8.2-decoded"
             "/assets/csv_logic/"
             "treasure_chests.decoded.csv")
-
-        conn = aiohttp.TCPConnector()
-        session = aiohttp.ClientSession(connector=conn)
-        async with session.get(url) as r:
-            text = await r.text()
-        session.close()
-
-        dr = csv.DictReader(text)
-        for i, row in enumerate(dr):
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                text = await resp.text()
+        reader = csv.DictReader(io.StringIO(text))
+        for i, row in enumerate(reader):
             out = []
             out.append(str(i))
             for k, v in row.items():
                 out.append('{}: {}'.format(k, v))
+            print('')
             print(' | '.join(out))
 
     @commands.group(pass_context=True, no_pm=True)
