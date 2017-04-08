@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Clash Royale Information",
+	"DESCRIPTION": "Display Clash Royale card + chest data using data from apk",
+	"DISABLED": false,
+	"NAME": "CRInfo",
+	"REQUIREMENTS": ["aiohttp"],
+	"TAGS": ["Clash Royale", "clash royale", "data"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}

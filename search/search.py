@@ -146,7 +146,7 @@ class Search:
             await self.bot.say(page)
 
     @search.command(name="imgur", pass_context=True, no_pm=True)
-    async def search_imgur(self, ctx: Context, query: str):
+    async def search_imgur(self, ctx: Context, *, query: str):
         """Imgur search."""
         search_id = 0
 
