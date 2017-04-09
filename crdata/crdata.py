@@ -120,7 +120,7 @@ class BarChart:
 
 
 class CRData:
-    """Clash Royale card popularity using Starfi.re."""
+    """Clash Royale Global 200 Decks."""
 
     def __init__(self, bot):
         """Init."""
@@ -128,6 +128,23 @@ class CRData:
         self.task = bot.loop.create_task(self.loop_task())
         self.settings = dataIO.load_json(SETTINGS_JSON)
         self.clashroyale = dataIO.load_json(CLASHROYALE_JSON)
+
+        # init card data
+        self.cards = []
+        self.cards_abbrev = {}
+
+        for card_key, card_value in self.clashroyale["Cards"].items():
+            self.cards.append(card_key)
+            self.cards_abbrev[card_key] = card_key
+
+            if card_key.find('-'):
+                self.cards_abbrev[card_key.replace('-', '')] = card_key
+
+            aka_list = card_value["aka"]
+            for aka in aka_list:
+                self.cards_abbrev[aka] = card_key
+                if aka.find('-'):
+                    self.cards_abbrev[aka.replace('-', '')] = card_key
 
     def __unload(self):
         self.task.cancel()
@@ -228,7 +245,7 @@ class CRData:
 
     @crdata.command(name="decks", pass_context=True, no_pm=True)
     async def crdata_decks(self, ctx: Context):
-        """List decks on global 200 leaderboard."""
+        """List popular decks."""
         data = await self.get_now_data()
         decks = data["popularDecks"]
         await self.bot.say(
@@ -254,7 +271,7 @@ class CRData:
 
     @crdata.command(name="cards", pass_context=True, no_pm=True)
     async def crdata_cards(self, ctx: Context):
-        """List popular cards on global 200 leaberboard."""
+        """List popular cards."""
         await self.bot.send_typing(ctx.message.channel)
         data = await self.get_now_data()
         cards = data["popularCards"]
@@ -269,7 +286,7 @@ class CRData:
     @crdata.command(
         name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
     async def crdata_leaderboard(self, ctx: Context):
-        """List decks from leaderboard sorted by rank."""
+        """List decks sorted by rank."""
         await self.bot.say("**Global 200 Leaderboard Decks**")
         data = await self.get_now_data()
         decks = data["decks"]
@@ -288,6 +305,56 @@ class CRData:
                 i,
                 len(decks),
                 deck_name="Rank {}".format(i + 1),
+                author="Top 200 Decks",
+                description=desc[:-1])
+
+            if not show_next:
+                return
+
+    @crdata.command(name="search", pass_context=True, no_pm=True)
+    async def crdata_search(self, ctx: Context, *cards):
+        """Search decks with cards.
+
+        !crdata search fb log
+        """
+        if not len(cards):
+            await self.bot.say("You must neter at least one card.")
+            return
+
+        cards = self.normalize_deck_data(cards)
+        sfids = [self.id_to_sfid(c) for c in cards]
+
+        data = await self.get_now_data()
+        decks = data["decks"]
+
+        found_decks = []
+        for rank, deck in enumerate(decks):
+            deck_cards = [card["key"] for card in deck]
+            if set(sfids) <= set(deck_cards):
+                found_decks.append({
+                    "deck": deck,
+                    "rank": rank + 1})
+
+        await self.bot.say("Found {} decks.".format(
+            len(found_decks)))
+
+        for i, data in enumerate(found_decks):
+            deck = data["deck"]
+            rank = data["rank"]
+            cards = [self.sfid_to_id(card["key"]) for card in deck]
+            levels = [card["level"] for card in deck]
+
+            desc = "**Rank {}: **".format(rank)
+            for j, card in enumerate(cards):
+                desc += "{} ".format(self.id_to_name(card))
+                desc += "({}), ".format(levels[j])
+
+            show_next = await self.show_result_row(
+                ctx,
+                cards,
+                i,
+                len(decks),
+                deck_name="Rank {}".format(rank),
                 author="Top 200 Decks",
                 description=desc[:-1])
 
@@ -334,24 +401,40 @@ class CRData:
                 return False
         return True
 
-    def sfid_to_id(self, sfid:str):
+    def sfid_to_id(self, sfid: str):
         """Convert Starfire ID to Card ID."""
         cards = self.clashroyale["Cards"]
         for card_key, card_data in cards.items():
             if card_data["sfid"] == sfid:
                 return card_key
 
-    def sfid_to_name(self, sfid:str):
+    def sfid_to_name(self, sfid: str):
         """Convert Starfire ID to Name."""
         s = sfid.replace('_', ' ')
         s = string.capwords(s)
         return s
 
-    def id_to_name(self, id:str):
+    def id_to_name(self, id: str):
         """Convert ID to Name."""
         s = id.replace('-', ' ')
         s = string.capwords(s)
         return s
+
+    def id_to_sfid(self, id: str):
+        """Convert Card ID to Starfire ID."""
+        cards = self.clashroyale["Cards"]
+        return cards[id]["sfid"]
+
+    def normalize_deck_data(self, cards):
+        """Return a deck list with normalized names."""
+        deck = [c.lower() if c is not None else '' for c in cards]
+
+        # replace abbreviations
+        for i, card in enumerate(deck):
+            if card in self.cards_abbrev.keys():
+                deck[i] = self.cards_abbrev[card]
+
+        return deck
 
 
 def check_folder():

@@ -26,10 +26,11 @@ DEALINGS IN THE SOFTWARE.
 import csv
 import io
 import os
+import pprint
 import datetime as dt
 import string
 import asyncio
-import pprint
+from collections import OrderedDict
 from datetime import timedelta
 from urllib.parse import urljoin
 
@@ -52,11 +53,6 @@ try:
 except ImportError:
     raise ImportError("Please install the aiohttp package.") from None
 
-try:
-    import pandas
-except ImportError:
-    raise ImportError("Please install the pandas package.") from None
-
 PATH = os.path.join("data", "crinfo")
 SETTINGS_JSON = os.path.join(PATH, "settings.json")
 CLASHROYALE_JSON = os.path.join(PATH, "clashroyale.json")
@@ -77,7 +73,7 @@ class CRInfo:
         self.bot = bot
         self.settings = dataIO.load_json(SETTINGS_JSON)
         self.clashroyale = dataIO.load_json(CLASHROYALE_JSON)
-
+        self.data = {}
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(manage_server=True)
@@ -88,23 +84,28 @@ class CRInfo:
 
     @setcrinfo.command(name="update", pass_context=True, no_pm=True)
     async def setcrinfo_update(self):
-        """Load and return data according to key."""
-        url = (
-            "https://raw.githubusercontent.com/smlbiobot"
-            "/cr/master/apk/1.8.2/com.supercell.clashroyale-1.8.2-decoded"
-            "/assets/csv_logic/"
-            "treasure_chests.decoded.csv")
+        """Update data."""
+        await self.update_data()
+
+    async def update_data(self):
+        """Update data."""
+        self.data["chests"] = {}
+        url = urljoin(CSV_LOGIC_BASE, FILES["CHESTS"])
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 text = await resp.text()
         reader = csv.DictReader(io.StringIO(text))
-        for i, row in enumerate(reader):
-            out = []
-            out.append(str(i))
-            for k, v in row.items():
-                out.append('{}: {}'.format(k, v))
-            print('')
-            print(' | '.join(out))
+        for row in reader:
+            chests = {
+                k: v for k, v in row.items()
+                if k
+                in ["Name", "RareChance", "EpicChance", "LegendaryChance"]}
+            self.data["chests"][row["Name"]] = chests
+
+
+
+        # pp = pprint.pformat(self.data["chests"])
+        # print(pp)
 
     @commands.group(pass_context=True, no_pm=True)
     async def crinfo(self, ctx: Context):
@@ -119,13 +120,26 @@ class CRInfo:
         await self.bot.say(url)
 
     @crinfo.command(name="chest", pass_context=True, no_pm=True)
-    async def crinfo_chest(self, ctx: Context):
+    async def crinfo_chest(self, ctx: Context, chest_type: str):
         """Clash Royale chests."""
-        url = urljoin(CSV_LOGIC_BASE, FILES["CHESTS"])
-        await self.bot.say(url)
+        if "chests" not in self.data:
+            await self.update_data()
 
+        await self.bot.say("chest type: {}".format(chest_type))
 
+        if chest_type == "cc":
+            await self.bot.say("cc")
+            datadict = self.data["chests"]
+            data = [
+                (k, datadict[k]) for k in datadict
+                if k.startswith('Survival_Bronze')]
+            # data = [
+            #     (k, v) for k, v in self.data["chests"].items()
+            #     if k.startswith('Survival_Bronze')]
 
+            for page in pagify(str(data)):
+                await self.bot.say(page)
+            # await self.bot.say(box(pprint.pformat(data)))
 
 
 def check_folder():
@@ -133,11 +147,13 @@ def check_folder():
     if not os.path.exists(PATH):
         os.makedirs(PATH)
 
+
 def check_file():
     """Check settings."""
     defaults = {}
     if not dataIO.is_valid_json(SETTINGS_JSON):
         dataIO.save_json(SETTINGS_JSON, defaults)
+
 
 def setup(bot):
     """Setup cog."""
