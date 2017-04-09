@@ -239,7 +239,7 @@ class CRData:
 
     @commands.group(pass_context=True, no_pm=True)
     async def crdata(self, ctx: Context):
-        """Clash Royale data."""
+        """Clash Royale Global 200 data."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
