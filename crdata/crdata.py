@@ -329,11 +329,13 @@ class CRData:
 
         found_decks = []
         for rank, deck in enumerate(decks):
-            deck_cards = [card["key"] for card in deck]
-            if set(sfids) <= set(deck_cards):
-                found_decks.append({
-                    "deck": deck,
-                    "rank": rank + 1})
+            # in unknown instances, starfi.re returns empty rows
+            if deck is not None:
+                deck_cards = [card["key"] for card in deck]
+                if set(sfids) <= set(deck_cards):
+                    found_decks.append({
+                        "deck": deck,
+                        "rank": rank + 1})
 
         await self.bot.say("Found {} decks.".format(
             len(found_decks)))
