@@ -29,6 +29,7 @@ import datetime as dt
 import string
 import asyncio
 from datetime import timedelta
+from collections import Counter
 
 import discord
 from discord import Message
@@ -328,24 +329,37 @@ class CRData:
         decks = data["decks"]
 
         found_decks = []
+        unique_decks = []
+
         for rank, deck in enumerate(decks):
             # in unknown instances, starfi.re returns empty rows
             if deck is not None:
                 deck_cards = [card["key"] for card in deck]
                 if set(sfids) <= set(deck_cards):
-                    found_decks.append({
+                    found_deck = {
                         "deck": deck,
-                        "rank": rank + 1})
+                        "cards": set([c["key"] for c in deck]),
+                        "count": 1,
+                        "ranks": [str(rank + 1)]
+                    }
+                    if found_deck["cards"] in unique_decks:
+                        found_deck["count"] += 1
+                        found_deck["ranks"].append(str(rank + 1))
+                    else:
+                        found_decks.append(found_deck)
+                        unique_decks.append(found_deck["cards"])
 
         await self.bot.say("Found {} decks.".format(
             len(found_decks)))
 
         for i, data in enumerate(found_decks):
             deck = data["deck"]
-            rank = data["rank"]
+            rank = ", ".join(data["ranks"])
+            usage = data["count"]
             cards = [self.sfid_to_id(card["key"]) for card in deck]
             levels = [card["level"] for card in deck]
 
+            # desc = "**Rank {}: (Usage: {})**".format(rank, usage)
             desc = "**Rank {}: **".format(rank)
             for j, card in enumerate(cards):
                 desc += "{} ".format(self.id_to_name(card))
