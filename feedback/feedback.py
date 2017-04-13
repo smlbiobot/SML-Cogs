@@ -59,7 +59,8 @@ class Feedback:
         self.settings[server.id] = {
             "channel": "",
             "read_roles": [],
-            "send_roles": []
+            "send_roles": [],
+            "feedbacks": {}
         }
         dataIO.save_json(JSON, self.settings)
 
@@ -171,8 +172,8 @@ class Feedback:
             "Removed {} in list of roles allowed to send feedbacks."
             "".format(role))
 
-    @setfeedback.command(name="roles", pass_context=True, no_pm=True)
-    async def setfeedback_roles(self, ctx: Context):
+    @setfeedback.command(name="status", pass_context=True, no_pm=True)
+    async def setfeedback_status(self, ctx: Context):
         """Display list of roles allowed to use feedback."""
         server = ctx.message.server
         if server.id not in self.settings:
@@ -192,6 +193,11 @@ class Feedback:
             await self.bot.say(
                 "List of roles allowed to read feedback: {}"
                 "".format(", ".join(roles)))
+        if "channel" in s:
+            channel = discord.utils.get(server.channels, id=s["channel"])
+            await self.bot.say("Channel: {}".format(channel))
+        if "feedbacks" in s:
+            await self.bot.say("Feedbacks: {}".format(len(s["feedbacks"])))
 
     @commands.command(name="feedback", pass_context=True, no_pm=False)
     async def feedback(self, ctx: Context, *, msg: str):
@@ -231,8 +237,6 @@ class Feedback:
         else:
             server = servers[0]
 
-        await self.bot.say(
-            "Your feedback is logged for {}".format(server.name))
         channel_id = self.settings[server.id]["channel"]
         channel = self.bot.get_channel(channel_id)
 
@@ -241,8 +245,8 @@ class Feedback:
             channel, feedbackmsg)
 
         await self.bot.say(
-            "Feedback received. Someone will reply to you shortly.")
-
+            "Feedback for {} received."
+            "Someone will reply to you shortly.".format(server.name))
 
 
 def check_folder():
