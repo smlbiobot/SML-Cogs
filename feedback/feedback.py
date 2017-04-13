@@ -46,14 +46,135 @@ class Feedback:
         """Init."""
         self.bot = bot
         self.settings = dataIO.load_json(JSON)
-        self.data = {}
 
-    @commands.group(pass_context=True, no_pm=False)
+    @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(manage_server=True)
     async def setfeedback(self, ctx: Context):
-        """CRInfo settings."""
+        """Set settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    @setfeedback.group(name="addrole", pass_context=True, no_pm=True)
+    async def setfeedback_addrole(self, ctx: Context):
+        """Set feedback role permissions."""
+        if ctx.invoked_subcommand is None or\
+                isinstance(ctx.invoked_subcommand, commands.Group):
+            await send_cmd_help(ctx)
+
+    @setfeedback_addrole.command(
+        name="read", pass_context=True, no_pm=True)
+    async def setfeedback_addrole_read(self, ctx: Context, role):
+        """Set feedback read role."""
+        server = ctx.message.server
+        r = discord.utils.get(server.roles, name=role)
+        if r is None:
+            await self.bot.say(
+                "{} is not a valid role on this server.".format(
+                    role))
+            return
+        if server.id not in self.settings:
+            self.settings[server.id] = {
+                "read_roles": [],
+                "send_roles": []
+            }
+        if r.id in self.settings[server.id]["read_roles"]:
+            return
+        self.settings[server.id]["read_roles"].append(r.id)
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say(
+            "Added {} in list of roles allowed to read feedbacks."
+            "".format(role))
+
+    @setfeedback_addrole.command(
+        name="send", pass_context=True, no_pm=True)
+    async def setfeedback_addrole_send(self, ctx: Context, role):
+        """Set roles which can accept feedback."""
+        server = ctx.message.server
+        r = discord.utils.get(server.roles, name=role)
+        if r is None:
+            await self.bot.say(
+                "{} is not a valid role on this server.".format(
+                    role))
+            return
+        if server.id not in self.settings:
+            self.settings[server.id] = {
+                "read_roles": [],
+                "send_roles": []
+            }
+        if r.id in self.settings[server.id]["send_roles"]:
+            return
+        self.settings[server.id]["send_roles"].append(r.id)
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say(
+            "Added {} in list of roles allowed to send feedbacks."
+            "".format(role))
+
+    @setfeedback.group(name="removerole", pass_context=True, no_pm=True)
+    async def setfeedback_removerole(self, ctx: Context):
+        """Add roles."""
+        if ctx.invoked_subcommand is None or\
+                isinstance(ctx.invoked_subcommand, commands.Group):
+            await send_cmd_help(ctx)
+
+    @setfeedback_removerole.command(
+        name="read", pass_context=True, no_pm=True)
+    async def setfeedback_removerole_read(self, ctx: Context, role):
+        """Set feedback read role."""
+        server = ctx.message.server
+        r = discord.utils.get(server.roles, name=role)
+        if r is None:
+            await self.bot.say(
+                "{} is not a valid role on this server.".format(
+                    role))
+            return
+        if server.id not in self.settings:
+            return
+        self.settings[server.id]["read_roles"].remove(r.id)
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say(
+            "Removed {} in list of roles allowed to read feedbacks."
+            "".format(role))
+
+    @setfeedback_removerole.command(
+        name="send", pass_context=True, no_pm=True)
+    async def setfeedback_removerole_send(self, ctx: Context, role):
+        """Remove feedback role."""
+        server = ctx.message.server
+        r = discord.utils.get(server.roles, name=role)
+        if r is None:
+            await self.bot.say(
+                "{} is not a valid role on this server.".format(
+                    role))
+            return
+        if server.id not in self.settings:
+            return
+        self.settings[server.id]["send_roles"].remove(r.id)
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say(
+            "Removed {} in list of roles allowed to send feedbacks."
+            "".format(role))
+
+    @setfeedback.command(name="roles", pass_context=True, no_pm=True)
+    async def setfeedback_roles(self, ctx: Context):
+        """Display list of roles allowed to use feedback."""
+        server = ctx.message.server
+        if server.id not in self.settings:
+            return
+        s = self.settings[server.id]
+        if "send_roles" in s:
+            roles = [
+                discord.utils.get(
+                    server.roles, id=id).name for id in s["send_roles"]]
+            await self.bot.say(
+                "List of roles allowed to send feedback: {}"
+                "".format(", ".join(roles)))
+        if "read_roles" in s:
+            roles = [
+                discord.utils.get(
+                    server.roles, id=id).name for id in s["read_roles"]]
+            await self.bot.say(
+                "List of roles allowed to read feedback: {}"
+                "".format(", ".join(roles)))
 
 
 def check_folder():
