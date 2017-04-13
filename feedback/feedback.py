@@ -54,6 +54,29 @@ class Feedback:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    def init_server_settings(self, server):
+        """Init server settings."""
+        self.settings[server.id] = {
+            "channel": "",
+            "read_roles": [],
+            "send_roles": []
+        }
+        dataIO.save_json(JSON, self.settings)
+
+    @setfeedback.command(name="channel", pass_context=True, no_pm=True)
+    async def setfeedback_channel(
+            self, ctx: Context, channel: discord.Channel=None):
+        """Set feedback channel."""
+        if channel is None:
+            channel = ctx.message.channel
+        server = ctx.message.server
+        if server.id not in self.settings:
+            self.init_server_settings(server)
+        self.settings[server.id]["channel"] = channel.id
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say(
+            "Feedback channel set to {}".format(channel.name))
+
     @setfeedback.group(name="addrole", pass_context=True, no_pm=True)
     async def setfeedback_addrole(self, ctx: Context):
         """Set feedback role permissions."""
@@ -73,10 +96,7 @@ class Feedback:
                     role))
             return
         if server.id not in self.settings:
-            self.settings[server.id] = {
-                "read_roles": [],
-                "send_roles": []
-            }
+            self.init_server_settings(server)
         if r.id in self.settings[server.id]["read_roles"]:
             return
         self.settings[server.id]["read_roles"].append(r.id)
@@ -97,10 +117,7 @@ class Feedback:
                     role))
             return
         if server.id not in self.settings:
-            self.settings[server.id] = {
-                "read_roles": [],
-                "send_roles": []
-            }
+            self.init_server_settings(server)
         if r.id in self.settings[server.id]["send_roles"]:
             return
         self.settings[server.id]["send_roles"].append(r.id)
@@ -175,6 +192,57 @@ class Feedback:
             await self.bot.say(
                 "List of roles allowed to read feedback: {}"
                 "".format(", ".join(roles)))
+
+    @commands.command(name="feedback", pass_context=True, no_pm=False)
+    async def feedback(self, ctx: Context, *, msg: str):
+        """Send feedback via DM to bot."""
+        author = ctx.message.author
+        servers = []
+        for server_id in self.settings:
+            server = self.bot.get_server(server_id)
+            if author in server.members:
+                servers.append(server)
+        if not len(servers):
+            await self.bot.say("You are not in the list of servers.")
+            return
+        if len(servers) > 1:
+            out = []
+            out.append(
+                "Please choose a server you would like to leave"
+                "feedback for:")
+            out.append("\n".join([
+                "{}. {}".format(i, server)
+                for i, server in enumerate(servers)]))
+            await self.bot.say("\n".join(out))
+
+            def check(msg):
+                """Validation."""
+                content = msg.content
+                if not content.isdigit():
+                    return False
+                content = int(content)
+                if not content < len(servers):
+                    return False
+                return True
+
+            answer = await self.bot.wait_for_message(
+                author=author, timeout=60, check=check)
+            server = servers[int(answer.content)]
+        else:
+            server = servers[0]
+
+        await self.bot.say(
+            "Your feedback is logged for {}".format(server.name))
+        channel_id = self.settings[server.id]["channel"]
+        channel = self.bot.get_channel(channel_id)
+
+        feedbackmsg = "**[{}]** {}".format(author, msg)
+        await self.bot.send_message(
+            channel, feedbackmsg)
+
+        await self.bot.say(
+            "Feedback received. Someone will reply to you shortly.")
+
 
 
 def check_folder():
