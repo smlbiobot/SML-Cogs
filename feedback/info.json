@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Feedback via DM",
+	"DESCRIPTION": "Accept feedback from users via DM.",
+	"DISABLED": false,
+	"NAME": "Feedback",
+	"REQUIREMENTS": [],
+	"TAGS": ["feedback", "suggestion", "comment"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please add an issue on Github."
+}
