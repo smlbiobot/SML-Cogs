@@ -24,6 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 import os
+from datetime import datetime as dt
 
 import discord
 from discord.ext import commands
@@ -201,43 +202,59 @@ class Feedback:
 
     @commands.command(name="feedback", pass_context=True, no_pm=False)
     async def feedback(self, ctx: Context, *, msg: str):
-        """Send feedback via DM to bot."""
+        """Send feedback as message or DM."""
         author = ctx.message.author
-        servers = []
-        for server_id in self.settings:
-            server = self.bot.get_server(server_id)
-            if author in server.members:
-                servers.append(server)
-        if not len(servers):
-            await self.bot.say("You are not in the list of servers.")
-            return
-        if len(servers) > 1:
-            out = []
-            out.append(
-                "Please choose a server you would like to leave"
-                "feedback for:")
-            out.append("\n".join([
-                "{}. {}".format(i, server)
-                for i, server in enumerate(servers)]))
-            await self.bot.say("\n".join(out))
+        server = None
+        if ctx.message.server is not None:
+            server = ctx.message.server
+        if server is None:
+            servers = []
+            for server_id in self.settings:
+                server = self.bot.get_server(server_id)
+                if author in server.members:
+                    servers.append(server)
+            if not len(servers):
+                await self.bot.say("You are not in the list of servers.")
+                return
+            if len(servers) > 1:
+                out = []
+                out.append(
+                    "Please choose a server you would like to leave"
+                    "feedback for:")
+                out.append("\n".join([
+                    "{}. {}".format(i, server)
+                    for i, server in enumerate(servers)]))
+                await self.bot.say("\n".join(out))
 
-            def check(msg):
-                """Validation."""
-                content = msg.content
-                if not content.isdigit():
-                    return False
-                content = int(content)
-                if not content < len(servers):
-                    return False
-                return True
+                def check(msg):
+                    """Validation."""
+                    content = msg.content
+                    if not content.isdigit():
+                        return False
+                    content = int(content)
+                    if not content < len(servers):
+                        return False
+                    return True
 
-            answer = await self.bot.wait_for_message(
-                author=author, timeout=60, check=check)
-            server = servers[int(answer.content)]
-        else:
-            server = servers[0]
+                answer = await self.bot.wait_for_message(
+                    author=author, timeout=60, check=check)
+                server = servers[int(answer.content)]
+            else:
+                server = servers[0]
 
-        channel_id = self.settings[server.id]["channel"]
+        settings = self.settings[server.id]
+
+        if "feedbacks" not in settings:
+            settings["feedbacks"] = {}
+        if author.id not in settings["feedbacks"]:
+            settings["feedbacks"][author.id] = []
+        settings["feedbacks"][author.id].append({
+            "time": dt.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+            "message": msg
+        })
+        dataIO.save_json(JSON, self.settings)
+
+        channel_id = settings["channel"]
         channel = self.bot.get_channel(channel_id)
 
         feedbackmsg = "**[{}]** {}".format(author, msg)
@@ -245,7 +262,7 @@ class Feedback:
             channel, feedbackmsg)
 
         await self.bot.say(
-            "Feedback for {} received."
+            "Feedback for {} received. "
             "Someone will reply to you shortly.".format(server.name))
 
 
