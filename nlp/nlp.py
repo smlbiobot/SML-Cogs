@@ -23,13 +23,19 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-
+import os
 from collections import OrderedDict
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
+from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
+
+PATH = os.path.join("data", "nlp")
+JSON = os.path.join(PATH, "settings.json")
 
 try:
+    import textblob
     from textblob import TextBlob
 except ImportError:
     raise ImportError("Please install the textblob package from pip") from None
@@ -89,6 +95,7 @@ class NLP:
 
     def __init__(self, bot):
         self.bot = bot
+        self.settings = dataIO.load_json(JSON)
 
     @commands.command(pass_context=True)
     async def translate(self, ctx: Context, to_lang: str, *, text: str):
@@ -111,7 +118,6 @@ class NLP:
         out = ["**{}**: {}".format(k, v) for k, v in LANG.items()]
         await self.bot.say(", ".join(out))
 
-
     @commands.command(pass_context=True)
     async def sentiment(self, ctx: Context, *, text: str):
         """Return sentiment analysis of a text."""
@@ -128,16 +134,68 @@ class NLP:
         b = TextBlob(text)
         await self.bot.say(b.correct())
 
-    @commands.command(pass_context=True)
-    async def grabroles(self, ctx: Context):
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_server=True)
+    async def autotranslate(self, ctx, on_off: bool):
+        """Auto translate."""
         server = ctx.message.server
-        roles = [
-            r.name.replace(" ", "_").lower()
-            for r in server.roles if not r.is_everyone]
-        roles = ["!role:{}".format(r) for r in roles]
-        await self.bot.say(",".join(roles))
+        if server.id not in self.settings:
+            self.settings[server.id] = {}
+        self.settings[server.id]["AUTO_TRANSLATE"] = on_off
+        if on_off:
+            self.settings[server.id]["CHANNEL"] = ctx.message.channel.id
+            await self.bot.say(
+                "Auto-translate enabled for {}".format(
+                    ctx.message.channel))
+        else:
+            await self.bot.say(
+                "Auto-translate disabled.")
+        dataIO.save_json(JSON, self.settings)
+
+    async def on_message(self, msg: discord.Message):
+        """Auto-translate if enabled."""
+        server = msg.server
+        if server is None:
+            return
+        if not server.id:
+            return
+        if server.id not in self.settings:
+            return
+        if "AUTO_TRANSLATE" not in self.settings[server.id]:
+            return
+        if msg.channel is None:
+            return
+        if msg.channel.id != self.settings[server.id]["CHANNEL"]:
+            return
+        if self.settings[server.id]["AUTO_TRANSLATE"]:
+            try:
+                blob = TextBlob(msg.content)
+                out = blob.translate(to='en')
+                author = msg.author
+                await self.bot.send_message(
+                    msg.channel,
+                    "**{}: **{}".format(
+                        author.display_name, out))
+            except textblob.exceptions.NotTranslated:
+                return
+
+
+def check_folder():
+    """Check folder."""
+    if not os.path.exists(PATH):
+        os.makedirs(PATH)
+
+
+def check_file():
+    """Check settings."""
+    defaults = {}
+    if not dataIO.is_valid_json(JSON):
+        dataIO.save_json(JSON, defaults)
 
 
 def setup(bot):
+    """Setup cog."""
+    check_folder()
+    check_file()
     n = NLP(bot)
     bot.add_cog(n)
