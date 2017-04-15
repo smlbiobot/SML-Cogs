@@ -1,0 +1,11 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Natural Language Processing",
+	"DESCRIPTION": "Google Translate + some natural language processing features.",
+	"DISABLED": false,
+	"NAME": "NLP",
+	"REQUIREMENTS": ["textblob"],
+	"TAGS": ["translate", "language", "natural"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please log an issue on my GitHub or message me on http://discord.me/sml"
+
+}
