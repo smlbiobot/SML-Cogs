@@ -47,8 +47,8 @@ LANG = OrderedDict([
     ("be", "Belarusian"),
     ("bg", "Bulgarian"),
     ("ca", "Catalan"),
-    ("zh-CN", "Chinese (Simplified)"),
-    ("zh-TW", "Chinese (Traditional)"),
+    ("zh-cn", "Chinese (Simplified)"),
+    ("zh-tw", "Chinese (Traditional)"),
     ("hr", "Croatian"),
     ("cs", "Czech"),
     ("da", "Danish"),
@@ -136,17 +136,26 @@ class NLP:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_server=True)
-    async def autotranslate(self, ctx, on_off: bool):
-        """Auto translate."""
+    async def autotranslate(self, ctx, language: str):
+        """Set auto-translate language or disable it.
+
+        Use 0 as language to disable auto-translation."""
         server = ctx.message.server
         if server.id not in self.settings:
             self.settings[server.id] = {}
+        on_off = True
+        if language.lower() in ['off', '0', 'false']:
+            on_off = False
         self.settings[server.id]["AUTO_TRANSLATE"] = on_off
+        self.settings[server.id]["LANGUAGE"] = language
         if on_off:
             self.settings[server.id]["CHANNEL"] = ctx.message.channel.id
+            lang = language
+            if language in LANG:
+                lang = LANG[language]
             await self.bot.say(
-                "Auto-translate enabled for {}".format(
-                    ctx.message.channel))
+                "Auto-translating messages to {} in {}".format(
+                    lang, ctx.message.channel))
         else:
             await self.bot.say(
                 "Auto-translate disabled.")
@@ -167,10 +176,12 @@ class NLP:
             return
         if msg.channel.id != self.settings[server.id]["CHANNEL"]:
             return
+        if msg.author == server.me:
+            return
         if self.settings[server.id]["AUTO_TRANSLATE"]:
             try:
                 blob = TextBlob(msg.content)
-                out = blob.translate(to='en')
+                out = blob.translate(to=self.settings[server.id]["LANGUAGE"])
                 author = msg.author
                 await self.bot.send_message(
                     msg.channel,
