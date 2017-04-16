@@ -248,10 +248,8 @@ class Feedback:
             settings["feedbacks"] = {}
         if author.id not in settings["feedbacks"]:
             settings["feedbacks"][author.id] = []
-        settings["feedbacks"][author.id].append({
-            "time": dt.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
-            "message": msg
-        })
+        settings["feedbacks"][author.id].append(
+            self.feedback_data(author, msg))
         dataIO.save_json(JSON, self.settings)
 
         channel_id = settings["channel"]
@@ -264,6 +262,47 @@ class Feedback:
         await self.bot.say(
             "Feedback for {} received. "
             "Someone will reply to you shortly.".format(server.name))
+
+    @commands.command(
+        name="feedbackreply", aliases="freply",
+        pass_context=True, no_pm=True)
+    async def feedbackreply(self, ctx, user: discord.Member, *, msg):
+        """Reply to user."""
+        author = ctx.message.author
+        server = ctx.message.server
+        if server is None:
+            return
+        if server.id not in self.settings:
+            return
+        settings = self.settings[server.id]["feedbacks"]
+        if user is None:
+            return
+        if user.id not in settings:
+            await self.bot.say(
+                "{} has not left any feedback on this server.".format(
+                    user.display_name))
+            return
+        settings[user.id].append(
+            self.feedback_data(author, msg))
+        dataIO.save_json(JSON, self.settings)
+
+        replymsg = '**[{}]** {}'.format(author, msg)
+        await self.bot.send_message(user, replymsg)
+        await self.bot.send_message(
+            user, "Use the feedback command again if you wish to reply.")
+        await self.bot.say(
+            'Reply sent via DM to {}'.format(
+                user.display_name))
+
+    def feedback_data(self, user: discord.Member, msg):
+        """Return feedback data dictionary."""
+        return {
+            "author_name": user.display_name,
+            "author_id": user.id,
+            "time": dt.utcnow().strftime('%Y-%m-%d %H:%M:%S'),
+            "message": msg
+        }
+
 
 
 def check_folder():
