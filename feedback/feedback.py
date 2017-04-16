@@ -110,7 +110,7 @@ class Feedback:
     @setfeedback_addrole.command(
         name="send", pass_context=True, no_pm=True)
     async def setfeedback_addrole_send(self, ctx: Context, role):
-        """Set roles which can accept feedback."""
+        """Set roles who can send feedback."""
         server = ctx.message.server
         r = discord.utils.get(server.roles, name=role)
         if r is None:
@@ -138,7 +138,7 @@ class Feedback:
     @setfeedback_removerole.command(
         name="read", pass_context=True, no_pm=True)
     async def setfeedback_removerole_read(self, ctx: Context, role):
-        """Set feedback read role."""
+        """Remove feedback read role."""
         server = ctx.message.server
         r = discord.utils.get(server.roles, name=role)
         if r is None:
@@ -157,7 +157,7 @@ class Feedback:
     @setfeedback_removerole.command(
         name="send", pass_context=True, no_pm=True)
     async def setfeedback_removerole_send(self, ctx: Context, role):
-        """Remove feedback role."""
+        """Remove feedback send role."""
         server = ctx.message.server
         r = discord.utils.get(server.roles, name=role)
         if r is None:
@@ -264,7 +264,7 @@ class Feedback:
             "Someone will reply to you shortly.".format(server.name))
 
     @commands.command(
-        name="feedbackreply", aliases="freply",
+        name="feedbackreply", aliases=["freply"],
         pass_context=True, no_pm=True)
     async def feedbackreply(self, ctx, user: discord.Member, *, msg):
         """Reply to user."""
@@ -281,6 +281,15 @@ class Feedback:
             await self.bot.say(
                 "{} has not left any feedback on this server.".format(
                     user.display_name))
+            return
+        author_role_ids = set([r.id for r in author.roles])
+        can_reply = False
+        for rid in self.settings[server.id]["read_roles"]:
+            if rid in author_role_ids:
+                can_reply = True
+                break
+        if not can_reply:
+            await self.bot.say("You have no permission to reply to feedbacks.")
             return
         settings[user.id].append(
             self.feedback_data(author, msg))
