@@ -85,6 +85,8 @@ class MemberManagement:
         option_members_without_clan_tag = "--members-without-clan-tag" in args
         option_sort_join = "--sort-join" in args
         option_everyone = "--everyone" in args
+        option_sort_alpha = "--sort-alpha" in args
+        option_csv = "--csv" in args
 
         server = ctx.message.server
         server_roles_names = [r.name for r in server.roles]
@@ -165,15 +167,25 @@ class MemberManagement:
             out_members = list(out_members)
             out_members.sort(key=lambda x: x.joined_at)
 
+            # sort alpha
+            if option_sort_alpha:
+                out_members = list(out_members)
+                out_members.sort(key=lambda x: x.display_name)
+
             # embed output
             if not option_output_mentions_only:
-                for data in self.get_member_embeds(ctx, out_members):
-                    try:
-                        await self.bot.say(embed=data)
-                    except discord.HTTPException:
-                        await self.bot.say(
-                            "I need the `Embed links` permission "
-                            "to send this")
+                if option_csv:
+                    await self.bot.say(", ".join([
+                        m.display_name for m in out_members]))
+
+                else:
+                    for data in self.get_member_embeds(ctx, out_members):
+                        try:
+                            await self.bot.say(embed=data)
+                        except discord.HTTPException:
+                            await self.bot.say(
+                                "I need the `Embed links` permission "
+                                "to send this")
 
             # Display a copy-and-pastable list
             if option_output_mentions | option_output_mentions_only:
