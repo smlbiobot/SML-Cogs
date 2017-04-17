@@ -167,39 +167,13 @@ class MemberManagement:
 
             # embed output
             if not option_output_mentions_only:
-                color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-                color = int(color, 16)
-
-                # split embed output to multiples of 25
-                # because embed only supports 25 max fields
-
-                out_members_group = self.grouper(25, out_members)
-
-                for out_members_list in out_members_group:
-
-                    data = discord.Embed(
-                        color=discord.Colour(value=color))
-
-                    for m in out_members_list:
-                        value = []
-                        roles = [r.name for r in m.roles if r.name != "@everyone"]
-                        value.append(f"{', '.join(roles)}")
-
-                        name = m.display_name
-                        since_joined = (ctx.message.timestamp - m.joined_at).days
-
-                        data.add_field(
-                            name=str(name),
-                            value=str(
-                                ''.join(value) +
-                                '\n{} days ago'.format(
-                                    since_joined)))
-
+                for data in self.get_member_embeds(ctx, out_members):
                     try:
                         await self.bot.say(embed=data)
                     except discord.HTTPException:
-                        await self.bot.say("I need the `Embed links` permission "
-                                           "to send this")
+                        await self.bot.say(
+                            "I need the `Embed links` permission "
+                            "to send this")
 
             # Display a copy-and-pastable list
             if option_output_mentions | option_output_mentions_only:
@@ -210,6 +184,37 @@ class MemberManagement:
                 out = ' '.join(mention_list)
                 for page in pagify(out, shorten_by=24):
                     await self.bot.say(box(page))
+
+    def get_member_embeds(self, ctx, members):
+        """Discord embed of data display."""
+        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+        color = int(color, 16)
+        embeds = []
+
+        # split embed output to multiples of 25
+        # because embed only supports 25 max fields
+        out_members_group = self.grouper(25, members)
+
+        for out_members_list in out_members_group:
+            data = discord.Embed(
+                color=discord.Colour(value=color))
+            for m in out_members_list:
+                value = []
+                roles = [r.name for r in m.roles if r.name != "@everyone"]
+                value.append(f"{', '.join(roles)}")
+
+                name = m.display_name
+                since_joined = (ctx.message.timestamp - m.joined_at).days
+
+                data.add_field(
+                    name=str(name),
+                    value=str(
+                        ''.join(value) +
+                        '\n{} days ago'.format(
+                            since_joined)))
+            embeds.append(data)
+        return embeds
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def listroles(self, ctx: Context):
