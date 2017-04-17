@@ -36,7 +36,7 @@ from cogs.economy import SetParser
 
 RULES_URL = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
 ROLES_URL = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
-DISCORD_URL = "http://tiny.cc/alphachat"
+DISCORD_URL = "http://discord.me/racf"
 
 welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
               "interested in joining our clans / just visiting?"
