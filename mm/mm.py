@@ -175,8 +175,10 @@ class MemberManagement:
             # embed output
             if not option_output_mentions_only:
                 if option_csv:
-                    await self.bot.say(", ".join([
-                        m.display_name for m in out_members]))
+                    out = ", ".join([
+                        m.display_name for m in out_members])
+                    for page in pagify(out, shorten_by=50):
+                        await self.bot.say(page)
 
                 else:
                     for data in self.get_member_embeds(ctx, out_members):
