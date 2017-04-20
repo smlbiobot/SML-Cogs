@@ -215,7 +215,7 @@ class MemberManagement:
             for m in out_members_list:
                 value = []
                 roles = [r.name for r in m.roles if r.name != "@everyone"]
-                value.append(f"{', '.join(roles)}")
+                value.append(', '.join(roles))
 
                 name = m.display_name
                 since_joined = (ctx.message.timestamp - m.joined_at).days
