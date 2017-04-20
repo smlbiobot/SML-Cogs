@@ -354,6 +354,26 @@ class RACF:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(administrator=True)
+    async def member2roles(self, ctx: Context, with_role, new_role):
+        """Add role to a list of users with specific roles."""
+        server = ctx.message.server
+        with_role = discord.utils.get(server.roles, name=with_role)
+        new_role = discord.utils.get(server.roles, name=new_role)
+        if with_role is None:
+            await self.bot.say('{} is not a valid role'.format(with_role))
+            return
+        if new_role is None:
+            await self.bot.say('{} is not a valid role.'.format(new_role))
+            return
+        members = [m for m in server.members if with_role in m.roles]
+        for member in members:
+            await self.bot.add_roles(member, new_role)
+            await self.bot.say("Added {} for {}".format(
+                new_role, member.display_name))
+
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(administrator=True)
     async def member2visitor(self, ctx: Context, *members: discord.Member):
         """Re-assign list of people from members to visitors."""
         server = ctx.message.server
