@@ -419,8 +419,7 @@ class RACF:
         server = ctx.message.server
         out = []
         for emoji in server.emojis:
-            # Discord emojis: <:joyless:230104023305420801>
-            emoji_str = "<:{0.name}:{0.id}>".format(emoji)
+            emoji_str = str(emoji)
             out.append("{} `:{}:`".format(emoji_str, emoji.name))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
