@@ -322,8 +322,16 @@ class CRData:
             await self.bot.say("You must neter at least one card.")
             return
 
+        # break lists out by include and exclude
+        include_cards = [c for c in cards if not c.startswith('-')]
+        exclude_cards = [c[1:] for c in cards if c.startswith('-')]
+
+        include_cards = self.normalize_deck_data(include_cards)
+        include_sfids = [self.id_to_sfid(c) for c in include_cards]
+        exclude_cards = self.normalize_deck_data(exclude_cards)
+        exclude_sfids = [self.id_to_sfid(c) for c in exclude_cards]
+
         cards = self.normalize_deck_data(cards)
-        sfids = [self.id_to_sfid(c) for c in cards]
 
         data = await self.get_now_data()
         decks = data["decks"]
@@ -335,19 +343,26 @@ class CRData:
             # in unknown instances, starfi.re returns empty rows
             if deck is not None:
                 deck_cards = [card["key"] for card in deck]
-                if set(sfids) <= set(deck_cards):
-                    found_deck = {
-                        "deck": deck,
-                        "cards": set([c["key"] for c in deck]),
-                        "count": 1,
-                        "ranks": [str(rank + 1)]
-                    }
-                    if found_deck["cards"] in unique_decks:
-                        found_deck["count"] += 1
-                        found_deck["ranks"].append(str(rank + 1))
-                    else:
-                        found_decks.append(found_deck)
-                        unique_decks.append(found_deck["cards"])
+                if set(include_sfids) <= set(deck_cards):
+                    include_deck = True
+                    if len(exclude_sfids):
+                        for sfid in exclude_sfids:
+                            if sfid in deck_cards:
+                                include_deck = False
+                                break
+                    if include_deck:
+                        found_deck = {
+                            "deck": deck,
+                            "cards": set([c["key"] for c in deck]),
+                            "count": 1,
+                            "ranks": [str(rank + 1)]
+                        }
+                        if found_deck["cards"] in unique_decks:
+                            found_deck["count"] += 1
+                            found_deck["ranks"].append(str(rank + 1))
+                        else:
+                            found_decks.append(found_deck)
+                            unique_decks.append(found_deck["cards"])
 
         await self.bot.say("Found {} decks.".format(
             len(found_decks)))
