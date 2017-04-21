@@ -62,6 +62,11 @@ DATA_UPDATE_INTERVAL = timedelta(minutes=5).seconds
 RESULTS_MAX = 3
 PAGINATION_TIMEOUT = 20
 
+def jaccard_similarity(x, y):
+    intersection_cardinality = len(set.intersection(*[set(x), set(y)]))
+    union_cardinality = len(set.union(*[set(x), set(y)]))
+    return intersection_cardinality / float(union_cardinality)
+
 
 class BarChart:
     """Plotting bar charts as ASCII.
@@ -336,8 +341,17 @@ class CRData:
         data = await self.get_now_data()
         decks = data["decks"]
 
+        # sort card in decks
+        sorted_decks = []
+        for deck in decks:
+            sorted_decks.append(sorted(deck.copy(), key=lambda x: x["key"]))
+        decks = sorted_decks
+
         found_decks = []
         unique_decks = []
+
+        # debug: to show uniques or not
+        unique_only = False
 
         for rank, deck in enumerate(decks):
             # in unknown instances, starfi.re returns empty rows
@@ -360,6 +374,8 @@ class CRData:
                         if found_deck["cards"] in unique_decks:
                             found_deck["count"] += 1
                             found_deck["ranks"].append(str(rank + 1))
+                            if not unique_only:
+                                unique_decks.append(found_deck["cards"])
                         else:
                             found_decks.append(found_deck)
                             unique_decks.append(found_deck["cards"])
@@ -391,6 +407,90 @@ class CRData:
 
             if not show_next:
                 return
+
+    @crdata.command(name="similar", pass_context=True)
+    async def crdata_similar(self, ctx, *cards):
+        """Find similar decks with specific deck or rank on leaderboard.
+
+        Find decks similar to the 2nd deck on Global 200:
+        !crdata similar 2
+
+        Find decks similar to what is entered:
+        !crdata similar hog log barrel gg skarmy princess it knight
+        """
+        is_rank = len(cards) == 1 and cards[0].isdigit()
+        is_card = len(cards) == 8
+        if not is_rank and not is_card:
+            await send_cmd_help(ctx)
+            return
+
+        data = await self.get_now_data()
+        decks = data["decks"]
+
+        # sort card in decks
+        # extract card keys as list
+        sorted_decks = []
+        for deck in decks:
+            d = sorted(deck.copy(), key=lambda x: x["key"])
+            d = [self.sfid_to_id(card["key"]) for card in d]
+            sorted_decks.append(d)
+        decks = sorted_decks
+
+        if is_rank:
+            deck = decks[int(cards[0]) - 1]
+        else:
+            cards = self.normalize_deck_data(cards)
+            deck = [c for c in cards]
+
+        # Entered deck
+        await self.bot.say(
+            "Listing decks from Global 200 that is most similar to:")
+        await self.show_result_row(
+            ctx,
+            deck,
+            0,
+            1,
+            deck_name="User Deck",
+            author="Similarity Search")
+
+        # Similarity search
+        results = []
+        uniques = []
+        for candidate in decks:
+            similarity = jaccard_similarity(deck, candidate)
+            if similarity != 1.0:
+                result = {
+                    "deck": candidate,
+                    "similarity": similarity
+                }
+                if candidate not in uniques:
+                    uniques.append(candidate)
+                    results.append(result)
+
+        # Sort by similarity
+        results = sorted(results, key=lambda x: -x["similarity"])
+
+        # Remove same deck (similarity = 1)
+        results = [r for r in results if r["similarity"] != 1.0]
+
+        # Output
+
+        for i, data in enumerate(results):
+            deck = data["deck"]
+            desc = "Similarity: {:.3f}".format(data["similarity"])
+
+            show_next = await self.show_result_row(
+                ctx,
+                deck,
+                i,
+                len(results),
+                deck_name=desc,
+                author="Top 200 Decks",
+                description=desc)
+
+            if not show_next:
+                return
+
 
     async def show_result_row(
             self, ctx: Context, cards, row_id, total_rows,
