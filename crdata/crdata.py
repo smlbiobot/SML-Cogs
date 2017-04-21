@@ -28,6 +28,7 @@ import os
 import datetime as dt
 import string
 import asyncio
+import json
 from datetime import timedelta
 from collections import Counter
 
@@ -222,9 +223,16 @@ class CRData:
                 auth=aiohttp.BasicAuth(
                     login=self.settings["STARFIRE_USERNAME"],
                     password=self.settings["STARFIRE_PASSWORD"])) as session:
-                resp = await session.get(url)
-                data = await resp.json()
-                dataIO.save_json(now_path, data)
+                async with session.get(url) as resp:
+                    # resp = await session.get(url)
+                    try:
+                        data = await resp.json()
+                    except json.decoder.JSONDecodeError:
+                        data = await resp.text()
+        if data is None:
+            print("Data exists already.")
+        else:
+            dataIO.save_json(now_path, data)
         return data
 
     async def get_now_data(self):
@@ -344,7 +352,10 @@ class CRData:
         # sort card in decks
         sorted_decks = []
         for deck in decks:
-            sorted_decks.append(sorted(deck.copy(), key=lambda x: x["key"]))
+            # for unknown reasons deck could sometimes be None in data src
+            if deck is not None:
+                sorted_decks.append(
+                    sorted(deck.copy(), key=lambda x: x["key"]))
         decks = sorted_decks
 
         found_decks = []
