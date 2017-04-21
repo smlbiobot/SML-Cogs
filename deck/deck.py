@@ -37,8 +37,8 @@ import io
 import string
 from cogs.utils.chat_formatting import pagify
 
-settings_path = "data/deck/settings.json"
-crdata_path = "data/deck/clashroyale.json"
+settings_path = os.path.join("data", "deck", "settings.json")
+crdata_path = os.path.join("data", "deck", "clashroyale.json")
 max_deck_per_user = 5
 
 PAGINATION_TIMEOUT = 20.0
@@ -98,7 +98,7 @@ class Deck:
         """Clash Royale deck builder.
 
         Example usage:
-        !deck add 3m mm ig is fs pump horde knight "3M EBarbs"
+        !deck add 3m mm ig is fs pump horde eb "3M EBarbs"
 
         Card list
         !deck cards
@@ -127,7 +127,7 @@ class Deck:
 
         Enter 8 cards followed by a name.
 
-        Example: !deck get bbd mm loon bt is fs gs lh
+        Example: !deck get bbd mm loon bt is fs gs lh "Lava Loon"
 
         For the full list of acceptable card names, type !deck cards
         """
@@ -152,7 +152,7 @@ class Deck:
                        deck_name=None):
         """Add a deck to a personal decklist.
 
-        Example: !deck add bbd mm loon bt is fs gs lh
+        Example: !deck add bbd mm loon bt is fs gs lh "Lava Loon"
 
         For the full list of acceptable card names, type !deck cards
         """
@@ -721,15 +721,18 @@ class Deck:
 
 
 def check_folder():
-    folders = ["data/deck",
-               "data/deck/img",
-               "data/deck/img/cards"]
+    """Verify folders exist."""
+    folders = [
+        os.path.join("data", "deck"),
+        os.path.join("data", "deck", "img"),
+        os.path.join("data", "deck", "img", "cards")]
     for f in folders:
         if not os.path.exists(f):
             print("Creating {} folder".format(f))
             os.makedirs(f)
 
 def check_file():
+    """Verify data is valid."""
     settings = {
         "Servers": {}
     }
@@ -739,6 +742,7 @@ def check_file():
         dataIO.save_json(f, settings)
 
 def setup(bot):
+    """Add cog to Red."""
     check_folder()
     check_file()
     n = Deck(bot)
