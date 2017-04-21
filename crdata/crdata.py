@@ -437,8 +437,12 @@ class CRData:
         decks = sorted_decks
 
         if is_rank:
+            deck_name = "Rank {}".format(cards[0])
+            deck_author = "Top 200 Decks"
             deck = decks[int(cards[0]) - 1]
         else:
+            deck_name = "User Deck"
+            deck_author = "Similarity Search"
             cards = self.normalize_deck_data(cards)
             deck = [c for c in cards]
 
@@ -450,8 +454,8 @@ class CRData:
             deck,
             0,
             1,
-            deck_name="User Deck",
-            author="Similarity Search")
+            deck_name=deck_name,
+            author=deck_author)
 
         # Similarity search
         results = []
