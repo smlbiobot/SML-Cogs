@@ -553,20 +553,25 @@ class CRData:
             author=FakeMember(name=author)
         )
 
+        paginate = True
         if (row_id + 1) % RESULTS_MAX == 0 and (row_id + 1) < total_rows:
-            def pagination_check(m):
-                return m.content.lower() == 'y'
             await self.bot.say(
                 "Would you like to see more results? (y/n)")
             answer = await self.bot.wait_for_message(
                 timeout=PAGINATION_TIMEOUT,
-                author=ctx.message.author,
-                check=pagination_check)
+                author=ctx.message.author)
             if answer is None:
-                await self.bot.say(
-                    "Search results aborted.\n{}".format(SF_CREDITS))
-                return False
-        return True
+                paginate = False
+            elif not len(answer.content):
+                paginate = False
+            elif answer.content[0].lower() != 'y':
+                paginate = False
+        if paginate:
+            return True
+        else:
+            await self.bot.say(
+                "Search results aborted.\n{}".format(SF_CREDITS))
+            return False
 
     def sfid_to_id(self, sfid: str):
         """Convert Starfire ID to Card ID."""
