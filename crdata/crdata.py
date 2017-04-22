@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
+import re
 import datetime as dt
 import string
 import asyncio
@@ -229,9 +230,9 @@ class CRData:
                         data = await resp.json()
                     except json.decoder.JSONDecodeError:
                         data = await resp.text()
-        if data is None:
-            print("Data exists already.")
-        else:
+        # if data is None:
+        #     print("Data exists already as {}".format(now_path))
+        if data is not None:
             dataIO.save_json(now_path, data)
         return data
 
@@ -330,10 +331,26 @@ class CRData:
         """Search decks with cards.
 
         !crdata search fb log
+        !crdata search golem lightning elixir=2-5
+        !crdata search hog elixir=0-3.2
         """
         if not len(cards):
             await self.bot.say("You must neter at least one card.")
             return
+
+        elixir_p = re.compile('elixir=([\d\.]*)-([\d\.]*)')
+
+        elixir_min = 0
+        elixir_max = 10
+        elixir = [c for c in cards if elixir_p.match(c)]
+        if elixir:
+            elixir = elixir[0]
+            cards = [c for c in cards if not elixir_p.match(c)]
+            m = elixir_p.match(elixir)
+            if m.group(1):
+                elixir_min = float(m.group(1))
+            if m.group(2):
+                elixir_max = float(m.group(2))
 
         # break lists out by include and exclude
         include_cards = [c for c in cards if not c.startswith('-')]
@@ -368,6 +385,7 @@ class CRData:
             # in unknown instances, starfi.re returns empty rows
             if deck is not None:
                 deck_cards = [card["key"] for card in deck]
+                deck_elixir = self.deck_elixir_by_sfid(deck_cards)
                 if set(include_sfids) <= set(deck_cards):
                     include_deck = True
                     if len(exclude_sfids):
@@ -375,6 +393,8 @@ class CRData:
                             if sfid in deck_cards:
                                 include_deck = False
                                 break
+                    if not elixir_min <= deck_elixir <= elixir_max:
+                        include_deck = False
                     if include_deck:
                         found_deck = {
                             "deck": deck,
@@ -406,6 +426,7 @@ class CRData:
             for j, card in enumerate(cards):
                 desc += "{} ".format(self.id_to_name(card))
                 desc += "({}), ".format(levels[j])
+            desc = desc[:-1]
 
             show_next = await self.show_result_row(
                 ctx,
@@ -581,6 +602,13 @@ class CRData:
                 deck[i] = self.cards_abbrev[card]
 
         return deck
+
+    def deck_elixir_by_sfid(self, deck):
+        """Return average elixir for a list of sfids."""
+        cards_data = self.clashroyale["Cards"]
+        cards = [self.sfid_to_id(c) for c in deck]
+        elixirs = [cards_data[key]["elixir"] for key in cards]
+        return sum(elixirs) / 8
 
 
 def check_folder():
