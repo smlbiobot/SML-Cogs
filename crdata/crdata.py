@@ -328,11 +328,19 @@ class CRData:
 
     @crdata.command(name="search", pass_context=True, no_pm=True)
     async def crdata_search(self, ctx: Context, *cards):
-        """Search decks with cards.
+        """Search decks on the Global 200.
 
+        1. Include card(s) to search for
         !crdata search fb log
-        !crdata search golem lightning elixir=2-5
+
+        2. Exclude card(s) to search for (use - as prefix)
+        !crdata search golem -lightning
+
+        3. Elixir range (add elixir=min-max)
         !crdata search hog elixir=0-3.2
+
+        e.g.: Find 3M Hog decks without battle ram under 4 elixir
+        !crdata search 3m hog -br elixir=0-4
         """
         if not len(cards):
             await self.bot.say("You must neter at least one card.")
@@ -526,7 +534,6 @@ class CRData:
 
             if not show_next:
                 return
-
 
     async def show_result_row(
             self, ctx: Context, cards, row_id, total_rows,
