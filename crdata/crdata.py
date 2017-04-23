@@ -343,7 +343,8 @@ class CRData:
         !crdata search 3m hog -br elixir=0-4
         """
         if not len(cards):
-            await self.bot.say("You must neter at least one card.")
+            await self.bot.say("You must enter at least one card.")
+            await send_cmd_help(ctx)
             return
 
         elixir_p = re.compile('elixir=([\d\.]*)-([\d\.]*)')
