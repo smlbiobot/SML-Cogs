@@ -86,7 +86,10 @@ class Trophies:
                 name = clan
                 value = self.settings[server.id]["Trophies"][clan.lower()]
 
-                data.add_field(name=str(name), value='{:,}'.format(int(value)))
+                if value.isdigit():
+                    value = '{:,}'.format(int(value))
+
+                data.add_field(name=str(name), value=value)
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
