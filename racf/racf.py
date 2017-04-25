@@ -49,7 +49,7 @@ TOGGLE_ROLES = ["Member"]
 TOGGLEABLE_ROLES = ["Heist", "Practice", "RACF-Tourney", "Tourney"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
-    "Echo", "Foxtrot", "Golf", "Hotel"]
+    "Echo", "Foxtrot", "Golf", "Hotel", "eSports"]
 BOTCOMMANDER_ROLE = ["Bot Commander"]
 
 
