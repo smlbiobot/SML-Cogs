@@ -33,7 +33,7 @@ from __main__ import send_cmd_help
 import os
 
 settings_path = "data/trophies/settings.json"
-clans = ['alpha', 'bravo', 'charlie', 'delta', 'echo', 'foxtrot', 'golf', 'hotel', 'esports']
+CLANS = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'eSports']
 set_allowed_role = 'Bot Commander'
 
 class Trophies:
@@ -65,10 +65,9 @@ class Trophies:
             self.settings[server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
-                "Trophies": { }
-                }
+                "Trophies": {}}
 
-        for c in clans:
+        for c in CLANS:
             if c not in self.settings[server.id]["Trophies"]:
                 self.settings[server.id]["Trophies"][c] = "0"
 
@@ -80,13 +79,14 @@ class Trophies:
             title="Trophy requirements",
             description="Minimum trophies to join our clans. "
                         "Current trophies required. "
-            )
+        )
 
-        for clan in clans:
-            name = '{}{}'.format(clan[0].upper(), clan[1:].lower())
-            value = self.settings[server.id]["Trophies"][clan]
+        for clan in CLANS:
+            if clan.lower() in self.settings[server.id]["Trophies"]:
+                name = clan
+                value = self.settings[server.id]["Trophies"][clan.lower()]
 
-            data.add_field(name=str(name), value='{:,}'.format(int(value)))
+                data.add_field(name=str(name), value='{:,}'.format(int(value)))
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
@@ -96,33 +96,27 @@ class Trophies:
 
         await self.bot.say(embed=data)
 
-
-
     @trophies.command(name="set", pass_context=True, no_pm=True)
     @commands.has_role(set_allowed_role)
-    async def _set_trophies(self, ctx, clan:str, req:str):
+    async def _set_trophies(self, ctx, clan: str, req: str):
         """Set the trophy requirements for clans"""
-
         server = ctx.message.server
-
-        clan = clan.lower()
 
         if server.id not in self.settings:
             self.settings[server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
-                "Trophies": { }
-                }
+                "Trophies": {}}
 
-        for c in clans:
+        for c in CLANS:
             if c not in self.settings[server.id]["Trophies"]:
-                self.settings[server.id]["Trophies"][c] = "0"
+                self.settings[server.id]["Trophies"][c.lower()] = "0"
 
-        if clan not in self.settings[server.id]["Trophies"]:
+        if clan.lower() not in [c.lower() for c in CLANS]:
             await self.bot.say("Clan name is not valid.")
 
         else:
-            self.settings[server.id]["Trophies"][clan] = req
+            self.settings[server.id]["Trophies"][clan.lower()] = req
             await self.bot.say("Trophy requirement for {} updated to {}.".format(clan, req))
 
         dataIO.save_json(self.file_path, self.settings)
