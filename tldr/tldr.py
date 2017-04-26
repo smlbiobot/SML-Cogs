@@ -180,21 +180,21 @@ class TLDR:
             await self.bot.say(page)
 
     @tldr.command(name="msg", pass_context=True, no_pm=True)
-    async def tldr_messages(self, ctx: Context, count: int, top=10):
-        """Extracts keywords from last X messages."""
+    async def tldr_messages(self, ctx, count: int, top=10):
+        """Extract keywords from last X messages."""
         channel = ctx.message.channel
         messages = []
-        async for message in self.bot.logs_from(channel, limit=count+1):
+        async for message in self.bot.logs_from(channel, limit=count + 1):
             messages.append(message.content)
 
         rake = RakeKeywordExtractor()
         keywords = rake.extract(" ".join(messages), incl_scores=True)
 
         out = []
-        out.append("Found keywords: ")
+        out.append("Keywords found in last {} messages: ".format(count))
         for k in keywords[:top]:
-            out.append("**{}** ({:.2f}), ".format(k[0], k[1]))
-        for page in pagify("".join(out)[:-2], shorten_by=12):
+            out.append('- {} ({:.2f})'.format(k[0], k[1]))
+        for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
 
 

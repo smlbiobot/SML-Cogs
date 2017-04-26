@@ -46,10 +46,10 @@ DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
                     "Higher Power", "AlphaBot"]
 HEIST_ROLE = "Heist"
 TOGGLE_ROLES = ["Member"]
-TOGGLEABLE_ROLES = ["Heist", "Practice", "RACF-Tourney", "Tourney"]
+TOGGLEABLE_ROLES = ["Heist", "Practice", "Tourney"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
-    "Echo", "Foxtrot", "Golf", "Hotel", "eSports"]
+    "Echo", "Foxtrot", "Golf", "Hotel"]
 BOTCOMMANDER_ROLE = ["Bot Commander"]
 
 
@@ -115,7 +115,8 @@ class RACF:
             return
 
         if clan.lower() not in clans:
-            await self.bot.say("{} is not a valid clan.".format(clan))
+            await self.bot.say(
+                "{} is not a clan you can self-assign.".format(clan))
             return
 
         clan_roles = [r for r in server.roles if r.name.lower() in clans]
