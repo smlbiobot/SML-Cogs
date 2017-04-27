@@ -89,25 +89,27 @@ class MemberManagement:
         option_csv = "--csv" in args
 
         server = ctx.message.server
-        server_roles_names = [r.name for r in server.roles]
+        server_roles_names = [r.name.lower() for r in server.roles]
 
         # get list of arguments which are valid server role names
         # as dictionary {flag, name}
-        out=["**Member Management**"]
+        out = ["**Member Management**"]
 
         if option_members_without_clan_tag:
-            args = ['Member', '-Alpha', '-Bravo', '-Charlie', '-Delta', '-Echo',
-                    '-Foxtrot', '-Golf', '-Hotel', '-Special']
+            args = ['Member', '-Alpha', '-Bravo', '-Charlie',
+                    '-Delta', '-Echo',
+                    '-Foxtrot', '-Golf', '-Hotel',
+                    '-eSports', '-Special']
 
         role_args = []
-        flags = ['+','-']
+        flags = ['+', '-']
         if args is not None:
             for arg in args:
                 has_flag = arg[0] in flags
                 flag = arg[0] if has_flag else '+'
                 name = arg[1:] if has_flag else arg
 
-                if name in server_roles_names:
+                if name.lower() in server_roles_names:
                     role_args.append({'flag': flag, 'name': name})
 
         plus  = set([r['name'] for r in role_args if r['flag'] == '+'])
@@ -120,23 +122,12 @@ class MemberManagement:
             plus.add('@everyone')
             plus_out.add('everyone')
 
-        help_str = ['Syntax Error: You must include at least one role to display results.',
-                    '',
-                    '**Usage** ',
-                    '```!mm [+include_roles] [-exclude_roles]```',
-                    '**Example**',
-                    '```!mm +A +B -C```',
-                    'will output members who have both role A and B but not C.',
-                    '',
-                    '**Roles with space**',
-                    'For roles with space, surround text with quotes.',
-                    'e.g. ```!mm "Role with space"```',
-                    '**Flags**',
-                    'You may omit the + sign for roles to include.',
-                    'e.g. `!mm +A +B -C -D` is equivalent to `!mm A B -C -D`']
+        help_str = (
+            'Syntax Error: You must include at '
+            'least one role to display results.')
 
         if len(plus) < 1:
-            out.append('\n'.join(help_str))
+            out.append(help_str)
         else:
             out.append("Listing members who have these roles: {}".format(
                 ', '.join(plus_out)))
@@ -152,7 +143,7 @@ class MemberManagement:
             # exclude roles with '-' flag
             out_members = set()
             for m in server.members:
-                roles = set([r.name for r in m.roles])
+                roles = set([r.name.lower() for r in m.roles])
                 if option_everyone:
                     roles.add('@everyone')
                 exclude = len(roles & minus)
