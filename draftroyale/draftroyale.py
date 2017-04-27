@@ -37,8 +37,8 @@ import string
 import os
 
 
-CRDATA_PATH = "data/draftroyale/clashroyale.json"
-SETTINGS_PATH = "data/draftroyale/draftroyale.json"
+CRDATA_PATH = os.path.join("data", "draftroyale", "clashroyale.json")
+SETTINGS_PATH = os.path.join("data", "draftroyale", "settings.json")
 
 HELP_TEXT = """
 **Draft Royale: Clash Royale draft system**
@@ -256,6 +256,9 @@ class DraftRoyale:
     @draft.command(name="status", pass_context=True, no_pm=True)
     async def draft_status(self, ctx: Context):
         """Display status of the current draft."""
+        if self.admin is None:
+            await self.bot.say("No active draft.")
+            return
         data = discord.Embed(
             title="Clash Royale Drafting System",
             description="Current Status")
@@ -373,9 +376,10 @@ class DraftRoyale:
 
 def check_folder():
     """Check data folders exist. Create if necessary."""
-    folders = ["data/draftroyale",
-               "data/draftroyale/img",
-               "data/draftroyale/img/cards"]
+    folders = [
+        os.path.join("data", "draftroyale"),
+        os.path.join("data", "draftroyale", "img"),
+        os.path.join("data", "draftroyale", "img", "cards")]
     for f in folders:
         if not os.path.exists(f):
             os.makedirs(f)
