@@ -534,9 +534,14 @@ class RACF:
         """Self-toggle role assignments."""
         author = ctx.message.author
         server = ctx.message.server
-        if role_name in TOGGLEABLE_ROLES:
-            role = discord.utils.get(server.roles, name=role_name)
+        toggleable_roles = [r.lower() for r in TOGGLEABLE_ROLES]
+        if role_name.lower() in toggleable_roles:
+            role = [
+                r for r in server.roles
+                if r.name.lower() == role_name.lower()]
+            # role = discord.utils.get(server.roles, name=role_name)
             if role is not None:
+                role = role[0]
                 if role in author.roles:
                     await self.bot.remove_roles(author, role)
                     await self.bot.say(
