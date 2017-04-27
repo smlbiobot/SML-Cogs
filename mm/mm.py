@@ -110,7 +110,7 @@ class MemberManagement:
                 name = arg[1:] if has_flag else arg
 
                 if name.lower() in server_roles_names:
-                    role_args.append({'flag': flag, 'name': name})
+                    role_args.append({'flag': flag, 'name': name.lower()})
 
         plus  = set([r['name'] for r in role_args if r['flag'] == '+'])
         minus = set([r['name'] for r in role_args if r['flag'] == '-'])
