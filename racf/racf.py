@@ -45,8 +45,9 @@ CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
                     "Higher Power", "AlphaBot"]
 HEIST_ROLE = "Heist"
+RECRUIT_ROLE = "Recruit"
 TOGGLE_ROLES = ["Member"]
-TOGGLEABLE_ROLES = ["Heist", "Practice", "Tourney"]
+TOGGLEABLE_ROLES = ["Heist", "Practice", "Tourney", "Recruit"]
 MEMBER_DEFAULT_ROLES = ["Member", "Tourney", "Practice"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
@@ -548,6 +549,24 @@ class RACF:
             await self.bot.say(
                 "Added {} role for {}.".format(
                     HEIST_ROLE, author.display_name))
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def togglerecruit(self, ctx: Context):
+        """Self-toggle heist role."""
+        author = ctx.message.author
+        server = ctx.message.server
+        role = discord.utils.get(
+            server.roles, name=RECRUIT_ROLE)
+        if role in author.roles:
+            await self.bot.remove_roles(author, role)
+            await self.bot.say(
+                "Removed {} role from {}.".format(
+                    HEIST_ROLE, author.display_name))
+        else:
+            await self.bot.add_roles(author, role)
+            await self.bot.say(
+                "Added {} role for {}.".format(
+                    RECRUIT_ROLE, author.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*TOGGLE_ROLES)
