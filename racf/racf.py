@@ -561,7 +561,7 @@ class RACF:
             await self.bot.remove_roles(author, role)
             await self.bot.say(
                 "Removed {} role from {}.".format(
-                    HEIST_ROLE, author.display_name))
+                    RECRUIT_ROLE, author.display_name))
         else:
             await self.bot.add_roles(author, role)
             await self.bot.say(
