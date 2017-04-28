@@ -220,24 +220,34 @@ class MemberManagement:
             embeds.append(data)
         return embeds
 
-
     @commands.command(pass_context=True, no_pm=True)
-    async def listroles(self, ctx: Context):
+    async def listroles(self, ctx: Context, *roles):
         """List all the roles on the server."""
         server = ctx.message.server
         if server is None:
             return
         out = []
         out.append("__List of roles on {}__".format(server.name))
-        roles = {}
-        for role in server.roles:
-            roles[role.id] = {'role': role, 'count': 0}
+        roles_to_list = []
+        if len(roles):
+            roles_to_list = [
+                r for r in server.roles if r.name.lower()
+                in [r2.lower() for r2 in roles]]
+        else:
+            roles_to_list = server.roles
+
+        out_roles = {}
+        for role in roles_to_list:
+            out_roles[role.id] = {'role': role, 'count': 0}
         for member in server.members:
             for role in member.roles:
-                roles[role.id]['count'] += 1
+                if role in roles_to_list:
+                    out_roles[role.id]['count'] += 1
         for role in server.role_hierarchy:
-            out.append("**{}** ({} members)".format(role.name,
-                                                    roles[role.id]['count']))
+            if role in roles_to_list:
+                out.append(
+                    "**{}** ({} members)".format(
+                        role.name, out_roles[role.id]['count']))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
 
