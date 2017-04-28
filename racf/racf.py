@@ -47,6 +47,7 @@ DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander",
 HEIST_ROLE = "Heist"
 TOGGLE_ROLES = ["Member"]
 TOGGLEABLE_ROLES = ["Heist", "Practice", "Tourney"]
+MEMBER_DEFAULT_ROLES = ["Member", "Tourney", "Practice"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
@@ -372,21 +373,41 @@ class RACF:
             await self.bot.say("Added {} for {}".format(
                 new_role, member.display_name))
 
-
-    @commands.command(pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(administrator=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=["m2v"])
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def member2visitor(self, ctx: Context, *members: discord.Member):
         """Re-assign list of people from members to visitors."""
         server = ctx.message.server
-        to_remove_roles = [r for r in server.roles if r.name == 'Member']
+        to_remove_roles = [
+            r for r in server.roles if r.name in MEMBER_DEFAULT_ROLES]
         to_add_roles = [r for r in server.roles if r.name == 'Visitor']
         for member in members:
             await self.bot.add_roles(member, *to_add_roles)
             await self.bot.say("Added {} for {}".format(
-                *to_add_roles, member.display_name))
+                ", ".join([r.name for r in to_add_roles]), member.display_name))
             await self.bot.remove_roles(member, *to_remove_roles)
             await self.bot.say("Removed {} from {}".format(
-                *to_remove_roles, member.display_name))
+                ", ".join([r.name for r in to_remove_roles]), member.display_name))
+
+    @commands.command(pass_context=True, no_pm=True, aliases=["v2m"])
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def visitor2member(
+            self, ctx: Context, member: discord.Member, *roles):
+        """Assign visitor to member and add clan name."""
+        server = ctx.message.server
+        to_add_roles = [
+            r for r in server.roles if r.name in MEMBER_DEFAULT_ROLES]
+        to_add_roles.extend(
+            [r for r in server.roles if r.name.lower() in
+                [r2.lower() for r2 in roles]])
+        to_remove_roles = [r for r in server.roles if r.name == 'Visitor']
+
+        await self.bot.add_roles(member, *to_add_roles)
+        await self.bot.say("Added {} for {}".format(
+            ", ".join([r.name for r in to_add_roles]), member.display_name))
+        await self.bot.remove_roles(member, *to_remove_roles)
+        await self.bot.say("Removed {} from {}".format(
+            ", ".join([r.name for r in to_remove_roles]), member.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
