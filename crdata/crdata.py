@@ -243,7 +243,8 @@ class CRData:
                     data = dataIO.load_json(path)
                     if "decks" not in data:
                         os.remove(path)
-                        print("Removed invalid JSON: {}".format(path))
+                        await self.bot.say(
+                            "Removed invalid JSON: {}".format(path))
 
     async def update_data(self, forceupdate=False):
         """Update data and return data."""
