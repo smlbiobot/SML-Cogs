@@ -226,6 +226,25 @@ class CRData:
             path = os.path.join(PATH, file)
         await self.bot.say("Last known data path: {}".format(path))
 
+    @setcrdata.command(name="cleandata", pass_context=True)
+    async def setcrdata_cleandata(self, ctx):
+        """Remove all bad data files.
+
+        Operation for legacy data files.
+        Some files were saved when no data can be found.
+        This command removes all data json files that are invalid.
+        """
+        prog = re.compile('cardpop-\d{4}-\d{2}-\d{2}-\d{2}.json')
+        for root, dirs, files in os.walk(PATH):
+            for file in files:
+                result = prog.match(file)
+                if result is not None:
+                    path = os.path.join(PATH, file)
+                    data = dataIO.load_json(path)
+                    if "decks" not in data:
+                        os.remove(path)
+                        print("Removed invalid JSON: {}".format(path))
+
     async def update_data(self, forceupdate=False):
         """Update data and return data."""
         now = dt.datetime.utcnow()
@@ -244,7 +263,9 @@ class CRData:
                     try:
                         data = await resp.json()
                     except json.decoder.JSONDecodeError:
-                        data = await resp.text()
+                        # data = await resp.text()
+                        # when data cannot be decoded, likely data source is down
+                        data = None
         if data is not None:
             dataIO.save_json(now_path, data)
         return data
