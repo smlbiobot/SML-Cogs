@@ -208,8 +208,23 @@ class CRData:
     @setcrdata.command(name="forceupdate", pass_context=True)
     async def setcrdata_forceupdate(self, ctx):
         """Update data even if exists."""
-        await self.update_data(forceupdate=True)
-        await self.bot.say("Data saved.")
+        data =  await self.update_data(forceupdate=True)
+        if data is None:
+            await self.bot.say("Update failed.")
+        else:
+            await self.bot.say("Data saved.")
+
+    @setcrdata.command(name="lastdata", pass_context=True)
+    async def setcrdata_lastdata(self, ctx):
+        """Return last known data filename."""
+        time = dt.datetime.utcnow()
+        file = time.strftime(CARDPOP_FILE)
+        path = os.path.join(PATH, file)
+        while not os.path.exists(path):
+            time = time - dt.timedelta(hours=1)
+            file = time.strftime(CARDPOP_FILE)
+            path = os.path.join(PATH, file)
+        await self.bot.say("Last known data path: {}".format(path))
 
     async def update_data(self, forceupdate=False):
         """Update data and return data."""
@@ -230,8 +245,6 @@ class CRData:
                         data = await resp.json()
                     except json.decoder.JSONDecodeError:
                         data = await resp.text()
-        # if data is None:
-        #     print("Data exists already as {}".format(now_path))
         if data is not None:
             dataIO.save_json(now_path, data)
         return data
@@ -244,13 +257,25 @@ class CRData:
             data = await self.update_data()
         return data
 
+    def get_last_data(self):
+        """Find and return last known data."""
+        time = dt.datetime.utcnow()
+        data = None
+        while data is None:
+            data = self.get_data(time)
+            time = time - dt.timedelta(hours=1)
+        return data
+
     def get_data(self, datetime_):
         """Get data as json by date and hour."""
         file = datetime_.strftime(CARDPOP_FILE)
         path = os.path.join(PATH, file)
+        data = None
         if os.path.exists(path):
-            return dataIO.load_json(path)
-        return None
+            data = dataIO.load_json(path)
+            if "decks" not in data:
+                data = None
+        return data
 
     @commands.group(pass_context=True, no_pm=True)
     async def crdata(self, ctx: Context):
@@ -261,7 +286,7 @@ class CRData:
     @crdata.command(name="decks", pass_context=True, no_pm=True)
     async def crdata_decks(self, ctx: Context):
         """List popular decks."""
-        data = await self.get_now_data()
+        data = self.get_last_data()
         decks = data["popularDecks"]
         await self.bot.say(
             "**Top 200 Decks**: Found {} results.".format(len(decks)))
@@ -288,7 +313,7 @@ class CRData:
     async def crdata_cards(self, ctx: Context):
         """List popular cards."""
         await self.bot.send_typing(ctx.message.channel)
-        data = await self.get_now_data()
+        data = self.get_last_data()
         cards = data["popularCards"]
         await self.bot.say(
             "**Popular Cards** from Top 200 decks.")
@@ -303,7 +328,7 @@ class CRData:
     async def crdata_leaderboard(self, ctx: Context):
         """List decks sorted by rank."""
         await self.bot.say("**Global 200 Leaderboard Decks**")
-        data = await self.get_now_data()
+        data = self.get_last_data()
         decks = data["decks"]
         for i, deck in enumerate(decks):
             cards = [self.sfid_to_id(card["key"]) for card in deck]
@@ -372,7 +397,7 @@ class CRData:
 
         cards = self.normalize_deck_data(cards)
 
-        data = await self.get_now_data()
+        data = self.get_last_data()
         decks = data["decks"]
 
         # sort card in decks
@@ -465,7 +490,7 @@ class CRData:
             await send_cmd_help(ctx)
             return
 
-        data = await self.get_now_data()
+        data = self.get_last_data()
         decks = data["decks"]
 
         # sort card in decks
@@ -625,15 +650,20 @@ class CRData:
 
 
 def check_folder():
+    """Check folder."""
     if not os.path.exists(PATH):
         os.makedirs(PATH)
 
+
 def check_file():
+    """Check files."""
     defaults = {}
     if not dataIO.is_valid_json(SETTINGS_JSON):
         dataIO.save_json(SETTINGS_JSON, defaults)
 
+
 def setup(bot):
+    """Setup bot."""
     check_folder()
     check_file()
     bot.add_cog(CRData(bot))
