@@ -40,6 +40,7 @@ import discord
 import itertools
 import io
 import os
+import re
 import string
 import pprint
 import statistics
@@ -53,6 +54,9 @@ crdata_path = "data/card/clashroyale.json"
 cardpop_path = "data/card/cardpop.json"
 crtexts_path = "data/card/crtexts.json"
 dates_path = "data/card/dates.json"
+
+CARDPOP_DATA_PATH = os.path.join("data", "crdata")
+CARDPOP_JSON_PROG = re.compile('cardpop-\d{4}-\d{2}-\d{2}-\d{2}.json')
 
 cardpop_range_min = 8
 cardpop_range_max = 26
@@ -555,16 +559,6 @@ class Card:
         fig.clf()
         plt.clf()
         plt.cla()
-
-
-        # print(pprint.pformat(trend))
-
-        # for page in pagify(pprint.pformat(trend["8"]), shorten_by=24):
-        #     await self.bot.say(page)
-
-
-
-
 
 
     @commands.command(pass_context=True)

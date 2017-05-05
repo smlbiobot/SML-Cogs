@@ -53,7 +53,10 @@ CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
 BOTCOMMANDER_ROLE = ["Bot Commander"]
-
+COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
+COMPETITIVE_TEAM_ROLES = [
+    "CRL", "RPL-NA", "RPL-EU", "RPL-AS", "MLG",
+    "ClashWars", "CRL-Elite", "CRL-Legends", "CRL-Rockets"]
 
 class RACF:
     """Display RACF specifc info.
@@ -601,6 +604,40 @@ class RACF:
             out.append(
                 "Toggleable roles: {}.".format(", ".join(TOGGLEABLE_ROLES)))
             await self.bot.say("\n".join(out))
+
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
+    async def teamadd(self, ctx, member: discord.Member, role):
+        """Add competitive team member roles."""
+        author = ctx.message.author
+        server = ctx.message.server
+        competitive_team_roles = [r.lower() for r in COMPETITIVE_TEAM_ROLES]
+        if role.lower() not in competitive_team_roles:
+            await self.bot.say("{} is not a competitive team role.".format(role))
+            return
+        if role.lower() not in [r.name.lower() for r in server.roles]:
+            await self.bot.say("{} is not a role on this server.".format(role))
+            return
+        roles = [r for r in server.roles if r.name.lower() == role.lower()]
+        await self.bot.add_roles(member, *roles)
+        await self.bot.say("Added {} for {}".format(role, member.display_name))
+
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
+    async def teamremove(self, ctx, member: discord.Member, role):
+        """Remove competitive team member roles."""
+        author = ctx.message.author
+        server = ctx.message.server
+        competitive_team_roles = [r.lower() for r in COMPETITIVE_TEAM_ROLES]
+        if role.lower() not in competitive_team_roles:
+            await self.bot.say("{} is not a competitive team role.".format(role))
+            return
+        if role.lower() not in [r.name.lower() for r in server.roles]:
+            await self.bot.say("{} is not a role on this server.".format(role))
+            return
+        roles = [r for r in server.roles if r.name.lower() == role.lower()]
+        await self.bot.remove_roles(member, *roles)
+        await self.bot.say("Removed {} from {}".format(role, member.display_name))
 
 
 def setup(bot):
