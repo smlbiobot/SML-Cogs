@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Voice Channel Utilities",
+	"DESCRIPTION": "Utilities for voice channels, e.g. creating text chat when people join a voice channel dynamically and remove it when done.",
+	"DISABLED": false,
+	"NAME": "VCUtil",
+	"REQUIREMENTS": [],
+	"TAGS": ["VC", "voice", "voice channel", "utility", "util", "helper"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
