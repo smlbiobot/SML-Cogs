@@ -476,7 +476,7 @@ class RACF:
             await self.bot.say(page)
         if len(twitch_out):
             await self.bot.say(
-                "Twich Subscribers only: {}".format(", ".join(twitch_out)))
+                "Twitch Subscribers only: {}".format(", ".join(twitch_out)))
 
 
     @commands.command(pass_context=True, no_pm=True)
