@@ -464,11 +464,19 @@ class RACF:
         """Show all emojis available on server."""
         server = ctx.message.server
         out = []
+        twitch_out = []
         for emoji in server.emojis:
-            emoji_str = str(emoji)
-            out.append("{} `:{}:`".format(emoji_str, emoji.name))
+            # only include in list if not managed by Twitch
+            if not emoji.managed:
+                emoji_str = str(emoji)
+                out.append("{} `:{}:`".format(emoji_str, emoji.name))
+            else:
+                twitch_out.append(str(emoji))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
+        if len(twitch_out):
+            await self.bot.say(
+                "Twich Subscribers only: {}".format(", ".join(twitch_out)))
 
 
     @commands.command(pass_context=True, no_pm=True)
