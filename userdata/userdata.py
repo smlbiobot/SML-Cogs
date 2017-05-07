@@ -43,6 +43,15 @@ from cogs.utils.dataIO import dataIO
 PATH = os.path.join("data", "userdata")
 JSON = os.path.join(PATH, "settings.json")
 
+class UserDataError(Exception):
+    pass
+
+class InvalidServerField(UserDataError):
+    pass
+
+class InvalidUserField(UserDataError):
+    pass
+
 class UserData:
     """User self-store data."""
 
@@ -139,21 +148,28 @@ class UserData:
         self.init_user(ctx)
         server = ctx.message.server
         author = ctx.message.author
-        fields = [f.lower() for f in self.settings[server.id]["fields"]]
-        if field.lower() not in fields:
+        try:
+            field = self.get_field(ctx, field)
+        except InvalidServerField:
             await self.bot.say(
                 "{} is not a valid field.\n"
                 "List of available fields: {}".format(
                     field, ", ".join(self.settings[server.id]["fields"])))
             return
-        field = [
-            f for f in self.settings[server.id]["fields"]
-            if field.lower() == f.lower()][0]
         self.settings[server.id]["users"][author.id][field] = value
         dataIO.save_json(JSON, self.settings)
         await self.bot.say(
             "{}: {}: {}".format(
                 author.display_name, field, value))
+
+    @userdata.command(name="edit", pass_context=True, no_pm=True)
+    async def userdata_edit(self, ctx, field, value):
+        """Edit data."""
+        self.init_server(ctx)
+        self.init_user(ctx)
+        server = ctx.message.server
+        author = ctx.message.author
+
 
     @userdata.command(name="remove", pass_context=True, no_pm=True)
     async def userdata_remove(self, ctx, field):
@@ -165,17 +181,17 @@ class UserData:
         self.init_user(ctx)
         server = ctx.message.server
         author = ctx.message.author
-        fields = [f.lower() for f in self.settings[server.id]["fields"]]
-        if field.lower() not in fields:
+        try:
+            field = self.get_field(ctx, field)
+        except InvalidServerField:
             await self.bot.say(
                 "{} is not a valid field.\n"
                 "List of available fields: {}".format(
                     field, ", ".join(self.settings[server.id]["fields"])))
             return
-        field = [
-            f for f in self.settings[server.id]["fields"]
-            if field.lower() == f.lower()][0]
-        if field not in self.settings[server.id]["users"][author.id]:
+        try:
+            user_field = self.get_user_field(server, author, field)
+        except InvalidUserField:
             await self.bot.say(
                 "{} does not have {} set.".format(
                     author.display_name, field))
@@ -205,6 +221,24 @@ class UserData:
         for k, v in self.settings[server.id]["users"][member.id].items():
             em.add_field(name=k, value=v)
         await self.bot.say(embed=em)
+
+    def get_field(self, ctx, field):
+        """Return field regardless of casing."""
+        self.init_server(ctx)
+        server = ctx.message.server
+        fields = [f.lower() for f in self.settings[server.id]["fields"]]
+        if field.lower() not in fields:
+            raise InvalidServerField()
+        field = [
+            f for f in self.settings[server.id]["fields"]
+            if field.lower() == f.lower()][0]
+        return field
+
+    def get_user_field(self, server, user, field):
+        """Return field data of a user."""
+        if field not in self.settings[server.id]["users"][user.id]:
+            raise InvalidUserField()
+        return self.settings[server.id]["users"][user.id][field]
 
 
 def check_folder():
