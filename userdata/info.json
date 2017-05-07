@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "User Data",
+	"DESCRIPTION": "Storing user data with custom fields",
+	"DISABLED": false,
+	"NAME": "UserData",
+	"REQUIREMENTS": [],
+	"TAGS": ["data", "custom", "User Data", "UserData", "info", "util", "utility"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
