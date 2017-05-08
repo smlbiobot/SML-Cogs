@@ -663,7 +663,10 @@ class RACF:
         await ctx.invoke(self.dmusers, KICK5050_MSG, member)
         member_clan = [
             '-{}'.format(r.name) for r in member.roles if r.name in CLANS]
-        await ctx.invoke(self.changerole, member, *member_clan)
+        if len(member_clan):
+            await ctx.invoke(self.changerole, member, *member_clan)
+        else:
+            await self.bot.say("Member has no clan roles to remove.")
 
 
 def setup(bot):
