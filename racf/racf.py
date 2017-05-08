@@ -57,6 +57,12 @@ COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
 COMPETITIVE_TEAM_ROLES = [
     "CRL", "RPL-NA", "RPL-EU", "RPL-AS", "MLG",
     "ClashWars", "CRL-Elite", "CRL-Legends", "CRL-Rockets"]
+KICK5050_MSG = (
+    "Sorry, but you were 50/50 and we have kicked you from the clan. "
+    "Please join one of our feeders for now. "
+    "Our clans are Alpha / Bravo / Charlie / Delta / "
+    "Echo / Foxtrot / Golf / Hotel with the red rocket emblem. "
+    "Good luck on the ladder!")
 
 class RACF:
     """Display RACF specifc info.
@@ -646,6 +652,18 @@ class RACF:
         roles = [r for r in server.roles if r.name.lower() == role.lower()]
         await self.bot.remove_roles(member, *roles)
         await self.bot.say("Removed {} from {}".format(role, member.display_name))
+
+    @commands.command(pass_context=True, no_pm=True, aliases=["k5"])
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def kick5050(self, ctx, member: discord.Member):
+        """Notify member that they were kicked for lower trophies.
+
+        Remove clan tags in the process.
+        """
+        await ctx.invoke(self.dmusers, KICK5050_MSG, member)
+        member_clan = [
+            '-{}'.format(r.name) for r in member.roles if r.name in CLANS]
+        await ctx.invoke(self.changerole, member, *member_clan)
 
 
 def setup(bot):

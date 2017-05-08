@@ -79,7 +79,6 @@ class UserData:
             self.settings[server.id]["users"][author.id] = {}
         dataIO.save_json(JSON, self.settings)
 
-
     @checks.mod_or_permissions()
     @commands.group(aliases=["sud"], pass_context=True, no_pm=True)
     async def setuserdata(self, ctx):
@@ -165,11 +164,7 @@ class UserData:
     @userdata.command(name="edit", pass_context=True, no_pm=True)
     async def userdata_edit(self, ctx, field, value):
         """Edit data."""
-        self.init_server(ctx)
-        self.init_user(ctx)
-        server = ctx.message.server
-        author = ctx.message.author
-
+        await ctx.invoke(self.userdata_add, field, value)
 
     @userdata.command(name="remove", pass_context=True, no_pm=True)
     async def userdata_remove(self, ctx, field):

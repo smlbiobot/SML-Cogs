@@ -84,8 +84,11 @@ class Farmers:
                 color = int(color, 16)
 
                 title = "Clan Chest Farmers"
-                description = f"""Members who have contributed 150+ crowns to their clan chests
-                                 {season[week].get_text()} (Week {week+1})"""
+                description = (
+                    "Members who have contributed 150+ crowns "
+                    "or 25+ 2v2 wins to their clan chests.\n"
+                    "{} (Week {})").format(
+                        season[week].get_text(), week + 1)
 
                 embed = discord.Embed(
                     title=title,
