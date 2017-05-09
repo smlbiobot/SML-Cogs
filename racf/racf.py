@@ -668,6 +668,27 @@ class RACF:
         else:
             await self.bot.say("Member has no clan roles to remove.")
 
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def recruit(self, ctx, member: discord.Member):
+        """Assign member with recruit roles and give them info.
+
+        Command detects origin:
+        If command is invoked from default channel, add Visitor role.
+        If command in invoked from other channels, only add Recruit role.
+        """
+        recruit_roles = ["Recruit"]
+        if ctx.message.channel.is_default:
+            recruit_roles.append("Visitor")
+        await ctx.invoke(self.changerole, member, *recruit_roles)
+        channel = discord.utils.get(
+            ctx.message.server.channels, name="esports-recruiting")
+        await self.bot.say(
+            "{} Please see pinned messages "
+            "in {} for eSports information.".format(
+                member.mention, channel.mention))
+
+
 
 def setup(bot):
     r = RACF(bot)
