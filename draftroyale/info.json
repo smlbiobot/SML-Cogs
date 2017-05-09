@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Clash Royale Drafting",
+	"DESCRIPTION": "Draft mode for Clash Royale",
+	"DISABLED": false,
+	"NAME": "DraftRoyale",
+	"REQUIREMENTS": [],
+	"TAGS": ["Clash Royale", "clash royale", "draft", "drafting", "mode"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
