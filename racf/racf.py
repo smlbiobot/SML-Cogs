@@ -480,9 +480,9 @@ class RACF:
                 twitch_out.append(str(emoji))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
-        if len(twitch_out):
-            await self.bot.say(
-                "Twitch Subscribers only: {}".format(", ".join(twitch_out)))
+        # if len(twitch_out):
+        #     await self.bot.say(
+        #         "Twitch Subscribers only: {}".format(", ".join(twitch_out)))
 
 
     @commands.command(pass_context=True, no_pm=True)
