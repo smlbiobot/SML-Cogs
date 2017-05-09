@@ -410,19 +410,16 @@ class RACF:
             self, ctx: Context, member: discord.Member, *roles):
         """Assign visitor to member and add clan name."""
         server = ctx.message.server
-        to_add_roles = [
-            r for r in server.roles if r.name in MEMBER_DEFAULT_ROLES]
-        to_add_roles.extend(
-            [r for r in server.roles if r.name.lower() in
-                [r2.lower() for r2 in roles]])
-        to_remove_roles = [r for r in server.roles if r.name == 'Visitor']
-
-        await self.bot.add_roles(member, *to_add_roles)
-        await self.bot.say("Added {} for {}".format(
-            ", ".join([r.name for r in to_add_roles]), member.display_name))
-        await self.bot.remove_roles(member, *to_remove_roles)
-        await self.bot.say("Removed {} from {}".format(
-            ", ".join([r.name for r in to_remove_roles]), member.display_name))
+        roles_param = MEMBER_DEFAULT_ROLES
+        roles_param.extend(roles)
+        roles_param.append("-Visitor")
+        channel = discord.utils.get(
+            ctx.message.server.channels, name="family-chat")
+        await ctx.invoke(self.changerole, member, *roles_param)
+        if channel is not None:
+            await self.bot.say(
+                "{} Welcome! Main family chat at {} — enjoy!".format(
+                    member.mention, channel.mention))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
