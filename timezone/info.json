@@ -1,0 +1,11 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Timezone",
+	"DESCRIPTION": "Timezone conversion and other general timezone utilities.",
+	"DISABLED": false,
+	"NAME": "TimeZone",
+	"REQUIREMENTS": ["delorean", "pytz", "googlemaps"],
+	"TAGS": ["time", "timezone", "util"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please log an issue on my GitHub or message me on http://discord.me/sml"
+
+}
