@@ -698,6 +698,19 @@ class RACF:
             "in {} for eSports information.".format(
                 member.mention, channel.mention))
 
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def visitor(self, ctx, member: discord.Member):
+        """Assign member with visitor roles and give them info."""
+        visitor_roles = ["Visitor"]
+        channel = discord.utils.get(
+            ctx.message.server.channels, name="visitors")
+        await ctx.invoke(self.changerole, member, *visitor_roles)
+        if channel is not None:
+            await self.bot.say(
+                "{} You can now chat in {} — enjoy!".format(
+                    member.mention, channel.mention))
+
 
 
 def setup(bot):
