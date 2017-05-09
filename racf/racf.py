@@ -711,6 +711,28 @@ class RACF:
                 "{} You can now chat in {} — enjoy!".format(
                     member.mention, channel.mention))
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def pay(self, ctx, amt, *members: discord.Member):
+        """Pay amount to member(s).
+
+        If more than one person is specificed, equally divide the credits.
+        """
+        bank = self.bot.get_cog('Economy').bank
+        amt = int(amt)
+        split_amt = int(amt / (len(members)))
+        for member in members:
+            bank.transfer_credits(
+                ctx.message.author, member, split_amt)
+        split_msg = ""
+        if len(members) > 1:
+            split_msg = ' ({} credits each)'.format(split_amt)
+        await self.bot.say(
+            "{} has transfered {} credits{} to {}.".format(
+                ctx.message.author.display_name,
+                amt,
+                split_msg,
+                ", ".join([m.display_name for m in members])))
+
 
 
 def setup(bot):
