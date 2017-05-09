@@ -23,7 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-
+import itertools
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
@@ -63,6 +63,11 @@ KICK5050_MSG = (
     "Our clans are Alpha / Bravo / Charlie / Delta / "
     "Echo / Foxtrot / Golf / Hotel with the red rocket emblem. "
     "Good luck on the ladder!")
+
+def grouper(n, iterable, fillvalue=None):
+    """grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
+    args = [iter(iterable)] * n
+    return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 class RACF:
     """Display RACF specifc info.
@@ -466,24 +471,29 @@ class RACF:
             await self.bot.say(f"{member.mention} changed to {nickname}.")
 
     @commands.command(pass_context=True, no_pm=True)
-    async def emojis(self, ctx: Context):
+    async def emojis(self, ctx: Context, embed=False):
         """Show all emojis available on server."""
         server = ctx.message.server
-        out = []
-        twitch_out = []
-        for emoji in server.emojis:
-            # only include in list if not managed by Twitch
-            if not emoji.managed:
-                emoji_str = str(emoji)
-                out.append("{} `:{}:`".format(emoji_str, emoji.name))
-            else:
-                twitch_out.append(str(emoji))
-        for page in pagify("\n".join(out), shorten_by=12):
-            await self.bot.say(page)
-        # if len(twitch_out):
-        #     await self.bot.say(
-        #         "Twitch Subscribers only: {}".format(", ".join(twitch_out)))
 
+        if embed:
+            emoji_list = [emoji for emoji in server.emojis if not emoji.managed]
+            emoji_lists = grouper(25, emoji_list)
+            for emoji_list in emoji_lists:
+                em = discord.Embed()
+                for emoji in emoji_list:
+                    if emoji is not None:
+                        em.add_field(
+                            name=str(emoji), value="`:{}:`".format(emoji.name))
+                await self.bot.say(embed=em)
+        else:
+            out = []
+            for emoji in server.emojis:
+                # only include in list if not managed by Twitch
+                if not emoji.managed:
+                    emoji_str = str(emoji)
+                    out.append("{} `:{}:`".format(emoji_str, emoji.name))
+            for page in pagify("\n".join(out), shorten_by=12):
+                await self.bot.say(page)
 
     @commands.command(pass_context=True, no_pm=True)
     async def trophy2rank(self, ctx: Context, trophies:int):
