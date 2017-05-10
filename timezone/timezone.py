@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 import os
 import datetime as dt
+import re
 
 import discord
 from discord.ext import commands
@@ -39,6 +40,30 @@ JSON = os.path.join(PATH, "settings.json")
 GMAPS_FIELDS = {
     "timeZoneName": "Time Zone Name",
     "timeZoneId": "Time Zone ID"
+}
+
+TZ_ABBREV = {
+    "ACDT": "Australia",
+    "ACST": "Australia",
+    "BST": "London",
+    "CET": "France",
+    "CT": "Beijing",
+    "EDT": "New York",
+    "EEST": "Finland",
+    "EET": "Findland",
+    "EST": "New York",
+    "ET": "New York",
+    "GMT": "London",
+    "HKT": "Hong Kong",
+    "JST": "Japan",
+    "KST": "Korea",
+    "MDT": "Idaho",
+    "MYT": "Malaysia",
+    "PDT": "Los Angeles",
+    "PST": "Los Angeles",
+    "SST": "Singapore",
+    "WEST": "Spain",
+    "WET": "London"
 }
 
 try:
@@ -151,8 +176,7 @@ class TimeZone:
         gc = self.gmclient().geocode(address)
         loc = gc[0]['geometry']['location']
         timestamp = dt.datetime.utcnow()
-        result = self.gmclient().timezone(
-            location=loc, timestamp=timestamp)
+        result = self.gmclient().timezone(location=loc)
         if result['status'] == 'OK':
             result_time = (
                 timestamp +
@@ -163,6 +187,21 @@ class TimeZone:
 
         else:
             await self.bot.say(result['status'])
+
+    @timezone.command(name="convert", pass_context=True)
+    async def timezone_convert(self, ctx, *, args):
+        """Convert time.
+
+        [p]tz convert 9am EST to GMT
+        """
+        prog = re.compile('([\d\:apm]+) ([A-Za-z]+) to ([A-Za-z]+)')
+        result = prog.match(args)
+        time = result.group(1)
+        from_tz = result.group(2).upper()
+        to_tz = result.group(3).upper()
+        await self.bot.say(
+            '{} {} {}'.format(time, from_tz, to_tz))
+
 
 
     @commands.group(aliases=['gm'], pass_context=True)

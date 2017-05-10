@@ -410,11 +410,12 @@ class RACF:
             self, ctx: Context, member: discord.Member, *roles):
         """Assign visitor to member and add clan name."""
         server = ctx.message.server
-        roles_param = MEMBER_DEFAULT_ROLES
+        roles_param = MEMBER_DEFAULT_ROLES.copy()
         roles_param.extend(roles)
         roles_param.append("-Visitor")
         channel = discord.utils.get(
             ctx.message.server.channels, name="family-chat")
+        # print(roles_param)
         await ctx.invoke(self.changerole, member, *roles_param)
         if channel is not None:
             await self.bot.say(
