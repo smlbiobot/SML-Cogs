@@ -275,6 +275,16 @@ class RACF:
                                 role.name, member.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def multiaddrole(self, ctx, role, *members: discord.Member):
+        """Add a role to multiple users.
+
+        !multiaddrole rolename User1 User2 User3
+        """
+        for member in members:
+            await ctx.invoke(self.changerole, member, role)
+
+    @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(mention_everyone=True)
     async def mentionusers(self, ctx, role: str, *msg):
         """Mention users by role.
