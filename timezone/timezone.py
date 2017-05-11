@@ -189,19 +189,46 @@ class TimeZone:
             await self.bot.say(result['status'])
 
     @timezone.command(name="convert", pass_context=True)
-    async def timezone_convert(self, ctx, *, args):
-        """Convert time.
+    async def timezone_convert(self, ctx, time, from_loc, to_loc):
+        """Convert time from location to location.
 
-        [p]tz convert 9am EST to GMT
+        !tz convert "2017-05-14 9:00" EST Sydney
+        !tz convert "2017-05-14 9:00" "Hong Kong" London
         """
-        prog = re.compile('([\d\:apm]+) ([A-Za-z]+) to ([A-Za-z]+)')
-        result = prog.match(args)
-        time = result.group(1)
-        from_tz = result.group(2).upper()
-        to_tz = result.group(3).upper()
-        await self.bot.say(
-            '{} {} {}'.format(time, from_tz, to_tz))
+        if from_loc.upper() in TZ_ABBREV:
+            from_loc = TZ_ABBREV[from_loc.upper()]
+        if to_loc.upper() in TZ_ABBREV:
+            to_loc = TZ_ABBREV[to_loc.upper()]
 
+        from_tz = self.get_timezone(from_loc)
+        to_tz = self.get_timezone(to_loc)
+
+        from_time = delorean.parse(time)
+        orig_time = delorean.Delorean(
+            datetime=from_time.naive,
+            timezone=from_tz["timeZoneId"]
+        )
+
+        converted_time = delorean.Delorean(
+            datetime=from_time.naive,
+            timezone=from_tz["timeZoneId"]
+        )
+        converted_time.shift(to_tz["timeZoneId"])
+
+        dt_fmt = "%A, %B %d, %Y at %H:%M:%S"
+
+        msg = (
+            "{} \n"
+            "for {} \n"
+            "is \n"
+            "{} \n"
+            "for {}.").format(
+                orig_time.datetime.strftime(dt_fmt),
+                "{} ({})".format(from_tz["timeZoneId"], from_tz["timeZoneName"]),
+                converted_time.datetime.strftime(dt_fmt),
+                "{} ({})".format(to_tz["timeZoneId"], to_tz["timeZoneName"])
+            )
+        await self.bot.say(msg)
 
 
     @commands.group(aliases=['gm'], pass_context=True)
@@ -223,11 +250,26 @@ class TimeZone:
     @gmaps.command(name="timezone", pass_context=True)
     async def gmaps_timezone(self, ctx, *, address):
         """Find the timezone by address."""
+        result = self.get_timezone(address)
+        await self.bot.say(result)
+
+    def get_timezone(self, address):
+        """Return timezone info by location.
+
+        Result format:
+        {
+            'dstOffset': 3600,
+            'rawOffset': -18000,
+            'status': 'OK',
+            'timeZoneId': 'America/New_York',
+            'timeZoneName': 'Eastern Daylight Time'
+        }
+
+        """
         gc = self.gmclient().geocode(address)
         loc = gc[0]['geometry']['location']
         result = self.gmclient().timezone(location=loc)
-        await self.bot.say(result)
-
+        return result
 
 def check_folder():
     """Check folder."""
