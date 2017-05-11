@@ -27,6 +27,7 @@ import itertools
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
+import cogs
 from cogs.utils.chat_formatting import pagify
 from .utils import checks
 from random import choice
@@ -729,8 +730,13 @@ class RACF:
         amt = int(amt)
         split_amt = int(amt / (len(members)))
         for member in members:
-            bank.transfer_credits(
-                ctx.message.author, member, split_amt)
+            if member != ctx.message.author:
+                try:
+                    bank.transfer_credits(
+                        ctx.message.author, member, split_amt)
+                except cogs.economy.NoAccount:
+                    await self.bot.say(
+                        "{} has no account.".format(member.display_name))
         split_msg = ""
         if len(members) > 1:
             split_msg = ' ({} credits each)'.format(split_amt)
