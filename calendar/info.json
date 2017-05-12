@@ -1,0 +1,11 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Practice + Signups",
+	"DESCRIPTION": "RACF-specific: Read from Google Calendar and allow people to signup for practice.",
+	"DISABLED": false,
+	"NAME": "Practice",
+	"REQUIREMENTS": ["google-api-python-client"],
+	"TAGS": ["calendar", "signup"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please log an issue on my GitHub or message me on http://discord.me/sml"
+
+}
