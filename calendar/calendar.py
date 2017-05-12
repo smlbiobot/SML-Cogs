@@ -40,20 +40,23 @@ from apiclient import discovery
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
+from oauth2client.service_account import ServiceAccountCredentials
 
 from apiclient.discovery import build
 
 
 PATH = os.path.join("data", "calendar")
 JSON = os.path.join(PATH, "settings.json")
-CREDENTIAL_PATH = os.path.join("data", "calendar")
+
 CREDENTIAL_FILENAME = "calendar-credentials.json"
-CREDENTIAL_JSON = os.path.join(CREDENTIAL_PATH, CREDENTIAL_FILENAME)
+CREDENTIAL_JSON = os.path.join(PATH, CREDENTIAL_FILENAME)
 
 SCOPES = 'https://www.googleapis.com/auth/calendar.readonly'
-CLIENT_SECRET_JSON = os.path.join("data", "calendar", "client_secret.json")
+CLIENT_SECRET_JSON = os.path.join(PATH, "client_secret.json")
+SERVICE_KEY_JSON = os.path.join(PATH, "service_key.json")
 APPLICATION_NAME = 'Red Discord Bot Google Calendar API Cog'
 
+RACF_CALENDAR_ID = 'imdea4ui8l6vrpsulmboplsms8@group.calendar.google.com'
 
 def get_credentials():
     """Get valid user credentials from storage.
@@ -116,6 +119,33 @@ class Practice:
         await self.bot.say(
             "Attachment received: {}".format(CLIENT_SECRET_JSON))
 
+    @setcalendar.command(name="servicekey", pass_context=True)
+    async def setcalendar_gapisecret(self, ctx):
+        """Set google API Service account Key file (JSON).
+
+        This is a json file downloadable from the Google API Console.
+        """
+        await self.bot.say(
+            "Please upload the Google API service account key (json).")
+        answer = await self.bot.wait_for_message(
+            timeout=30.0,
+            author=ctx.message.author)
+        if answer is None:
+            await self.bot.say("Time out.")
+            return
+        if not len(answer.attachments):
+            await self.bot.say("Cannot find attachments.")
+            return
+        attach = answer.attachments[0]
+        url = attach["url"]
+
+        async with aiohttp.get(url) as cred:
+            with open(SERVICE_KEY_JSON, "wb") as f:
+                f.write(await cred.read())
+
+        await self.bot.say(
+            "Attachment received: {}".format(SERVICE_KEY_JSON))
+
     @commands.group(pass_context=True)
     async def calendar(self, ctx):
         """Google Calendar."""
@@ -123,22 +153,23 @@ class Practice:
             await send_cmd_help(ctx)
 
     @calendar.command(name="list", pass_context=True)
-    async def calendar_list(self, ctx):
+    async def calendar_list(self, ctx, max_results=5):
         """List events on a calendar."""
-        credentials = get_credentials()
+        # credentials = get_credentials()
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            SERVICE_KEY_JSON, scopes=SCOPES)
         http = credentials.authorize(httplib2.Http())
         service = discovery.build('calendar', 'v3', http=http)
 
         now = dt.datetime.utcnow().isoformat() + 'Z'
-        # await self.bot.typing()
-        await self.bot.say("Getting the upcoming 10 events")
 
-        gcal_id = 'imdea4ui8l6vrpsulmboplsms8@group.calendar.google.com'
-        # gcal_id = 'primary'
+        await self.bot.say(
+            "Getting the upcoming {} events:".format(max_results))
+
         eventsResult = service.events().list(
-            calendarId=gcal_id,
+            calendarId=RACF_CALENDAR_ID,
             timeMin=now,
-            maxResults=10,
+            maxResults=max_results,
             singleEvents=True,
             orderBy='startTime').execute()
         events = eventsResult.get('items', [])
