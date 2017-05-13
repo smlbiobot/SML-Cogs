@@ -73,7 +73,7 @@ class Practice:
 
     @setcalendar.command(name="servicekey", pass_context=True)
     async def setcalendar_gapisecret(self, ctx):
-        """Set google API Service account Key file (JSON).
+        """Set Google API service account Key.
 
         This is a json file downloadable from the Google API Console.
         """
@@ -107,7 +107,6 @@ class Practice:
     @calendar.command(name="list", pass_context=True)
     async def calendar_list(self, ctx, max_results=5):
         """List events on a calendar."""
-        # credentials = get_credentials()
         credentials = ServiceAccountCredentials.from_json_keyfile_name(
             SERVICE_KEY_JSON, scopes=SCOPES)
         http = credentials.authorize(httplib2.Http())

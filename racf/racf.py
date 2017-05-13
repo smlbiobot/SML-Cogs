@@ -404,10 +404,14 @@ class RACF:
     async def member2visitor(self, ctx: Context, *members: discord.Member):
         """Re-assign list of people from members to visitors."""
         server = ctx.message.server
-        to_remove_roles = [
-            r for r in server.roles if r.name in MEMBER_DEFAULT_ROLES]
         to_add_roles = [r for r in server.roles if r.name == 'Visitor']
         for member in members:
+            to_remove_roles = [
+                r for r in member.roles if r.name in MEMBER_DEFAULT_ROLES]
+            to_remove_roles.extend([
+                r for r in member.roles if r.name in CLANS])
+            to_remove_roles.extend([
+                r for r in member.roles if r.name in ['eSports']])
             await self.bot.add_roles(member, *to_add_roles)
             await self.bot.say("Added {} for {}".format(
                 ", ".join([r.name for r in to_add_roles]), member.display_name))
