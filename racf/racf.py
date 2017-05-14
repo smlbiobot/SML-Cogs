@@ -65,10 +65,14 @@ KICK5050_MSG = (
     "Echo / Foxtrot / Golf / Hotel with the red rocket emblem. "
     "Good luck on the ladder!")
 
+
 def grouper(n, iterable, fillvalue=None):
-    """grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
+    """Group lists into lists of items.
+
+    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
     args = [iter(iterable)] * n
     return itertools.zip_longest(*args, fillvalue=fillvalue)
+
 
 class RACF:
     """Display RACF specifc info.
@@ -646,11 +650,11 @@ class RACF:
     @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
     async def teamadd(self, ctx, member: discord.Member, role):
         """Add competitive team member roles."""
-        author = ctx.message.author
         server = ctx.message.server
         competitive_team_roles = [r.lower() for r in COMPETITIVE_TEAM_ROLES]
         if role.lower() not in competitive_team_roles:
-            await self.bot.say("{} is not a competitive team role.".format(role))
+            await self.bot.say(
+                "{} is not a competitive team role.".format(role))
             return
         if role.lower() not in [r.name.lower() for r in server.roles]:
             await self.bot.say("{} is not a role on this server.".format(role))
@@ -663,18 +667,19 @@ class RACF:
     @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
     async def teamremove(self, ctx, member: discord.Member, role):
         """Remove competitive team member roles."""
-        author = ctx.message.author
         server = ctx.message.server
         competitive_team_roles = [r.lower() for r in COMPETITIVE_TEAM_ROLES]
         if role.lower() not in competitive_team_roles:
-            await self.bot.say("{} is not a competitive team role.".format(role))
+            await self.bot.say(
+                "{} is not a competitive team role.".format(role))
             return
         if role.lower() not in [r.name.lower() for r in server.roles]:
             await self.bot.say("{} is not a role on this server.".format(role))
             return
         roles = [r for r in server.roles if r.name.lower() == role.lower()]
         await self.bot.remove_roles(member, *roles)
-        await self.bot.say("Removed {} from {}".format(role, member.display_name))
+        await self.bot.say(
+            "Removed {} from {}".format(role, member.display_name))
 
     @commands.command(pass_context=True, no_pm=True, aliases=["k5"])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -701,15 +706,25 @@ class RACF:
         If command in invoked from other channels, only add Recruit role.
         """
         recruit_roles = ["Recruit"]
+        add_visitor_role = False
         if ctx.message.channel.is_default:
             recruit_roles.append("Visitor")
+            add_visitor_role = True
         await ctx.invoke(self.changerole, member, *recruit_roles)
         channel = discord.utils.get(
             ctx.message.server.channels, name="esports-recruiting")
-        await self.bot.say(
-            "{} Please see pinned messages "
-            "in {} for eSports information.".format(
-                member.mention, channel.mention))
+        if channel is not None:
+            await self.bot.say(
+                "{} Please see pinned messages "
+                "in {} for eSports information.".format(
+                    member.mention, channel.mention))
+        if add_visitor_role:
+            visitor_channel = discord.utils.get(
+                ctx.message.server.channels, name="visitors")
+            if visitor_channel is not None:
+                await self.bot.say(
+                    "{} You can now chat in {} — enjoy!".format(
+                        member.mention, visitor_channel.mention))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)

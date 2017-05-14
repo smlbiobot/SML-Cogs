@@ -88,6 +88,7 @@ class TimeZone:
     """Timezone conversion and more."""
 
     def __init__(self, bot):
+        """Constructor."""
         self.bot = bot
         self.settings = dataIO.load_json(JSON)
 
