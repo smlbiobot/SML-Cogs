@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "RCS Interview",
+	"DESCRIPTION": "Fetches interview answers from Google Forms responses",
+	"DISABLED": false,
+	"NAME": "RCSInterview",
+	"REQUIREMENTS": ["google-api-python-client"],
+	"TAGS": ["VC", "voice", "voice channel", "utility", "util", "helper"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
