@@ -149,6 +149,9 @@ class RCSInterview:
 
         # questions: first row
         questions = values[0]
+        # questions contain legacy field at end
+        questions = questions[:-1]
+
         # for question in questions:
         #     out.append('**{}**'.format(question))
 
@@ -156,7 +159,7 @@ class RCSInterview:
         answers = None
         forms = values[1:]
         for form in forms:
-            if form[2] == app_id:
+            if form[1] == app_id:
                 answers = form
                 break
 
@@ -169,20 +172,13 @@ class RCSInterview:
             out.append(
                 '`{}. `**{}**'.format(id + 1, question))
             out.append('')
-            out.append(answers[id])
-            out.append('')
+            if id < len(answers):
+                out.append(answers[id])
+                out.append('')
 
         # output
         for page in pagify('\n'.join(out), shorten_by=24):
             await self.bot.say(page)
-
-
-
-
-        # await self.bot.say('Name, Major:')
-        # for row in values:
-        #     # Print columns A and E, which correspond to indices 0 and 4.
-        #     await self.bot.say('%s, %s' % (row[0], row[4]))
 
 
 def check_folder():
