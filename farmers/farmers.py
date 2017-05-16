@@ -85,8 +85,9 @@ class Farmers:
 
                 title = "Clan Chest Farmers"
                 description = (
-                    "Members who have contributed 150+ crowns "
+                    "Members who have contributed 125+ crowns "
                     "or 25+ 2v2 wins to their clan chests.\n"
+                    "Or: being 1st in their clan."
                     "{} (Week {})").format(
                         season[week].get_text(), week + 1)
 
