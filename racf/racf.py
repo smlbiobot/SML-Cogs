@@ -692,6 +692,26 @@ class RACF:
         await self.bot.say(
             "Removed {} from {}".format(role, member.display_name))
 
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
+    async def teamlist(self, ctx, role_name):
+        """List team members with specific competitive roles.
+
+        Default CSV output.
+        """
+        server = ctx.message.server
+        role = discord.utils.get(server.roles, name=role_name)
+        if role is None:
+            await self.bot.say(
+                '{} is not a valid role on this server.'.format(role_name))
+            return
+        members = [m for m in server.members if role in m.roles]
+        members = sorted(members, key=lambda x: x.display_name)
+        out = ', '.join([m.display_name for m in members])
+        await self.bot.say(
+            'List of members with {}:\n'
+            '{}'.format(role_name, out))
+
     @commands.command(pass_context=True, no_pm=True, aliases=["k5"])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def kick5050(self, ctx, member: discord.Member):
