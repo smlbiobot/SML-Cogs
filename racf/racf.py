@@ -56,7 +56,7 @@ CLANS = [
 BOTCOMMANDER_ROLE = ["Bot Commander"]
 COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
 COMPETITIVE_TEAM_ROLES = [
-    "CRL", "RPL-NA", "RPL-EU", "RPL-AS", "MLG",
+    "CRL", "RPL-NA", "RPL-EU", "RPL-APAC", "MLG",
     "ClashWars", "CRL-Elite", "CRL-Legends", "CRL-Rockets"]
 KICK5050_MSG = (
     "Sorry, but you were 50/50 and we have kicked you from the clan. "
@@ -700,6 +700,11 @@ class RACF:
         Default CSV output.
         """
         server = ctx.message.server
+        competitive_team_roles = [r.lower() for r in COMPETITIVE_TEAM_ROLES]
+        if role_name.lower() not in competitive_team_roles:
+            await self.bot.say(
+                "{} is not a competitive team role.".format(role_name))
+            return
         role = discord.utils.get(server.roles, name=role_name)
         if role is None:
             await self.bot.say(
