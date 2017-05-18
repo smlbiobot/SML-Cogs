@@ -265,7 +265,8 @@ class CRData:
                         data = await resp.json()
                     except json.decoder.JSONDecodeError:
                         # data = await resp.text()
-                        # when data cannot be decoded, likely data source is down
+                        # when data cannot be decoded,
+                        # likely data source is down
                         data = None
         if data is not None:
             dataIO.save_json(now_path, data)
@@ -373,6 +374,24 @@ class CRData:
             if not show_next:
                 return
 
+    @crdata.command(name="cardnames", pass_context=True, no_pm=True)
+    async def crdata_cardnames(self, ctx):
+        """Display valid card names and abbreviations."""
+        out = []
+        for card_key, card_value in self.clashroyale["Cards"].items():
+            names = [card_key]
+            name = string.capwords(card_key.replace('-', ' '))
+            for abbrev in card_value["aka"]:
+                names.append(abbrev)
+            rarity = string.capwords(card_value["rarity"])
+            elixir = card_value["elixir"]
+            out.append(
+                "**{}** ({}, {} elixir): {}".format(
+                    name, rarity, elixir, ", ".join(names)))
+
+        for page in pagify("\n".join(out), shorten_by=24):
+            await self.bot.say(page)
+
     @crdata.command(name="search", pass_context=True, no_pm=True)
     async def crdata_search(self, ctx: Context, *cards):
         """Search decks on the Global 200.
@@ -412,12 +431,21 @@ class CRData:
         include_cards = [c for c in cards if not c.startswith('-')]
         exclude_cards = [c[1:] for c in cards if c.startswith('-')]
 
+        # validate card input is valid
+        invalid_cards = []
+        invalid_cards.extend(self.get_invalid_cards(include_cards))
+        invalid_cards.extend(self.get_invalid_cards(exclude_cards))
+        if len(invalid_cards) > 0:
+            await self.bot.say(
+                'Invalid card names: {}'.format(', '.join(invalid_cards)))
+            await self.bot.say(
+                'Type `!crdata cardnames` to see a list of valid input.')
+            return
+
         include_cards = self.normalize_deck_data(include_cards)
         include_sfids = [self.id_to_sfid(c) for c in include_cards]
         exclude_cards = self.normalize_deck_data(exclude_cards)
         exclude_sfids = [self.id_to_sfid(c) for c in exclude_cards]
-
-        cards = self.normalize_deck_data(cards)
 
         data = self.get_last_data()
         decks = data["decks"]
@@ -660,8 +688,19 @@ class CRData:
         for i, card in enumerate(deck):
             if card in self.cards_abbrev.keys():
                 deck[i] = self.cards_abbrev[card]
+            else:
+                deck[i] = None
 
         return deck
+
+    def get_invalid_cards(self, cards):
+        """Validate card data.
+
+        Return list of cards which are invalid.
+        """
+        deck = [c.lower() if c is not None else '' for c in cards]
+        invalid_cards = [c for c in deck if c not in self.cards_abbrev.keys()]
+        return invalid_cards
 
     def deck_elixir_by_sfid(self, deck):
         """Return average elixir for a list of sfids."""
