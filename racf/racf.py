@@ -235,29 +235,14 @@ class RACF:
         + for role addition
         - for role removal
         """
+        server = ctx.message.server
+        author = ctx.message.author
         if member is None:
             await self.bot.say("You must specify a member")
             return
         elif roles is None or not roles:
             await self.bot.say("You must specify a role.")
             return
-
-        server = ctx.message.server
-        author = ctx.message.author
-
-        rh = server.role_hierarchy
-        if rh.index(member.top_role) < rh.index(author.top_role):
-            await self.bot.say(
-                "You do not have permission to edit roles for that user.")
-            return
-
-        bot_msg = await self.do_changerole(server, author, member, roles)
-        await self.bot.say(bot_msg)
-
-    async def do_changerole(
-            self, server, author, member: discord.Member, roles):
-        """Change role using params and return message for bot to say."""
-        bot_msg = []
 
         server_role_names = [r.name for r in server.roles]
         role_args = []
@@ -278,22 +263,21 @@ class RACF:
             if role.name.lower() not in disallowed_roles:
                 if role.name.lower() in minus:
                     await self.bot.remove_roles(member, role)
-                    bot_msg.append("Removed {} from {}".format(
-                        role.name, member.display_name))
+                    await self.bot.say(
+                        "Removed {} from {}".format(
+                            role.name, member.display_name))
                 if role.name.lower() in plus:
                     # respect role hiearchy
                     rh = server.role_hierarchy
                     if rh.index(role) < rh.index(author.top_role):
-                        bot_msg.append(
+                        await self.bot.say(
                             "{} does not have permission to edit {}.".format(
                                 author.display_name, role.name))
                     else:
                         await self.bot.add_roles(member, role)
-                        bot_msg.append(
+                        await self.bot.say(
                             "Added {} for {}".format(
                                 role.name, member.display_name))
-
-        return "\n".join(bot_msg)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -465,7 +449,7 @@ class RACF:
         await ctx.invoke(self.changerole, member, *roles_param)
         if channel is not None:
             await self.bot.say(
-                "{} Welcome! Main family chat at {} — enjoy!".format(
+                "{} Welcome! Main family chat at {} — enjoy!".format(
                     member.mention, channel.mention))
 
     @commands.command(pass_context=True, no_pm=True)
@@ -775,7 +759,7 @@ class RACF:
                 ctx.message.server.channels, name="visitors")
             if visitor_channel is not None:
                 await self.bot.say(
-                    "{} You can now chat in {} — enjoy!".format(
+                    "{} You can now chat in {} — enjoy!".format(
                         member.mention, visitor_channel.mention))
 
     @commands.command(pass_context=True, no_pm=True)
@@ -788,7 +772,7 @@ class RACF:
         await ctx.invoke(self.changerole, member, *visitor_roles)
         if channel is not None:
             await self.bot.say(
-                "{} You can now chat in {} — enjoy!".format(
+                "{} You can now chat in {} — enjoy!".format(
                     member.mention, channel.mention))
 
     @commands.command(pass_context=True, no_pm=True)
