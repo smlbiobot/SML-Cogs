@@ -1,495 +1,702 @@
 {
     "Cards": {
         "archers": {
-            "aka": ["arch"],
+            "aka": [
+                "arch"
+            ],
             "elixir": 3,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_ARCHERS",
-            "cpid": "Archers"
+            "cpid": "Archers",
+            "emoji": "Archers"
         },
         "arrows": {
-            "aka": ["arrow", "arr"],
+            "aka": [
+                "arrow",
+                "arr"
+            ],
             "elixir": 3,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_ARROWS",
-            "cpid": "Arrows"
+            "cpid": "Arrows",
+            "emoji": "Arrows"
         },
         "baby-dragon": {
-            "aka": ["bbd", "babyd", "bd"],
+            "aka": [
+                "bbd",
+                "babyd",
+                "bd"
+            ],
             "elixir": 4,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_BABY_DRAGON",
-            "cpid": "Baby Dragon"
+            "cpid": "Baby Dragon",
+            "emoji": "BabyDragon"
         },
         "balloon": {
-            "aka": ["loon"],
+            "aka": [
+                "loon"
+            ],
             "elixir": 5,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_BALLOON",
-            "cpid": "Balloon"
+            "cpid": "Balloon",
+            "emoji": "Balloon"
         },
         "barbarian-hut": {
-            "aka": ["barb-hut", "bh"],
+            "aka": [
+                "barb-hut",
+                "bh"
+            ],
             "elixir": 7,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_BARBARIAN_HUT",
-            "cpid": "Barbaian Hut"
+            "cpid": "Barbaian Hut",
+            "emoji": "BarbarianHut"
         },
         "barbarians": {
-            "aka": ["barb", "barbs"],
+            "aka": [
+                "barb",
+                "barbs"
+            ],
             "elixir": 5,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_BARBARIANS",
-            "cpid": "Barbarians"
+            "cpid": "Barbarians",
+            "emoji": "Barbarians"
         },
         "battle-ram": {
-            "aka": ["br"],
+            "aka": [
+                "br"
+            ],
             "elixir": 4,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_BATTLE_RAM",
-            "cpid": "Battle Ram"
+            "cpid": "Battle Ram",
+            "emoji": "BattleRam"
         },
         "bomb-tower": {
-            "aka": ["bt"],
+            "aka": [
+                "bt"
+            ],
             "elixir": 5,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_BOMB_TOWER",
-            "cpid": "Bomb Tower"
+            "cpid": "Bomb Tower",
+            "emoji": "BombTower"
         },
         "bomber": {
             "aka": [],
             "elixir": 3,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_BOMBER",
-            "cpid": "Bomber"
+            "cpid": "Bomber",
+            "emoji": "Bomber"
         },
         "bowler": {
             "aka": [],
             "elixir": 5,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_BOWLER",
-            "cpid": "Bowler"
+            "cpid": "Bowler",
+            "emoji": "Bowler"
         },
         "cannon": {
             "aka": [],
             "elixir": 3,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_CANNON",
-            "cpid": "Cannon"
+            "cpid": "Cannon",
+            "emoji": "Cannon"
         },
         "clone": {
             "aka": [],
             "elixir": 3,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_CLONE",
-            "cpid": "Clone"
+            "cpid": "Clone",
+            "emoji": "Clone"
         },
         "dark-prince": {
-            "aka": ["dp", "dank-prince"],
+            "aka": [
+                "dp",
+                "dank-prince"
+            ],
             "elixir": 4,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_DARK_PRINCE",
-            "cpid": "Dark Prince"
+            "cpid": "Dark Prince",
+            "emoji": "DarkPrince"
         },
         "dart-goblin": {
-            "aka": ["dg", "dart-gob", "dart-gobs"],
+            "aka": [
+                "dg",
+                "dart-gob",
+                "dart-gobs"
+            ],
             "elixir": 3,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_BLOWDART_GOBLIN",
-            "cpid": "Dart Goblin"
+            "cpid": "Dart Goblin",
+            "emoji": "DartGoblin"
         },
         "electro-wizard": {
-            "aka": ["ew", "ewiz", "ewizard"],
+            "aka": [
+                "ew",
+                "ewiz",
+                "ewizard"
+            ],
             "elixir": 4,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_ELECTRO_WIZARD",
-            "cpid": "Electro Wizard"
+            "cpid": "Electro Wizard",
+            "emoji": "ElectroWizard"
         },
         "elite-barbarians": {
-            "aka": ["eb", "ebarb", "ebarbs"],
+            "aka": [
+                "eb",
+                "ebarb",
+                "ebarbs"
+            ],
             "elixir": 6,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_ANGRY_BARBARIANS",
-            "cpid": "Elite Barbarians"
+            "cpid": "Elite Barbarians",
+            "emoji": "EliteBarbarians"
         },
         "elixir-collector": {
-            "aka": ["ec", "pump", "collector"],
+            "aka": [
+                "ec",
+                "pump",
+                "collector"
+            ],
             "elixir": 6,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_ELIXIR_COLLECTOR",
-            "cpid": "Elixir Collector"
+            "cpid": "Elixir Collector",
+            "emoji": "ElixirCollector"
         },
         "executioner": {
-            "aka": ["ex", "exe", "exec"],
+            "aka": [
+                "ex",
+                "exe",
+                "exec"
+            ],
             "elixir": 5,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_AXEMAN",
-            "cpid": "Executioner"
+            "cpid": "Executioner",
+            "emoji": "Executioner"
         },
         "fire-spirits": {
-            "aka": ["fs"],
+            "aka": [
+                "fs"
+            ],
             "elixir": 2,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_FIRE_SPIRITS",
-            "cpid": "Fire Spirits"
+            "cpid": "Fire Spirits",
+            "emoji": "FireSpirits"
         },
         "fireball": {
-            "aka": ["fb"],
+            "aka": [
+                "fb"
+            ],
             "elixir": 4,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_FIREBALL",
-            "cpid": "Fireball"
+            "cpid": "Fireball",
+            "emoji": "Fireball"
         },
         "freeze": {
             "aka": [],
             "elixir": 4,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_FREEZE",
-            "cpid": "Freeze"
+            "cpid": "Freeze",
+            "emoji": "Freeze"
         },
         "furnace": {
             "aka": [],
             "elixir": 4,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_FIRE_SPIRIT_HUT",
-            "cpid": "Furnace"
+            "cpid": "Furnace",
+            "emoji": "Furnace"
         },
         "giant-skeleton": {
-            "aka": ["gs"],
+            "aka": [
+                "gs"
+            ],
             "elixir": 6,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_GIANT_SKELETON",
-            "cpid": "Giant Skeleton"
+            "cpid": "Giant Skeleton",
+            "emoji": "GiantSkeleton"
         },
         "giant": {
             "aka": [],
             "elixir": 5,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_GIANT",
-            "cpid": "Giant"
+            "cpid": "Giant",
+            "emoji": "Giant"
         },
         "goblin-barrel": {
-            "aka": ["gb", "gob-barrel", "barrel"],
+            "aka": [
+                "gb",
+                "gob-barrel",
+                "barrel"
+            ],
             "elixir": 3,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_GOBLIN_BARREL",
-            "cpid": "Goblin Barrel"
+            "cpid": "Goblin Barrel",
+            "emoji": "GoblinBarrel"
         },
         "goblin-gang": {
-            "aka": ["gg", "gob-gang"],
+            "aka": [
+                "gg",
+                "gob-gang"
+            ],
             "elixir": 3,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_GOBLIN_GANG",
-            "cpid": "Goblin Gang"
+            "cpid": "Goblin Gang",
+            "emoji": "GoblinGang"
         },
         "goblin-hut": {
-            "aka": ["gob-hut", "gh"],
+            "aka": [
+                "gob-hut",
+                "gh"
+            ],
             "elixir": 5,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_GOBLIN_HUT",
-            "cpid": "Goblin Hut"
+            "cpid": "Goblin Hut",
+            "emoji": "GoblinHut"
         },
         "goblins": {
-            "aka": ["gobs", "gob", "stab-gobs", "stab-gob"],
+            "aka": [
+                "gobs",
+                "gob",
+                "stab-gobs",
+                "stab-gob"
+            ],
             "elixir": 2,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_GOBLINS",
-            "cpid": "Goblins"
+            "cpid": "Goblins",
+            "emoji": "Goblins"
         },
         "golem": {
             "aka": [],
             "elixir": 8,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_GOLEM",
-            "cpid": "Golem"
+            "cpid": "Golem",
+            "emoji": "Golem"
         },
         "graveyard": {
-            "aka": ["gy", "skillyard"],
+            "aka": [
+                "gy",
+                "skillyard"
+            ],
             "elixir": 5,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_GRAVEYARD",
-            "cpid": "Graveyard"
+            "cpid": "Graveyard",
+            "emoji": "Graveyard"
         },
         "guards": {
             "aka": [],
             "elixir": 3,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_SKELETON_WARRIORS",
-            "cpid": "Guards"
+            "cpid": "Guards",
+            "emoji": "Guards"
         },
         "hog-rider": {
-            "aka": ["hog"],
+            "aka": [
+                "hog"
+            ],
             "elixir": 4,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_HOG_RIDER",
-            "cpid": "Hog Rider"
+            "cpid": "Hog Rider",
+            "emoji": "HogRider"
         },
         "ice-golem": {
-            "aka": ["ig"],
+            "aka": [
+                "ig"
+            ],
             "elixir": 2,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_ICEGOLEMITE",
-            "cpid": "Ice Golem"
+            "cpid": "Ice Golem",
+            "emoji": "IceGolem"
         },
         "ice-spirit": {
-            "aka": ["is"],
+            "aka": [
+                "is"
+            ],
             "elixir": 1,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_ICE_SPIRITS",
-            "cpid": "Ice Spirit"
+            "cpid": "Ice Spirit",
+            "emoji": "IceSpirit"
         },
         "ice-wizard": {
-            "aka": ["iw", "ice-wiz", "iwiz"],
+            "aka": [
+                "iw",
+                "ice-wiz",
+                "iwiz"
+            ],
             "elixir": 3,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_ICE_WIZARD",
-            "cpid": "Ice Wizard"
+            "cpid": "Ice Wizard",
+            "emoji": "IceWizard"
         },
         "inferno-dragon": {
-            "aka": ["id"],
+            "aka": [
+                "id"
+            ],
             "elixir": 4,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_INFERNO_DRAGON",
-            "cpid": "Inferno Dragon"
+            "cpid": "Inferno Dragon",
+            "emoji": "InfernoDragon"
         },
         "inferno-tower": {
-            "aka": ["inferno", "it"],
+            "aka": [
+                "inferno",
+                "it"
+            ],
             "elixir": 5,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_INFERNO",
-            "cpid": "Inferno Tower"
+            "cpid": "Inferno Tower",
+            "emoji": "InfernoTower"
         },
         "knight": {
             "aka": [],
             "elixir": 3,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_KNIGHT",
-            "cpid": "Knight"
+            "cpid": "Knight",
+            "emoji": "Knight"
         },
         "lava-hound": {
-            "aka": ["lava", "lh", "hound"],
+            "aka": [
+                "lava",
+                "lh",
+                "hound"
+            ],
             "elixir": 7,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_LAVA_HOUND",
-            "cpid": "Lava Hound"
+            "cpid": "Lava Hound",
+            "emoji": "LavaHound"
         },
         "lightning": {
             "aka": [],
             "elixir": 6,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_LIGHTNING",
-            "cpid": "Lightning"
+            "cpid": "Lightning",
+            "emoji": "Lightning"
         },
         "lumberjack": {
-            "aka": ["lj"],
+            "aka": [
+                "lj"
+            ],
             "elixir": 4,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_RAGE_BARBARIAN",
-            "cpid": "Lumberjack"
+            "cpid": "Lumberjack",
+            "emoji": "Lumberjack"
         },
         "mega-minion": {
-            "aka": ["mm", "meta-minion", "mega"],
+            "aka": [
+                "mm",
+                "meta-minion",
+                "mega"
+            ],
             "elixir": 3,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_MEGAMINION",
-            "cpid": "Mega Minion"
+            "cpid": "Mega Minion",
+            "emoji": "MegaMinion"
         },
         "miner": {
             "aka": [],
             "elixir": 3,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_MINER",
-            "cpid": "Miner"
+            "cpid": "Miner",
+            "emoji": "Miner"
         },
         "mini-pekka": {
-            "aka": ["minip", "mini-p", "mp"],
+            "aka": [
+                "minip",
+                "mini-p",
+                "mp"
+            ],
             "elixir": 4,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_MINIPEKKA",
-            "cpid": "Mini P.E.K.K.A"
+            "cpid": "Mini P.E.K.K.A",
+            "emoji": "MiniPekka"
         },
         "minion-horde": {
-            "aka": ["mh", "horde"],
+            "aka": [
+                "mh",
+                "horde"
+            ],
             "elixir": 5,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_MINION_HORDE",
-            "cpid": "Minion Horde"
+            "cpid": "Minion Horde",
+            "emoji": "MinionHorde"
         },
         "minions": {
             "aka": [],
             "elixir": 3,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_MINIONS",
-            "cpid": "Minions"
+            "cpid": "Minions",
+            "emoji": "Minions"
         },
         "mirror": {
             "aka": [],
             "elixir": 0,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_MIRROR",
-            "cpid": "Mirror"
+            "cpid": "Mirror",
+            "emoji": "Mirror"
         },
         "mortar": {
             "aka": [],
             "elixir": 4,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_MORTAR",
-            "cpid": "Mortar"
+            "cpid": "Mortar",
+            "emoji": "Mortar"
         },
         "musketeer": {
-            "aka": ["1m", "musk"],
+            "aka": [
+                "1m",
+                "musk"
+            ],
             "elixir": 4,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_MUSKETEER",
-            "cpid": "Musketeer"
+            "cpid": "Musketeer",
+            "emoji": "Musketeer"
         },
         "pekka": {
             "aka": [],
             "elixir": 7,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_PEKKA",
-            "cpid": "P.E.K.K.A."
+            "cpid": "P.E.K.K.A.",
+            "emoji": "Pekka"
         },
         "poison": {
             "aka": [],
             "elixir": 4,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_POISON",
-            "cpid": "Poison"
+            "cpid": "Poison",
+            "emoji": "Poison"
         },
         "prince": {
             "aka": [],
             "elixir": 5,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_PRINCE",
-            "cpid": "Prince"
+            "cpid": "Prince",
+            "emoji": "Prince"
         },
         "princess": {
             "aka": [],
             "elixir": 3,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_PRINCESS",
-            "cpid": "Princess"
+            "cpid": "Princess",
+            "emoji": "Princess"
         },
         "rage": {
             "aka": [],
             "elixir": 2,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_RAGE",
-            "cpid": "Rage"
+            "cpid": "Rage",
+            "emoji": "Rage"
         },
         "rocket": {
             "aka": [],
             "elixir": 6,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_ROCKET",
-            "cpid": "Rocket"
+            "cpid": "Rocket",
+            "emoji": "Rocket"
         },
         "royal-giant": {
-            "aka": ["rg", "rgg"],
+            "aka": [
+                "rg",
+                "rgg"
+            ],
             "elixir": 6,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_ROYAL_GIANT",
-            "cpid": "Royal Giant"
+            "cpid": "Royal Giant",
+            "emoji": "RoyalGiant"
         },
         "skeleton-army": {
-            "aka": ["skarmy", "sa"],
+            "aka": [
+                "skarmy",
+                "sa"
+            ],
             "elixir": 3,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_SKELETON_HORDE",
-            "cpid": "Skeleton Army"
+            "cpid": "Skeleton Army",
+            "emoji": "SkeletonArmy"
         },
         "skeletons": {
-            "aka": ["skele"],
+            "aka": [
+                "skele"
+            ],
             "elixir": 1,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_SKELETONS",
-            "cpid": "Skeletons"
+            "cpid": "Skeletons",
+            "emoji": "Skeletons"
         },
         "sparky": {
             "aka": [],
             "elixir": 6,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_ZAPMACHINE",
-            "cpid": "Sparky"
+            "cpid": "Sparky",
+            "emoji": "Sparky"
         },
         "spear-goblins": {
-            "aka": ["spear-gobs", "spear-gob", "sgobs", "sgob"],
+            "aka": [
+                "spear-gobs",
+                "spear-gob",
+                "sgobs",
+                "sgob"
+            ],
             "elixir": 2,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_SPEAR_GOBLINS",
-            "cpid": "Spear Goblins"
+            "cpid": "Spear Goblins",
+            "emoji": "SpearGoblins"
         },
         "tesla": {
             "aka": [],
             "elixir": 4,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_TESLA",
-            "cpid": "Tesla"
+            "cpid": "Tesla",
+            "emoji": "Tesla"
         },
         "the-log": {
-            "aka": ["log"],
+            "aka": [
+                "log"
+            ],
             "elixir": 2,
             "rarity": "legendary",
             "tid": "TID_SPELL_INFO_LOG",
-            "cpid": "The Log"
+            "cpid": "The Log",
+            "emoji": "TheLog"
         },
         "three-musketeers": {
-            "aka": ["3m", "3musk", "3musks"],
+            "aka": [
+                "3m",
+                "3musk",
+                "3musks"
+            ],
             "elixir": 9,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_THREE_MUSKETEERS",
-            "cpid": "Three Musketeers"
+            "cpid": "Three Musketeers",
+            "emoji": "ThreeMusketeers"
         },
         "tombstone": {
-            "aka": ["ts"],
+            "aka": [
+                "ts"
+            ],
             "elixir": 3,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_TOMBSTONE",
-            "cpid": "Tombstone"
+            "cpid": "Tombstone",
+            "emoji": "Tombstone"
         },
         "tornado": {
-            "aka": ["nado"],
+            "aka": [
+                "nado"
+            ],
             "elixir": 3,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_TORNADO",
-            "cpid": "Tornado"
+            "cpid": "Tornado",
+            "emoji": "Tornado"
         },
         "valkyrie": {
-            "aka": ["valk"],
+            "aka": [
+                "valk"
+            ],
             "elixir": 4,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_VALKYRIE",
-            "cpid": "Valkyrie"
+            "cpid": "Valkyrie",
+            "emoji": "Valkyrie"
         },
         "witch": {
             "aka": [],
             "elixir": 5,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_WITCH",
-            "cpid": "Witch"
+            "cpid": "Witch",
+            "emoji": "Witch"
         },
         "wizard": {
-            "aka": ["wiz"],
+            "aka": [
+                "wiz"
+            ],
             "elixir": 5,
             "rarity": "rare",
             "tid": "TID_SPELL_INFO_WIZARD",
-            "cpid": "Wizard"
+            "cpid": "Wizard",
+            "emoji": "Wizard"
         },
         "xbow": {
-            "aka": ["x-bow"],
+            "aka": [
+                "x-bow"
+            ],
             "elixir": 6,
             "rarity": "epic",
             "tid": "TID_SPELL_INFO_XBOW",
-            "cpid": "X-Bow"
+            "cpid": "X-Bow",
+            "emoji": "XBow"
         },
         "zap": {
             "aka": [],
             "elixir": 2,
             "rarity": "common",
             "tid": "TID_SPELL_INFO_ZAP",
-            "cpid": "Zap"
+            "cpid": "Zap",
+            "emoji": "Zap"
         }
     },
-    "Rarity": ["common", "rare", "epic", "legendary"]
+    "Rarity": [
+        "common",
+        "rare",
+        "epic",
+        "legendary"
+    ]
 }

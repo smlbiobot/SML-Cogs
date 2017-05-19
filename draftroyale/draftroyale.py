@@ -24,21 +24,24 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-from .utils.dataIO import dataIO
-from __main__ import send_cmd_help
-from cogs.utils.chat_formatting import pagify
-from discord.ext import commands
-from discord.ext.commands import Context
 from random import choice
 from random import shuffle
 import datetime
 import discord
 import string
 import os
+import itertools
+
+from .utils.dataIO import dataIO
+from __main__ import send_cmd_help
+from cogs.utils.chat_formatting import pagify
+from discord.ext import commands
+from discord.ext.commands import Context
 
 
 CRDATA_PATH = os.path.join("data", "draftroyale", "clashroyale.json")
 SETTINGS_PATH = os.path.join("data", "draftroyale", "settings.json")
+EMOJI_JSON = os.path.join("data", "draftroyale", "emojis.json")
 
 HELP_TEXT = """
 **Draft Royale: Clash Royale draft system**
@@ -52,6 +55,15 @@ HELP_TEXT = """
 3. Pick cards
 `!draft pick`
 """
+
+
+def grouper(iterable, n, fillvalue=None):
+    """Collect data into fixed-length chunks or blocks.
+
+    grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx
+    """
+    args = [iter(iterable)] * n
+    return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
 class Draft:
@@ -104,6 +116,7 @@ class DraftRoyale:
 
         self.crdata = dataIO.load_json(self.crdata_path)
         self.settings = dataIO.load_json(self.settings_path)
+        self.emojis = dataIO.load_json(EMOJI_JSON)
 
         # init card data
         self.cards = []
@@ -288,10 +301,12 @@ class DraftRoyale:
         out = []
         out.append("**Available cards**")
         card_names = [
-            self.card_key_to_name(key)
+            # self.card_key_to_name(key)
+            self.card_key_to_emoji(key)
             for key in self.cards
             if key not in self.picked_cards]
-        out.append(", ".join(card_names))
+        # out.append(", ".join(card_names))
+        out.append(" ".join(card_names))
 
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
@@ -367,11 +382,52 @@ class DraftRoyale:
             card for card in self.cards
             if card not in self.picked_cards]
 
+    def card_key_to_emoji(self, card_key):
+        """Return card emoji from id."""
+        name = self.crdata["Cards"][card_key]["emoji"]
+        return '<:{}:{}>'.format(name, self.emojis[name])
+
     def get_available_card_names(self):
         """Return list of available card names that are not picked yet."""
         return [
             self.card_key_to_name(card)
             for card in self.get_available_cards()]
+
+    @commands.group(pass_context=True)
+    async def draftutil(self, ctx):
+        """Draft utilities."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @draftutil.command(name="cards", pass_context=True)
+    async def draftutil_cards(self, ctx):
+        """List available cards by emojis."""
+        emojis = [v["emoji"] for k, v in self.crdata["Cards"].items()]
+
+        groups = grouper(emojis, 25)
+        for group in groups:
+            out = []
+            for emoji in group:
+                if emoji is not None:
+                    out.append('<:{}:{}>'.format(emoji, self.emojis[emoji]))
+            await self.bot.say(' '.join(out))
+        # out = []
+        # for emoji in emojis:
+        #     if emoji is not None:
+        #         out.append('<:{}:{}>'.format(emoji, self.emojis[emoji]))
+        # em = discord.Embed()
+        # em.add_field(name="", value="".join(out))
+        # await self.bot.say(embed=em)
+
+    @draftutil.command(name="emojis", pass_context=True)
+    async def draftutil_emojis(self, ctx):
+        """Save list of emojis on all servers."""
+        self.emojis = {}
+        for server in self.bot.servers:
+            for emoji in server.emojis:
+                self.emojis[emoji.name] = emoji.id
+        dataIO.save_json(EMOJI_JSON, self.emojis)
+        await self.bot.say("Emojis saved to {}".format(EMOJI_JSON))
 
 
 def check_folder():
@@ -391,6 +447,10 @@ def check_files():
     f = SETTINGS_PATH
     if not dataIO.is_valid_json(f):
         dataIO.save_json(f, defaults)
+    f = EMOJI_JSON
+    if not dataIO.is_valid_json(f):
+        dataIO.save_json(f, defaults)
+
 
 
 def setup(bot):
