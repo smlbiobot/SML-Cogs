@@ -203,7 +203,6 @@ class Deck:
 
                 self.save_settings()
 
-
     @deck.command(name="list", pass_context=True, no_pm=True)
     async def deck_list(self, ctx, member:discord.Member=None):
         """List the decks of a user."""

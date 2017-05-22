@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Banned",
+	"DESCRIPTION": "Get a list of banned players from Google Spreadsheet",
+	"DISABLED": false,
+	"NAME": "Banned",
+	"REQUIREMENTS": ["google-api-python-client"],
+	"TAGS": ["banned"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
