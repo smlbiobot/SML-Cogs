@@ -167,7 +167,7 @@ class Banned:
         for row in rows:
             player = {}
             for id, field in enumerate(FIELDS):
-                player[field] = row[id] if id < len(row) else None
+                player[field] = row[id] if id < len(row) else '-'
             players.append(player)
         return players
 
@@ -187,20 +187,38 @@ class Banned:
             '+ {} ({})'.format(player['IGN'], player['PlayerTag'])
             for player in players]
 
-        # for row in rows:
-        #     if len(row) < max_columns:
-        #         row.extend([''] * (max_columns - len(row)))
-        #     # data = str(row)
-        #     data = '+ {} ({})'.format(row[0], row[1])
-        #     out.append(data)
-
         for page in pagify('\n'.join(out), shorten_by=24):
             await self.bot.say(page)
+
+    def player_embed(self, ctx, player):
+        """Return Discord embed of player info."""
+        server = ctx.message.server
+        title = '{} Banned List'.format(server.name)
+        em = discord.Embed(title=title)
+        em.set_thumbnail(url=server.icon_url)
+        em.add_field(name='IGN', value=player['IGN'])
+        em.add_field(name='Player Tag', value=player['PlayerTag'])
+        em.add_field(name='Reason', value=player['Reason'])
+        em.add_field(name='Date', value=player['Date'])
+        em.set_image(url=player['ImageLink'])
+        return em
 
     @banned.command(name="tag", pass_context=True)
     async def banned_tag(self, ctx, tag):
         """Show banned player by player tag."""
+        if not tag.startswith('#'):
+            tag = '#{}'.format(tag)
+        players = self.get_players(ctx)
+        player = None
+        for p in players:
+            if p['PlayerTag'] == tag:
+                player = p
+                break
+        if player is None:
+            await self.bot.say('Cannot find player with that tag.')
+            return
 
+        await self.bot.say(embed=self.player_embed(ctx, player))
 
 
 def check_folder():
