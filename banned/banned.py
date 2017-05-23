@@ -87,6 +87,16 @@ class Banned:
         self.bot = bot
         self.settings = dataIO.load_json(JSON)
 
+    def check_server_settings(self, server):
+        """check server settings. Init if necessary."""
+        if server.id not in self.settings:
+            self.settings[server.id] = {}
+        if "SHEET_ID" not in self.settings[server.id]:
+            self.settings[server.id]["SHEET_ID"] = ""
+        if "ROLES" not in self.settings[server.id]:
+            self.settings[server.id]["ROLES"] = []
+        dataIO.save_json(JSON, self.settings)
+
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
     async def setbanned(self, ctx):
@@ -133,8 +143,7 @@ class Banned:
         If Google Spreadsheet’s URL is above, then its ID is 1A2B3C
         """
         server = ctx.message.server
-        if server.id not in self.settings:
-            self.settings[server.id] = {}
+        self.check_server_settings(server)
         self.settings[server.id]["SHEET_ID"] = id
         await self.bot.say("Saved Google Spreadsheet ID.")
         dataIO.save_json(JSON, self.settings)
@@ -143,9 +152,70 @@ class Banned:
     async def setbanned_info(self, ctx):
         """Display settings."""
         server = ctx.message.server
+        self.check_server_settings(server)
         em = discord.Embed(title="Banned: Settings")
-        em.add_field(name="Spreadsheet ID", value=self.settings[server.id]["SHEET_ID"])
+        em.add_field(
+            name="Spreadsheet ID",
+            value=self.settings[server.id]["SHEET_ID"])
+        em.add_field(
+            name="Service Key Uploaded",
+            value=os.path.exists(SERVICE_KEY_JSON))
+        role_ids = self.settings[server.id]["ROLES"]
+        roles = [discord.utils.get(server.roles, id=id) for id in role_ids]
+        role_names = [r.name for r in roles]
+        if len(role_names):
+            em.add_field(
+                name="Roles with edit permission",
+                value=', '.join(role_names))
+        else:
+            em.add_field(
+                name="Roles with edit permission",
+                value="None")
         await self.bot.say(embed=em)
+
+    @setbanned.command(name="addrole", pass_context=True)
+    async def setbanned_addrole(self, ctx, *, role):
+        """Add roles allowed to edit bans."""
+        server = ctx.message.server
+        self.check_server_settings(server)
+        server_role = discord.utils.get(server.roles, name=role)
+        if server_role is None:
+            await self.bot.say(
+                '{} is not a valid role on this server.'.format(role))
+            return
+        self.check_server_settings(server)
+        if server_role.id in self.settings[server.id]["ROLES"]:
+            await self.bot.say(
+                '{} is already in the list.'.format(role))
+            return
+        self.settings[server.id]["ROLES"].append(server_role.id)
+        role_ids = self.settings[server.id]["ROLES"]
+        roles = [discord.utils.get(server.roles, id=id) for id in role_ids]
+        role_names = [r.name for r in roles]
+        await self.bot.say(
+            'List of roles updated: {}.'.format(
+                ', '.join(role_names)))
+        dataIO.save_json(JSON, self.settings)
+
+    @setbanned.command(name="removerole", pass_context=True)
+    async def setbanned_removerole(self, ctx, *, role):
+        """Remove roles allowed to edit bans."""
+        server = ctx.message.server
+        self.check_server_settings(server)
+        server_role = discord.utils.get(server.roles, name=role)
+        if server_role is None:
+            await self.bot.say(
+                '{} is not a valid role on this server.'.format(role))
+            return
+        self.check_server_settings(server)
+        if server_role.id not in self.settings[server.id]["ROLES"]:
+            await self.bot.say(
+                '{} is not on in the list.'.format(role))
+            return
+        self.settings[server.id]["ROLES"].remove(server_role.id)
+        await self.bot.say(
+            'Removed {} from list of roles.'.format(role))
+        dataIO.save_json(JSON, self.settings)
 
     @commands.group(pass_context=True)
     async def banned(self, ctx):
@@ -157,7 +227,8 @@ class Banned:
         """Return values from spreadsheet."""
         server = ctx.message.server
 
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(SERVICE_KEY_JSON, scopes=SCOPES)
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            SERVICE_KEY_JSON, scopes=SCOPES)
         spreadsheetId = self.settings[server.id]["SHEET_ID"]
         gc = gspread.authorize(credentials)
         sh = gc.open_by_key(spreadsheetId)
@@ -249,13 +320,15 @@ class Banned:
         fuzz_ratio = sorted(fuzz_ratio, key=lambda x: x["ratio"], reverse=True)
 
         await self.bot.say('Exact IGN not found. Showing closest match:')
-        await self.bot.say(embed=self.player_embed(ctx, fuzz_ratio[0]["player"]))
+        await self.bot.say(
+            embed=self.player_embed(
+                ctx, fuzz_ratio[0]["player"]))
 
         out = []
         list_max = 5
         out.append('Here are other top matches:'.format(list_max))
 
-        for r in fuzz_ratio[1:list_max+1]:
+        for r in fuzz_ratio[1:list_max + 1]:
             player = r["player"]
             out.append('+ {} ({})'.format(player['IGN'], player['PlayerTag']))
 
