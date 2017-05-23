@@ -38,6 +38,7 @@ from __main__ import send_cmd_help
 from oauth2client.service_account import ServiceAccountCredentials
 
 import gspread
+from fuzzywuzzy import fuzz
 
 PATH = os.path.join("data", "banned")
 JSON = os.path.join(PATH, "settings.json")
@@ -219,6 +220,47 @@ class Banned:
             return
 
         await self.bot.say(embed=self.player_embed(ctx, player))
+
+    @banned.command(name="ign", pass_context=True, aliases=['name'])
+    async def banned_ign(self, ctx, *, ign):
+        """Find player by IGN."""
+        players = self.get_players(ctx)
+        player = None
+
+        # find exact match
+        for p in players:
+            if p['IGN'] == ign:
+                player = p
+                break
+
+        if player is not None:
+            await self.bot.say(embed=self.player_embed(ctx, player))
+            return
+
+        # find fuzzy match
+        fuzz_ratio = []
+        for id, p in enumerate(players):
+            ratio = fuzz.ratio(ign, p['IGN'])
+            fuzz_ratio.append({
+                "id": id,
+                "ratio": ratio,
+                "player": p
+            })
+        fuzz_ratio = sorted(fuzz_ratio, key=lambda x: x["ratio"], reverse=True)
+
+        await self.bot.say('Exact IGN not found. Showing closest match:')
+        await self.bot.say(embed=self.player_embed(ctx, fuzz_ratio[0]["player"]))
+
+        out = []
+        list_max = 5
+        out.append('Here are other top matches:'.format(list_max))
+
+        for r in fuzz_ratio[1:list_max+1]:
+            player = r["player"]
+            out.append('+ {} ({})'.format(player['IGN'], player['PlayerTag']))
+
+        for page in pagify('\n'.join(out), shorten_by=24):
+            await self.bot.say(page)
 
 
 def check_folder():
