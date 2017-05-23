@@ -34,8 +34,10 @@ from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from __main__ import send_cmd_help
 
-from apiclient import discovery
+# from apiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
+
+import gspread
 
 PATH = os.path.join("data", "banned")
 JSON = os.path.join(PATH, "settings.json")
@@ -43,7 +45,10 @@ JSON = os.path.join(PATH, "settings.json")
 CREDENTIALS_FILENAME = "sheets-credentials.json"
 CREDENTIALS_JSON = os.path.join(PATH, CREDENTIALS_FILENAME)
 
-SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
+SCOPES = [
+    'https://spreadsheets.google.com/feeds',
+    'https://www.googleapis.com/auth/drive'
+]
 SERVICE_KEY_JSON = os.path.join(PATH, "service_key.json")
 APPLICATION_NAME = "Red Discord Bot Banned Cog"
 
@@ -133,46 +138,40 @@ class Banned:
         await self.bot.say("Saved Google Spreadsheet ID.")
         dataIO.save_json(JSON, self.settings)
 
+    @setbanned.command(name="info", pass_context=True)
+    async def setbanned_info(self, ctx):
+        """Display settings."""
+        server = ctx.message.server
+        em = discord.Embed(title="Banned: Settings")
+        em.add_field(name="Spreadsheet ID", value=self.settings[server.id]["SHEET_ID"])
+        await self.bot.say(embed=em)
+
     @commands.group(pass_context=True)
     async def banned(self, ctx):
         """Banned players."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    def get_sheet(self, ctx):
+    def get_sheet(self, ctx) -> gspread.Worksheet:
         """Return values from spreadsheet."""
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            SERVICE_KEY_JSON, scopes=SCOPES)
-        http = credentials.authorize(httplib2.Http())
-        discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
-                        'version=v4')
-        service = discovery.build('sheets', 'v4', http=http,
-                                  discoveryServiceUrl=discoveryUrl)
-
         server = ctx.message.server
+
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(SERVICE_KEY_JSON, scopes=SCOPES)
         spreadsheetId = self.settings[server.id]["SHEET_ID"]
+        gc = gspread.authorize(credentials)
+        sh = gc.open_by_key(spreadsheetId)
+        worksheet = sh.get_worksheet(0)
 
-        rangeName = 'Sheet1!A:D'
-        result = service.spreadsheets().values().get(
-            spreadsheetId=spreadsheetId, range=rangeName).execute()
-        values = result.get('values', [])
-
-        return values
+        return worksheet
 
     def get_players(self, ctx):
         """Return lisst of players as dictionary."""
         sheet = self.get_sheet(ctx)
-        rows = sheet[1:]
-        players = []
-        for row in rows:
-            player = {}
-            for id, field in enumerate(FIELDS):
-                player[field] = row[id] if id < len(row) else '-'
-            players.append(player)
-        return players
+        records = sheet.get_all_records(default_blank="-")
+        return records
 
     @banned.command(name="list", pass_context=True)
-    async def banned_list(self, ctx, *, args=None):
+    async def banned_list(self, ctx):
         """List banned players.
 
         By default, list only player names and tags,
@@ -193,14 +192,15 @@ class Banned:
     def player_embed(self, ctx, player):
         """Return Discord embed of player info."""
         server = ctx.message.server
-        title = '{} Banned List'.format(server.name)
+        title = 'Banned Player'
         em = discord.Embed(title=title)
-        em.set_thumbnail(url=server.icon_url)
-        em.add_field(name='IGN', value=player['IGN'])
-        em.add_field(name='Player Tag', value=player['PlayerTag'])
-        em.add_field(name='Reason', value=player['Reason'])
-        em.add_field(name='Date', value=player['Date'])
-        em.set_image(url=player['ImageLink'])
+        fields = ['IGN', 'PlayerTag', 'Reason', 'Date']
+        for field in fields:
+            if player[field] is not None:
+                em.add_field(name=field, value=player[field])
+        if player['ImageLink'] is not None:
+            em.set_image(url=player['ImageLink'])
+        em.set_footer(text=server.name, icon_url=server.icon_url)
         return em
 
     @banned.command(name="tag", pass_context=True)
