@@ -24,7 +24,6 @@ DEALINGS IN THE SOFTWARE.
 
 import os
 import datetime as dt
-import httplib2
 import aiohttp
 
 import discord
@@ -53,13 +52,16 @@ SCOPES = [
 SERVICE_KEY_JSON = os.path.join(PATH, "service_key.json")
 APPLICATION_NAME = "Red Discord Bot Banned Cog"
 
-FIELDS = [
-    'IGN',
-    'PlayerTag',
-    'Reason',
-    'ImageLink',
-    'Date'
-]
+FIELDS = {
+    'IGN': 'IGN',
+    'PlayerTag': 'Player tag',
+    'Reason': 'Reason',
+    'ImageLink': 'Profile',
+    'Date': 'Date added',
+    'Author': 'Moderator',
+    'EditDate': 'Last updated',
+    'EditAuthor': 'Last edited by'
+}
 
 
 class Player:
@@ -334,6 +336,25 @@ class Banned:
 
         for page in pagify('\n'.join(out), shorten_by=24):
             await self.bot.say(page)
+
+    async def check_edit_permission(self, author, server):
+        """Return True if author is allowed to edit."""
+        self.check_server_settings(server)
+        author_role_ids = [r.id for r in author.roles]
+        for id in author_role_ids:
+            if id in self.settings[server.id]["ROLES"]:
+                return True
+        return False
+
+    @banned.command(name="add", pass_context=True)
+    async def banned_add(self, ctx, ign, tag=None, reason=None):
+        """Add player to banned list."""
+        server = ctx.message.server
+        author = ctx.message.author
+        if not self.check_edit_permission(author, server):
+            await self.bot.say('You do not have permission to edit the list.')
+            return
+
 
 
 def check_folder():
