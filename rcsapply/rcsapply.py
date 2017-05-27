@@ -37,7 +37,7 @@ from __main__ import send_cmd_help
 from apiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
 
-PATH = os.path.join("data", "rcsinterview")
+PATH = os.path.join("data", "rcsapply")
 JSON = os.path.join(PATH, "settings.json")
 
 CREDENTIALS_FILENAME = "sheets-credentials.json"
@@ -48,8 +48,8 @@ SERVICE_KEY_JSON = os.path.join(PATH, "service_key.json")
 APPLICATION_NAME = "Red Discord Bot RCS Interview Cog"
 
 
-class RCSInterview:
-    """Reddit Clan System interviews."""
+class RCSApply:
+    """Reddit Clan System applys."""
 
     def __init__(self, bot):
         """Constructor."""
@@ -58,13 +58,13 @@ class RCSInterview:
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
-    async def setinterview(self, ctx):
-        """Set interview settings."""
+    async def setapply(self, ctx):
+        """Set apply settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setinterview.command(name="servicekey", pass_context=True)
-    async def setinterview_servicekey(self, ctx):
+    @setapply.command(name="servicekey", pass_context=True)
+    async def setapply_servicekey(self, ctx):
         """Set Google API service account key.
 
         This is a json file downloaable from the Google API Console.
@@ -92,8 +92,17 @@ class RCSInterview:
         await self.bot.say(
             "Attachment received and saved as {}".format(SERVICE_KEY_JSON))
 
-    @setinterview.command(name="sheetid", pass_context=True)
-    async def setinterview_sheetid(self, ctx, id):
+    @setapply.command(name="req", pass_context=True)
+    async def setapply_req(self, ctx, *, requirements):
+        """Set RCS Requirements.
+
+        This is an open text field. It can be set to anything,
+        and will be displayed to interested parties requesting that info.
+        """
+        pass
+
+    @setapply.command(name="sheetid", pass_context=True)
+    async def setapply_sheetid(self, ctx, id):
         """Set Google Spreadsheet ID.
 
         Example:
@@ -110,14 +119,22 @@ class RCSInterview:
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
-    async def interview(self, ctx):
-        """Set interview settings."""
+    async def apply(self, ctx):
+        """Set apply settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @interview.command(name="get", pass_context=True)
-    async def interview_get(self, ctx, app_id):
-        """Get interview results by application ID.
+    @apply.comamnd(name="new", pass_context=True)
+    async def apply_new(self, ctx, user: discord.Member):
+        """Create a new application ID.
+
+        This will additionally create a link to the Google Form and
+        give instruction to the user re: what to do.
+        """
+
+    @apply.command(name="get", pass_context=True)
+    async def apply_get(self, ctx, app_id):
+        """Get apply results by application ID.
 
         Application ID is a field that is tied to an RCS clan application.
         This was given to the interviewee when they apply.
@@ -198,6 +215,6 @@ def setup(bot):
     """Setup bot."""
     check_folder()
     check_file()
-    n = RCSInterview(bot)
+    n = RCSApply(bot)
     bot.add_cog(n)
 

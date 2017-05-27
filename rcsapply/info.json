@@ -1,9 +1,9 @@
 {
 	"AUTHOR": "SML",
-	"SHORT": "RCS Interview",
+	"SHORT": "RCS Application",
 	"DESCRIPTION": "Fetches interview answers from Google Forms responses",
 	"DISABLED": false,
-	"NAME": "RCSInterview",
+	"NAME": "RCSApply",
 	"REQUIREMENTS": ["google-api-python-client"],
 	"TAGS": ["VC", "voice", "voice channel", "utility", "util", "helper"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
