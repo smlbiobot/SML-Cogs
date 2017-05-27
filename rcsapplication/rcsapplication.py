@@ -37,7 +37,7 @@ from __main__ import send_cmd_help
 from apiclient import discovery
 from oauth2client.service_account import ServiceAccountCredentials
 
-PATH = os.path.join("data", "rcsapply")
+PATH = os.path.join("data", "rcsapp")
 JSON = os.path.join(PATH, "settings.json")
 
 CREDENTIALS_FILENAME = "sheets-credentials.json"
@@ -48,8 +48,8 @@ SERVICE_KEY_JSON = os.path.join(PATH, "service_key.json")
 APPLICATION_NAME = "Red Discord Bot RCS Interview Cog"
 
 
-class RCSApply:
-    """Reddit Clan System applys."""
+class RCSApplication:
+    """Reddit Clan System apps."""
 
     def __init__(self, bot):
         """Constructor."""
@@ -58,13 +58,13 @@ class RCSApply:
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
-    async def setapply(self, ctx):
-        """Set apply settings."""
+    async def setapplication(self, ctx):
+        """Set app settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setapply.command(name="servicekey", pass_context=True)
-    async def setapply_servicekey(self, ctx):
+    @setapplication.command(name="servicekey", pass_context=True)
+    async def setapplication_servicekey(self, ctx):
         """Set Google API service account key.
 
         This is a json file downloaable from the Google API Console.
@@ -92,8 +92,8 @@ class RCSApply:
         await self.bot.say(
             "Attachment received and saved as {}".format(SERVICE_KEY_JSON))
 
-    @setapply.command(name="req", pass_context=True)
-    async def setapply_req(self, ctx, *, requirements):
+    @setapplication.command(name="req", pass_context=True)
+    async def setapplication_req(self, ctx, *, requirements):
         """Set RCS Requirements.
 
         This is an open text field. It can be set to anything,
@@ -101,8 +101,8 @@ class RCSApply:
         """
         pass
 
-    @setapply.command(name="sheetid", pass_context=True)
-    async def setapply_sheetid(self, ctx, id):
+    @setapplication.command(name="sheetid", pass_context=True)
+    async def setapplication_sheetid(self, ctx, id):
         """Set Google Spreadsheet ID.
 
         Example:
@@ -118,26 +118,26 @@ class RCSApply:
         dataIO.save_json(JSON, self.settings)
 
     @checks.mod_or_permissions()
-    @commands.group(pass_context=True)
-    async def apply(self, ctx):
-        """Set apply settings."""
+    @commands.application(pass_context=True)
+    async def app(self, ctx):
+        """Set app settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @apply.comamnd(name="new", pass_context=True)
-    async def apply_new(self, ctx, user: discord.Member):
+    @application.command(name="new", pass_context=True)
+    async def application_new(self, ctx, user: discord.Member):
         """Create a new application ID.
 
         This will additionally create a link to the Google Form and
         give instruction to the user re: what to do.
         """
 
-    @apply.command(name="get", pass_context=True)
-    async def apply_get(self, ctx, app_id):
-        """Get apply results by application ID.
+    @application.command(name="get", pass_context=True)
+    async def application_get(self, ctx, app_id):
+        """Get app results by application ID.
 
         Application ID is a field that is tied to an RCS clan application.
-        This was given to the interviewee when they apply.
+        This was given to the interviewee when they app.
         It is inserted into the sheet as a value in a cell.
         """
         credentials = ServiceAccountCredentials.from_json_keyfile_name(
@@ -215,6 +215,6 @@ def setup(bot):
     """Setup bot."""
     check_folder()
     check_file()
-    n = RCSApply(bot)
+    n = RCSApplication(bot)
     bot.add_cog(n)
 
