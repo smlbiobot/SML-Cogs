@@ -802,6 +802,62 @@ class RACF:
                 split_msg,
                 ", ".join([m.display_name for m in members])))
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def skill(self, ctx, pb, *cardlevels):
+        """Calculate skill level based on card levels.
+
+        !skills 5216 c12 c12 r10 r9 e5 e4 l2 l1
+        c = commons
+        r = rares
+        e = epics
+        l = legendaries
+        """
+        if not pb.isdigit():
+            await self.bot.say("PB (Personal Best) must be a number.")
+            await send_cmd_help(ctx)
+            return
+        if len(cardlevels) != 8:
+            await self.bot.say("You must enter exactly 8 cards.")
+            await send_cmd_help(ctx)
+            return
+        rarities = {
+            'c': 0,
+            'r': 2,
+            'e': 5,
+            'l': 8
+        }
+        rarity_names = {
+            'c': 'Common',
+            'r': 'Rare',
+            'e': 'Epic',
+            'l': 'Legendary'
+        }
+        cards = [{'r': cl[0], 'l': int(cl[1:])} for cl in cardlevels]
+
+        common_levels = []
+        for card in cards:
+            rarity = card['r']
+            level = int(card['l'])
+            if rarity not in rarities:
+                await self.bot.say('{} is not a valid rarity.'.format(rarity))
+                return
+            common_level = level + rarities[rarity]
+            common_levels.append(common_level)
+
+        pb = int(pb)
+        skill = pb / sum(common_levels) * 8
+
+        out = []
+        out.append('You have entered:')
+        out.append(
+            ', '.join(
+                ['{} ({})'.format(
+                    rarity_names[card['r']], card['l']) for card in cards]))
+        out.append(
+            'With a PB of {}, your skill level is {}.'.format(pb, skill))
+
+        await self.bot.say('\n'.join(out))
+
 
 
 def setup(bot):
