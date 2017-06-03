@@ -5,6 +5,6 @@
 	"DISABLED": false,
 	"NAME": "Ladder",
 	"REQUIREMENTS": ["skills", "numpy"],
-	"TAGS": ["competitive", "elo", "glicko", "skills", "ladder"],
+	"TAGS": ["competitive", "elo", "glicko", "trueskill", "skill", "skills", "ladder"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
 }
