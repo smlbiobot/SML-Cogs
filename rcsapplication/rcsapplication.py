@@ -118,8 +118,8 @@ class RCSApplication:
         dataIO.save_json(JSON, self.settings)
 
     @checks.mod_or_permissions()
-    @commands.application(pass_context=True)
-    async def app(self, ctx):
+    @commands.group(pass_context=True)
+    async def application(self, ctx):
         """Set app settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
