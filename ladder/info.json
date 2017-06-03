@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Ladder",
+	"DESCRIPTION": "Ladder system for competitive gaming using elo / glicko system",
+	"DISABLED": false,
+	"NAME": "Ladder",
+	"REQUIREMENTS": ["skills", "numpy"],
+	"TAGS": ["competitive", "elo", "glicko", "skills", "ladder"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
