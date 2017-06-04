@@ -1,10 +1,10 @@
 {
 	"AUTHOR": "SML",
 	"SHORT": "Ladder",
-	"DESCRIPTION": "Ladder system for competitive gaming using elo / glicko system",
+	"DESCRIPTION": "Ladder system for competitive gaming using Trueskill system",
 	"DISABLED": false,
 	"NAME": "Ladder",
-	"REQUIREMENTS": ["skills", "numpy"],
+	"REQUIREMENTS": ["trueskill"],
 	"TAGS": ["competitive", "elo", "glicko", "trueskill", "skill", "skills", "ladder"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
 }
