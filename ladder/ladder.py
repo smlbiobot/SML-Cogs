@@ -32,8 +32,7 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 
-import numpy
-import skills
+import trueskill
 
 PATH = os.path.join("data", "ladder")
 JSON = os.path.join(PATH, "settings.json")
@@ -47,10 +46,10 @@ class Ladder:
     """Ladder ranking system.
 
     Based on http://www.moserware.com/2010/03/computing-your-skill.html
+    http://trueskill.org/
 
     Reuirements:
-    pip install skills
-    pip install numpy
+    pip install trueskill
     """
 
     def __init__(self, bot):
