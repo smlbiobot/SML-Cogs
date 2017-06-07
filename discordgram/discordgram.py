@@ -23,9 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
-import datetime as dt
 
-import discord
 from discord import Message
 from discord.ext import commands
 
@@ -128,8 +126,8 @@ class Discordgram:
         dgm_id = len(self.settings[server.id]["MESSAGES"])
 
         footer_text = (
-            "Type `!dgr {} <reply message>` "
-            "to add your comment to {}’s post.".format(
+            ":: Type `!dgr {} <reply message>` "
+            "to reply to {}’s post.".format(
                 dgm_id, author.display_name)
         )
 
@@ -171,9 +169,14 @@ class Discordgram:
         channel_id = self.settings[server.id]["CHANNEL"]
         channel = self.bot.get_channel(channel_id)
 
-        bot_msg = await self.bot.get_message(channel, message["BOT_MESSAGE_ID"])
-        content = "{}\n\n{}".format(comment, bot_msg.content)
+        bot_msg = await self.bot.get_message(
+            channel, message["BOT_MESSAGE_ID"])
 
+        prev_content = bot_msg.content.rsplit('::', 1)
+        content = "{}\n{}\n\n::{}".format(
+            prev_content[0].rstrip(),
+            comment.rstrip(),
+            prev_content[1].rstrip())
         await self.bot.edit_message(bot_msg, new_content=content)
 
 
