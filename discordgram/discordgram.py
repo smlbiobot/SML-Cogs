@@ -23,6 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
+import re
 
 from discord import Message
 from discord.ext import commands
@@ -152,8 +153,6 @@ class Discordgram:
         author = ctx.message.author
         server = ctx.message.server
 
-        comment = "**{}:** {}".format(author.display_name, msg)
-
         if server.id not in self.settings:
             return
         if not id.isdigit():
@@ -172,7 +171,18 @@ class Discordgram:
         bot_msg = await self.bot.get_message(
             channel, message["BOT_MESSAGE_ID"])
 
-        prev_content = bot_msg.content.rsplit('::', 1)
+        transformations = {
+            '@everyone': '@\u200beveryone',
+            '@here': '@\u200bhere'
+        }
+        def repl2(obj):
+            return transformations.get(obj.group(0), '')
+        pattern = re.compile('|'.join(transformations.keys()))
+        msg = pattern.sub(repl2, msg)
+
+        comment = "**{}:** {}".format(author.display_name, msg)
+
+        prev_content = bot_msg.clean_content.rsplit('::', 1)
         content = "{}\n{}\n\n::{}".format(
             prev_content[0].rstrip(),
             comment.rstrip(),
