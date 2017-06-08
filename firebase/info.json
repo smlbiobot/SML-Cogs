@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Firebase",
+	"DESCRIPTION": "Firebase analytics tracking",
+	"DISABLED": false,
+	"NAME": "Firebase",
+	"REQUIREMENTS": ["firebase-admin"],
+	"TAGS": ["firebase", "analytics", "stats"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
