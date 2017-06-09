@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Google Analytics",
+	"DESCRIPTION": "Discord activity tracking with Google Analytics",
+	"DISABLED": false,
+	"NAME": "GA",
+	"REQUIREMENTS": ["google_measurement_protocol"],
+	"TAGS": ["google", "analytics", "stats", "activity", "utility"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
