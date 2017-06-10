@@ -29,12 +29,16 @@ import os
 import re
 import uuid
 
+from collections import OrderedDict
+
 from discord import Message
 from discord import Member
 from discord import Server
 from discord import Channel
 from discord import ChannelType
 from discord.ext import commands
+from discord.ext.commands import Command
+from discord.ext.commands import Context
 
 from cogs.utils import checks
 
@@ -73,20 +77,23 @@ class GA:
         await self.bot.say("Google Analaytics TID saved.")
         await self.bot.delete_message(ctx.message)
 
+    def get_member_uuid(self, member: Member):
+        """Get member uuid."""
+        client_id = uuid.uuid4()
+        if "USERS" not in self.settings:
+            self.settings["USERS"] = {}
+        if member.id in self.settings["USERS"]:
+            client_id = uuid.UUID(self.settings["USERS"][member.id])
+        else:
+            self.settings["USERS"][member.id] = str(client_id)
+        dataIO.save_json(JSON, self.settings)
+        return client_id
+
     async def on_message(self, msg: Message):
         """Track on message."""
         author = msg.author
         server = msg.server
         channel = msg.channel
-        client_id = uuid.uuid4()
-
-        if "USERS" not in self.settings:
-            self.settings["USERS"] = {}
-        if author.id in self.settings["USERS"]:
-            client_id = uuid.UUID(self.settings["USERS"][author.id])
-        else:
-            self.settings["USERS"][author.id] = str(client_id)
-            dataIO.save_json(JSON, self.settings)
 
         if author is None:
             return
@@ -103,11 +110,35 @@ class GA:
         if "TID" not in self.settings:
             return
 
+        # client_id = self.get_member_uuid(author)
+        # use new uuid for pageviews so they will be logged as counters
+        # theory: GA might not add hits if the same uuid is accessing
+        # same “page” multiple times within a short time period.
+        client_id = uuid.uuid4()
+
         # message author
-        self.log_member(client_id, server, channel, author)
+        self.log_author(uuid.uuid4(), server, channel, author)
+        self.log_message(uuid.uuid4(), server, channel, author)
 
         # message channel
-        self.log_channel(client_id, server, channel, author)
+        self.log_channel(uuid.uuid4(), server, channel, author)
+
+    async def on_command(self, command: Command, ctx: Context):
+        """Track command usage."""
+        server = ctx.message.server
+        author = ctx.message.author
+        channel = ctx.message.channel
+
+        if server is None:
+            return
+        if author is None:
+            return
+        if "TID" not in self.settings:
+            return
+
+        # client_id = self.get_member_uuid(author)
+        client_id = uuid.uuid4()
+        self.log_command(client_id, server, channel, author, command)
 
     def gmp_report_pageview(
             self, client_id,
@@ -139,31 +170,139 @@ class GA:
             self, client_id,
             server: Server, channel: Channel, member: Member):
         """Log channel usage."""
+        server_name = self.url_escape(server.name)
+        channel_name = self.url_escape(channel.name)
+        member_name = self.url_escape(member.display_name)
         self.gmp_report_event(
             client_id,
-            '{}: Channels'.format(self.url_escape(server.name)),
-            self.url_escape(channel.name),
-            label=self.url_escape(member.display_name),
+            '{}: Channels'.format(server_name),
+            channel_name,
+            label=member_name,
             value=1)
 
-    def log_member(
+        log_params = OrderedDict([
+            ('server', server),
+            ('channel', channel)
+        ])
+        self.log_pageview_names(client_id, log_params)
+        self.log_pageview_ids(client_id, log_params)
+        log_params = OrderedDict([
+            ('server', server),
+            ('channel', channel),
+            ('member', member)
+        ])
+        self.log_pageview_names(client_id, log_params)
+        self.log_pageview_ids(client_id, log_params)
+
+    def log_author(
             self, client_id,
             server: Server, channel: Channel, member: Member):
-        """Log channel usage."""
+        """Log user activity."""
+        log_params = OrderedDict([
+            ('server', server),
+            ('member', member)
+        ])
+        self.log_pageview_names(client_id, log_params)
+        self.log_pageview_ids(client_id, log_params)
+
+        log_params = OrderedDict([
+            ('server', server),
+            ('member', member),
+            ('channel', channel)
+        ])
+        self.log_pageview_names(client_id, log_params)
+        self.log_pageview_ids(client_id, log_params)
+
+    def log_message(
+            self, client_id,
+            server: Server, channel: Channel, member: Member):
+        """Log messages."""
+        server_name = self.url_escape(server.name)
         self.gmp_report_event(
             client_id,
-            '{}: Messages: Author'.format(self.url_escape(server.name)),
-            self.url_escape(member.display_name),
-            label='{}: {}'.format(
-                self.url_escape(server.name),
-                self.url_escape(channel.name)),
+            '{}: Messages'.format(server_name),
+            server_name,
+            label=server_name,
             value=1)
-        self.gmp_report_pageview(
+
+        log_params = OrderedDict([
+            ('server', server)
+        ])
+        self.log_pageview_names(client_id, log_params)
+        self.log_pageview_ids(client_id, log_params)
+
+    def log_command(
+            self, client_id,
+            server: Server, channel: Channel,
+            member: Member, command: Command):
+        """Log command usage."""
+        server_name = self.url_escape(server.name)
+        channel_name = self.url_escape(channel.name)
+        member_name = self.url_escape(member.display_name)
+        self.gmp_report_event(
             client_id,
-            '/server/{}/channel/{}/member/{}'.format(
-                self.url_escape(server.name),
-                self.url_escape(channel.name),
-                self.url_escape(member.display_name)))
+            '{}: Commands'.format(server_name),
+            command.name,
+            label='{}: {}: {}'.format(
+                server_name,
+                channel_name,
+                member_name),
+            value=1)
+
+        log_params = OrderedDict([
+            ('server', server),
+            ('command', command)
+        ])
+        self.log_pageview_names(client_id, log_params)
+        self.log_pageview_ids(client_id, log_params)
+
+        log_params = OrderedDict([
+            ('server', server),
+            ('command', command),
+            ('member', member)
+        ])
+        self.log_pageview_names(client_id, log_params)
+        self.log_pageview_ids(client_id, log_params)
+
+    def log_pageview_ids(self, client_id, params: OrderedDict):
+        """Log events as serializable id path."""
+        path = '/id'
+        title = ''
+        for k, v in params.items():
+            if k == 'server':
+                path += '/server/' + v.id
+                title += self.url_escape(v.name) + ': '
+            if k == 'channel':
+                path += '/channel/' + v.id
+                title += self.url_escape(v.name) + ': '
+            if k == 'member':
+                path += '/member/' + v.id
+                title += self.url_escape(v.display_name) + ': '
+            if k == 'command':
+                path += '/command/' + v.id
+                title += self.url_escape(v.name) + ': '
+        title = title.rsplit(':', 1)[0]
+        self.gmp_report_pageview(client_id, path, title)
+
+    def log_pageview_names(self, client_id, params: OrderedDict):
+        """Log events as serializable id path."""
+        path = '/name'
+        title = ''
+        for k, v in params.items():
+            if k == 'server':
+                path += '/server/' + self.url_escape(v.name)
+                title += self.url_escape(v.name) + ': '
+            if k == 'channel':
+                path += '/channel/' + self.url_escape(v.name)
+                title += self.url_escape(v.name) + ': '
+            if k == 'member':
+                path += '/member/' + self.url_escape(v.display_name)
+                title += self.url_escape(v.display_name) + ': '
+            if k == 'command':
+                path += '/command/' + self.url_escape(v.name)
+                title += self.url_escape(v.name) + ': '
+        title = title.rsplit(':', 1)[0]
+        self.gmp_report_pageview(client_id, path, title)
 
     def url_escape(self, text):
         """Escaped member name."""
