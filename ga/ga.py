@@ -288,7 +288,7 @@ class GA:
                 path += '/member/' + v.id
                 title += self.url_escape(v.display_name) + ': '
             if k == 'command':
-                path += '/command/' + v.id
+                path += '/command/' + v.name
                 title += self.url_escape(v.name) + ': '
         title = title.rsplit(':', 1)[0]
         self.gmp_report_pageview(client_id, path, title)
