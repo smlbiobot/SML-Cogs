@@ -869,6 +869,16 @@ class RACF:
 
         Remove all roles from members and then re-add them."""
         await self.bot.say("iOS Fix")
+        await self.run_iosfix(ctx, *members)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def iosfixme(self, ctx: Context):
+        """Self-Quick fix to iOS bug."""
+        await self.bot.say("iOS Fix me")
+        await self.run_iosfix(ctx, ctx.message.author)
+
+    async def run_iosfix(self, ctx: Context, *members: discord.Member):
+        """Actual fix to allow members without the bot commander to run on themselves."""
         for member in members:
             roles = member.roles.copy()
             for role in roles:
