@@ -857,7 +857,32 @@ class RACF:
 
         await self.bot.say('\n'.join(out))
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def test(self, ctx):
+        """Test."""
+        await self.bot.say("test")
 
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    @commands.command(pass_context=True, no_pm=True)
+    async def iosfix(self, ctx: Context, *members: discord.Member):
+        """Quick fix to iOS bug.
+
+        Remove all roles from members and then re-add them."""
+        await self.bot.say("iOS Fix")
+        for member in members:
+            roles = member.roles.copy()
+            for role in roles:
+                if not role.is_everyone:
+                    try:
+                        await self.bot.remove_roles(member, role)
+                        await self.bot.add_roles(member, role)
+                        await self.bot.say(
+                            "Removed and re-added {} from {}.".format(
+                                role, member))
+                    except discord.errors.Forbidden:
+                        await self.bot.say(
+                            "I am not allowed to remove {} from {}.".format(
+                                role, member))
 
 def setup(bot):
     r = RACF(bot)
