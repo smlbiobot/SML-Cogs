@@ -877,7 +877,7 @@ class RACF:
                         await self.bot.remove_roles(member, role)
                         await self.bot.add_roles(member, role)
                         await self.bot.say(
-                            "Removed and re-added {} from {}.".format(
+                            "Removed and re-added {} to {}.".format(
                                 role, member))
                     except discord.errors.Forbidden:
                         await self.bot.say(
