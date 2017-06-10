@@ -198,6 +198,15 @@ class GA:
             self, client_id,
             server: Server, channel: Channel, member: Member):
         """Log user activity."""
+        server_name = self.url_escape(server.name)
+        channel_name = self.url_escape(channel.name)
+        member_name = self.url_escape(member.display_name)
+        self.gmp_report_event(
+            client_id,
+            '{}: Authors'.format(server_name),
+            member_name,
+            label=channel_name,
+            value=1)
         log_params = OrderedDict([
             ('server', server),
             ('member', member)
