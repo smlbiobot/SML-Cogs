@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Logstash",
+	"DESCRIPTION": "Discord activity tracking with Logstash",
+	"DISABLED": false,
+	"NAME": "Logstash",
+	"REQUIREMENTS": ["python-logstash"],
+	"TAGS": ["logstash", "analytics", "stats", "activity", "utility"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
