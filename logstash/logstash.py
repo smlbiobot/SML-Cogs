@@ -133,21 +133,13 @@ class Logstash:
 
     def log_command(self, command, ctx):
         """Log bot commands."""
-        server = ctx.message.server
-        author = ctx.message.author
-        channel = ctx.message.channel
-
+        event_key = "command"
         extra = {
-            'discord_event': "command",
-            'author_id': author.id,
-            'author_name': author.display_name,
-            'server_id': server.id,
-            'server_name': server.name,
-            'channel_id': channel.id,
-            'channel_name': channel.name,
+            'discord_event': event_key,
             'command_name': command.name
         }
-        self.logger.info('discord.logger.command', extra=extra)
+        extra.update(self.get_extra_sca(ctx.message))
+        self.logger.info(self.get_event_key(event_key), extra=extra)
 
 
 def check_folder():
