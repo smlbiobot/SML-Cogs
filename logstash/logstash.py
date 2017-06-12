@@ -69,12 +69,20 @@ class Logstash:
         self.extra = {}
         self.task = bot.loop.create_task(self.loop_task())
 
+        self.handler = logstash.LogstashHandler(HOST, PORT, version=1)
+
         self.logger = logging.getLogger('discord.logger')
         self.logger.setLevel(logging.INFO)
-        self.logger.addHandler(
-            logstash.LogstashHandler(
-                HOST, PORT, version=1))
+        self.logger.addHandler(self.handler)
         self.logger.info('discord.logger: Logstash cog init')
+
+    def __unload__(self):
+        """Unhook logger when unloaded.
+
+        Thanks Kowlin!
+        """
+        self.logger.removeHandler(self.handler)
+
 
     async def loop_task(self):
         """Loop task."""
