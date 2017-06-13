@@ -76,14 +76,13 @@ class Logstash:
         self.logger.addHandler(self.handler)
         self.logger.info('discord.logger: Logstash cog init')
 
-    def __unload__(self):
+    def __unload(self):
         """Unhook logger when unloaded.
 
         Thanks Kowlin!
         """
         logging.getLogger('discord.logger').removeHandler(self.handler)
         self.logger.removeHandler(self.handler)
-
 
     async def loop_task(self):
         """Loop task."""
@@ -98,6 +97,19 @@ class Logstash:
         await asyncio.sleep(INTERVAL)
         if self is self.bot.get_cog('Logstash'):
             self.task = self.bot.loop.create_task(self.loop_task())
+
+    @commands.group(pass_context=True, no_pm=True)
+    @checks.serverowner_or_permissions(manage_server=True)
+    async def logstash(self, ctx: Context):
+        """Logstash command. Admin only."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @logstash.command(name="all", pass_context=True)
+    async def logstash_all(self):
+        """Send all stats."""
+        self.log_all()
+        await self.bot.say("Logged all.")
 
     def get_message_sca(self, message: Message):
         """Return server, channel and author from message."""
@@ -203,10 +215,7 @@ class Logstash:
         self.log_voice()
         self.log_players()
         self.log_uptime()
-        # self.log_roles()
-        self.log_server_roles2()
-        self.log_server_roles3()
-
+        self.log_server_roles()
 
     def log_servers(self):
         """Log servers."""
@@ -254,9 +263,11 @@ class Logstash:
         """Log members."""
         if not self.extra:
             return
+
+        # all members
         members = list(self.bot.get_all_members())
         unique = set(m.id for m in members)
-        event_key = 'members'
+        event_key = 'all_members'
         extra = self.extra.copy()
         extra.update({
             'discord_gauge': event_key,
@@ -264,6 +275,30 @@ class Logstash:
             'unique_member_count': len(unique)
         })
         self.logger.info(self.get_event_key(event_key), extra=extra)
+
+        # individual member
+        event_key = 'member'
+        extra = self.extra.copy()
+        for member in members:
+            extra.update({
+                'discord_gauge': event_key,
+                'member_name': member.display_name,
+                'member_id': member.id,
+                'server_name': member.server.name,
+                'server_id': member.server.id,
+                'joined_at': member.joined_at.isoformat()
+            })
+            member_roles = []
+            for index, role in enumerate(member.server.role_hierarchy):
+                if role in member.roles:
+                    member_roles.append({
+                        "role_id": role.id,
+                        "role_name": role.name,
+                        "role_hiearchy_index": index
+                    })
+            extra["member_roles"] = member_roles
+
+            self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_voice(self):
         """Log voice channels."""
@@ -277,105 +312,21 @@ class Logstash:
         """Log updtime."""
         pass
 
-    # def log_roles(self):
-    #     """Log server roles."""
-    #     if not self.extra:
-    #         return
-    #     for server in self.bot.servers:
-    #         self.log_server_roles(server)
-
-    # def log_server_roles(self, server: Server):
-    #     """Log server roles."""
-    #     if not self.extra:
-    #         return
-    #     event_key = 'server.roles'
-    #     extra = self.extra.copy()
-
-    #     roles = server.role_hierarchy
-
-    #     # count number of members with a particular role
-    #     role_counts = []
-    #     for role in roles:
-    #         count = 0
-    #         for member in server.members:
-    #             if role in member.roles:
-    #                 count += 1
-    #         role_counts.append(count)
-
-    #         # in order for logstash time series to work,
-    #         # create fields with the role names with the count
-    #         field_name = 'role_count_{}'.format(role.name)
-    #         extra.update({field_name: count})
-
-    #     extra.update({
-    #         'discord_gauge': event_key,
-    #         'role_count': len(roles),
-    #         'role_names': [r.name for r in roles],
-    #         'role_ids': [r.id for r in roles],
-    #         'role_counts': role_counts,
-    #         'server_id': server.id,
-    #         'server_name': server.name
-    #     })
-
-    #     self.logger.info(self.get_event_key(event_key), extra=extra)
-
-    def log_server_roles2(self):
+    def log_server_roles(self):
         """Log server roles."""
         if not self.extra:
             return
 
-        if not self.extra:
-            return
-        event_key = 'server.roles2'
-
-        for server in self.bot.servers:
-
-            extra = self.extra.copy()
-
-            roles = server.role_hierarchy
-            server_roles = []
-
-            # count number of members with a particular role
-            for role in roles:
-                count = 0
-                for member in server.members:
-                    if role in member.roles:
-                        count += 1
-                server_roles.append({
-                    'role_name': role.name,
-                    'role_id': role.id,
-                    'role_count': count
-                })
-
-            extra.update({
-                'discord_gauge': event_key,
-                'server_id': server.id,
-                'server_name': server.name,
-                'server_roles': server_roles
-            })
-
-            self.logger.info(self.get_event_key(event_key), extra=extra)
-
-    def log_server_roles3(self):
-        """Log server roles."""
-        if not self.extra:
-            return
-
-        if not self.extra:
-            return
-        event_key = 'server.roles3'
+        event_key = 'server.roles'
 
         for server in self.bot.servers:
 
             roles = server.role_hierarchy
 
             # count number of members with a particular role
-            for role in roles:
+            for index, role in enumerate(roles):
                 extra = self.extra.copy()
-                count = 0
-                for member in server.members:
-                    if role in member.roles:
-                        count += 1
+                count = sum([1 for m in server.members if role in m.roles])
 
                 extra.update({
                     'discord_gauge': event_key,
@@ -383,7 +334,8 @@ class Logstash:
                     'server_name': server.name,
                     'role_name': role.name,
                     'role_id': role.id,
-                    'role_count': count
+                    'role_count': count,
+                    'role_hiearchy_index': index
                 })
 
                 self.logger.info(self.get_event_key(event_key), extra=extra)
