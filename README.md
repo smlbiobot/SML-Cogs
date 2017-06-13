@@ -1,4 +1,4 @@
-This repo hosts a variety of cogs (aka modules) for use with the Red Discord Bot. Most of them are in active development and are developed mostly for the RACF server.
+This repo hosts a variety of cogs (aka modules) for use with the **Red Discord Bot** ([source](https://twentysix26.github.io/Red-Docs/) / [documentation](https://twentysix26.github.io/Red-Docs/])). Most of them are in active development and are developed mostly for the **Reddit Alpha Clan Family** (RACF) Discord server.
 
 You are welcome to log any issues in the Issues tab.
 
