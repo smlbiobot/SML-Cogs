@@ -63,6 +63,24 @@ KICK5050_MSG = (
     "Our clans are Alpha / Bravo / Charlie / Delta / "
     "Echo / Foxtrot / Golf / Hotel with the red rocket emblem. "
     "Good luck on the ladder!")
+VISITOR_RULES = (
+    "Welcome to the **Reddit Alpha Clan Family** (RACF) Discord server. "
+    "As a visitor, you agree to follow the following rules: \n"
+    "\n"
+    "+ No spamming.\n"
+    "+ No advertisement of any kind, "
+    "e.g. Facebook / Twitter / YouTube / Friend Invite Links\n"
+    "+ Use #bot-commands for bot features, e.g. `!deck` / `!crdata`\n"
+    "+ Use #casino for bot commands related to casino, "
+    "e.g. `!payday` / `!slot` / `!heist`\n"
+    "\n"
+    "Failure to follow these rules will get you kicked from the server. "
+    "Repeat offenders will be banned.\n"
+    "\n"
+    "If you would like to invite your friends to join this server, "
+    "you may use this Discord invite: <http://discord.gg/racf> \n"
+    "\n"
+    "Thanks + enjoy!")
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -470,10 +488,10 @@ class RACF:
                 name=ctx.message.author,
                 icon_url=ctx.message.author.avatar_url)
             data.set_footer(text=ctx.message.server.name)
-            data.add_field(
-                name="How to reply",
-                value="DM or tag {0.mention} if you want to reply.".format(
-                    ctx.message.author))
+            # data.add_field(
+            #     name="How to reply",
+            #     value="DM or tag {0.mention} if you want to reply.".format(
+            #         ctx.message.author))
             for m in members:
                 await self.bot.send_message(m, embed=data)
                 await self.bot.say("Message sent to {}".format(m.display_name))
@@ -760,6 +778,7 @@ class RACF:
                 await self.bot.say(
                     "{} You can now chat in {} — enjoy!".format(
                         member.mention, visitor_channel.mention))
+            await ctx.invoke(self.visitorrules, member)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -773,6 +792,17 @@ class RACF:
             await self.bot.say(
                 "{} You can now chat in {} — enjoy!".format(
                     member.mention, channel.mention))
+        await ctx.invoke(self.visitorrules, member)
+
+    @commands.command(pass_context=True, no_pm=True, aliases=['vrules', 'vr'])
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def visitorrules(self, ctx, *members: discord.Member):
+        """DM server rules to user."""
+        await ctx.invoke(self.dmusers, VISITOR_RULES, *members)
+        await self.bot.say(
+            "A list of rules has been sent via DM to {}.".format(
+                ", ".join([m.display_name for m in members])))
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def pay(self, ctx, amt, *members: discord.Member):

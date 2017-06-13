@@ -122,11 +122,15 @@ class Logstash:
         extra = {
             'author_id': author.id,
             'author_name': author.display_name,
-            'server_id': server.id,
-            'server_name': server.name,
             'channel_id': channel.id,
             'channel_name': channel.name
         }
+
+        if server is not None:
+            extra.update({
+                'server_id': server.id,
+                'server_name': server.name,
+            })
 
         # message sometimes reference a user and has no roles info
         if hasattr(author, 'roles'):
