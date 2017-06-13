@@ -1,6 +1,10 @@
-This repo hosts a variety of cogs (aka modules) for use with the **Red Discord Bot** ([source](https://twentysix26.github.io/Red-Docs/) / [documentation](https://twentysix26.github.io/Red-Docs/])). Most of them are in active development and are developed mostly for the **Reddit Alpha Clan Family** (RACF) Discord server.
+This repo hosts a variety of cogs (aka modules) for use with the **Red Discord Bot** ([source](https://twentysix26.github.io/Red-Docs/) / [documentation](https://twentysix26.github.io/Red-Docs/)). Most of them are in active development and are developed specifically for the **Reddit Alpha Clan Family** (RACF) Discord server. 
 
-You are welcome to log any issues in the Issues tab.
+While some of these cogs can theoretically be used for any Discord server, many contain codes which are RACF-specifc.
+
+If you would like to see most of these in action, you can join the RACF Discord server with this invite code: [http://discord.gg/racf](http://discord.gg/racf)
+
+You are welcome to log any issues in the Issues tab, or try to find me on either the RACF Discord server or my own Discord server at [http://discord.me/sml](http://discord.me/sml)
 
 # General Cogs
 * **activity**: weekly server activity logging
