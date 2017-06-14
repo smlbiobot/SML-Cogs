@@ -24,12 +24,9 @@ DEALINGS IN THE SOFTWARE.
 
 import os
 import re
-import uuid
 import logging
 import logstash
 import asyncio
-
-
 
 from __main__ import send_cmd_help
 from cogs.utils import checks
@@ -444,18 +441,24 @@ class Logstash:
 
             # count number of members with a particular role
             for index, role in enumerate(roles):
-                extra = self.extra.copy()
                 count = sum([1 for m in server.members if role in m.roles])
 
-                extra.update({
-                    'discord_gauge': event_key,
-                    'server_id': server.id,
-                    'server_name': server.name,
-                    'role_name': role.name,
-                    'role_id': role.id,
-                    'role_count': count,
-                    'role_hiearchy_index': index
-                })
+                extra = self.extra.copy()
+                extra['discord_gauge'] = event_key
+                extra['server'] = self.get_extra_server(server)
+                extra['role'] = self.get_extra_role(role)
+                extra['role']['count'] = count
+                extra['role']['hierachy_index'] = index
+
+                # extra.update({
+                #     'discord_gauge': event_key,
+                #     'server_id': server.id,
+                #     'server_name': server.name,
+                #     'role_name': role.name,
+                #     'role_id': role.id,
+                #     'role_count': count,
+                #     'role_hiearchy_index': index
+                # })
 
                 self.logger.info(self.get_event_key(event_key), extra=extra)
 
