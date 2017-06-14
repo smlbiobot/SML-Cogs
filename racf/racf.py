@@ -493,8 +493,15 @@ class RACF:
             #     value="DM or tag {0.mention} if you want to reply.".format(
             #         ctx.message.author))
             for m in members:
-                await self.bot.send_message(m, embed=data)
-                await self.bot.say("Message sent to {}".format(m.display_name))
+                try:
+                    await self.bot.send_message(m, embed=data)
+                    await self.bot.say(
+                        "Message sent to {}".format(m.display_name))
+                except discord.errors.Forbidden:
+                    await self.bot.say(
+                        "{} does not accept DMs from me.".format(
+                            m.display_name))
+                    raise
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -798,11 +805,16 @@ class RACF:
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def visitorrules(self, ctx, *members: discord.Member):
         """DM server rules to user."""
-        await ctx.invoke(self.dmusers, VISITOR_RULES, *members)
-        await self.bot.say(
-            "A list of rules has been sent via DM to {}.".format(
-                ", ".join([m.display_name for m in members])))
-
+        try:
+            await ctx.invoke(self.dmusers, VISITOR_RULES, *members)
+            await self.bot.say(
+                "A list of rules has been sent via DM to {}.".format(
+                    ", ".join([m.display_name for m in members])))
+        except discord.errors.Forbidden:
+            await self.bot.say(
+                '{} {}'.format(
+                    " ".join([m.mention for m in members]),
+                    VISITOR_RULES))
 
     @commands.command(pass_context=True, no_pm=True)
     async def pay(self, ctx, amt, *members: discord.Member):
