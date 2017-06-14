@@ -633,10 +633,14 @@ class Deck:
 
         # elixir
         total_elixir = 0
+        # total card exclude mirror (0-elixir cards)
+        card_count = 0
         for card_key, card_value in self.crdata["Cards"].items():
             if card_key in deck:
                 total_elixir += card_value["elixir"]
-        average_elixir = "{:.3f}".format(total_elixir / 8)
+                if card_value["elixir"]:
+                    card_count += 1
+        average_elixir = "{:.3f}".format(total_elixir / card_count)
 
         # text
         # Take out hyphnens and capitlize the name of each card

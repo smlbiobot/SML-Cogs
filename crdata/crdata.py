@@ -453,10 +453,22 @@ class CRData:
         # sort card in decks
         sorted_decks = []
         for deck in decks:
+            # when data is not clean, "key" may be missin
+            # if this is the case, fix it
+            clean_deck = []
+            for card in deck.copy():
+                if not "key" in card:
+                    card["key"] = "soon"
+                    card["level"] = 13
+                clean_deck.append(card)
+            deck = clean_deck
+
             # for unknown reasons deck could sometimes be None in data src
             if deck is not None:
                 sorted_decks.append(
-                    sorted(deck.copy(), key=lambda x: x["key"]))
+                    sorted(
+                        deck.copy(),
+                        key=lambda x: x["key"]))
         decks = sorted_decks
 
         found_decks = []
@@ -707,7 +719,12 @@ class CRData:
         cards_data = self.clashroyale["Cards"]
         cards = [self.sfid_to_id(c) for c in deck]
         elixirs = [cards_data[key]["elixir"] for key in cards]
-        return sum(elixirs) / 8
+        # count 1 less card if mirror
+        total = 0
+        for elixir in elixirs:
+            if elixir:
+                total += 1
+        return sum(elixirs) / total
 
 
 def check_folder():

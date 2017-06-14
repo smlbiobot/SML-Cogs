@@ -76,13 +76,15 @@ class Logstash:
         self.logger.addHandler(self.handler)
         self.logger.info('discord.logger: Logstash cog init')
 
+        logging.getLogger("red").addHandler(self.handler)
+
     def __unload(self):
         """Unhook logger when unloaded.
 
         Thanks Kowlin!
         """
-        logging.getLogger('discord.logger').removeHandler(self.handler)
         self.logger.removeHandler(self.handler)
+        logging.getLogger("red").removeHandler(self.handler)
 
     async def loop_task(self):
         """Loop task."""
@@ -142,7 +144,7 @@ class Logstash:
         """Return data for member."""
         extra = {
             'name': member.display_name,
-            'nickname': member.nick,
+            # 'nickname': member.nick,
             'id': member.id,
             'status': self.get_extra_status(member.status),
             'game': self.get_extra_game(member.game),

@@ -774,6 +774,14 @@
             "tid": "TID_SPELL_INFO_ZAP",
             "cpid": "Zap",
             "sfid": "zap"
+        },
+        "soon": {
+            "aka": [],
+            "elixir": 0,
+            "rarity": "common",
+            "tid": "TID_SPELL_INFO_SOON",
+            "cpid": "Soon",
+            "sfid": "soon"
         }
     },
     "Rarity": [
