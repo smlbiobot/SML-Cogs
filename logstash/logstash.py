@@ -29,22 +29,26 @@ import logging
 import logstash
 import asyncio
 
-from discord import Message
-from discord import Member
-from discord import Server
+
+
+from __main__ import send_cmd_help
+from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
+from discord import Channel
 from discord import ChannelType
+from discord import Game
+from discord import Member
+from discord import Message
+from discord import Role
+from discord import Server
+from discord import Status
 from discord.ext import commands
 from discord.ext.commands import Command
 from discord.ext.commands import Context
-from cogs.utils.dataIO import dataIO
-
-from cogs.utils import checks
-
-from __main__ import send_cmd_help
 
 HOST = 'localhost'
 PORT = 5959
-INTERVAL = 3600
+INTERVAL = 300
 DB_PATH = os.path.join('data', 'logstash', 'logstash.db')
 
 PATH = os.path.join('data', 'logstash')
@@ -57,7 +61,6 @@ UEMOJI_P = re.compile(u'['
                       u'\uD83C-\uDBFF\uDC00-\uDFFF'
                       u'\u2600-\u26FF\u2700-\u27BF]{1,2}',
                       re.UNICODE)
-
 
 class Logstash:
     """Send activity of Discord using Google Analytics."""
@@ -115,33 +118,103 @@ class Logstash:
         """Return server, channel and author from message."""
         return message.server, message.channel, message.author
 
-    def get_extra_sca(self, message: Message):
-        """Return extra fields from messages."""
-        server, channel, author = self.get_message_sca(message)
-
+    def get_extra_server(self, server: Server):
+        """Return extra fields for server."""
         extra = {
-            'author_id': author.id,
-            'author_name': author.display_name,
-            'channel_id': channel.id,
-            'channel_name': channel.name
+            'id': server.id,
+            'name': server.name,
+        }
+        return extra
+
+    def get_extra_channel(self, channel: Channel):
+        """Return extra fields for channel."""
+        extra = {
+            'id': channel.id,
+            'name': channel.name,
+            'server': self.get_extra_server(channel.server),
+            'type': {
+                'text': channel.type == ChannelType.text,
+                'voice': channel.type == ChannelType.voice,
+                'private': channel.type == ChannelType.private,
+                'group': channel.type == ChannelType.group
+            }
+        }
+        return extra
+
+    def get_extra_member(self, member: Member):
+        """Return data for member."""
+        extra = {
+            'name': member.display_name,
+            'nickname': member.nick,
+            'id': member.id,
+            'status': self.get_extra_status(member.status),
+            'game': self.get_extra_game(member.game),
+            'top_role': self.get_extra_role(member.top_role),
+            'joined_at': member.joined_at.isoformat()
         }
 
-        if server is not None:
-            extra.update({
-                'server_id': server.id,
-                'server_name': server.name,
-            })
+        if member.server is not None:
+            extra['server'] = self.get_extra_server(member.server)
 
-        # message sometimes reference a user and has no roles info
-        if hasattr(author, 'roles'):
-            # list roles in server hiearchy
-            roles = [r for r in server.role_hierarchy if r in author.roles]
-            role_names = [r.name for r in roles if not r.is_everyone]
-            role_ids = [r.id for r in roles if not r.is_everyone]
-            extra.update({
-                'role_ids': role_ids,
-                'role_names': role_names
-            })
+            # message sometimes reference a user and has no roles info
+            if hasattr(member, 'roles'):
+                roles = []
+                for r in member.server.role_hierarchy:
+                    if r in member.roles:
+                        roles.append({
+                            'id': r.id,
+                            'name': r.name
+                        })
+                extra['roles'] = roles
+
+        return extra
+
+    def get_extra_role(self, role: Role):
+        """Return data for role."""
+        extra = {
+            'name': role.name,
+            'id': role.id
+        }
+        return extra
+
+    def get_extra_status(self, status: Status):
+        """Return data for status."""
+        extra = {
+            'online': status == Status.online,
+            'offline': status == Status.offline,
+            'idle': status == Status.idle,
+            'dnd': status == Status.dnd,
+            'invisible': status == Status.invisible
+        }
+        return extra
+
+    def get_extra_game(self, game: Game):
+        """Return ata for game."""
+        if game is None:
+            return None
+        extra = {
+            'name': game.name,
+            'url': game.url,
+            'type': game.type
+        }
+        return extra
+
+    def get_extra_sca(self, message: Message):
+        """Return extra fields from messages."""
+        server = message.server
+        channel = message.channel
+        author = message.author
+
+        extra = {}
+
+        if author is not None:
+            extra['author'] = self.get_extra_member(author)
+
+        if channel is not None:
+            extra['channel'] = self.get_extra_channel(channel)
+
+        if server is not None:
+            extra['server'] = self.get_extra_server(server)
 
         return extra
 
@@ -171,6 +244,7 @@ class Logstash:
     async def on_message(self, message: Message):
         """Track on message."""
         self.log_message(message)
+        # self.log_emojis(message)
 
     def log_message(self, message: Message):
         """Log message."""
@@ -178,13 +252,31 @@ class Logstash:
             return
         extra = self.extra.copy()
         event_key = "message"
+
         extra = {
-            'discord_event': event_key
+            'discord_event': event_key,
+            'content': message.content
         }
         extra.update(self.get_extra_sca(message))
         extra.update(self.get_extra_mentions(message))
-        extra.update(self.get_extra_emojis(message))
+        # extra.update(self.get_extra_emojis(message))
         self.logger.info(self.get_event_key(event_key), extra=extra)
+
+    def log_emojis(self, message: Message):
+        """Log emoji uses."""
+        emojis = []
+        emojis.append(EMOJI_P.findall(message.content))
+        emojis.append(UEMOJI_P.findall(message.content))
+        if not self.extra:
+            return
+        for emoji in emojis:
+            extra = self.extra.copy()
+            event_key = "message.emoji"
+            extra = {
+                'discord_event': event_key,
+                'emoji': emoji
+            }
+            self.logger.info(self.get_event_key(event_key), extra=extra)
 
     async def on_command(self, command: Command, ctx: Context):
         """Track command usage."""
@@ -202,6 +294,42 @@ class Logstash:
         }
         extra.update(self.get_extra_sca(ctx.message))
         self.logger.info(self.get_event_key(event_key), extra=extra)
+
+    async def on_message_delete(self, message: Message):
+        """Track message deletion."""
+        self.log_message_delete(message)
+
+    def log_message_delete(self, message: Message):
+        """Log deleted message."""
+        if not self.extra:
+            return
+        extra = self.extra.copy()
+        event_key = "message.delete"
+
+        extra = {
+            'discord_event': event_key,
+            'content': message.content
+        }
+        extra.update(self.get_extra_sca(message))
+        extra.update(self.get_extra_mentions(message))
+        self.logger.info(self.get_event_key(event_key), extra=extra)
+
+    async def on_member_update(self, before: Member, after: Member):
+        """Called when a Member updates their profile.
+
+        Only track status after.
+        """
+        self.log_member_update(before, after)
+
+    def log_member_update(self, before: Member, after: Member):
+        """Track member’s updated status."""
+        if set(before.roles) != set(after.roles):
+            extra = self.extra.copy()
+            event_key = 'member.update.roles'
+            extra['discord_event'] = event_key
+            extra['before'] = self.get_extra_member(before)
+            extra['after'] = self.get_extra_member(after)
+            self.logger.info(self.get_event_key(event_key), extra=extra)
 
     async def on_ready(self):
         """Bot ready."""
@@ -230,10 +358,12 @@ class Logstash:
         servers = list(self.bot.servers)
         extra.update({
             'discord_gauge': event_key,
-            # 'server_names': [s.name for s in servers],
-            # 'server_ids': [s.id for s in servers],
             'server_count': len(servers)
         })
+        servers_data = []
+        for server in servers:
+            servers_data.append(self.get_extra_server(server))
+        extra['servers'] = servers_data
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_channels(self):
@@ -241,26 +371,24 @@ class Logstash:
         if not self.extra:
             return
         channels = list(self.bot.get_all_channels())
-        event_key = 'channels'
+        event_key = 'all_channels'
         extra = self.extra.copy()
         extra.update({
             'discord_gauge': event_key,
-            'channel_count': len(channels),
-            # 'channel_ids': [c.id for c in channels],
-            # 'channel_names': [c.name for c in channels],
-            'text_channel_count': len(
-                [c.id for c in channels if c.type == ChannelType.text]),
-            # 'text_channel_ids': [
-            #     c.id for c in channels if c.type == ChannelType.text],
-            # 'text_channel_names': [
-            #     c.name for c in channels if c.type == ChannelType.text],
-            'voice_channel_count': len(
-                [c.id for c in channels if c.type == ChannelType.text]),
-            # 'voice_channel_ids': [
-            #     c.id for c in channels if c.type == ChannelType.text],
-            # 'voice_channel_names': [
-            #     c.name for c in channels if c.type == ChannelType.text]
+            'channel_count': len(channels)
         })
+        self.logger.info(self.get_event_key(event_key), extra=extra)
+
+        # individual channels
+        for channel in channels:
+            self.log_channel(channel)
+
+    def log_channel(self, channel: Channel):
+        """Log one channel."""
+        event_key = 'channel'
+        extra = self.extra.copy()
+        extra['discord_gauge'] = event_key
+        extra['channel'] = self.get_extra_channel(channel)
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_members(self):
@@ -280,29 +408,16 @@ class Logstash:
         })
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
-        # individual member
-        event_key = 'member'
-        extra = self.extra.copy()
         for member in members:
-            extra.update({
-                'discord_gauge': event_key,
-                'member_name': member.display_name,
-                'member_id': member.id,
-                'server_name': member.server.name,
-                'server_id': member.server.id,
-                'joined_at': member.joined_at.isoformat()
-            })
-            member_roles = []
-            for index, role in enumerate(member.server.role_hierarchy):
-                if role in member.roles:
-                    member_roles.append({
-                        "role_id": role.id,
-                        "role_name": role.name,
-                        "role_hiearchy_index": index
-                    })
-            extra["member_roles"] = member_roles
+            self.log_member(member)
 
-            self.logger.info(self.get_event_key(event_key), extra=extra)
+    def log_member(self, member: Member):
+        """Log member."""
+        extra = self.extra.copy()
+        event_key = 'member'
+        extra['discord_gauge'] = event_key
+        extra['member'] = self.get_extra_member(member)
+        self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_voice(self):
         """Log voice channels."""
