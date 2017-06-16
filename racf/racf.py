@@ -805,8 +805,8 @@ class RACF:
 
     @commands.command(pass_context=True, no_pm=True, aliases=['bs'])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def brawlstars(self, ctx, member: discord.Member):
-        """Assign member with visitor and brawl-stars roles and give them info."""
+    async def brawlstars(self, ctx, member: discord.Member, *roles):
+        """Assign member with visitor and brawl-stars roles."""
         bs_roles = ["Visitor", "Brawl-Stars"]
         channel = discord.utils.get(
             ctx.message.server.channels, name="brawl-stars")
@@ -816,6 +816,11 @@ class RACF:
                 "{} You can now chat in {} — enjoy!".format(
                     member.mention, channel.mention))
         await ctx.invoke(self.visitorrules, member)
+
+        # Add additional roles if present
+        if len(roles):
+            await ctx.invoke(self.changerole, member, *roles)
+
 
     @commands.command(pass_context=True, no_pm=True, aliases=['vrules', 'vr'])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
