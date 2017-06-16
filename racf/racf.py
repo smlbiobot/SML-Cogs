@@ -54,6 +54,8 @@ MEMBER_DEFAULT_ROLES = ["Member", "Tourney", "Practice"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
+BS_CLANS = [
+    "BS-Alpha", "BS-Bravo", "BS-Charlie"]
 BOTCOMMANDER_ROLE = ["Bot Commander"]
 COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
 COMPETITIVE_TEAM_ROLES = [
@@ -65,6 +67,13 @@ KICK5050_MSG = (
     "Our clans are Alpha / Bravo / Charlie / Delta / "
     "Echo / Foxtrot / Golf / Hotel with the red rocket emblem. "
     "Good luck on the ladder!")
+BS_KICK5050_MSG = (
+    "Sorry, but you were 50/50 and we have "
+    "kicked you from the Brawl Stars band. "
+    "Please join one of our feeders for now. "
+    "Our clans are Alpha / Bravo / Charlie "
+    "with the red skull emblem. "
+    "Good luck in your future games!")
 VISITOR_RULES = (
     "Welcome to the **Reddit Alpha Clan Family** (RACF) Discord server. "
     "As a visitor, you agree to follow the following rules: \n"
@@ -753,6 +762,21 @@ class RACF:
         await ctx.invoke(self.dmusers, KICK5050_MSG, member)
         member_clan = [
             '-{}'.format(r.name) for r in member.roles if r.name in CLANS]
+        if len(member_clan):
+            await ctx.invoke(self.changerole, member, *member_clan)
+        else:
+            await self.bot.say("Member has no clan roles to remove.")
+
+    @commands.command(pass_context=True, no_pm=True, aliases=["bsk5", "bk5"])
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def bskick5050(self, ctx, member: discord.Member):
+        """Notify member that they were kicked for lower trophies.
+
+        Remove clan tags in the process.
+        """
+        await ctx.invoke(self.dmusers, BS_KICK5050_MSG, member)
+        member_clan = [
+            '-{}'.format(r.name) for r in member.roles if r.name in BS_CLANS]
         if len(member_clan):
             await ctx.invoke(self.changerole, member, *member_clan)
         else:
