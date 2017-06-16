@@ -55,7 +55,7 @@ CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
 BS_CLANS = [
-    "BS-Alpha", "BS-Bravo", "BS-Charlie"]
+    "BS-Alpha", "BS-Bravo", "BS-Charlie", "BS-Delta"]
 BOTCOMMANDER_ROLE = ["Bot Commander"]
 COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
 COMPETITIVE_TEAM_ROLES = [
