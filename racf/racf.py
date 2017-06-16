@@ -47,7 +47,9 @@ DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander", "AlphaBot"]
 HEIST_ROLE = "Heist"
 RECRUIT_ROLE = "Recruit"
 TOGGLE_ROLES = ["Member"]
-TOGGLEABLE_ROLES = ["Heist", "Practice", "Tourney", "Recruit", "CoC", "Battle-Bay", "RACF-Tourney", "Brawl-Stars"]
+TOGGLEABLE_ROLES = [
+    "Heist", "Practice", "Tourney", "Recruit", "CoC",
+    "Battle-Bay", "RACF-Tourney", "Brawl-Stars", "vc-crew"]
 MEMBER_DEFAULT_ROLES = ["Member", "Tourney", "Practice"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
