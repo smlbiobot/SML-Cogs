@@ -69,6 +69,8 @@ class MemberManagement:
         Optional arguments
         --output-mentions
             Append a string of user mentions for users displayed.
+        --output-id
+            Append a string ot user ids for the results.
         --output-mentions-only
             Don’t display the long list and only display the list of member mentions
         --members-without-clan-tag
@@ -81,6 +83,7 @@ class MemberManagement:
 
         # Extract optional arguments if exist
         option_output_mentions = "--output-mentions" in args
+        option_output_id = "--output-id" in args
         option_output_mentions_only = "--output-mentions-only" in args
         option_members_without_clan_tag = "--members-without-clan-tag" in args
         option_sort_join = "--sort-join" in args
@@ -187,6 +190,15 @@ class MemberManagement:
                     "Copy and paste these in message to mention users listed:")
 
                 out = ' '.join(mention_list)
+                for page in pagify(out, shorten_by=24):
+                    await self.bot.say(box(page))
+
+            # Display a copy-and-pastable list of ids
+            if option_output_id:
+                id_list = [m.id for m in out_members]
+                await self.bot.say(
+                    "Copy and paste these in message to mention users listed:")
+                out = ' '.join(id_list)
                 for page in pagify(out, shorten_by=24):
                     await self.bot.say(box(page))
 
