@@ -1,0 +1,10 @@
+{
+    "AUTHOR" : "SML",
+    "SHORT" : "RBS (Reddit Band System)",
+    "DESCRIPTION" : "General utility cog for Reddit Band System (RBS). Installing on other servers is not recommended.",
+    "DISABLED" : false,
+    "NAME" : "RBS",
+    "REQUIREMENTS" : [],
+    "TAGS" : ["rbs"],
+    "INSTALL_MSG" : "Thank you for installing recruitment. Contact SML for help."
+}
