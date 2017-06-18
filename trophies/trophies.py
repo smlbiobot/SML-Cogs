@@ -24,72 +24,184 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import discord
+from enum import Enum
+
+from __main__ import send_cmd_help
+from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from random import choice
-from .utils.dataIO import dataIO
-from __main__ import send_cmd_help
+import discord
 
 import os
 
-settings_path = "data/trophies/settings.json"
-CLANS = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'eSports']
+PATH = os.path.join("data", "trophies")
+JSON = os.path.join(PATH, "settings.json")
+
 set_allowed_role = 'Bot Commander'
+
+
+class ClanType:
+    """Type of trophies."""
+    CR = "CR"
+    BS = "BS"
+
+
+RACF_CLANS = {
+    ClanType.CR: [
+        'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo',
+        'Foxtrot', 'Golf', 'Hotel', 'eSports'],
+    ClanType.BS: ['Alpha', 'Bravo', 'Charlie', 'Delta']
+}
+
+SERVER_DEFAULTS = {
+    "ServerName": None,
+    "ServerID": None,
+    "Trophies": {
+        ClanType.CR: [],
+        ClanType.BS: []
+    }
+}
+
 
 class Trophies:
     """
-    Display the current trophy requirements for RACF
+    Display the current trophy requirements for RACF.
 
     Note: RACF specific plugin for Red
     """
 
     def __init__(self, bot):
+        """Init."""
         self.bot = bot
-        self.file_path = settings_path
-        self.settings = dataIO.load_json(self.file_path)
+        self.settings = dataIO.load_json(JSON)
 
+    @checks.serverowner_or_permissions(manage_server=True)
     @commands.group(pass_context=True, no_pm=True)
-    async def trophies(self, ctx):
-        """Display RACF Trophy requirements"""
+    async def settrophies(self, ctx):
+        """Set trophies settings."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
 
+    @settrophies.command(name="initserver", pass_context=True)
+    async def settrophies_initserver(self, ctx, init_all=False):
+        """Initialize server settings to default values.
+
+        Requires confirmation as this is a destructive process.
+        """
+        server = ctx.message.server
+        if init_all:
+            self.settings = {}
+
+        server_settings = SERVER_DEFAULTS.copy()
+        server_settings["ServerName"] = server.name
+        server_settings["ServerID"] = server.id
+        for clan in RACF_CLANS[ClanType.CR]:
+            server_settings['Trophies'][ClanType.CR].append({
+                'name': clan,
+                'value': 0
+            })
+        for clan in RACF_CLANS[ClanType.BS]:
+            server_settings['Trophies'][ClanType.BS].append({
+                'name': clan,
+                'value': 0
+            })
+
+        self.settings[server.id] = server_settings
+
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say(
+            'Settings set to server defaults.')
+
+    @commands.group(aliases=["tr"], pass_context=True, no_pm=True)
+    async def trophies(self, ctx):
+        """Display RACF Trophy requirements."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @trophies.command(name="show", pass_context=True, no_pm=True)
-    async def _show_trophies(self, ctx):
-        """Display the requirements"""
-
+    async def trophies_show(self, ctx):
+        """Display the requirements."""
         server = ctx.message.server
+        data = self.embed_trophies(server, ClanType.CR)
+        await self.bot.say(embed=data)
 
-        if server.id not in self.settings:
-            self.settings[server.id] = {
-                "ServerName": str(server),
-                "ServerID": str(server.id),
-                "Trophies": {}}
+    @trophies.command(name="set", pass_context=True, no_pm=True)
+    @commands.has_role(set_allowed_role)
+    async def trophies_set(self, ctx, clan: str, *, req: str):
+        """Set the trophy requirements for clans."""
+        await self.run_trophies_set(ctx, ClanType.CR, clan, req)
 
-        for c in CLANS:
-            if c not in self.settings[server.id]["Trophies"]:
-                self.settings[server.id]["Trophies"][c] = "0"
+    @commands.group(aliases=["bstr"], pass_context=True, no_pm=True)
+    async def bstrophies(self, ctx):
+        """Display RACF Trophy requirements."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
 
+    @bstrophies.command(name="show", pass_context=True, no_pm=True)
+    async def bstrophies_show(self, ctx):
+        """Display the requirements."""
+        server = ctx.message.server
+        data = self.embed_trophies(server, ClanType.BS)
+        await self.bot.say(embed=data)
+
+    @bstrophies.command(name="set", pass_context=True, no_pm=True)
+    @commands.has_role(set_allowed_role)
+    async def bstrophies_set(self, ctx, clan: str, *, req: str):
+        """Set the trophy requirements for clans."""
+        await self.run_trophies_set(ctx, ClanType.BS, clan, req)
+
+    async def run_trophies_set(self, ctx, clan_type, clan: str, req: str):
+        """Set to trophy requirements for clans."""
+        server = ctx.message.server
+        clans = RACF_CLANS[clan_type]
+
+        if clan.lower() not in [c.lower() for c in clans]:
+            await self.bot.say("Clan name is not valid.")
+            return
+
+        for i, c in enumerate(clans):
+            if clan.lower() == c.lower():
+                self.settings[server.id][
+                    "Trophies"][clan_type][i]["value"] = req
+                await self.bot.say(
+                    "Trophy requirement for {} "
+                    "updated to {}.".format(clan, req))
+                break
+
+        dataIO.save_json(JSON, self.settings)
+
+    def embed_trophies(self, server, clan_type):
+        """Return Discord embed."""
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
+
+        if clan_type == ClanType.CR:
+            our_clans = 'Clash Royale clans'
+        else:
+            our_clans = 'Brawl Stars bands'
+
+        description = (
+            "Minimum trophies trophies to join our {}. "
+            "Current trophies required."
+        ).format(our_clans)
 
         data = discord.Embed(
             color=discord.Color(value=color),
             title="Trophy requirements",
-            description="Minimum trophies to join our clans. "
-                        "Current trophies required. "
+            description=description
         )
 
-        for clan in CLANS:
-            if clan.lower() in self.settings[server.id]["Trophies"]:
-                name = clan
-                value = self.settings[server.id]["Trophies"][clan.lower()]
+        clans = self.settings[server.id]["Trophies"][clan_type]
 
-                if value.isdigit():
-                    value = '{:,}'.format(int(value))
+        for clan in clans:
+            name = clan["name"]
+            value = clan["value"]
 
-                data.add_field(name=str(name), value=value)
+            if str(value).isdigit():
+                value = '{:,}'.format(int(value))
+
+            data.add_field(name=str(name), value=value)
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
@@ -97,53 +209,26 @@ class Trophies:
         else:
             data.set_author(name=server.name)
 
-        await self.bot.say(embed=data)
-
-    @trophies.command(name="set", pass_context=True, no_pm=True)
-    @commands.has_role(set_allowed_role)
-    async def _set_trophies(self, ctx, clan: str, req: str):
-        """Set the trophy requirements for clans"""
-        server = ctx.message.server
-
-        if server.id not in self.settings:
-            self.settings[server.id] = {
-                "ServerName": str(server),
-                "ServerID": str(server.id),
-                "Trophies": {}}
-
-        for c in CLANS:
-            if c not in self.settings[server.id]["Trophies"]:
-                self.settings[server.id]["Trophies"][c.lower()] = "0"
-
-        if clan.lower() not in [c.lower() for c in CLANS]:
-            await self.bot.say("Clan name is not valid.")
-
-        else:
-            self.settings[server.id]["Trophies"][clan.lower()] = req
-            await self.bot.say("Trophy requirement for {} updated to {}.".format(clan, req))
-
-        dataIO.save_json(self.file_path, self.settings)
-
+        return data
 
 
 def check_folder():
-    if not os.path.exists("data/trophies"):
-        print("Creating data/trophies folder...")
-        os.makedirs("data/trophies")
+    """Check folder."""
+    if not os.path.exists(PATH):
+        os.makedirs(PATH)
 
 
 def check_file():
-    d = {}
-
-    f = settings_path
-    if not dataIO.is_valid_json(f):
-        print("Creating default trophies‘ settings.json...")
-        dataIO.save_json(f, d)
+    """Check files."""
+    if not dataIO.is_valid_json(JSON):
+        dataIO.save_json(JSON, {})
 
 
 def setup(bot):
+    """Setup bot."""
     check_folder()
     check_file()
     n = Trophies(bot)
     bot.add_cog(n)
+
 
