@@ -45,7 +45,7 @@ from discord.ext.commands import Context
 
 HOST = 'localhost'
 PORT = 5959
-INTERVAL = 300
+INTERVAL = 3600
 DB_PATH = os.path.join('data', 'logstash', 'logstash.db')
 
 PATH = os.path.join('data', 'logstash')

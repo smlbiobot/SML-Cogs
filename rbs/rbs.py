@@ -30,7 +30,7 @@ from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 import discord
 
-LOOP_INTERVAL = 5
+LOOP_INTERVAL = 60
 
 SERVER_DEFAULTS = {
     'autorole': {
