@@ -43,6 +43,7 @@ welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
               "interested in joining our clans / just visiting?"
 
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
+BS_CHANGECLAN_ROLES = ["Member", "Brawl-Stars"]
 DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander", "AlphaBot"]
 HEIST_ROLE = "Heist"
 RECRUIT_ROLE = "Recruit"
@@ -65,7 +66,8 @@ CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
 BS_CLANS = [
-    "BS-Alpha", "BS-Bravo", "BS-Charlie", "BS-Delta"]
+    "BS-Alpha", "BS-Bravo", "BS-Charlie"]
+BS_CLANS_PREFIX = 'BS-'
 BOTCOMMANDER_ROLE = ["Bot Commander"]
 COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
 COMPETITIVE_TEAM_ROLES = [
@@ -166,6 +168,49 @@ class RACF:
         Example: !changeclan Delta
         """
         clans = [c.lower() for c in CLANS]
+        await self.do_changeclan(ctx, clan, clans)
+        # author = ctx.message.author
+        # server = ctx.message.server
+
+        # if clan is None:
+        #     await send_cmd_help(ctx)
+        #     return
+
+        # if clan.lower() not in clans:
+        #     await self.bot.say(
+        #         "{} is not a clan you can self-assign.".format(clan))
+        #     return
+
+        # clan_roles = [r for r in server.roles if r.name.lower() in clans]
+
+        # to_remove_roles = set(author.roles) & set(clan_roles)
+        # to_add_roles = [
+        #     r for r in server.roles if r.name.lower() == clan.lower()]
+
+        # await self.bot.remove_roles(author, *to_remove_roles)
+        # await self.bot.say("Removed {} for {}".format(
+        #     ",".join([r.name for r in to_remove_roles]),
+        #     author.display_name))
+
+        # await self.bot.add_roles(author, *to_add_roles)
+        # await self.bot.say("Added {} for {}".format(
+        #     ",".join([r.name for r in to_add_roles]),
+        #     author.display_name))
+
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*BS_CHANGECLAN_ROLES)
+    async def bschangeclan(self, ctx, clan: str=None):
+        """Update clan role when moved to a new clan.
+
+        Example: !bschangeclan BS-Delta
+        """
+        if not clan.startswith(BS_CLANS_PREFIX):
+            clan = BS_CLANS_PREFIX + clan
+        clans = [c.lower() for c in BS_CLANS]
+        await self.do_changeclan(ctx, clan, clans)
+
+    async def do_changeclan(self, ctx, clan: str=None, clans=[]):
+        """Perform clan changes."""
         author = ctx.message.author
         server = ctx.message.server
 
