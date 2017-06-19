@@ -169,33 +169,6 @@ class RACF:
         """
         clans = [c.lower() for c in CLANS]
         await self.do_changeclan(ctx, clan, clans)
-        # author = ctx.message.author
-        # server = ctx.message.server
-
-        # if clan is None:
-        #     await send_cmd_help(ctx)
-        #     return
-
-        # if clan.lower() not in clans:
-        #     await self.bot.say(
-        #         "{} is not a clan you can self-assign.".format(clan))
-        #     return
-
-        # clan_roles = [r for r in server.roles if r.name.lower() in clans]
-
-        # to_remove_roles = set(author.roles) & set(clan_roles)
-        # to_add_roles = [
-        #     r for r in server.roles if r.name.lower() == clan.lower()]
-
-        # await self.bot.remove_roles(author, *to_remove_roles)
-        # await self.bot.say("Removed {} for {}".format(
-        #     ",".join([r.name for r in to_remove_roles]),
-        #     author.display_name))
-
-        # await self.bot.add_roles(author, *to_add_roles)
-        # await self.bot.say("Added {} for {}".format(
-        #     ",".join([r.name for r in to_add_roles]),
-        #     author.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BS_CHANGECLAN_ROLES)
@@ -204,7 +177,7 @@ class RACF:
 
         Example: !bschangeclan BS-Delta
         """
-        if not clan.startswith(BS_CLANS_PREFIX):
+        if not clan.lower().startswith(BS_CLANS_PREFIX.lower()):
             clan = BS_CLANS_PREFIX + clan
         clans = [c.lower() for c in BS_CLANS]
         await self.do_changeclan(ctx, clan, clans)
