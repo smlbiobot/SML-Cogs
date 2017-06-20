@@ -215,69 +215,22 @@ class RACF:
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def addrole(
-            self, ctx, member: discord.Member=None, role_name: str=None):
+            self, ctx, member: discord.Member=None, *, role_name: str=None):
         """Add role to a user.
 
         Example: !addrole SML Delta
-
-        Role name needs be in quotes if it is a multi-word role.
         """
-        server = ctx.message.server
-        author = ctx.message.author
-        if member is None:
-            await self.bot.say("You must specify a member.")
-            return
-        if role_name is None:
-            await self.bot.say("You must specify a role.")
-            return
-        if role_name.lower() in [r.lower() for r in DISALLOWED_ROLES]:
-            await self.bot.say("You are not allowed to add those roles.")
-            return
-        if role_name.lower() not in [r.name.lower() for r in server.roles]:
-            await self.bot.say("{} is not a valid role.".format(role_name))
-            return
-
-        desired_role = discord.utils.get(server.roles, name=role_name)
-        rh = server.role_hierarchy
-        if rh.index(desired_role) < rh.index(author.top_role):
-            await self.bot.say(
-                "{} does not have permission to edit {}.".format(
-                    author.display_name, role_name))
-            return
-
-        to_add_roles = [
-            r for r in server.roles if (
-                r.name.lower() == role_name.lower())]
-        await self.bot.add_roles(member, *to_add_roles)
-        await self.bot.say("Added {} for {}".format(
-            role_name, member.display_name))
+        await ctx.invoke(self.changerole, member, role_name)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def removerole(
-            self, ctx, member: discord.Member=None, role_name: str=None):
+            self, ctx, member: discord.Member=None, *, role_name: str=None):
         """Remove role from a user.
 
         Example: !removerole SML Delta
-
-        Role name needs be in quotes if it is a multi-word role.
         """
-        server = ctx.message.server
-        if member is None:
-            await self.bot.say("You must specify a member.")
-        elif role_name is None:
-            await self.bot.say("You must specify a role.")
-        elif role_name.lower() in [r.lower() for r in DISALLOWED_ROLES]:
-            await self.bot.say("You are not allowed to remove those roles.")
-        elif role_name.lower() not in [r.name.lower() for r in server.roles]:
-            await self.bot.say("{} is not a valid role.".format(role_name))
-        else:
-            to_remove_roles = [
-                r for r in server.roles if (
-                    r.name.lower() == role_name.lower())]
-            await self.bot.remove_roles(member, *to_remove_roles)
-            await self.bot.say("Removed {} from {}".format(
-                role_name, member.display_name))
+        await ctx.invoke(self.changerole, member, '-' + role_name)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -381,6 +334,33 @@ class RACF:
                     out_mentions.append(m.mention)
             await self.bot.say("{} {}".format(" ".join(out_mentions),
                                               " ".join(msg)))
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(mention_everyone=True)
+    async def mentionrole(self, ctx, role_name: str, *, msg):
+        """Mention a role with message.
+
+        Temporarily make a role mentionable and send a message.
+        """
+        server = ctx.message.server
+
+        # role = discord.utils.get(server.roles, name=role_name)
+        # find role regardless of casing
+        role = None
+        for r in server.roles:
+            if r.name.lower() == role_name.lower():
+                role = r
+                break
+        if role is None:
+            await self.bot.say(
+                '{} is not a valid role on this server.'.format(
+                    role_name))
+            return
+
+        orig_mentionable = role.mentionable
+        await self.bot.edit_role(server, role, mentionable=True)
+        await self.bot.say('{} {}'.format(role.mention, msg))
+        await self.bot.edit_role(server, role, mentionable=orig_mentionable)
 
     @commands.command(pass_context=True, no_pm=True)
     async def avatar(self, ctx, member: discord.Member=None):
