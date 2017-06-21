@@ -32,7 +32,7 @@ import itertools
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 
-BOTCOMMANDER_ROLE = ["Bot Commander"]
+BOTCOMMANDER_ROLE = ["Bot Commander", "High-Elder"]
 
 class MemberManagement:
     """

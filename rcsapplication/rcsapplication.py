@@ -30,6 +30,7 @@ import aiohttp
 import discord
 from discord.ext import commands
 from cogs.utils import checks
+from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from __main__ import send_cmd_help
@@ -46,6 +47,13 @@ CREDENTIALS_JSON = os.path.join(PATH, CREDENTIALS_FILENAME)
 SCOPES = 'https://www.googleapis.com/auth/spreadsheets.readonly'
 SERVICE_KEY_JSON = os.path.join(PATH, "service_key.json")
 APPLICATION_NAME = "Red Discord Bot RCS Interview Cog"
+
+
+class NoDataFound(Exception):
+    pass
+
+class ApplicationIdNotFound(Exception):
+    pass
 
 
 class RCSApplication:
@@ -140,6 +148,38 @@ class RCSApplication:
         This was given to the interviewee when they app.
         It is inserted into the sheet as a value in a cell.
         """
+
+        try:
+            out = self.get_application_response(ctx, app_id)
+        except NoDataFound:
+            await self.bot.say('No data found.')
+            return
+        except ApplicationIdNotFound:
+            await self.bot.say("Application ID not found.")
+            return
+
+        # output
+        for page in pagify(out, shorten_by=24):
+            await self.bot.say(page)
+
+    @application.command(name="getmd", pass_context=True)
+    async def application_getmd(self, ctx, app_id):
+        """Return appliation info as markdown."""
+        try:
+            out = self.get_application_response(ctx, app_id)
+        except NoDataFound:
+            await self.bot.say('No data found.')
+            return
+        except ApplicationIdNotFound:
+            await self.bot.say("Application ID not found.")
+            return
+
+        for page in pagify(out):
+            await self.bot.say(box(page, lang="markdown"))
+
+
+    def get_application_response(self, ctx, app_id):
+        """Return application info as text."""
         credentials = ServiceAccountCredentials.from_json_keyfile_name(
             SERVICE_KEY_JSON, scopes=SCOPES)
         http = credentials.authorize(httplib2.Http())
@@ -158,7 +198,8 @@ class RCSApplication:
         values = result.get('values', [])
 
         if not values:
-            await self.bot.say('No data found.')
+            # await self.bot.say('No data found.')
+            raise NoDataFound()
             return
 
         # output
@@ -182,7 +223,8 @@ class RCSApplication:
 
         # process answers
         if answers is None:
-            await self.bot.say("Application ID not found.")
+            # await self.bot.say("Application ID not found.")
+            raise ApplicationIdNotFound()
             return
 
         for id, question in enumerate(questions):
@@ -193,9 +235,7 @@ class RCSApplication:
                 out.append(answers[id])
                 out.append('')
 
-        # output
-        for page in pagify('\n'.join(out), shorten_by=24):
-            await self.bot.say(page)
+        return '\n'.join(out)
 
 
 def check_folder():
