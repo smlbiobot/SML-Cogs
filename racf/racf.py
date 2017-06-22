@@ -69,7 +69,7 @@ BS_CLANS = [
     "BS-Alpha", "BS-Bravo", "BS-Charlie"]
 BS_CLANS_PREFIX = 'BS-'
 BOTCOMMANDER_ROLE = ["Bot Commander"]
-BS_BOTCOMMANDER_ROLE = ["Bot Commander", "BS-Alpha Lead"]
+HE_BOTCOMMANDER_ROLES = ["Bot Commander", "High-Elder"]
 COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
 COMPETITIVE_TEAM_ROLES = [
     "CRL", "RPL-NA", "RPL-EU", "RPL-APAC", "MLG",
@@ -490,7 +490,7 @@ class RACF:
                     member.mention, channel.mention))
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
     async def dmusers(self, ctx: Context, msg: str=None,
                       *members: discord.Member):
         """Send a DM to a list of people.
@@ -792,7 +792,7 @@ class RACF:
             await self.bot.say("Member has no clan roles to remove.")
 
     @commands.command(pass_context=True, no_pm=True, aliases=["bsk5", "bk5"])
-    @commands.has_any_role(*BS_BOTCOMMANDER_ROLE)
+    @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
     async def bskick5050(self, ctx, member: discord.Member):
         """Notify member that they were kicked for lower trophies.
 
@@ -852,7 +852,7 @@ class RACF:
         await ctx.invoke(self.visitorrules, member)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['bs'])
-    @commands.has_any_role(*BS_BOTCOMMANDER_ROLE)
+    @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
     async def brawlstars(self, ctx, member: discord.Member, *roles):
         """Assign member with visitor and brawl-stars roles."""
         bs_roles = ["Visitor", "Brawl-Stars"]
