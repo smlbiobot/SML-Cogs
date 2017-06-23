@@ -342,6 +342,7 @@ class RACF:
         """Mention a role with message.
 
         Temporarily make a role mentionable and send a message.
+        Delete message sending the command so it won’t be a dupe.
         """
         server = ctx.message.server
 
@@ -360,8 +361,14 @@ class RACF:
 
         orig_mentionable = role.mentionable
         await self.bot.edit_role(server, role, mentionable=True)
-        await self.bot.say('{} {}'.format(role.mention, msg))
+        await self.bot.say(
+            '**{author.display_name}** ({author.id}): '
+            '{role.mention} {message}'.format(
+                author=ctx.message.author,
+                role=role,
+                message=msg))
         await self.bot.edit_role(server, role, mentionable=orig_mentionable)
+        await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True, no_pm=True)
     async def avatar(self, ctx, member: discord.Member=None):
