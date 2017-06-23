@@ -362,7 +362,7 @@ class RACF:
         orig_mentionable = role.mentionable
         await self.bot.edit_role(server, role, mentionable=True)
         await self.bot.say(
-            '**{author.display_name}** ({author.id}): '
+            '**{author.mention}** ({author.id}): '
             '{role.mention} {message}'.format(
                 author=ctx.message.author,
                 role=role,
