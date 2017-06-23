@@ -862,7 +862,10 @@ class RACF:
     @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
     async def brawlstars(self, ctx, member: discord.Member, *roles):
         """Assign member with visitor and brawl-stars roles."""
-        bs_roles = ["Visitor", "Brawl-Stars"]
+        bs_roles = ["Brawl-Stars"]
+        if discord.utils.get(member.roles, name="Member") is None:
+            if discord.utils.get(member.roles, name="Guest") is None:
+                bs_roles.append("Visitor")
         channel = discord.utils.get(
             ctx.message.server.channels, name="brawl-stars")
         await ctx.invoke(self.changerole, member, *bs_roles)
@@ -870,12 +873,12 @@ class RACF:
             await self.bot.say(
                 "{} You can now chat in {} — enjoy!".format(
                     member.mention, channel.mention))
-        await ctx.invoke(self.visitorrules, member)
+        if "Visitor" in bs_roles:
+            await ctx.invoke(self.visitorrules, member)
 
         # Add additional roles if present
         if len(roles):
             await ctx.invoke(self.changerole, member, *roles)
-
 
     @commands.command(pass_context=True, no_pm=True, aliases=['vrules', 'vr'])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)

@@ -144,13 +144,19 @@ class Logstash:
         """Return data for member."""
         extra = {
             'name': member.display_name,
+            'username': member.name,
+            'display_name': member.display_name,
             'id': member.id,
-            'status': self.get_extra_status(member.status),
-            'game': self.get_extra_game(member.game),
-            'top_role': self.get_extra_role(member.top_role),
-            'joined_at': member.joined_at.isoformat(),
             'bot': member.bot
         }
+
+        if isinstance(member, Member):
+            extra.update({
+                'status': self.get_extra_status(member.status),
+                'game': self.get_extra_game(member.game),
+                'top_role': self.get_extra_role(member.top_role),
+                'joined_at': member.joined_at.isoformat()
+            })
 
         if member.server is not None:
             extra['server'] = self.get_extra_server(member.server)
