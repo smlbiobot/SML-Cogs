@@ -44,7 +44,7 @@ welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
 
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 BS_CHANGECLAN_ROLES = ["Member", "Brawl-Stars"]
-DISALLOWED_ROLES = ["SUPERMOD", "MOD", "Bot Commander", "AlphaBot"]
+DISALLOWED_ROLES = ["SUPERMOD", "MOD", "AlphaBot"]
 HEIST_ROLE = "Heist"
 RECRUIT_ROLE = "Recruit"
 TOGGLE_ROLES = ["Member", "Visitor"]
