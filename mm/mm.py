@@ -75,8 +75,8 @@ class MemberManagement:
             Don’t display the long list and only display the list of member mentions
         --members-without-clan-tag
             RACF specific option. Equivalent to typing Member -Alpha -Bravo -Charlie -Delta -Echo -Foxtrot -Golf -Hotel
-        --sort-join
-            Sort list by join date on server
+        --list
+            Display as inline list
         --everyone
             Include everyone
         """
@@ -90,6 +90,7 @@ class MemberManagement:
         option_everyone = "--everyone" in args
         option_sort_alpha = "--sort-alpha" in args
         option_csv = "--csv" in args
+        option_list = "--list" in args
 
         server = ctx.message.server
         server_roles_names = [r.name.lower() for r in server.roles]
@@ -169,11 +170,13 @@ class MemberManagement:
             # embed output
             if not option_output_mentions_only:
                 if option_csv:
-                    out = ", ".join([
-                        m.display_name for m in out_members])
-                    for page in pagify(out, shorten_by=50):
+                    for page in pagify(
+                            self.get_member_csv(out_members), shorten_by=50):
                         await self.bot.say(page)
-
+                elif option_list:
+                    for page in pagify(
+                            self.get_member_list(out_members), shorten_by=50):
+                        await self.bot.say(page)
                 else:
                     for data in self.get_member_embeds(ctx, out_members):
                         try:
@@ -201,6 +204,18 @@ class MemberManagement:
                 out = ' '.join(id_list)
                 for page in pagify(out, shorten_by=24):
                     await self.bot.say(box(page))
+
+    def get_member_csv(self, members):
+        """Return members as a list."""
+        names = [m.display_name for m in members]
+        return ', '.join(names)
+
+    def get_member_list(self, members):
+        """Return members as a list."""
+        out = []
+        for m in members:
+            out.append('+ {}'.format(m.display_name))
+        return '\n'.join(out)
 
     def get_member_embeds(self, ctx, members):
         """Discord embed of data display."""
