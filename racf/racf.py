@@ -533,7 +533,7 @@ class RACF:
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def changenick(
-            self, ctx: Context, member: discord.Member, nickname: str):
+            self, ctx: Context, member: discord.Member, *, nickname: str):
         """Change the nickname of a member.
 
         Example
