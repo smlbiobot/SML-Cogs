@@ -183,6 +183,19 @@ class RACF:
         clans = [c.lower() for c in BS_CLANS]
         await self.do_changeclan(ctx, clan, clans)
 
+    @commands.command(pass_context=True ,no_pm=True)
+    @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
+    async def bselder(self, ctx, member: discord.Member):
+        """Add bs-elder role for member.
+
+        TMP command for bs leader who’s not a bot comamnder.
+        """
+        role = discord.utils.get(ctx.message.server.roles, name="BS-Elder")
+        await self.bot.add_roles(member, role)
+        await self.bot.say(
+            "Added {} for {}".format(
+                role.name, member.display_name))
+
     async def do_changeclan(self, ctx, clan: str=None, clans=[]):
         """Perform clan changes."""
         author = ctx.message.author
