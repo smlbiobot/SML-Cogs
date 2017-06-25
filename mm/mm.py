@@ -157,6 +157,10 @@ class MemberManagement:
                 if not exclude and roles >= plus:
                     out_members.add(m)
 
+            # only role
+            if option_only_role:
+                out_members = [m for m in out_members if len(m.roles) == 2]
+
             suffix = 's' if len(out_members) > 1 else ''
             await self.bot.say("**Found {} member{}.**".format(
                 len(out_members), suffix))
@@ -169,10 +173,6 @@ class MemberManagement:
             if option_sort_alpha:
                 out_members = list(out_members)
                 out_members.sort(key=lambda x: x.display_name)
-
-            # only role
-            if option_only_role:
-                out_members = [m for m in out_members if len(m.roles) == 2]
 
             # embed output
             if not option_output_mentions_only:
