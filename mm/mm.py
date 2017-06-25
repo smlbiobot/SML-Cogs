@@ -77,6 +77,8 @@ class MemberManagement:
             RACF specific option. Equivalent to typing Member -Alpha -Bravo -Charlie -Delta -Echo -Foxtrot -Golf -Hotel
         --list
             Display as inline list
+        --only-role
+            Check member has one and exactly one role
         --everyone
             Include everyone
         """
@@ -91,6 +93,7 @@ class MemberManagement:
         option_sort_alpha = "--sort-alpha" in args
         option_csv = "--csv" in args
         option_list = "--list" in args
+        option_only_role = "--only-role" in args
 
         server = ctx.message.server
         server_roles_names = [r.name.lower() for r in server.roles]
@@ -166,6 +169,10 @@ class MemberManagement:
             if option_sort_alpha:
                 out_members = list(out_members)
                 out_members.sort(key=lambda x: x.display_name)
+
+            # only role
+            if option_only_role:
+                out_members = [m for m in out_members if len(m.roles) == 2]
 
             # embed output
             if not option_output_mentions_only:
