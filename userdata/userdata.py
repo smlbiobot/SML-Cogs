@@ -118,7 +118,7 @@ class UserData:
         self.settings[server.id]["fields"] = sorted(
             self.settings[server.id]["fields"])
         await self.bot.say(
-            "List of fields udpated: {}".format(
+            "List of fields updated: {}".format(
                 ", ".join(self.settings[server.id]["fields"])))
         dataIO.save_json(JSON, self.settings)
 
