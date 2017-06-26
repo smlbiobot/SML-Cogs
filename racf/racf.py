@@ -178,6 +178,9 @@ class RACF:
 
         Example: !bschangeclan BS-Delta
         """
+        if clan is None:
+            await send_cmd_help(ctx)
+            return
         if not clan.lower().startswith(BS_CLANS_PREFIX.lower()):
             clan = BS_CLANS_PREFIX + clan
         clans = [c.lower() for c in BS_CLANS]
