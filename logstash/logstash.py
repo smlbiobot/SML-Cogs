@@ -369,11 +369,11 @@ class Logstash:
             if len(before.roles) > len(after.roles):
                 roles_removed = set(before.roles) - set(after.roles)
                 extra['role_update'] = 'remove'
-                extra['role_removed'] = [self.get_role_params(r) for r in roles_removed][0]
+                extra['roles_removed'] = [self.get_role_params(r) for r in roles_removed]
             else:
                 roles_added = set(after.roles) - set(before.roles)
                 extra['role_update'] = 'add'
-                extra['role_added'] = [self.get_role_params(r) for r in roles_added][0]
+                extra['roles_added'] = [self.get_role_params(r) for r in roles_added]
 
             self.log_discord_event(event_key='member.update.roles', extra=extra)
 
