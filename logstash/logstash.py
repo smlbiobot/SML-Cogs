@@ -193,6 +193,9 @@ class Logstash:
             'id': channel.id,
             'name': channel.name,
             'server': self.get_server_params(channel.server),
+            'position': channel.position,
+            'is_default': channel.is_default,
+            'created_at': channel.created_at.isoformat(),
             'type': {
                 'text': channel.type == ChannelType.text,
                 'voice': channel.type == ChannelType.voice,
@@ -302,19 +305,13 @@ class Logstash:
         """Return event name used in logger."""
         return "discord.logger.{}".format(name)
 
-
     def log_command(self, command, ctx):
         """Log bot commands."""
-        if not self.extra:
-            return
-        extra = self.extra.copy()
-        event_key = "command"
         extra = {
-            'discord_event': event_key,
-            'command_name': command.name
+            'name': command.name
         }
         extra.update(self.get_sca_params(ctx.message))
-        self.logger.info(self.get_event_key(event_key), extra=extra)
+        self.log_discord_event("command", extra)
 
     def log_emojis(self, message: Message):
         """Log emoji uses."""
@@ -434,6 +431,7 @@ class Logstash:
         self.log_players()
         self.log_uptime()
         self.log_server_roles()
+        self.log_server_channels()
 
     def log_servers(self):
         """Log servers."""
@@ -454,16 +452,11 @@ class Logstash:
 
     def log_channels(self):
         """Log channels."""
-        if not self.extra:
-            return
         channels = list(self.bot.get_all_channels())
-        event_key = 'all_channels'
-        extra = self.extra.copy()
-        extra.update({
-            'discord_gauge': event_key,
+        extra = {
             'channel_count': len(channels)
-        })
-        self.logger.info(self.get_event_key(event_key), extra=extra)
+        }
+        self.log_discord_gauge('all_channels', extra=extra)
 
         # individual channels
         for channel in channels:
@@ -471,39 +464,26 @@ class Logstash:
 
     def log_channel(self, channel: Channel):
         """Log one channel."""
-        event_key = 'channel'
-        extra = self.extra.copy()
-        extra['discord_gauge'] = event_key
-        extra['channel'] = self.get_channel_params(channel)
-        self.logger.info(self.get_event_key(event_key), extra=extra)
+        extra = {'channel': self.get_channel_params(channel)}
+        self.log_discord_gauge('channel', extra=extra)
 
     def log_members(self):
         """Log members."""
-        if not self.extra:
-            return
-
-        # all members
         members = list(self.bot.get_all_members())
         unique = set(m.id for m in members)
-        event_key = 'all_members'
-        extra = self.extra.copy()
-        extra.update({
-            'discord_gauge': event_key,
+        extra = {
             'member_count': len(members),
             'unique_member_count': len(unique)
-        })
-        self.logger.info(self.get_event_key(event_key), extra=extra)
+        }
+        self.log_discord_gauge('all_members', extra=extra)
 
         for member in members:
             self.log_member(member)
 
     def log_member(self, member: Member):
         """Log member."""
-        extra = self.extra.copy()
-        event_key = 'member'
-        extra['discord_gauge'] = event_key
-        extra['member'] = self.get_member_params(member)
-        self.logger.info(self.get_event_key(event_key), extra=extra)
+        extra = {'member': self.get_member_params(member)}
+        self.log_discord_gauge('member', extra=extra)
 
     def log_voice(self):
         """Log voice channels."""
@@ -537,6 +517,21 @@ class Logstash:
                 extra['roles'].append(role_params)
 
             self.log_discord_gauge('server.roles', extra)
+
+    def log_server_channels(self):
+        """Log server channels."""
+        for server in self.bot.servers:
+            extra = {
+                'server': self.get_server_params(server),
+                'channels': []
+            }
+            channels = sorted(server.channels, key=lambda x:x.position)
+
+            for channel in channels:
+                extra['channels'].append(self.get_channel_params(channel))
+
+            self.log_discord_gauge('server.channels', extra)
+
 
 def check_folder():
     """Check folder."""
