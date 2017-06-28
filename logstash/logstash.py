@@ -152,7 +152,7 @@ class Logstash:
         """Return server, channel and author from message."""
         return message.server, message.channel, message.author
 
-    def get_extra_server(self, server: Server):
+    def get_server_params(self, server: Server):
         """Return extra fields for server."""
         extra = {
             'id': server.id,
@@ -160,12 +160,12 @@ class Logstash:
         }
         return extra
 
-    def get_extra_channel(self, channel: Channel):
+    def get_channel_params(self, channel: Channel):
         """Return extra fields for channel."""
         extra = {
             'id': channel.id,
             'name': channel.name,
-            'server': self.get_extra_server(channel.server),
+            'server': self.get_server_params(channel.server),
             'type': {
                 'text': channel.type == ChannelType.text,
                 'voice': channel.type == ChannelType.voice,
@@ -175,7 +175,7 @@ class Logstash:
         }
         return extra
 
-    def get_extra_member(self, member: Member):
+    def get_member_params(self, member: Member):
         """Return data for member."""
         extra = {
             'name': member.display_name,
@@ -188,13 +188,13 @@ class Logstash:
         if isinstance(member, Member):
             extra.update({
                 'status': self.get_extra_status(member.status),
-                'game': self.get_extra_game(member.game),
-                'top_role': self.get_extra_role(member.top_role),
+                'game': self.get_game_params(member.game),
+                'top_role': self.get_role_params(member.top_role),
                 'joined_at': member.joined_at.isoformat()
             })
 
         if hasattr(member, 'server'):
-            extra['server'] = self.get_extra_server(member.server)
+            extra['server'] = self.get_server_params(member.server)
 
             # message sometimes reference a user and has no roles info
             if hasattr(member, 'roles'):
@@ -209,7 +209,7 @@ class Logstash:
 
         return extra
 
-    def get_extra_role(self, role: Role):
+    def get_role_params(self, role: Role):
         """Return data for role."""
         extra = {
             'name': role.name,
@@ -228,7 +228,7 @@ class Logstash:
         }
         return extra
 
-    def get_extra_game(self, game: Game):
+    def get_game_params(self, game: Game):
         """Return ata for game."""
         if game is None:
             return None
@@ -239,7 +239,7 @@ class Logstash:
         }
         return extra
 
-    def get_extra_sca(self, message: Message):
+    def get_sca_params(self, message: Message):
         """Return extra fields from messages."""
         server = message.server
         channel = message.channel
@@ -248,13 +248,13 @@ class Logstash:
         extra = {}
 
         if author is not None:
-            extra['author'] = self.get_extra_member(author)
+            extra['author'] = self.get_member_params(author)
 
         if channel is not None:
-            extra['channel'] = self.get_extra_channel(channel)
+            extra['channel'] = self.get_channel_params(channel)
 
         if server is not None:
-            extra['server'] = self.get_extra_server(server)
+            extra['server'] = self.get_server_params(server)
 
         return extra
 
@@ -268,7 +268,7 @@ class Logstash:
             'mention_ids': ids
         }
 
-    def get_extra_emojis(self, message: Message):
+    def get_emojis_params(self, message: Message):
         """Return list of emojis used in messages."""
         emojis = []
         emojis.append(EMOJI_P.findall(message.content))
@@ -292,7 +292,7 @@ class Logstash:
             'discord_event': event_key,
             'command_name': command.name
         }
-        extra.update(self.get_extra_sca(ctx.message))
+        extra.update(self.get_sca_params(ctx.message))
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_emojis(self, message: Message):
@@ -317,8 +317,8 @@ class Logstash:
             extra = self.extra.copy()
             event_key = 'member.update.roles'
             extra['discord_event'] = event_key
-            extra['before'] = self.get_extra_member(before)
-            extra['after'] = self.get_extra_member(after)
+            extra['before'] = self.get_member_params(before)
+            extra['after'] = self.get_member_params(after)
             self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_message(self, message: Message):
@@ -332,7 +332,7 @@ class Logstash:
             'discord_event': event_key,
             'content': message.content
         }
-        extra.update(self.get_extra_sca(message))
+        extra.update(self.get_sca_params(message))
         extra.update(self.get_extra_mentions(message))
         # extra.update(self.get_extra_emojis(message))
         self.logger.info(self.get_event_key(event_key), extra=extra)
@@ -348,7 +348,7 @@ class Logstash:
             'discord_event': event_key,
             'content': message.content
         }
-        extra.update(self.get_extra_sca(message))
+        extra.update(self.get_sca_params(message))
         extra.update(self.get_extra_mentions(message))
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
@@ -363,10 +363,10 @@ class Logstash:
             'discord_event': event_key,
         }
         before_extra = {'content': before.content}
-        before_extra.update(self.get_extra_sca(before))
+        before_extra.update(self.get_sca_params(before))
         before_extra.update(self.get_extra_mentions(before))
         after_extra = {'content': after.content}
-        after_extra.update(self.get_extra_sca(after))
+        after_extra.update(self.get_sca_params(after))
         after_extra.update(self.get_extra_mentions(after))
         extra.update({
             'before': before_extra,
@@ -397,7 +397,7 @@ class Logstash:
         })
         servers_data = []
         for server in servers:
-            servers_data.append(self.get_extra_server(server))
+            servers_data.append(self.get_server_params(server))
         extra['servers'] = servers_data
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
@@ -423,7 +423,7 @@ class Logstash:
         event_key = 'channel'
         extra = self.extra.copy()
         extra['discord_gauge'] = event_key
-        extra['channel'] = self.get_extra_channel(channel)
+        extra['channel'] = self.get_channel_params(channel)
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_members(self):
@@ -451,7 +451,7 @@ class Logstash:
         extra = self.extra.copy()
         event_key = 'member'
         extra['discord_gauge'] = event_key
-        extra['member'] = self.get_extra_member(member)
+        extra['member'] = self.get_member_params(member)
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_voice(self):
@@ -483,8 +483,8 @@ class Logstash:
 
                 extra = self.extra.copy()
                 extra['discord_gauge'] = event_key
-                extra['server'] = self.get_extra_server(server)
-                extra['role'] = self.get_extra_role(role)
+                extra['server'] = self.get_server_params(server)
+                extra['role'] = self.get_role_params(role)
                 extra['role']['count'] = count
                 extra['role']['hierachy_index'] = index
 
