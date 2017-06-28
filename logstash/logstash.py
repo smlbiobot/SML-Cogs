@@ -27,6 +27,7 @@ import re
 import logging
 import logstash
 import asyncio
+from datetime import timedelta
 
 from __main__ import send_cmd_help
 from cogs.utils import checks
@@ -45,7 +46,7 @@ from discord.ext.commands import Context
 
 HOST = 'localhost'
 PORT = 5959
-INTERVAL = 3600
+INTERVAL = timedelta(hours=4).seconds
 DB_PATH = os.path.join('data', 'logstash', 'logstash.db')
 
 PATH = os.path.join('data', 'logstash')
@@ -319,6 +320,32 @@ class Logstash:
         extra.update(self.get_extra_mentions(message))
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
+    async def on_message_edit(self, before: Message, after: Message):
+        """Track message editing."""
+        self.log_message_edit(before, after)
+
+    def log_message_edit(self, before: Message, after: Message):
+        """Log message diting."""
+        if not self.extra:
+            return
+        extra = self.extra.copy()
+        event_key = "message.edit"
+
+        extra = {
+            'discord_event': event_key,
+        }
+        before_extra = {'content': before.content}
+        before_extra.update(self.get_extra_sca(before))
+        before_extra.update(self.get_extra_mentions(before))
+        after_extra = {'content': after.content}
+        after_extra.update(self.get_extra_sca(after))
+        after_extra.update(self.get_extra_mentions(after))
+        extra.update({
+            'before': before_extra,
+            'after': after_extra
+        })
+        self.logger.info(self.get_event_key(event_key), extra=extra)
+
     async def on_member_update(self, before: Member, after: Member):
         """Called when a Member updates their profile.
 
@@ -457,16 +484,6 @@ class Logstash:
                 extra['role'] = self.get_extra_role(role)
                 extra['role']['count'] = count
                 extra['role']['hierachy_index'] = index
-
-                # extra.update({
-                #     'discord_gauge': event_key,
-                #     'server_id': server.id,
-                #     'server_name': server.name,
-                #     'role_name': role.name,
-                #     'role_id': role.id,
-                #     'role_count': count,
-                #     'role_hiearchy_index': index
-                # })
 
                 self.logger.info(self.get_event_key(event_key), extra=extra)
 
