@@ -345,9 +345,9 @@ class Logstash:
 
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
-        pp = pprint.PrettyPrinter(indent=4)
-        pp.pprint(self.get_event_key(event_key))
-        pp.pprint(extra)
+        # pp = pprint.PrettyPrinter(indent=4)
+        # pp.pprint(self.get_event_key(event_key))
+        # pp.pprint(extra)
 
     def log_channel_create(self, channel: Channel):
         """Log channel creation."""
@@ -375,66 +375,37 @@ class Logstash:
                 extra['role_update'] = 'add'
                 extra['roles_added'] = [self.get_role_params(r) for r in roles_added]
 
-            self.log_discord_event(event_key='member.update.roles', extra=extra)
+            self.log_discord_event('member.update.roles', extra)
 
     def log_member_remove(self, member: Member):
         """Log member leaving the server."""
-        extra = self.extra.copy()
+        extra = {}
         extra['member'] = self.get_member_params(member)
         self.log_discord_event("member.remove", extra)
 
     def log_message(self, message: Message):
         """Log message."""
-        if not self.extra:
-            return
-        extra = self.extra.copy()
-        event_key = "message"
-
-        extra = {
-            'discord_event': event_key,
-            'content': message.content
-        }
+        extra = {'content': message.content}
         extra.update(self.get_sca_params(message))
         extra.update(self.get_extra_mentions(message))
-        # extra.update(self.get_extra_emojis(message))
-        self.logger.info(self.get_event_key(event_key), extra=extra)
+        self.log_discord_event('message', extra)
 
     def log_message_delete(self, message: Message):
         """Log deleted message."""
-        if not self.extra:
-            return
-        extra = self.extra.copy()
-        event_key = "message.delete"
-
-        extra = {
-            'discord_event': event_key,
-            'content': message.content
-        }
+        extra = {'content': message.content}
         extra.update(self.get_sca_params(message))
         extra.update(self.get_extra_mentions(message))
-        self.logger.info(self.get_event_key(event_key), extra=extra)
+        self.log_discord_event('message.delete', extra)
 
     def log_message_edit(self, before: Message, after: Message):
-        """Log message diting."""
-        if not self.extra:
-            return
-        extra = self.extra.copy()
-        event_key = "message.edit"
-
+        """Log message editing."""
         extra = {
-            'discord_event': event_key,
+            'content_before': before.content,
+            'content_after': after.content
         }
-        before_extra = {'content': before.content}
-        before_extra.update(self.get_sca_params(before))
-        before_extra.update(self.get_extra_mentions(before))
-        after_extra = {'content': after.content}
-        after_extra.update(self.get_sca_params(after))
-        after_extra.update(self.get_extra_mentions(after))
-        extra.update({
-            'before': before_extra,
-            'after': after_extra
-        })
-        self.logger.info(self.get_event_key(event_key), extra=extra)
+        extra.update(self.get_sca_params(after))
+        extra.update(self.get_extra_mentions(after))
+        self.log_discord_event('message.edit', extra)
 
     def log_all(self):
         """Log all gauge values."""
