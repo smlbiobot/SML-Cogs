@@ -22,16 +22,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
+import logging
 import os
 import re
-import logging
-import logstash
-import asyncio
 from datetime import timedelta
 
+import logstash
 from __main__ import send_cmd_help
-from cogs.utils import checks
-from cogs.utils.dataIO import dataIO
 from discord import Channel
 from discord import ChannelType
 from discord import Game
@@ -43,6 +41,9 @@ from discord import Status
 from discord.ext import commands
 from discord.ext.commands import Command
 from discord.ext.commands import Context
+
+from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
 
 HOST = 'localhost'
 PORT = 5959
@@ -59,6 +60,7 @@ UEMOJI_P = re.compile(u'['
                       u'\uD83C-\uDBFF\uDC00-\uDFFF'
                       u'\u2600-\u26FF\u2700-\u27BF]{1,2}',
                       re.UNICODE)
+
 
 class Logstash:
     """Send activity of Discord using Google Analytics."""
@@ -114,6 +116,38 @@ class Logstash:
         self.log_all()
         await self.bot.say("Logged all.")
 
+    async def on_message(self, message: Message):
+        """Track on message."""
+        self.log_message(message)
+        # self.log_emojis(message)
+
+    async def on_command(self, command: Command, ctx: Context):
+        """Track command usage."""
+        self.log_command(command, ctx)
+
+    async def on_message_delete(self, message: Message):
+        """Track message deletion."""
+        self.log_message_delete(message)
+
+    async def on_message_edit(self, before: Message, after: Message):
+        """Track message editing."""
+        self.log_message_edit(before, after)
+
+    async def on_member_update(self, before: Member, after: Member):
+        """Called when a Member updates their profile.
+
+        Only track status after.
+        """
+        self.log_member_update(before, after)
+
+    async def on_ready(self):
+        """Bot ready."""
+        self.log_all()
+
+    async def on_resume(self):
+        """Bot resume."""
+        self.log_all()
+
     def get_message_sca(self, message: Message):
         """Return server, channel and author from message."""
         return message.server, message.channel, message.author
@@ -159,7 +193,7 @@ class Logstash:
                 'joined_at': member.joined_at.isoformat()
             })
 
-        if member.server is not None:
+        if hasattr(member, 'server'):
             extra['server'] = self.get_extra_server(member.server)
 
             # message sometimes reference a user and has no roles info
@@ -247,25 +281,18 @@ class Logstash:
         """Return event name used in logger."""
         return "discord.logger.{}".format(name)
 
-    async def on_message(self, message: Message):
-        """Track on message."""
-        self.log_message(message)
-        # self.log_emojis(message)
 
-    def log_message(self, message: Message):
-        """Log message."""
+    def log_command(self, command, ctx):
+        """Log bot commands."""
         if not self.extra:
             return
         extra = self.extra.copy()
-        event_key = "message"
-
+        event_key = "command"
         extra = {
             'discord_event': event_key,
-            'content': message.content
+            'command_name': command.name
         }
-        extra.update(self.get_extra_sca(message))
-        extra.update(self.get_extra_mentions(message))
-        # extra.update(self.get_extra_emojis(message))
+        extra.update(self.get_extra_sca(ctx.message))
         self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_emojis(self, message: Message):
@@ -284,26 +311,31 @@ class Logstash:
             }
             self.logger.info(self.get_event_key(event_key), extra=extra)
 
-    async def on_command(self, command: Command, ctx: Context):
-        """Track command usage."""
-        self.log_command(command, ctx)
+    def log_member_update(self, before: Member, after: Member):
+        """Track member’s updated status."""
+        if set(before.roles) != set(after.roles):
+            extra = self.extra.copy()
+            event_key = 'member.update.roles'
+            extra['discord_event'] = event_key
+            extra['before'] = self.get_extra_member(before)
+            extra['after'] = self.get_extra_member(after)
+            self.logger.info(self.get_event_key(event_key), extra=extra)
 
-    def log_command(self, command, ctx):
-        """Log bot commands."""
+    def log_message(self, message: Message):
+        """Log message."""
         if not self.extra:
             return
         extra = self.extra.copy()
-        event_key = "command"
+        event_key = "message"
+
         extra = {
             'discord_event': event_key,
-            'command_name': command.name
+            'content': message.content
         }
-        extra.update(self.get_extra_sca(ctx.message))
+        extra.update(self.get_extra_sca(message))
+        extra.update(self.get_extra_mentions(message))
+        # extra.update(self.get_extra_emojis(message))
         self.logger.info(self.get_event_key(event_key), extra=extra)
-
-    async def on_message_delete(self, message: Message):
-        """Track message deletion."""
-        self.log_message_delete(message)
 
     def log_message_delete(self, message: Message):
         """Log deleted message."""
@@ -319,10 +351,6 @@ class Logstash:
         extra.update(self.get_extra_sca(message))
         extra.update(self.get_extra_mentions(message))
         self.logger.info(self.get_event_key(event_key), extra=extra)
-
-    async def on_message_edit(self, before: Message, after: Message):
-        """Track message editing."""
-        self.log_message_edit(before, after)
 
     def log_message_edit(self, before: Message, after: Message):
         """Log message diting."""
@@ -345,31 +373,6 @@ class Logstash:
             'after': after_extra
         })
         self.logger.info(self.get_event_key(event_key), extra=extra)
-
-    async def on_member_update(self, before: Member, after: Member):
-        """Called when a Member updates their profile.
-
-        Only track status after.
-        """
-        self.log_member_update(before, after)
-
-    def log_member_update(self, before: Member, after: Member):
-        """Track member’s updated status."""
-        if set(before.roles) != set(after.roles):
-            extra = self.extra.copy()
-            event_key = 'member.update.roles'
-            extra['discord_event'] = event_key
-            extra['before'] = self.get_extra_member(before)
-            extra['after'] = self.get_extra_member(after)
-            self.logger.info(self.get_event_key(event_key), extra=extra)
-
-    async def on_ready(self):
-        """Bot ready."""
-        self.log_all()
-
-    async def on_resume(self):
-        """Bot resume."""
-        self.log_all()
 
     def log_all(self):
         """Log all gauge values."""
