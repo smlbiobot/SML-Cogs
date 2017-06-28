@@ -99,7 +99,7 @@ class Logstash:
             'bot_id': self.bot.user.id,
             'bot_name': self.bot.user.name
         }
-        self.log_all()
+        self.log_all_gauges()
         await asyncio.sleep(INTERVAL)
         if self is self.bot.get_cog('Logstash'):
             self.task = self.bot.loop.create_task(self.loop_task())
@@ -114,7 +114,7 @@ class Logstash:
     @logstash.command(name="all", pass_context=True)
     async def logstash_all(self):
         """Send all stats."""
-        self.log_all()
+        self.log_all_gauges()
         await self.bot.say("Logged all.")
 
     @logstash.command(name="debug", pass_context=True)
@@ -127,14 +127,22 @@ class Logstash:
         self.log_discord_event(event_key="discord.debug", extra=extra)
         await self.bot.say("logstash debug")
 
-    async def on_message(self, message: Message):
-        """Track on message."""
-        self.log_message(message)
-        # self.log_emojis(message)
+    async def on_channel_create(self, channel: Channel):
+        """Track channel creation."""
+        self.log_channel_create(channel)
+
+    async def on_channel_delete(self, channel: Channel):
+        """Track channel deletion."""
+        self.log_channel_delete(channel)
 
     async def on_command(self, command: Command, ctx: Context):
         """Track command usage."""
         self.log_command(command, ctx)
+
+    async def on_message(self, message: Message):
+        """Track on message."""
+        self.log_message(message)
+        # self.log_emojis(message)
 
     async def on_message_delete(self, message: Message):
         """Track message deletion."""
@@ -161,11 +169,11 @@ class Logstash:
 
     async def on_ready(self):
         """Bot ready."""
-        self.log_all()
+        self.log_all_gauges()
 
     async def on_resume(self):
         """Bot resume."""
-        self.log_all()
+        self.log_all_gauges()
 
     def get_message_sca(self, message: Message):
         """Return server, channel and author from message."""
@@ -214,17 +222,9 @@ class Logstash:
 
         if hasattr(member, 'server'):
             extra['server'] = self.get_server_params(member.server)
-
             # message sometimes reference a user and has no roles info
             if hasattr(member, 'roles'):
-                roles = []
-                for r in member.server.role_hierarchy:
-                    if r in member.roles:
-                        roles.append({
-                            'id': r.id,
-                            'name': r.name
-                        })
-                extra['roles'] = roles
+                extra['roles'] = [self.get_role_params(r) for r in member.server.role_hierarchy if r in member.roles]
 
         return extra
 
@@ -279,7 +279,7 @@ class Logstash:
 
         return extra
 
-    def get_extra_mentions(self, message: Message):
+    def get_mentions_extra(self, message: Message):
         """Return mentions in message."""
         mentions = set(message.mentions.copy())
         names = [m.display_name for m in mentions]
@@ -332,26 +332,43 @@ class Logstash:
             }
             self.logger.info(self.get_event_key(event_key), extra=extra)
 
-    def log_discord_event(self, event_key=None, extra=None):
-        """Log Discord events."""
-        if event_key is None:
+    def log_discord(self, key=None, is_event=False, is_gauge=False, extra=None):
+        """Log Discord logs"""
+        if key is None:
             return
         if self.extra is None:
             return
         if extra is None:
             extra = {}
         extra.update(self.extra.copy())
-        extra['discord_event'] = event_key
+        if is_event:
+            extra['discord_event'] = key
+        if is_gauge:
+            extra['discord_gauge'] = key
 
-        self.logger.info(self.get_event_key(event_key), extra=extra)
+        self.logger.info(self.get_event_key(key), extra=extra)
 
-        # pp = pprint.PrettyPrinter(indent=4)
-        # pp.pprint(self.get_event_key(event_key))
-        # pp.pprint(extra)
+    def log_discord_event(self, key=None, extra=None):
+        """Log Discord events."""
+        self.log_discord(key=key, is_event=True, extra=extra)
+
+    def log_discord_gauge(self, key=None, extra=None):
+        """Log Discord events."""
+        self.log_discord(key=key, is_gauge=True, extra=extra)
 
     def log_channel_create(self, channel: Channel):
         """Log channel creation."""
-        extra = self.extra
+        extra = {
+            'channel': self.get_channel_params(channel)
+        }
+        self.log_discord_event("channel.create", extra)
+
+    def log_channel_delete(self, channel: Channel):
+        """Log channel deletion."""
+        extra = {
+            'channel': self.get_channel_params(channel)
+        }
+        self.log_discord_event("channel.delete", extra)
 
     def log_member_join(self, member: Member):
         """Log member joining the server."""
@@ -379,22 +396,23 @@ class Logstash:
 
     def log_member_remove(self, member: Member):
         """Log member leaving the server."""
-        extra = {}
-        extra['member'] = self.get_member_params(member)
+        extra = {
+            'member': self.get_member_params(member)
+        }
         self.log_discord_event("member.remove", extra)
 
     def log_message(self, message: Message):
         """Log message."""
         extra = {'content': message.content}
         extra.update(self.get_sca_params(message))
-        extra.update(self.get_extra_mentions(message))
+        extra.update(self.get_mentions_extra(message))
         self.log_discord_event('message', extra)
 
     def log_message_delete(self, message: Message):
         """Log deleted message."""
         extra = {'content': message.content}
         extra.update(self.get_sca_params(message))
-        extra.update(self.get_extra_mentions(message))
+        extra.update(self.get_mentions_extra(message))
         self.log_discord_event('message.delete', extra)
 
     def log_message_edit(self, before: Message, after: Message):
@@ -404,10 +422,10 @@ class Logstash:
             'content_after': after.content
         }
         extra.update(self.get_sca_params(after))
-        extra.update(self.get_extra_mentions(after))
+        extra.update(self.get_mentions_extra(after))
         self.log_discord_event('message.edit', extra)
 
-    def log_all(self):
+    def log_all_gauges(self):
         """Log all gauge values."""
         self.log_servers()
         self.log_channels()
@@ -501,12 +519,10 @@ class Logstash:
 
     def log_server_roles(self):
         """Log server roles."""
-        if not self.extra:
-            return
-
-        event_key = 'server.roles'
-
         for server in self.bot.servers:
+            extra = {}
+            extra['server'] = self.get_server_params(server)
+            extra['roles'] = []
 
             roles = server.role_hierarchy
 
@@ -514,15 +530,13 @@ class Logstash:
             for index, role in enumerate(roles):
                 count = sum([1 for m in server.members if role in m.roles])
 
-                extra = self.extra.copy()
-                extra['discord_gauge'] = event_key
-                extra['server'] = self.get_server_params(server)
-                extra['role'] = self.get_role_params(role)
-                extra['role']['count'] = count
-                extra['role']['hierachy_index'] = index
+                role_params = self.get_role_params(role)
+                role_params['count'] = count
+                role_params['hierachy_index'] = index
 
-                self.logger.info(self.get_event_key(event_key), extra=extra)
+                extra['roles'].append(role_params)
 
+            self.log_discord_gauge('server.roles', extra)
 
 def check_folder():
     """Check folder."""
