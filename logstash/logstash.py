@@ -26,6 +26,7 @@ import asyncio
 import logging
 import os
 import re
+import pprint
 from datetime import timedelta
 
 import logstash
@@ -116,6 +117,16 @@ class Logstash:
         self.log_all()
         await self.bot.say("Logged all.")
 
+    @logstash.command(name="debug", pass_context=True)
+    async def logstash_debug(self, ctx, *, msg):
+        """Send debug event."""
+        extra = {
+            'debug': 'debug',
+            'debug_message': msg
+        }
+        self.log_discord_event(event_key="discord.debug", extra=extra)
+        await self.bot.say("logstash debug")
+
     async def on_message(self, message: Message):
         """Track on message."""
         self.log_message(message)
@@ -133,12 +144,20 @@ class Logstash:
         """Track message editing."""
         self.log_message_edit(before, after)
 
+    async def on_member_join(self, member: Member):
+        """Track members joining server."""
+        self.log_member_join(member)
+
     async def on_member_update(self, before: Member, after: Member):
         """Called when a Member updates their profile.
 
         Only track status after.
         """
         self.log_member_update(before, after)
+
+    async def on_member_remove(self, member: Member):
+        """Track members leaving server."""
+        self.log_member_remove(member)
 
     async def on_ready(self):
         """Bot ready."""
@@ -211,6 +230,8 @@ class Logstash:
 
     def get_role_params(self, role: Role):
         """Return data for role."""
+        if not role:
+            return {}
         extra = {
             'name': role.name,
             'id': role.id
@@ -231,7 +252,7 @@ class Logstash:
     def get_game_params(self, game: Game):
         """Return ata for game."""
         if game is None:
-            return None
+            return {}
         extra = {
             'name': game.name,
             'url': game.url,
@@ -311,15 +332,56 @@ class Logstash:
             }
             self.logger.info(self.get_event_key(event_key), extra=extra)
 
+    def log_discord_event(self, event_key=None, extra=None):
+        """Log Discord events."""
+        if event_key is None:
+            return
+        if self.extra is None:
+            return
+        if extra is None:
+            extra = {}
+        extra.update(self.extra.copy())
+        extra['discord_event'] = event_key
+
+        self.logger.info(self.get_event_key(event_key), extra=extra)
+
+        pp = pprint.PrettyPrinter(indent=4)
+        pp.pprint(self.get_event_key(event_key))
+        pp.pprint(extra)
+
+    def log_channel_create(self, channel: Channel):
+        """Log channel creation."""
+        extra = self.extra
+
+    def log_member_join(self, member: Member):
+        """Log member joining the server."""
+        extra = {
+            'member': self.get_member_params(member)
+        }
+        self.log_discord_event("member.join", extra)
+
     def log_member_update(self, before: Member, after: Member):
         """Track member’s updated status."""
         if set(before.roles) != set(after.roles):
-            extra = self.extra.copy()
-            event_key = 'member.update.roles'
-            extra['discord_event'] = event_key
-            extra['before'] = self.get_member_params(before)
-            extra['after'] = self.get_member_params(after)
-            self.logger.info(self.get_event_key(event_key), extra=extra)
+            extra = {
+                'member': self.get_member_params(after)
+            }
+            if len(before.roles) > len(after.roles):
+                roles_removed = set(before.roles) - set(after.roles)
+                extra['role_update'] = 'remove'
+                extra['role_removed'] = [self.get_role_params(r) for r in roles_removed][0]
+            else:
+                roles_added = set(after.roles) - set(before.roles)
+                extra['role_update'] = 'add'
+                extra['role_added'] = [self.get_role_params(r) for r in roles_added][0]
+
+            self.log_discord_event(event_key='member.update.roles', extra=extra)
+
+    def log_member_remove(self, member: Member):
+        """Log member leaving the server."""
+        extra = self.extra.copy()
+        extra['member'] = self.get_member_params(member)
+        self.log_discord_event("member.remove", extra)
 
     def log_message(self, message: Message):
         """Log message."""
