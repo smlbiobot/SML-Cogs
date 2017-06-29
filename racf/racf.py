@@ -655,6 +655,31 @@ class RACF:
             await self.bot.clear_reactions(message)
 
     @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
+    async def addreaction(self, ctx, message_id, *emojis):
+        """Add reactions to a message by message id"""
+        channel = ctx.message.channel
+        try:
+            message = await self.bot.get_message(channel, message_id)
+        except discord.NotFound:
+            await self.bot.say("Cannot find message with that id.")
+            return
+        for emoji in emojis:
+            try:
+                await self.bot.add_reaction(message, emoji)
+            except discord.HTTPException:
+                # reaction add failed
+                pass
+            except discord.Forbidden:
+                await self.bot.say("I don’t have permission to react to that message.")
+                break
+            except discord.InvalidArgument:
+                await self.bot.say("Invalid arguments for emojis")
+                break
+
+        await self.bot.delete_message(ctx.message)
+
+    @commands.command(pass_context=True, no_pm=True)
     async def toggleheist(self, ctx: Context):
         """Self-toggle heist role."""
         author = ctx.message.author
