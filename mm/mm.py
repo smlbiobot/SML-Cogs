@@ -298,7 +298,7 @@ class MemberManagement:
         results = []
         for member in server.members:
             for member_name in [member.display_name, member.name]:
-                if name in member_name:
+                if name.lower() in member_name.lower():
                     results.append(member)
                     break
 
