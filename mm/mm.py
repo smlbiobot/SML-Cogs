@@ -31,6 +31,7 @@ from random import choice
 import itertools
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
+from __main__ import send_cmd_help
 
 BOTCOMMANDER_ROLE = ["Bot Commander", "High-Elder"]
 
@@ -284,6 +285,39 @@ class MemberManagement:
                         role.name, out_roles[role.id]['count']))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
+
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def searchmember(self, ctx, name=None):
+        """Search member on server by name."""
+        if name is None:
+            await send_cmd_help(ctx)
+            return
+
+        server = ctx.message.server
+        results = []
+        for member in server.members:
+            for member_name in [member.display_name, member.name]:
+                if name in member_name:
+                    results.append(member)
+                    break
+
+        if not len(results):
+            await self.bot.say("Cannot find any users with that name.")
+            return
+
+        await self.bot.say('Found {} members.'.format(len(results)))
+
+        for member in results:
+            out = [
+                '---------------------',
+                'Display name: {}'.format(member.display_name),
+                'Username: {}'.format(str(member)),
+                'Roles: {}'.format(', '.join([r.name for r in member.roles if not r.is_everyone])),
+                'id: {}'.format(member.id)
+            ]
+            await self.bot.say('\n'.join(out))
+
 
 
 def setup(bot):
