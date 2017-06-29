@@ -205,6 +205,17 @@ class Logstash:
         }
         return extra
 
+    def get_server_channel_params(self, channel: Channel):
+        """Return digested version of channel params"""
+        extra = {
+            'id': channel.id,
+            'name': channel.name,
+            'position': channel.position,
+            'is_default': channel.is_default,
+            'created_at': channel.created_at.isoformat(),
+        }
+        return extra
+
     def get_member_params(self, member: Member):
         """Return data for member."""
         extra = {
@@ -523,12 +534,19 @@ class Logstash:
         for server in self.bot.servers:
             extra = {
                 'server': self.get_server_params(server),
-                'channels': []
+                'channels': {
+                    'text': [],
+                    'voice': []
+                }
             }
             channels = sorted(server.channels, key=lambda x:x.position)
 
             for channel in channels:
-                extra['channels'].append(self.get_channel_params(channel))
+                channel_params = self.get_server_channel_params(channel)
+                if channel.type == ChannelType.text:
+                    extra['channels']['text'].append(channel_params)
+                elif channel.type == ChannelType.voice:
+                    extra['channels']['voice'].append(channel_params)
 
             self.log_discord_gauge('server.channels', extra)
 
