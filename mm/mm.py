@@ -35,6 +35,7 @@ from __main__ import send_cmd_help
 
 BOTCOMMANDER_ROLE = ["Bot Commander", "High-Elder"]
 
+
 class MemberManagement:
     """
     Member Management plugin for Red Discord bot
@@ -43,7 +44,8 @@ class MemberManagement:
     def __init__(self, bot):
         self.bot = bot
 
-    def grouper(self, n, iterable, fillvalue=None):
+    @staticmethod
+    def grouper(n, iterable, fillvalue=None):
         """
         Helper function to split lists
 
@@ -51,7 +53,7 @@ class MemberManagement:
         grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
         """
         args = [iter(iterable)] * n
-        return ([e for e in t if e != None] for t in itertools.zip_longest(*args))
+        return ([e for e in t if e is not None] for t in itertools.zip_longest(*args))
 
     @commands.command(pass_context=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -120,7 +122,7 @@ class MemberManagement:
                 if name.lower() in server_roles_names:
                     role_args.append({'flag': flag, 'name': name.lower()})
 
-        plus  = set([r['name'] for r in role_args if r['flag'] == '+'])
+        plus = set([r['name'] for r in role_args if r['flag'] == '+'])
         minus = set([r['name'] for r in role_args if r['flag'] == '-'])
 
         # Used for output only, so it won’t mention everyone in chat
@@ -213,12 +215,14 @@ class MemberManagement:
                 for page in pagify(out, shorten_by=24):
                     await self.bot.say(box(page))
 
-    def get_member_csv(self, members):
+    @staticmethod
+    def get_member_csv(members):
         """Return members as a list."""
         names = [m.display_name for m in members]
         return ', '.join(names)
 
-    def get_member_list(self, members):
+    @staticmethod
+    def get_member_list(members):
         """Return members as a list."""
         out = []
         for m in members:
@@ -267,7 +271,7 @@ class MemberManagement:
         if len(roles):
             roles_to_list = [
                 r for r in server.roles if r.name.lower()
-                in [r2.lower() for r2 in roles]]
+                                           in [r2.lower() for r2 in roles]]
         else:
             roles_to_list = server.roles
 
@@ -317,7 +321,6 @@ class MemberManagement:
                 'id: {}'.format(member.id)
             ]
             await self.bot.say('\n'.join(out))
-
 
 
 def setup(bot):
