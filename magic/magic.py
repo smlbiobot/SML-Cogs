@@ -56,14 +56,13 @@ class Magic:
         self.magic_is_running = False
         self.hue = 0
         self.task = None
-        self.loop = None
         self.magic_role = None
         self.settings = dataIO.load_json(JSON)
         self.interval = 0.5
 
     def __unload(self):
         """Remove task when unloaded."""
-        # self.task.cancel()
+        self.task.cancel()
 
     async def change_magic_color(self, server):
         """Change magic role color."""
@@ -72,8 +71,8 @@ class Magic:
 
         server_settings = self.settings[server.id].copy()
         role_name = server_settings["role"]["name"]
-
         magic_role = discord.utils.get(server.roles, name=role_name)
+
         self.hue = self.hue + 10
         self.hue = self.hue % 360
         hex = hsluv.hsluv_to_hex((self.hue, 100, 60))
@@ -85,6 +84,8 @@ class Magic:
             server,
             magic_role,
             color=new_color)
+
+        await self.verify_members(server, magic_role)
 
         await asyncio.sleep(self.interval)
         if self.magic_is_running:
@@ -131,12 +132,9 @@ class Magic:
         member_ids = self.settings[server.id]["member_ids"]
         if member.id not in member_ids:
             member_ids.append(member.id)
-        dataIO.save_json(JSON, self.settings)
-        role_name = self.settings[server.id]["role"]["name"]
-        magic_role = discord.utils.get(server.roles, name=role_name)
-        try:
-            await self.bot.add_roles(member, magic_role)
-        except discord.errors.Forbidden:
+            dataIO.save_json(JSON, self.settings)
+        success = await self.edit_user_roles(server, member, add=True)
+        if not success:
             await self.bot.say(
                 "I don’t have permission to edit that user’s roles.")
         await self.list_magic_users(ctx)
@@ -151,12 +149,9 @@ class Magic:
         member_ids = self.settings[server.id]["member_ids"]
         if member.id in member_ids:
             member_ids.remove(member.id)
-        dataIO.save_json(JSON, self.settings)
-        role_name = self.settings[server.id]["role"]["name"]
-        magic_role = discord.utils.get(server.roles, name=role_name)
-        try:
-            await self.bot.remove_roles(member, magic_role)
-        except discord.errors.Forbidden:
+            dataIO.save_json(JSON, self.settings)
+        success = await self.edit_user_roles(server, member, remove=True)
+        if not success:
             await self.bot.say(
                 "I don’t have permission to edit that user’s roles.")
         await self.list_magic_users(ctx)
@@ -165,6 +160,20 @@ class Magic:
     async def magic_userlist(self, ctx):
         """List users permitted to have Magic."""
         await self.list_magic_users(ctx)
+
+    async def edit_user_roles(self, server, member: discord.Member, add=False, remove=False):
+        """Add or remove Magic role from user."""
+        role_name = self.settings[server.id]["role"]["name"]
+        magic_role = discord.utils.get(server.roles, name=role_name)
+        try:
+            if add:
+                await self.bot.add_roles(member, magic_role)
+                return True
+            if remove:
+                await self.bot.remove_roles(member, magic_role)
+                return True
+        except discord.errors.Forbidden:
+            return False
 
     async def list_magic_users(self, ctx):
         """List users permitted to have Magic."""
@@ -177,23 +186,25 @@ class Magic:
         else:
             await self.bot.say('None')
 
-    async def on_member_update(self, before, after):
-        """Listen for member update roles."""
-        await self.verify_member_magic(after)
+    async def verify_members(self, server, magic_role):
+        """Check members on server with the magic_role are in the permitted list."""
+        magic_members = [m for m in server.members if magic_role in m.roles]
+        for member in magic_members:
+            await self.verify_member_magic(member, magic_role)
 
-    async def verify_member_magic(self, member: discord.Member):
+    async def verify_member_magic(self, member: discord.Member, magic_role):
         """Check member is in acceptable list."""
         server = member.server
         if server.id not in self.settings:
             return
         if member.id in self.settings[server.id]["member_ids"]:
             return
-        role_name = self.settings[server.id]["role"]["name"]
-        magic_role = discord.utils.get(server.roles, name=role_name)
-        try:
-            await self.bot.remove_roles(member, magic_role)
-        except discord.errors.Forbidden:
-            pass
+
+        if magic_role in member.roles:
+            try:
+                await self.bot.remove_roles(member, magic_role)
+            except discord.errors.Forbidden:
+                pass
 
     def get_random_color(self):
         """Return a discord.Color instance of a random color."""
