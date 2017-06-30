@@ -24,16 +24,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
 import os
+
 import discord
+import hsluv
+from __main__ import send_cmd_help
 from discord.ext import commands
 from discord.ext.commands import Context
-from cogs.utils.dataIO import dataIO
+
 from cogs.utils import checks
-from random import choice
-from __main__ import send_cmd_help
-import asyncio
-import hsluv
+from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "magic")
 JSON = os.path.join(PATH, "settings.json")
@@ -205,12 +206,6 @@ class Magic:
                 await self.bot.remove_roles(member, magic_role)
             except discord.errors.Forbidden:
                 pass
-
-    def get_random_color(self):
-        """Return a discord.Color instance of a random color."""
-        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-        color = int(color, 16)
-        return discord.Color(value=color)
 
 
 def check_folder():
