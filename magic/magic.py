@@ -76,10 +76,10 @@ class Magic:
 
         self.hue = self.hue + 10
         self.hue = self.hue % 360
-        hex = hsluv.hsluv_to_hex((self.hue, 100, 60))
+        hex_ = hsluv.hsluv_to_hex((self.hue, 100, 60))
         # Remove # sign from hex
-        hex = hex[1:]
-        new_color = discord.Color(value=int(hex, 16))
+        hex_ = hex_[1:]
+        new_color = discord.Color(value=int(hex_, 16))
 
         await self.bot.edit_role(
             server,
@@ -180,7 +180,7 @@ class Magic:
         """List users permitted to have Magic."""
         server = ctx.message.server
         member_ids = self.settings[server.id]["member_ids"].copy()
-        names = [server.get_member(id).display_name for id in member_ids]
+        names = [server.get_member(mid).display_name for mid in member_ids]
         await self.bot.say("List of users permitted for Magic:")
         if len(names):
             await self.bot.say(', '.join(names))
