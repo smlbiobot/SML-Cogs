@@ -318,11 +318,12 @@ class Logstash:
 
     def log_command(self, command, ctx):
         """Log bot commands."""
-        extra = {
-            'name': command.name
-        }
-        extra.update(self.get_sca_params(ctx.message))
-        self.log_discord_event("command", extra)
+        pass
+        # extra = {
+        #     'name': command.name
+        # }
+        # extra.update(self.get_sca_params(ctx.message))
+        # self.log_discord_event("command", extra)
 
     def log_emojis(self, message: Message):
         """Log emoji uses."""

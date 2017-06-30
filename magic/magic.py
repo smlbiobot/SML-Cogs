@@ -24,14 +24,27 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import os
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
-from .utils import checks
+from cogs.utils.dataIO import dataIO
+from cogs.utils import checks
 from random import choice
 from __main__ import send_cmd_help
 import asyncio
 import hsluv
+
+PATH = os.path.join("data", "magic")
+JSON = os.path.join(PATH, "settings.json")
+
+SERVER_DEFAULTS = {
+    "role": {
+        "id": None,
+        "name": "Magic"
+    },
+    "member_ids": []
+}
 
 
 class Magic:
@@ -42,47 +55,145 @@ class Magic:
         self.bot = bot
         self.magic_is_running = False
         self.hue = 0
+        self.task = None
         self.loop = None
         self.magic_role = None
+        self.settings = dataIO.load_json(JSON)
+        self.interval = 0.5
+
+    def __unload(self):
+        """Remove task when unloaded."""
+        # self.task.cancel()
 
     async def change_magic_color(self, server):
         """Change magic role color."""
-        while self.magic_is_running:
-            magic_role = discord.utils.get(server.roles, name="Magic")
-            self.hue = self.hue + 10
-            self.hue = self.hue % 360
-            hex = hsluv.hsluv_to_hex((self.hue, 100, 60))
-            # Remove # sign from hex
-            hex = hex[1:]
-            new_color = discord.Color(value=int(hex, 16))
+        if not self.magic_is_running:
+            return
 
-            await self.bot.edit_role(
-                server,
-                magic_role,
-                color=new_color)
+        server_settings = self.settings[server.id].copy()
+        role_name = server_settings["role"]["name"]
 
-            await asyncio.sleep(0.5)
+        magic_role = discord.utils.get(server.roles, name=role_name)
+        self.hue = self.hue + 10
+        self.hue = self.hue % 360
+        hex = hsluv.hsluv_to_hex((self.hue, 100, 60))
+        # Remove # sign from hex
+        hex = hex[1:]
+        new_color = discord.Color(value=int(hex, 16))
+
+        await self.bot.edit_role(
+            server,
+            magic_role,
+            color=new_color)
+
+        await asyncio.sleep(self.interval)
+        if self.magic_is_running:
+            if self is self.bot.get_cog("Magic"):
+                self.task = self.bot.loop.create_task(
+                    self.change_magic_color(server))
 
     @commands.group(pass_context=True)
-    @checks.mod_or_permissions()
+    @checks.admin_or_permissions()
     async def magic(self, ctx: Context):
         """Magic role with ever changing username color."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @magic.command(name="init", pass_context=True)
+    async def magic_init(self, ctx):
+        """Init server settings."""
+        server = ctx.message.server
+        self.settings[server.id] = SERVER_DEFAULTS
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Initialized server with magic settings.")
+
     @magic.command(name="start", pass_context=True)
-    @checks.mod_or_permissions()
     async def magic_start(self, ctx: Context):
         """Start the magic role."""
         self.magic_is_running = True
-        self.loop = asyncio.get_event_loop()
-        self.loop.create_task(self.change_magic_color(ctx.message.server))
+        await self.bot.say("Magic started.")
+        self.task = self.bot.loop.create_task(
+            self.change_magic_color(ctx.message.server))
 
     @magic.command(name="stop", pass_context=True)
-    @checks.mod_or_permissions()
     async def magic_stop(self, ctx):
         """Stop magic role color change."""
         self.magic_is_running = False
+        await self.bot.say("Magic stopped.")
+
+    @magic.command(name="adduser", pass_context=True)
+    async def magic_adduser(self, ctx, member: discord.Member):
+        """Permit user to have the magic role."""
+        if member is None:
+            await send_cmd_help(ctx)
+            return
+        server = ctx.message.server
+        member_ids = self.settings[server.id]["member_ids"]
+        if member.id not in member_ids:
+            member_ids.append(member.id)
+        dataIO.save_json(JSON, self.settings)
+        role_name = self.settings[server.id]["role"]["name"]
+        magic_role = discord.utils.get(server.roles, name=role_name)
+        try:
+            await self.bot.add_roles(member, magic_role)
+        except discord.errors.Forbidden:
+            await self.bot.say(
+                "I don’t have permission to edit that user’s roles.")
+        await self.list_magic_users(ctx)
+
+    @magic.command(name="removeuser", pass_context=True)
+    async def magic_removeuser(self, ctx, member: discord.Member):
+        """Permit user to have the magic role."""
+        if member is None:
+            await send_cmd_help(ctx)
+            return
+        server = ctx.message.server
+        member_ids = self.settings[server.id]["member_ids"]
+        if member.id in member_ids:
+            member_ids.remove(member.id)
+        dataIO.save_json(JSON, self.settings)
+        role_name = self.settings[server.id]["role"]["name"]
+        magic_role = discord.utils.get(server.roles, name=role_name)
+        try:
+            await self.bot.remove_roles(member, magic_role)
+        except discord.errors.Forbidden:
+            await self.bot.say(
+                "I don’t have permission to edit that user’s roles.")
+        await self.list_magic_users(ctx)
+
+    @magic.command(name="userlist", pass_context=True)
+    async def magic_userlist(self, ctx):
+        """List users permitted to have Magic."""
+        await self.list_magic_users(ctx)
+
+    async def list_magic_users(self, ctx):
+        """List users permitted to have Magic."""
+        server = ctx.message.server
+        member_ids = self.settings[server.id]["member_ids"].copy()
+        names = [server.get_member(id).display_name for id in member_ids]
+        await self.bot.say("List of users permitted for Magic:")
+        if len(names):
+            await self.bot.say(', '.join(names))
+        else:
+            await self.bot.say('None')
+
+    async def on_member_update(self, before, after):
+        """Listen for member update roles."""
+        await self.verify_member_magic(after)
+
+    async def verify_member_magic(self, member: discord.Member):
+        """Check member is in acceptable list."""
+        server = member.server
+        if server.id not in self.settings:
+            return
+        if member.id in self.settings[server.id]["member_ids"]:
+            return
+        role_name = self.settings[server.id]["role"]["name"]
+        magic_role = discord.utils.get(server.roles, name=role_name)
+        try:
+            await self.bot.remove_roles(member, magic_role)
+        except discord.errors.Forbidden:
+            pass
 
     def get_random_color(self):
         """Return a discord.Color instance of a random color."""
@@ -91,51 +202,22 @@ class Magic:
         return discord.Color(value=color)
 
 
+def check_folder():
+    """Check folder."""
+    if not os.path.exists(PATH):
+        os.makedirs(PATH)
+
+
+def check_file():
+    """Check files."""
+    defaults = {}
+    if not dataIO.is_valid_json(JSON):
+        dataIO.save_json(JSON, defaults)
+
+
 def setup(bot):
-    """Add cog to bot."""
-    r = Magic(bot)
-    bot.add_cog(r)
-
-"""
-Sample code for timer events
-
-https://github.com/Rapptz/discord.py/blob/master/examples/background_task.py
-
-import discord
-import asyncio
-
-client = discord.Client()
-
-async def my_background_task():
-    await client.wait_until_ready()
-    counter = 0
-    channel = discord.Object(id='channel_id_here')
-    while not client.is_closed:
-        counter += 1
-        await client.send_message(channel, counter)
-        await asyncio.sleep(60) # task runs every 60 seconds
-
-@client.event
-async def on_ready():
-    print('Logged in as')
-    print(client.user.name)
-    print(client.user.id)
-    print('------')
-
-client.loop.create_task(my_background_task())
-client.run('token')
-
-"""
-"""
-
-https://github.com/tekulvw/Squid-Plugins/blob/master/scheduler/scheduler.py
-
-loop = asyncio.get_event_loop()
-loop.create_task(self.check())
-
-async def check(self):
-    while True:
-        # do some stuff
-        await asyncio.sleep(3600)
-
-"""
+    """Setup bot."""
+    check_folder()
+    check_file()
+    n = Magic(bot)
+    bot.add_cog(n)
