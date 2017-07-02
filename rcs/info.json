@@ -4,7 +4,7 @@
 	"DESCRIPTION": "Reddit Clan System (RCS) utility",
 	"DISABLED": false,
 	"NAME": "RCS",
-	"REQUIREMENTS": [""],
+	"REQUIREMENTS": [],
 	"TAGS": ["rcs", "utility"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
 }
