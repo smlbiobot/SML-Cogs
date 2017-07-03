@@ -37,29 +37,28 @@ BOTCOMMANDER_ROLE = ["Bot Commander", "High-Elder"]
 
 
 class MemberManagement:
-    """
-    Member Management plugin for Red Discord bot
-    """
+    """Member Management plugin for Red Discord bot."""
 
     def __init__(self, bot):
+        """Init."""
         self.bot = bot
 
     @staticmethod
     def grouper(n, iterable, fillvalue=None):
-        """
-        Helper function to split lists
+        """Helper function to split lists.
 
         Example:
         grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
         """
         args = [iter(iterable)] * n
-        return ([e for e in t if e is not None] for t in itertools.zip_longest(*args))
+        return (
+            [e for e in t if e is not None]
+            for t in itertools.zip_longest(*args))
 
     @commands.command(pass_context=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def mm(self, ctx, *args):
-        """
-        Member management command.
+        """Member management command.
 
         Get a list of users that satisfy a list of roles supplied.
 
@@ -75,9 +74,11 @@ class MemberManagement:
         --output-id
             Append a string ot user ids for the results.
         --output-mentions-only
-            Don’t display the long list and only display the list of member mentions
+            Don’t display the long list and
+            only display the list of member mentions
         --members-without-clan-tag
-            RACF specific option. Equivalent to typing Member -Alpha -Bravo -Charlie -Delta -Echo -Foxtrot -Golf -Hotel
+            RACF specific option. Equivalent to typing
+            Member -Alpha -Bravo -Charlie -Delta -Echo -Foxtrot -Golf -Hotel
         --list
             Display as inline list
         --only-role
@@ -85,13 +86,11 @@ class MemberManagement:
         --everyone
             Include everyone
         """
-
         # Extract optional arguments if exist
         option_output_mentions = "--output-mentions" in args
         option_output_id = "--output-id" in args
         option_output_mentions_only = "--output-mentions-only" in args
         option_members_without_clan_tag = "--members-without-clan-tag" in args
-        option_sort_join = "--sort-join" in args
         option_everyone = "--everyone" in args
         option_sort_alpha = "--sort-alpha" in args
         option_csv = "--csv" in args
@@ -269,9 +268,9 @@ class MemberManagement:
         out.append("__List of roles on {}__".format(server.name))
         roles_to_list = []
         if len(roles):
+            roles_lower = [r.lower() for r in roles]
             roles_to_list = [
-                r for r in server.roles if r.name.lower()
-                                           in [r2.lower() for r2 in roles]]
+                r for r in server.roles if r.name.lower() in roles_lower]
         else:
             roles_to_list = server.roles
 
@@ -317,11 +316,14 @@ class MemberManagement:
                 '---------------------',
                 'Display name: {}'.format(member.display_name),
                 'Username: {}'.format(str(member)),
-                'Roles: {}'.format(', '.join([r.name for r in member.roles if not r.is_everyone])),
+                'Roles: {}'.format(', '.join(
+                    [r.name for r in member.roles if not r.is_everyone])),
                 'id: {}'.format(member.id)
             ]
             await self.bot.say('\n'.join(out))
 
 
 def setup(bot):
-    bot.add_cog(MemberManagement(bot))
+    """Setup."""
+    n = MemberManagement(bot)
+    bot.add_cog(n)
