@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Member Management",
+	"DESCRIPTION": "Member management utility for displaying members using multiple role inclusions and exclusions.",
+	"DISABLED": false,
+	"NAME": "MemberManagement",
+	"REQUIREMENTS": [],
+	"TAGS": ["role", "member", "management", "utility", "util"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
