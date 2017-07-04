@@ -229,6 +229,18 @@ class RACF:
             ",".join([r.name for r in to_add_roles]),
             author.display_name))
 
+    async def changerole(self, ctx, member: discord.Member=None, *roles: str):
+        """Change roles of a user.
+
+        Uses the changerole command in the MM cog.
+        """
+        mm = self.bot.get_cog("MemberManagement")
+        if mm is None:
+            await self.bot.say(
+                "You must load MemberManagement for this to run.")
+            return
+        await ctx.invoke(mm.changerole, member, *roles)
+
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def addrole(
@@ -237,7 +249,7 @@ class RACF:
 
         Example: !addrole SML Delta
         """
-        await ctx.invoke(self.changerole, member, role_name)
+        await self.changerole(ctx, member, role_name)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -247,63 +259,8 @@ class RACF:
 
         Example: !removerole SML Delta
         """
-        await ctx.invoke(self.changerole, member, '-' + role_name)
-
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def changerole(self, ctx, member: discord.Member=None, *roles: str):
-        """Change roles of a user.
-
-        Example: !changerole SML +Delta "-Foxtrot Lead" "+Delta Lead"
-
-        Multi-word roles must be surrounded by quotes.
-        Operators are used as prefix:
-        + for role addition
-        - for role removal
-        """
-        server = ctx.message.server
-        author = ctx.message.author
-        if member is None:
-            await self.bot.say("You must specify a member")
-            return
-        elif roles is None or not roles:
-            await self.bot.say("You must specify a role.")
-            return
-
-        server_role_names = [r.name for r in server.roles]
-        role_args = []
-        flags = ['+', '-']
-        for role in roles:
-            has_flag = role[0] in flags
-            flag = role[0] if has_flag else '+'
-            name = role[1:] if has_flag else role
-
-            if name.lower() in [r.lower() for r in server_role_names]:
-                role_args.append({'flag': flag, 'name': name})
-
-        plus = [r['name'].lower() for r in role_args if r['flag'] == '+']
-        minus = [r['name'].lower() for r in role_args if r['flag'] == '-']
-        disallowed_roles = [r.lower() for r in DISALLOWED_ROLES]
-
-        for role in server.roles:
-            if role.name.lower() not in disallowed_roles:
-                if role.name.lower() in minus:
-                    await self.bot.remove_roles(member, role)
-                    await self.bot.say(
-                        "Removed {} from {}".format(
-                            role.name, member.display_name))
-                if role.name.lower() in plus:
-                    # respect role hiearchy
-                    rh = server.role_hierarchy
-                    if rh.index(role) < rh.index(author.top_role):
-                        await self.bot.say(
-                            "{} does not have permission to edit {}.".format(
-                                author.display_name, role.name))
-                    else:
-                        await self.bot.add_roles(member, role)
-                        await self.bot.say(
-                            "Added {} for {}".format(
-                                role.name, member.display_name))
+        role_name = '-{}'.format(role_name)
+        await self.changerole(ctx, member, role_name)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -313,7 +270,7 @@ class RACF:
         !multiaddrole rolename User1 User2 User3
         """
         for member in members:
-            await ctx.invoke(self.changerole, member, role)
+            await self.changerole(ctx, member, role)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
@@ -324,7 +281,7 @@ class RACF:
         """
         role = '-{}'.format(role)
         for member in members:
-            await ctx.invoke(self.changerole, member, role)
+            await self.changerole(ctx, member, role)
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(mention_everyone=True)
@@ -506,7 +463,7 @@ class RACF:
         channel = discord.utils.get(
             ctx.message.server.channels, name="family-chat")
         # print(roles_param)
-        await ctx.invoke(self.changerole, member, *roles_param)
+        await self.changerole(ctx, member, *roles_param)
         if channel is not None:
             await self.bot.say(
                 "{} Welcome! Main family chat at {} — enjoy!".format(
@@ -591,32 +548,6 @@ class RACF:
                 await self.bot.say(page)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def trophy2rank(self, ctx: Context, trophies:int):
-        """Convert trophies to rank.
-
-        log10(rank) = -2.102e-3 * trophies + 14.245
-        """
-        # log_a(b) = (log_e b / log_e a))
-        # (log_a b = 3 => b = a^3)
-        rank = 10 ** (-2.102e-3 * int(trophies) + 14.245)
-        rank = int(rank)
-        await self.bot.say(
-            f"With {trophies} trophies, the approximate rank you will get is {rank:d}")
-        await self.bot.say("Calculated using 28 data points only so it may not be accurate.")
-
-    @commands.command(pass_context=True, no_pm=True)
-    async def rank2trophy(self, ctx: Context, rank:int):
-        """Convert rank to trophies.
-
-        log10(rank) = -2.102e-3 * trophies + 14.245
-        """
-        trophies = (math.log10(int(rank)) - 14.245) / -2.102e-3
-        trophies = int(trophies)
-        await self.bot.say(
-            f"Rank {rank} will need approximately {trophies:d} trophies.")
-        await self.bot.say("Calculated using 28 data points only so it may not be accurate.")
-
-    @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions()
     async def bankset(
             self, ctx: Context, user: discord.Member, credits: SetParser):
@@ -626,18 +557,17 @@ class RACF:
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.mod_or_permissions()
-    async def removereaction(self, ctx:Context):
+    async def removereaction(self, ctx: Context):
         """Remove reactions from messages."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @removereaction.command(name="messages", pass_context=True, no_pm=True)
     async def removereaction_messages(self, ctx: Context, number: int):
-        """Removes reactions from last X messages."""
+        """Remove reactions from last X messages."""
         channel = ctx.message.channel
         author = ctx.message.author
         server = author.server
-        is_bot = self.bot.user.bot
         has_permissions = channel.permissions_for(server.me).manage_messages
         to_manage = []
 
@@ -645,19 +575,20 @@ class RACF:
             await self.bot.say("I’m not allowed to remove reactions.")
             return
 
-        async for message in self.bot.logs_from(channel, limit=number+1):
+        async for message in self.bot.logs_from(channel, limit=number + 1):
             to_manage.append(message)
 
         await self.remove_reactions(to_manage)
 
     async def remove_reactions(self, messages):
+        """Remove reactions."""
         for message in messages:
             await self.bot.clear_reactions(message)
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions()
     async def addreaction(self, ctx, message_id, *emojis):
-        """Add reactions to a message by message id"""
+        """Add reactions to a message by message id."""
         channel = ctx.message.channel
         try:
             message = await self.bot.get_message(channel, message_id)
@@ -671,7 +602,8 @@ class RACF:
                 # reaction add failed
                 pass
             except discord.Forbidden:
-                await self.bot.say("I don’t have permission to react to that message.")
+                await self.bot.say(
+                    "I don’t have permission to react to that message.")
                 break
             except discord.InvalidArgument:
                 await self.bot.say("Invalid arguments for emojis")
@@ -835,7 +767,7 @@ class RACF:
         member_clan = [
             '-{}'.format(r.name) for r in member.roles if r.name in CLANS]
         if len(member_clan):
-            await ctx.invoke(self.changerole, member, *member_clan)
+            await self.changerole(ctx, member, *member_clan)
         else:
             await self.bot.say("Member has no clan roles to remove.")
 
@@ -850,7 +782,7 @@ class RACF:
         member_clan = [
             '-{}'.format(r.name) for r in member.roles if r.name in BS_CLANS]
         if len(member_clan):
-            await ctx.invoke(self.changerole, member, *member_clan)
+            await self.changerole(ctx, member, *member_clan)
         else:
             await self.bot.say("Member has no clan roles to remove.")
 
@@ -868,7 +800,7 @@ class RACF:
         if ctx.message.channel.is_default:
             recruit_roles.append("Visitor")
             add_visitor_role = True
-        await ctx.invoke(self.changerole, member, *recruit_roles)
+        await self.changerole(ctx, member, *recruit_roles)
         channel = discord.utils.get(
             ctx.message.server.channels, name="esports-recruiting")
         if channel is not None:
@@ -892,7 +824,7 @@ class RACF:
         visitor_roles = ["Visitor"]
         channel = discord.utils.get(
             ctx.message.server.channels, name="visitors")
-        await ctx.invoke(self.changerole, member, *visitor_roles)
+        await self.changerole(ctx, member, *visitor_roles)
         if channel is not None:
             await self.bot.say(
                 "{} You can now chat in {} — enjoy!".format(
@@ -910,7 +842,7 @@ class RACF:
                     bs_roles.append("Visitor")
         channel = discord.utils.get(
             ctx.message.server.channels, name="brawl-stars")
-        await ctx.invoke(self.changerole, member, *bs_roles)
+        await self.changerole(ctx, member, *bs_roles)
         if channel is not None:
             await self.bot.say(
                 "{} You can now chat in {} — enjoy!".format(
@@ -920,7 +852,7 @@ class RACF:
 
         # Add additional roles if present
         if len(roles):
-            await ctx.invoke(self.changerole, member, *roles)
+            await self.changerole(ctx, member, *roles)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['vrules', 'vr'])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)

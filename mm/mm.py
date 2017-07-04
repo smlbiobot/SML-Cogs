@@ -228,6 +228,7 @@ class MemberManagement:
             out.append('+ {}'.format(m.display_name))
         return '\n'.join(out)
 
+    @staticmethod
     def get_member_embeds(self, ctx, members):
         """Discord embed of data display."""
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
@@ -288,6 +289,66 @@ class MemberManagement:
                         role.name, out_roles[role.id]['count']))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
+
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def changerole(self, ctx, member: discord.Member=None, *roles: str):
+        """Change roles of a user.
+
+        Example: !changerole SML +Delta "-Foxtrot Lead" "+Delta Lead"
+
+        Multi-word roles must be surrounded by quotes.
+        Operators are used as prefix:
+        + for role addition
+        - for role removal
+        """
+        server = ctx.message.server
+        author = ctx.message.author
+        if member is None:
+            await self.bot.say("You must specify a member")
+            return
+        elif roles is None or not roles:
+            await self.bot.say("You must specify a role.")
+            return
+
+        server_role_names = [r.name for r in server.roles]
+        role_args = []
+        flags = ['+', '-']
+        for role in roles:
+            has_flag = role[0] in flags
+            flag = role[0] if has_flag else '+'
+            name = role[1:] if has_flag else role
+
+            if name.lower() in [r.lower() for r in server_role_names]:
+                role_args.append({'flag': flag, 'name': name})
+
+        plus = [r['name'].lower() for r in role_args if r['flag'] == '+']
+        minus = [r['name'].lower() for r in role_args if r['flag'] == '-']
+        # disallowed_roles = [r.lower() for r in DISALLOWED_ROLES]
+
+        for role in server.roles:
+            role_in_minus = role.name.lower() in minus
+            role_in_plus = role.name.lower() in plus
+            role_in_either = role_in_minus or role_in_plus
+
+            if role_in_either:
+                # respect role hiearchy
+                rh = server.role_hierarchy
+                if rh.index(role) <= rh.index(author.top_role):
+                    await self.bot.say(
+                        "{} does not have permission to edit {}.".format(
+                            author.display_name, role.name))
+                else:
+                    if role_in_minus:
+                        await self.bot.remove_roles(member, role)
+                        await self.bot.say(
+                            "Removed {} from {}".format(
+                                role.name, member.display_name))
+                    if role_in_plus:
+                        await self.bot.add_roles(member, role)
+                        await self.bot.say(
+                            "Added {} for {}".format(
+                                role.name, member.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
