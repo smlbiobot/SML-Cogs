@@ -228,7 +228,6 @@ class MemberManagement:
             out.append('+ {}'.format(m.display_name))
         return '\n'.join(out)
 
-    @staticmethod
     def get_member_embeds(self, ctx, members):
         """Discord embed of data display."""
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
