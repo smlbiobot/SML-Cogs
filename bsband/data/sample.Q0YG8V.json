@@ -1,0 +1,696 @@
+{
+    "badge": "clan_badge_02_01",
+    "badge_id": 4,
+    "description": "Official Reddit Charlie Feeder #98VLYJ - RACF - discord.gg/racf - RACF CR members only - @BS-Delta Lead for req password",
+    "id": {
+        "high": 1,
+        "low": 14766,
+        "unsigned": false
+    },
+    "member_count": 45,
+    "members": [
+        {
+            "experience_level": 32,
+            "id": {
+                "high": 0,
+                "low": 30326,
+                "unsigned": false
+            },
+            "name": "Jroth24",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "20L29LG",
+            "trophies": 970,
+            "unk1": 28,
+            "unk2": 15
+        },
+        {
+            "experience_level": 25,
+            "id": {
+                "high": 1,
+                "low": 260161,
+                "unsigned": false
+            },
+            "name": "J-Dog_Squad",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "GCCRG2C",
+            "trophies": 962,
+            "unk1": 28,
+            "unk2": 7
+        },
+        {
+            "experience_level": 34,
+            "id": {
+                "high": 0,
+                "low": 49142,
+                "unsigned": false
+            },
+            "name": "Megeric",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "2RYLRLG",
+            "trophies": 955,
+            "unk1": 28,
+            "unk2": 11
+        },
+        {
+            "experience_level": 38,
+            "id": {
+                "high": 1,
+                "low": 67640,
+                "unsigned": false
+            },
+            "name": "JustPush",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "8P8JL2C",
+            "trophies": 935,
+            "unk1": 28,
+            "unk2": 2
+        },
+        {
+            "experience_level": 24,
+            "id": {
+                "high": 0,
+                "low": 72215,
+                "unsigned": false
+            },
+            "name": "OldSchool",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "8LY99GU",
+            "trophies": 836,
+            "unk1": 28,
+            "unk2": 14
+        },
+        {
+            "experience_level": 25,
+            "id": {
+                "high": 1,
+                "low": 19725,
+                "unsigned": false
+            },
+            "name": "nite",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "RYL99C",
+            "trophies": 832,
+            "unk1": 28,
+            "unk2": 2
+        },
+        {
+            "experience_level": 29,
+            "id": {
+                "high": 0,
+                "low": 15708,
+                "unsigned": false
+            },
+            "name": "Will 147",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "QLRLG0",
+            "trophies": 811,
+            "unk1": 28,
+            "unk2": 14
+        },
+        {
+            "experience_level": 22,
+            "id": {
+                "high": 1,
+                "low": 9550,
+                "unsigned": false
+            },
+            "name": "Zulu",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "PQGVLR",
+            "trophies": 798,
+            "unk1": 28,
+            "unk2": 15
+        },
+        {
+            "experience_level": 28,
+            "id": {
+                "high": 1,
+                "low": 6480,
+                "unsigned": false
+            },
+            "name": "Trainer PK",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "928QRQ",
+            "trophies": 762,
+            "unk1": 28,
+            "unk2": 0
+        },
+        {
+            "experience_level": 27,
+            "id": {
+                "high": 1,
+                "low": 45156,
+                "unsigned": false
+            },
+            "name": "ZigZag01",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "2QLUC9C",
+            "trophies": 748,
+            "unk1": 28,
+            "unk2": 3
+        },
+        {
+            "experience_level": 30,
+            "id": {
+                "high": 1,
+                "low": 103929,
+                "unsigned": false
+            },
+            "name": "Descendent",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "9QLG002",
+            "trophies": 725,
+            "unk1": 28,
+            "unk2": 0
+        },
+        {
+            "experience_level": 36,
+            "id": {
+                "high": 1,
+                "low": 94232,
+                "unsigned": false
+            },
+            "name": "Jamieblob",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "98CVPQQ",
+            "trophies": 690,
+            "unk1": 28,
+            "unk2": 9
+        },
+        {
+            "experience_level": 27,
+            "id": {
+                "high": 1,
+                "low": 261819,
+                "unsigned": false
+            },
+            "name": "Dinger",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "GUGJ9RQ",
+            "trophies": 671,
+            "unk1": 28,
+            "unk2": 11
+        },
+        {
+            "experience_level": 22,
+            "id": {
+                "high": 1,
+                "low": 61753,
+                "unsigned": false
+            },
+            "name": "pixnecs",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "82YQ8VC",
+            "trophies": 662,
+            "unk1": 28,
+            "unk2": 5
+        },
+        {
+            "experience_level": 26,
+            "id": {
+                "high": 1,
+                "low": 251873,
+                "unsigned": false
+            },
+            "name": "Beany",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "GQULPVC",
+            "trophies": 662,
+            "unk1": 28,
+            "unk2": 2
+        },
+        {
+            "experience_level": 26,
+            "id": {
+                "high": 0,
+                "low": 20452,
+                "unsigned": false
+            },
+            "name": "Phil",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "RJP0CL",
+            "trophies": 659,
+            "unk1": 28,
+            "unk2": 9
+        },
+        {
+            "experience_level": 24,
+            "id": {
+                "high": 1,
+                "low": 227024,
+                "unsigned": false
+            },
+            "name": "Irish",
+            "role": "Co Leader",
+            "role_id": 4,
+            "tag": "QJ0U282",
+            "trophies": 634,
+            "unk1": 28,
+            "unk2": 10
+        },
+        {
+            "experience_level": 23,
+            "id": {
+                "high": 0,
+                "low": 158107,
+                "unsigned": false
+            },
+            "name": "Crawfy",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "YY9GQ2L",
+            "trophies": 617,
+            "unk1": 28,
+            "unk2": 1
+        },
+        {
+            "experience_level": 30,
+            "id": {
+                "high": 1,
+                "low": 4540,
+                "unsigned": false
+            },
+            "name": "SML",
+            "role": "Leader",
+            "role_id": 2,
+            "tag": "889QC9",
+            "trophies": 613,
+            "unk1": 28,
+            "unk2": 7
+        },
+        {
+            "experience_level": 17,
+            "id": {
+                "high": 1,
+                "low": 154996,
+                "unsigned": false
+            },
+            "name": "Blacklazerz",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "Y9JU9JR",
+            "trophies": 546,
+            "unk1": 28,
+            "unk2": 3
+        },
+        {
+            "experience_level": 26,
+            "id": {
+                "high": 0,
+                "low": 26960,
+                "unsigned": false
+            },
+            "name": "aa",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "UCR90U",
+            "trophies": 537,
+            "unk1": 28,
+            "unk2": 4
+        },
+        {
+            "experience_level": 18,
+            "id": {
+                "high": 0,
+                "low": 39698,
+                "unsigned": false
+            },
+            "name": "Patrick",
+            "role": "Co Leader",
+            "role_id": 4,
+            "tag": "2PUQGLP",
+            "trophies": 514,
+            "unk1": 28,
+            "unk2": 13
+        },
+        {
+            "experience_level": 22,
+            "id": {
+                "high": 1,
+                "low": 31041,
+                "unsigned": false
+            },
+            "name": "FratDaddy",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "20JCVPV",
+            "trophies": 504,
+            "unk1": 28,
+            "unk2": 4
+        },
+        {
+            "experience_level": 16,
+            "id": {
+                "high": 1,
+                "low": 89134,
+                "unsigned": false
+            },
+            "name": "Adam",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "90YVRUV",
+            "trophies": 481,
+            "unk1": 28,
+            "unk2": 3
+        },
+        {
+            "experience_level": 23,
+            "id": {
+                "high": 1,
+                "low": 44851,
+                "unsigned": false
+            },
+            "name": "0m3ga",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "2QPUPUR",
+            "trophies": 479,
+            "unk1": 28,
+            "unk2": 3
+        },
+        {
+            "experience_level": 19,
+            "id": {
+                "high": 0,
+                "low": 148558,
+                "unsigned": false
+            },
+            "name": "johnie",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "Y0RVGV8",
+            "trophies": 479,
+            "unk1": 28,
+            "unk2": 10
+        },
+        {
+            "experience_level": 26,
+            "id": {
+                "high": 0,
+                "low": 339460,
+                "unsigned": false
+            },
+            "name": "karim",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "CQG2JPG",
+            "trophies": 459,
+            "unk1": 28,
+            "unk2": 3
+        },
+        {
+            "experience_level": 25,
+            "id": {
+                "high": 0,
+                "low": 859,
+                "unsigned": false
+            },
+            "name": "AbePlaysGame",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "YJ2VL",
+            "trophies": 456,
+            "unk1": 28,
+            "unk2": 8
+        },
+        {
+            "experience_level": 17,
+            "id": {
+                "high": 1,
+                "low": 170590,
+                "unsigned": false
+            },
+            "name": "noodlez",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "YC8C2L2",
+            "trophies": 451,
+            "unk1": 28,
+            "unk2": 13
+        },
+        {
+            "experience_level": 18,
+            "id": {
+                "high": 1,
+                "low": 404427,
+                "unsigned": false
+            },
+            "name": "Hao",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "VJQ0C8R",
+            "trophies": 434,
+            "unk1": 28,
+            "unk2": 0
+        },
+        {
+            "experience_level": 19,
+            "id": {
+                "high": 1,
+                "low": 102797,
+                "unsigned": false
+            },
+            "name": "Death&Fear",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "9LV0YLR",
+            "trophies": 429,
+            "unk1": 28,
+            "unk2": 9
+        },
+        {
+            "experience_level": 15,
+            "id": {
+                "high": 1,
+                "low": 12297,
+                "unsigned": false
+            },
+            "name": "Zach",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "YCV9YQ",
+            "trophies": 428,
+            "unk1": 28,
+            "unk2": 9
+        },
+        {
+            "experience_level": 16,
+            "id": {
+                "high": 0,
+                "low": 294890,
+                "unsigned": false
+            },
+            "name": "Cinnamon",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "J0Y2GLP",
+            "trophies": 403,
+            "unk1": 28,
+            "unk2": 6
+        },
+        {
+            "experience_level": 20,
+            "id": {
+                "high": 1,
+                "low": 344183,
+                "unsigned": false
+            },
+            "name": "Jason",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "CRCGY82",
+            "trophies": 393,
+            "unk1": 28,
+            "unk2": 15
+        },
+        {
+            "experience_level": 14,
+            "id": {
+                "high": 0,
+                "low": 10442,
+                "unsigned": false
+            },
+            "name": "FLONGAS",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "PVG8QL",
+            "trophies": 329,
+            "unk1": 28,
+            "unk2": 6
+        },
+        {
+            "experience_level": 14,
+            "id": {
+                "high": 0,
+                "low": 24944,
+                "unsigned": false
+            },
+            "name": "schmaniki",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "CU92UU",
+            "trophies": 318,
+            "unk1": 28,
+            "unk2": 0
+        },
+        {
+            "experience_level": 17,
+            "id": {
+                "high": 1,
+                "low": 38904,
+                "unsigned": false
+            },
+            "name": "Dank Ganon",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "2PQ9QYQ",
+            "trophies": 265,
+            "unk1": 28,
+            "unk2": 9
+        },
+        {
+            "experience_level": 13,
+            "id": {
+                "high": 1,
+                "low": 140842,
+                "unsigned": false
+            },
+            "name": "AndyT",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "PC0QJUR",
+            "trophies": 243,
+            "unk1": 28,
+            "unk2": 0
+        },
+        {
+            "experience_level": 10,
+            "id": {
+                "high": 1,
+                "low": 28177,
+                "unsigned": false
+            },
+            "name": "david",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "VYJJGR",
+            "trophies": 225,
+            "unk1": 28,
+            "unk2": 12
+        },
+        {
+            "experience_level": 10,
+            "id": {
+                "high": 1,
+                "low": 13140,
+                "unsigned": false
+            },
+            "name": "f1nesse13",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "L9QULY",
+            "trophies": 170,
+            "unk1": 28,
+            "unk2": 0
+        },
+        {
+            "experience_level": 13,
+            "id": {
+                "high": 0,
+                "low": 14893,
+                "unsigned": false
+            },
+            "name": "Min",
+            "role": "Co Leader",
+            "role_id": 4,
+            "tag": "Q29L28",
+            "trophies": 167,
+            "unk1": 28,
+            "unk2": 9
+        },
+        {
+            "experience_level": 15,
+            "id": {
+                "high": 1,
+                "low": 97002,
+                "unsigned": false
+            },
+            "name": "BLANK",
+            "role": "Elder",
+            "role_id": 3,
+            "tag": "9P8YJLV",
+            "trophies": 165,
+            "unk1": 28,
+            "unk2": 7
+        },
+        {
+            "experience_level": 8,
+            "id": {
+                "high": 1,
+                "low": 85819,
+                "unsigned": false
+            },
+            "name": "phuie024",
+            "role": "Co Leader",
+            "role_id": 4,
+            "tag": "8UCUL2C",
+            "trophies": 130,
+            "unk1": 28,
+            "unk2": 0
+        },
+        {
+            "experience_level": 7,
+            "id": {
+                "high": 1,
+                "low": 217472,
+                "unsigned": false
+            },
+            "name": "DaanvZ",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "QYQ8V0V",
+            "trophies": 125,
+            "unk1": 28,
+            "unk2": 9
+        },
+        {
+            "experience_level": 7,
+            "id": {
+                "high": 0,
+                "low": 551834,
+                "unsigned": false
+            },
+            "name": "MCBC45",
+            "role": "Member",
+            "role_id": 1,
+            "tag": "2PJRY0JU",
+            "trophies": 122,
+            "unk1": 28,
+            "unk2": 9
+        }
+    ],
+    "name": "Reddit Delta",
+    "required_score": 0,
+    "score": 23794,
+    "tag": "Q0YG8V",
+    "type": "Closed",
+    "type_id": 3,
+    "unk1": 8,
+    "unk2": 0
+}
