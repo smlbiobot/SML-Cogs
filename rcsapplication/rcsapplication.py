@@ -174,7 +174,7 @@ class RCSApplication:
             await self.bot.say("Application ID not found.")
             return
 
-        for page in pagify(out):
+        for page in pagify(out, shorten_by=80):
             await self.bot.say(box(page, lang="markdown"))
 
 
