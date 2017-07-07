@@ -63,7 +63,7 @@ SERVER_DEFAULTS = {
     "bands": {}
 }
 BAND_DEFAULTS = {
-    "name": "",
+    "name": None,
     "role": "",
     "tag": "",
     "members": []
@@ -102,7 +102,43 @@ BS_ROLES = {
 }
 
 
-class BSClan:
+class BSBandData:
+    """Brawl Stars Band data."""
+
+    def __init__(self, **kwargs):
+        """Init.
+
+        Expected list of keywords:
+        From API:
+            badge
+            badge_id
+            description
+            id
+            member_count
+            members
+            name
+            required_score
+            score
+            type
+            type_id
+            unk1
+            unk2
+        From cog:
+            role
+            tag
+        """
+        self.__dict__.update(kwargs)
+
+    @property
+    def member_count_str(self):
+        """Member count in #/50 format."""
+        count = self.member_count
+        if count is None:
+            count = 0
+        return '{}/50'.format(count)
+
+
+class BSBand:
     """Brawl Stars Clan management."""
 
     def __init__(self, bot):
@@ -165,14 +201,22 @@ class BSClan:
                     data = None
         return data
 
-    async def update_data(self):
+    async def update_data(self, band_tag=None):
         """Perform data update from api."""
         for server_id in self.settings["servers"]:
-            bands = self.settings["servers"][server_id]["bands"]
+            bands = self.settings["servers"][server_id]["bands"].copy()
 
-            for tag, band in bands.items():
-                data = await self.get_band_data(tag)
-                bands[tag].update(data)
+            if band_tag is None:
+                for tag, band in bands.items():
+                    data = await self.get_band_data(tag)
+                    bands[tag].update(data)
+            else:
+                # update only if band tag is in settings
+                if band_tag in bands:
+                    data = await self.get_band_data(band_tag)
+                    bands[band_tag].update(data)
+
+            self.settings["servers"][server_id]["bands"] = bands
             dataIO.save_json(JSON, self.settings)
         return True
 
@@ -247,9 +291,12 @@ class BSClan:
     async def bsband_info(self, ctx: Context):
         """Information."""
         # await self.update_data()
-
         server = ctx.message.server
         bands = self.settings["servers"][server.id]["bands"]
+        for k, band in bands.items():
+            # update band data if it was never fetched
+            if band["name"] is None:
+                await self.update_data(band["tag"])
         embeds = [self.embed_bsband_info(band) for tag, band in bands.items()]
         embeds = sorted(embeds, key=lambda x: x.title)
 
@@ -261,14 +308,17 @@ class BSClan:
 
     def embed_bsband_info(self, band):
         """Return band info embed."""
+        data = BSBandData(**band)
         em = discord.Embed(
-            title="{} #{}".format(band["name"], band["tag"]),
-            description=band["description"])
-        em.add_field(name="Trophies", value=band["required_score"])
-        # em.add_field(name="Clan Tag", value="#{}".format(band["tag"]))
-        em.add_field(name="Type", value=band["type"])
+            title=data.name,
+            description=data.description)
+        em.add_field(name="Band Trophies", value=data.score)
+        em.add_field(name="Type", value=data.type)
+        em.add_field(name="Required Trophies", value=data.required_score)
+        em.add_field(name="Band Tag", value=data.tag)
         em.add_field(
-            name="Members", value="{}/50".format(band["member_count"]))
+            name="Members", value=data.member_count_str)
+        # em.set_author(name=data.name)
         return em
 
     @bsband.command(name="name", pass_context=True, no_pm=True)
@@ -293,7 +343,7 @@ def setup(bot):
     """Setup bot."""
     check_folder()
     check_file()
-    n = BSClan(bot)
+    n = BSBand(bot)
     bot.add_cog(n)
 
 
