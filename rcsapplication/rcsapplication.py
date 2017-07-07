@@ -159,7 +159,7 @@ class RCSApplication:
             return
 
         # output
-        for page in pagify(out, shorten_by=24):
+        for page in pagify(out, shorten_by=80):
             await self.bot.say(page)
 
     @application.command(name="getmd", pass_context=True)
