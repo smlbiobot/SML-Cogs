@@ -56,13 +56,16 @@ DATA_UPDATE_INTERVAL = timedelta(minutes=5).seconds
 RESULTS_MAX = 3
 PAGINATION_TIMEOUT = 20
 
+BOTCOMMANDER_ROLES = ["Bot Commander"]
+
 SETTINGS_DEFAULTS = {
     "band_api_url": {},
     "player_api_url": {},
-    "servers": {}
+    "servers": {},
 }
 SERVER_DEFAULTS = {
-    "bands": {}
+    "bands": {},
+    "players": {}
 }
 BAND_DEFAULTS = {
     "name": None,
@@ -156,7 +159,6 @@ class BSBandData:
             "/smlbiobot/smlbiobot.github.io/master/img"
             "/bs-badge/{}.png").format(self.badge)
 
-
 class BSBandMemberData:
     """Brawl Stars Member data."""
 
@@ -179,6 +181,17 @@ class BSBandMemberData:
             unk2
         """
         self.__dict__.update(kwargs)
+        self._discord_member = None
+
+    @property
+    def discord_member(self):
+        """Discord user id."""
+        return self._discord_member
+
+    @discord_member.setter
+    def discord_member(self, value):
+        """Discord user id."""
+        self._discord_member = value
 
 
 class BSBrawlerData:
@@ -242,6 +255,17 @@ class BSPlayerData:
             wins
         """
         self.__dict__.update(kwargs)
+        self._discord_member = None
+
+    @property
+    def discord_member(self):
+        """Discord user id."""
+        return self._discord_member
+
+    @discord_member.setter
+    def discord_member(self, value):
+        """Discord user id."""
+        self._discord_member = value
 
 class BSData:
     """Brawl Stars Clan management."""
@@ -486,9 +510,10 @@ class BSData:
         band_result = None
         for k, band in bands.items():
             data = BSBandData(**band)
-            if data.key == key:
-                band_result = data
-                break
+            if hasattr(data, "key"):
+                if data.key == key:
+                    band_result = data
+                    break
 
         if band_result is None:
             await self.bot.say("Cannot find key {} in settings.".format(key))
@@ -531,9 +556,33 @@ class BSData:
                 em.add_field(name=name, value=value)
         return em
 
-    @bsdata.command(name="player", pass_context=True, no_pm=True)
-    async def bsdata_player(self, ctx, tag=None):
-        """Return player data by player tag."""
+    @bsdata.command(name="profile", pass_context=True, no_pm=True)
+    async def bsdata_profile(self, ctx, member: discord.Member):
+        """Return player profile by Discord member name or id."""
+        server = ctx.message.server
+        players = self.settings["servers"][server.id]["players"]
+
+        if not member:
+            await send_cmd_help(ctx)
+            return
+
+        player_tag = None
+        for tag, member_id in players.items():
+            if member_id == member.id:
+                player_tag = tag
+                break
+
+        if player_tag is None:
+            await self.bot.say(
+                "Member has not registered a player tag yet."
+                "Type [p]bsdata settag [member] [tag] to set it.")
+            return
+
+        await ctx.invoke(self.bsdata_profiletag, player_tag)
+
+    @bsdata.command(name="profiletag", pass_context=True, no_pm=True)
+    async def bsdata_profiletag(self, ctx, tag=None):
+        """Return player profile by player tag."""
         if tag is None:
             await send_cmd_help(ctx)
             return
@@ -544,7 +593,8 @@ class BSData:
             return
 
         player = BSPlayerData(**data)
-
+        server = ctx.message.server
+        player.discord_member = self.get_discord_member(server, player.tag)
         await self.bot.say(embed=self.embed_player(player))
 
     async def get_player_data(self, tag):
@@ -565,6 +615,11 @@ class BSData:
             description="#{}".format(player.tag))
         band = BSBandData(**player.band)
         em.color = discord.Color(value=self.random_color())
+
+        if player.discord_member is not None:
+            em.description = '{} {}'.format(
+                em.description,
+                player.discord_member.mention)
 
         em.add_field(name=band.name, value=band.role)
         em.add_field(name="Trophies", value=player.trophies)
@@ -594,6 +649,32 @@ class BSData:
             icon_url=band.badge_url)
 
         return em
+
+    def get_discord_member(self, server, player_tag):
+        """Return Discord member if tag is associated."""
+        member_id = None
+        try:
+            players = self.settings["servers"][server.id]["players"]
+            member_id = players[player_tag]
+        except KeyError:
+            pass
+        if member_id is None:
+            return None
+        return server.get_member(member_id)
+
+    @bsdata.command(name="playertag", pass_context=True, no_pm=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
+    async def bsdata_playertag(
+            self, ctx, member: discord.Member, playertag=None):
+        """Set playertag to discord member."""
+        if playertag is None:
+            await send_cmd_help(ctx)
+            return
+
+        server = ctx.message.server
+        self.settings["servers"][server.id]["players"][playertag] = member.id
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Associated player tag with Discord Member.")
 
     @staticmethod
     def random_color():
