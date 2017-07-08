@@ -667,9 +667,9 @@ class BSData:
             return None
         return server.get_member(member_id)
 
-    @bsdata.command(name="playertag", pass_context=True, no_pm=True)
+    @bsdata.command(name="settag", pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLES)
-    async def bsdata_playertag(
+    async def bsdata_settag(
             self, ctx, member: discord.Member, playertag=None):
         """Set playertag to discord member."""
         if playertag is None:
