@@ -24,20 +24,6 @@ def generate_emblems():
 
     for i, color in enumerate(EMBLEM_COLORS):
         for j, symbol in enumerate(EMBLEM_SYMBOLS):
-            # bg = Image.open(
-            #     os.path.join(src_path, "{}{}.png".format(color, i + 1)))
-            # img = Image.new('RGBA', bg.size, (255, 255, 255, 0))
-            # img.paste(bg)
-            # # symbol
-            # sm_fn = "{}.png".format(symbol)
-            # img
-            # img.paste(
-            #     Image.open(os.path.join(src_path, sm_fn)), (0, 0))
-
-            # filename = "clan_badge_0{}_0{}.png".format(i, j)
-            # filename = os.path.join(out_path, filename)
-            # img.save(filename)
-
             filename = "clan_badge_0{}_0{}.png".format(i + 1, j + 1)
             filename = os.path.join(out_path, filename)
             bg_fn = "{}{}.png".format(color, j + 1)

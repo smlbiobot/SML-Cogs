@@ -180,6 +180,68 @@ class BSBandMemberData:
         self.__dict__.update(kwargs)
 
 
+class BSBrawlerData:
+    """Brawl Stars Brawler data."""
+
+    def __init__(self, **kwargs):
+        """Init.
+
+        Expected list of keywords:
+        From API:
+            highest_trophies
+            level
+            name
+            number
+            trophies
+            type
+            value
+        """
+        self.__dict__.update(kwargs)
+
+class BSPlayerData:
+    """Brawl Stars player data."""
+
+    def __init__(self, **kwargs):
+        """Init.
+
+        Expected list of keywords:
+        From API:
+            avatar
+            band
+                badge
+                badge_id
+                high
+                low
+                member_count
+                name
+                requirement
+                role
+                role_id
+                tag
+                trophies
+                type
+                type_id
+            brawler_count
+            brawlers[]
+                highest_trophies
+                level
+                name
+                number
+                trophies
+                type
+                value
+            high
+            highest_trophies
+            low
+            survival_wins
+            tag
+            total_experience
+            trophies
+            username
+            wins
+        """
+        self.__dict__.update(kwargs)
+
 class BSData:
     """Brawl Stars Clan management."""
 
@@ -232,15 +294,15 @@ class BSData:
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Band API URL updated.")
 
-    @setbsdata.command(name="memberapi", pass_context=True)
-    async def setbsdata_memberapi(self, ctx: Context, url):
+    @setbsdata.command(name="playerapi", pass_context=True)
+    async def setbsdata_playerapi(self, ctx: Context, url):
         """BS Member API URL base.
 
         Format:
         If path is hhttp://domain.com/path/LQQ
         Enter http://domain.com/path/
         """
-        self.settings["member_api_url"] = url
+        self.settings["player_api_url"] = url
 
         server = ctx.message.server
         self.check_server_settings(server.id)
@@ -250,7 +312,7 @@ class BSData:
 
     async def get_band_data(self, tag):
         """Return band data JSON."""
-        url = "{}{}".format(self.settings["api_url"], tag)
+        url = "{}{}".format(self.settings["band_api_url"], tag)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 try:
@@ -428,11 +490,12 @@ class BSData:
             return
 
         members = band_result.members
-        # split results as list of 25
+        # split results as list of 24
         # because embeds can only contain 25 fields
+        # if fields are displayed inline,
+        # 24 can fit both 2 and 3-column layout
         members_out = grouper(24, members, None)
-        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-        color = int(color, 16)
+        color = self.random_color()
         page = 1
         for members in members_out:
             em = self.embed_bsdata_roster(members)
@@ -462,6 +525,75 @@ class BSData:
                     data.tag)
                 em.add_field(name=name, value=value)
         return em
+
+    @bsdata.command(name="player", pass_context=True, no_pm=True)
+    async def bsdata_player(self, ctx, tag=None):
+        """Return player data by player tag."""
+        if tag is None:
+            await send_cmd_help(ctx)
+            return
+
+        data = await self.get_player_data(tag)
+        if data is None:
+            await self.bot.say("Error fetching player data.")
+            return
+
+        player = BSPlayerData(**data)
+
+        await self.bot.say(embed=self.embed_player(player))
+
+    async def get_player_data(self, tag):
+        """Return band data JSON."""
+        url = "{}{}".format(self.settings["player_api_url"], tag)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                try:
+                    data = await resp.json()
+                except json.decoder.JSONDecodeError:
+                    data = None
+        return data
+
+    def embed_player(self, player: BSPlayerData):
+        """Return band roster embed."""
+        em = discord.Embed(
+            title=player.username,
+            description="#{}".format(player.tag))
+        em.color = discord.Color(value=self.random_color())
+        em.add_field(name="Trophies", value=player.trophies)
+        em.add_field(name="Victories", value=player.wins)
+        em.add_field(name="Highest Trophies", value=player.highest_trophies)
+        em.add_field(name="Brawlers", value=player.brawler_count, inline=False)
+
+        for brawler in player.brawlers:
+            data = BSBrawlerData(**brawler)
+            emoji = self.brawler_emoji(data.name)
+            if emoji is None:
+                emoji = ''
+            em.add_field(
+                name='{} {}'.format(data.name, emoji),
+                value=data.highest_trophies)
+
+        return em
+
+    @staticmethod
+    def random_color():
+        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+        color = int(color, 16)
+        return color
+
+    def brawler_emoji(self, name):
+        """Emoji of the brawler.
+
+        Find emoji against all known servers
+        to look for match
+        <:emoji_name:emoji_id>
+        """
+        for server in self.bot.servers:
+            for emoji in server.emojis:
+                if emoji.name == name:
+                    return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return None
+
 
 
 def check_folder():
