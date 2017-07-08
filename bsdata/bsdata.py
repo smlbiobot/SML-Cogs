@@ -57,7 +57,8 @@ RESULTS_MAX = 3
 PAGINATION_TIMEOUT = 20
 
 SETTINGS_DEFAULTS = {
-    "api_url": "",
+    "band_api_url": {},
+    "player_api_url": {},
     "servers": {}
 }
 SERVER_DEFAULTS = {
@@ -278,6 +279,14 @@ class BSData:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @setbsdata.command(name="init", pass_context=True)
+    async def setbsdata_init(self, ctx: Context):
+        """Init BS Band settings."""
+        server = ctx.message.server
+        self.settings["servers"][server.id] = SERVER_DEFAULTS
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Server settings initialized.")
+
     @setbsdata.command(name="bandapi", pass_context=True)
     async def setbsdata_bandapi(self, ctx: Context, url):
         """BS Band API URL base.
@@ -326,15 +335,12 @@ class BSData:
         for server_id in self.settings["servers"]:
             bands = self.get_bands_settings(server_id)
 
-            if band_tag is None:
-                for tag, band in bands.items():
+            for tag, band in bands.items():
+                do_update = band_tag is None or band_tag == tag
+                if do_update:
                     data = await self.get_band_data(tag)
                     bands[tag].update(data)
-            else:
-                # update only if band tag is in settings
-                if band_tag in bands:
-                    data = await self.get_band_data(band_tag)
-                    bands[band_tag].update(data)
+                    self.set_bands_settings(server_id, bands)
 
             self.set_bands_settings(server_id, bands)
         return True
@@ -383,7 +389,7 @@ class BSData:
 
             await self.bot.say("added Band with clan tag: #{}".format(clantag))
 
-        await self.update_data()
+        # await self.update_data()
 
     @setbsdata.command(name="remove", pass_context=True)
     async def setbsdata_remove(self, ctx: Context, *clantags):
