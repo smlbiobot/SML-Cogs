@@ -156,7 +156,7 @@ class BSBandData:
             "/bs-badge/{}.png").format(self.badge)
 
 
-class BSMemberData:
+class BSBandMemberData:
     """Brawl Stars Member data."""
 
     def __init__(self, **kwargs):
@@ -216,21 +216,37 @@ class BSData:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setbsdata.command(name="apiurl", pass_context=True)
-    async def setbsdata_apiurl(self, ctx: Context, apiurl):
-        """API URL base.
+    @setbsdata.command(name="bandapi", pass_context=True)
+    async def setbsdata_bandapi(self, ctx: Context, url):
+        """BS Band API URL base.
 
         Format:
         If path is hhttp://domain.com/path/LQQ
         Enter http://domain.com/path/
         """
-        self.settings["api_url"] = apiurl
+        self.settings["band_api_url"] = url
 
         server = ctx.message.server
         self.check_server_settings(server.id)
 
         dataIO.save_json(JSON, self.settings)
-        await self.bot.say("API URL updated.")
+        await self.bot.say("Band API URL updated.")
+
+    @setbsdata.command(name="memberapi", pass_context=True)
+    async def setbsdata_memberapi(self, ctx: Context, url):
+        """BS Member API URL base.
+
+        Format:
+        If path is hhttp://domain.com/path/LQQ
+        Enter http://domain.com/path/
+        """
+        self.settings["member_api_url"] = url
+
+        server = ctx.message.server
+        self.check_server_settings(server.id)
+
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Member API URL updated.")
 
     async def get_band_data(self, tag):
         """Return band data JSON."""
@@ -426,9 +442,10 @@ class BSData:
                 "Required Trophies: {}").format(
                     band_result.tag, band_result.required_score)
             em.color = discord.Color(value=color)
+            em.set_thumbnail(url=band_result.badge_url)
             em.set_footer(
                 text="Page {}".format(page),
-                icon_url=band_result.badge_url)
+                icon_url=server.icon_url)
             await self.bot.say(embed=em)
             page = page + 1
 
@@ -437,17 +454,14 @@ class BSData:
         em = discord.Embed(title=".")
         for member in members:
             if member is not None:
-                data = BSMemberData(**member)
-                name = data.name
-                value = "{}, {} ({})".format(
-                    data.role, data.trophies, data.experience_level)
+                data = BSBandMemberData(**member)
+                name = "{}, {}".format(data.name, data.role)
+                value = "{}, {} XP, #{}".format(
+                    data.trophies,
+                    data.experience_level,
+                    data.tag)
                 em.add_field(name=name, value=value)
         return em
-
-    @bsdata.command(name="name", pass_context=True, no_pm=True)
-    async def bsdata_name(self, ctx: Context, name):
-        """Return roster."""
-        pass
 
 
 def check_folder():
