@@ -124,6 +124,7 @@ class BSBandData:
             unk1
             unk2
         From cog:
+            key
             role
             tag
         """
@@ -146,6 +147,30 @@ class BSBandData:
             "/bs-badge/{}.png").format(self.badge)
 
 
+class BSMemberData:
+    """Brawl Stars Member data."""
+
+    def __init__(self, **kwargs):
+        """Init.
+
+        Expected list of keywords:
+        From API:
+            experience_level
+            id
+                high
+                low
+                unsigned
+            name
+            role
+            role_id
+            tag
+            trophies
+            unk1
+            unk2
+        """
+        self.__dict__.update(kwargs)
+
+
 class BSBand:
     """Brawl Stars Clan management."""
 
@@ -166,10 +191,10 @@ class BSBand:
         if self is self.bot.get_cog('BSBand'):
             self.task = self.bot.loop.create_task(self.loop_task())
 
-    def check_server_settings(self, server: discord.Server):
+    def check_server_settings(self, server_id):
         """Add server to settings if one does not exist."""
-        if server.id not in self.settings["servers"]:
-            self.settings["servers"][server.id] = SERVER_DEFAULTS
+        if server_id not in self.settings["servers"]:
+            self.settings["servers"][server_id] = SERVER_DEFAULTS
         dataIO.save_json(JSON, self.settings)
 
     @commands.group(pass_context=True, no_pm=True)
@@ -212,7 +237,8 @@ class BSBand:
     async def update_data(self, band_tag=None):
         """Perform data update from api."""
         for server_id in self.settings["servers"]:
-            bands = self.settings["servers"][server_id]["bands"].copy()
+            # bands = self.settings["servers"][server_id]["bands"].copy()
+            bands = self.get_bands_settings(server_id)
 
             if band_tag is None:
                 for tag, band in bands.items():
@@ -224,8 +250,9 @@ class BSBand:
                     data = await self.get_band_data(band_tag)
                     bands[band_tag].update(data)
 
-            self.settings["servers"][server_id]["bands"] = bands
-            dataIO.save_json(JSON, self.settings)
+            self.set_bands_settings(server_id, bands)
+            # self.settings["servers"][server_id]["bands"] = bands
+            # dataIO.save_json(JSON, self.settings)
         return True
 
     @setbsband.command(name="update", pass_context=True)
@@ -234,6 +261,17 @@ class BSBand:
         success = await self.update_data()
         if success:
             await self.bot.say("Data updated")
+
+    def get_bands_settings(self, server_id):
+        """Return bands in settings."""
+        self.check_server_settings(server_id)
+        return self.settings["servers"][server_id]["bands"].copy()
+
+    def set_bands_settings(self, server_id, data):
+        """Set bands data in settings."""
+        self.settings["servers"][server_id]["bands"] = data
+        dataIO.save_json(JSON, self.settings)
+        return True
 
     @setbsband.command(name="add", pass_context=True)
     async def setbsband_add(self, ctx: Context, *clantags):
@@ -253,15 +291,17 @@ class BSBand:
             if clantag.startswith('#'):
                 clantag = clantag[1:]
 
-            bands = self.settings["servers"][server.id]["bands"].copy()
+            # bands = self.settings["servers"][server.id]["bands"].copy()
+            bands = self.get_bands_settings(server.id)
             if clantag not in bands:
                 bands[clantag] = BAND_DEFAULTS
 
-            self.settings["servers"][server.id]["bands"] = bands
+            # self.settings["servers"][server.id]["bands"] = bands
+            self.set_bands_data(server.id, bands)
 
             await self.bot.say("added Band with clan tag: #{}".format(clantag))
 
-        dataIO.save_json(JSON, self.settings)
+        # dataIO.save_json(JSON, self.settings)
 
     @setbsband.command(name="remove", pass_context=True)
     async def setbsband_remove(self, ctx: Context, *clantags):
@@ -275,8 +315,9 @@ class BSBand:
             return
 
         server = ctx.message.server
-        self.check_server_settings(server)
-        bands = self.settings["servers"][server.id]["bands"]
+        self.check_server_settings(server.id)
+        # bands = self.settings["servers"][server.id]["bands"]
+        bands = self.get_bands_settings(server.id)
 
         for clantag in clantags:
             if clantag.startswith('#'):
@@ -287,7 +328,22 @@ class BSBand:
                 await self.bot.say("{} not in clan settings.".format(clantag))
                 return
 
+            self.set_bands_data(server.id, bands)
+
             await self.bot.say("Removed #{} from bands.".format(clantag))
+
+    @setbsband.command(name="setkey", pass_context=True)
+    async def setbsband_setkey(self, ctx, tag, key):
+        """Associate band tag with human readable key.
+
+        This is used for running other commands to make
+        fetching data easier without having to use
+        band tag every time.
+        """
+        server = ctx.message.server
+        # self.check_server_settings(server.id)
+        # bands = self.settings["servers"][server.id]["bands"]
+        bands = self.get_bands_settings(server.id)
 
     @commands.group(pass_context=True, no_pm=True)
     async def bsband(self, ctx: Context):
@@ -300,7 +356,8 @@ class BSBand:
         """Information."""
         # await self.update_data()
         server = ctx.message.server
-        bands = self.settings["servers"][server.id]["bands"]
+        # bands = self.settings["servers"][server.id]["bands"]
+        bands = self.get_bands_settings(server.id)
         for k, band in bands.items():
             # update band data if it was never fetched
             if band["name"] is None:
@@ -330,8 +387,17 @@ class BSBand:
         # em.set_author(name=data.name)
         return em
 
+    @bsband.command(name="roster", pass_context=True, no_pm=True)
+    async def bsband_roster(self, ctx: Context, key):
+        """Return band roster by key
+
+        Key of each band is set from [p]bsband addkey
+        """
+        pass
+
     def embed_bsband_roster(self, band):
         """Return band roster embed."""
+        pass
 
     @bsband.command(name="name", pass_context=True, no_pm=True)
     async def bsband_name(self, ctx: Context, name):
