@@ -360,12 +360,17 @@ class BSData:
             bands = self.get_bands_settings(server_id)
 
             for tag, band in bands.items():
-                do_update = band_tag is None or band_tag == tag
+                do_update = False
+                if band_tag is None:
+                    do_update = True
+                elif band_tag == tag:
+                    do_update = True
                 if do_update:
                     # async with self.get_band_data(tag) as data:
                     data = await self.get_band_data(tag)
                     bands[tag].update(data)
-                    self.set_bands_settings(server_id, bands)
+
+            self.set_bands_settings(server_id, bands)
         return True
 
     @setbsdata.command(name="update", pass_context=True)
@@ -412,7 +417,7 @@ class BSData:
 
             await self.bot.say("added Band with clan tag: #{}".format(clantag))
 
-        # await self.update_data()
+        await self.update_data()
 
     @setbsdata.command(name="remove", pass_context=True)
     async def setbsdata_remove(self, ctx: Context, *clantags):
