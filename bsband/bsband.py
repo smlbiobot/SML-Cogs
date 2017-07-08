@@ -137,6 +137,14 @@ class BSBandData:
             count = 0
         return '{}/50'.format(count)
 
+    @property
+    def badge_url(self):
+        """Return band emblem URL."""
+        return (
+            "https://raw.githubusercontent.com"
+            "/smlbiobot/smlbiobot.github.io/master/img"
+            "/bs-badge/{}.png").format(self.badge)
+
 
 class BSBand:
     """Brawl Stars Clan management."""
@@ -155,7 +163,7 @@ class BSBand:
         await self.bot.wait_until_ready()
         await self.update_data()
         await asyncio.sleep(DATA_UPDATE_INTERVAL)
-        if self is self.bot.get_cog('BSClan'):
+        if self is self.bot.get_cog('BSBand'):
             self.task = self.bot.loop.create_task(self.loop_task())
 
     def check_server_settings(self, server: discord.Server):
@@ -318,8 +326,12 @@ class BSBand:
         em.add_field(name="Band Tag", value=data.tag)
         em.add_field(
             name="Members", value=data.member_count_str)
+        em.set_thumbnail(url=data.badge_url)
         # em.set_author(name=data.name)
         return em
+
+    def embed_bsband_roster(self, band):
+        """Return band roster embed."""
 
     @bsband.command(name="name", pass_context=True, no_pm=True)
     async def bsband_name(self, ctx: Context, name):
