@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 
 import os
 import asyncio
+import itertools
 import datetime as dt
 from random import choice
 import json
@@ -47,7 +48,7 @@ try:
 except ImportError:
     raise ImportError("Please install the aiohttp package.") from None
 
-PATH = os.path.join("data", "bsband")
+PATH = os.path.join("data", "bsdata")
 JSON = os.path.join(PATH, "settings.json")
 
 DATA_UPDATE_INTERVAL = timedelta(minutes=5).seconds
@@ -83,6 +84,14 @@ MEMBER_DEFAULTS = {
     "trophies": 0,
     "unk1": 0
 }
+
+
+def grouper(n, iterable, fillvalue=None):
+    """Group lists into lists of items.
+
+    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
+    args = [iter(iterable)] * n
+    return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
 class BSRole(Enum):
@@ -171,7 +180,7 @@ class BSMemberData:
         self.__dict__.update(kwargs)
 
 
-class BSBand:
+class BSData:
     """Brawl Stars Clan management."""
 
     def __init__(self, bot):
@@ -199,16 +208,16 @@ class BSBand:
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(manage_server=True)
-    async def setbsband(self, ctx):
-        """Set Clash Royale Data settings.
+    async def setbsdata(self, ctx):
+        """Set Brawl Stars Data settings.
 
-        Require: Starfire access permission.
+        Require: Brawl Stars API by Harmiox.
         May not work for you."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setbsband.command(name="apiurl", pass_context=True)
-    async def setbsband_apiurl(self, ctx: Context, apiurl):
+    @setbsdata.command(name="apiurl", pass_context=True)
+    async def setbsdata_apiurl(self, ctx: Context, apiurl):
         """API URL base.
 
         Format:
@@ -218,7 +227,7 @@ class BSBand:
         self.settings["api_url"] = apiurl
 
         server = ctx.message.server
-        self.check_server_settings(server)
+        self.check_server_settings(server.id)
 
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("API URL updated.")
@@ -237,7 +246,6 @@ class BSBand:
     async def update_data(self, band_tag=None):
         """Perform data update from api."""
         for server_id in self.settings["servers"]:
-            # bands = self.settings["servers"][server_id]["bands"].copy()
             bands = self.get_bands_settings(server_id)
 
             if band_tag is None:
@@ -251,12 +259,10 @@ class BSBand:
                     bands[band_tag].update(data)
 
             self.set_bands_settings(server_id, bands)
-            # self.settings["servers"][server_id]["bands"] = bands
-            # dataIO.save_json(JSON, self.settings)
         return True
 
-    @setbsband.command(name="update", pass_context=True)
-    async def sebsband_update(self, ctx: Context):
+    @setbsdata.command(name="update", pass_context=True)
+    async def sebsdata_update(self, ctx: Context):
         """Update data from api."""
         success = await self.update_data()
         if success:
@@ -273,8 +279,8 @@ class BSBand:
         dataIO.save_json(JSON, self.settings)
         return True
 
-    @setbsband.command(name="add", pass_context=True)
-    async def setbsband_add(self, ctx: Context, *clantags):
+    @setbsdata.command(name="add", pass_context=True)
+    async def setbsdata_add(self, ctx: Context, *clantags):
         """Add clan tag(s).
 
         [p]setbsband add LQQ 82RQLR 98VLYJ Q0YG8V
@@ -285,26 +291,24 @@ class BSBand:
             return
 
         server = ctx.message.server
-        self.check_server_settings(server)
+        self.check_server_settings(server.id)
 
         for clantag in clantags:
             if clantag.startswith('#'):
                 clantag = clantag[1:]
 
-            # bands = self.settings["servers"][server.id]["bands"].copy()
             bands = self.get_bands_settings(server.id)
             if clantag not in bands:
                 bands[clantag] = BAND_DEFAULTS
 
-            # self.settings["servers"][server.id]["bands"] = bands
-            self.set_bands_data(server.id, bands)
+            self.set_bands_settings(server.id, bands)
 
             await self.bot.say("added Band with clan tag: #{}".format(clantag))
 
-        # dataIO.save_json(JSON, self.settings)
+        await self.update_data()
 
-    @setbsband.command(name="remove", pass_context=True)
-    async def setbsband_remove(self, ctx: Context, *clantags):
+    @setbsdata.command(name="remove", pass_context=True)
+    async def setbsdata_remove(self, ctx: Context, *clantags):
         """Remove clan tag(s).
 
         [p]setbsband remove LQQ 82RQLR 98VLYJ Q0YG8V
@@ -315,8 +319,6 @@ class BSBand:
             return
 
         server = ctx.message.server
-        self.check_server_settings(server.id)
-        # bands = self.settings["servers"][server.id]["bands"]
         bands = self.get_bands_settings(server.id)
 
         for clantag in clantags:
@@ -328,12 +330,11 @@ class BSBand:
                 await self.bot.say("{} not in clan settings.".format(clantag))
                 return
 
-            self.set_bands_data(server.id, bands)
-
+            self.set_bands_settings(server.id, bands)
             await self.bot.say("Removed #{} from bands.".format(clantag))
 
-    @setbsband.command(name="setkey", pass_context=True)
-    async def setbsband_setkey(self, ctx, tag, key):
+    @setbsdata.command(name="setkey", pass_context=True)
+    async def setbsdata_setkey(self, ctx, tag, key):
         """Associate band tag with human readable key.
 
         This is used for running other commands to make
@@ -341,28 +342,32 @@ class BSBand:
         band tag every time.
         """
         server = ctx.message.server
-        # self.check_server_settings(server.id)
-        # bands = self.settings["servers"][server.id]["bands"]
         bands = self.get_bands_settings(server.id)
 
+        if tag not in bands:
+            await self.bot.say(
+                "{} is not a band tag you have added".format(tag))
+            return
+        bands[tag]["key"] = key
+        self.set_bands_settings(server.id, bands)
+        await self.bot.say("Added {} for band #{}.".format(key, tag))
+
     @commands.group(pass_context=True, no_pm=True)
-    async def bsband(self, ctx: Context):
+    async def bsdata(self, ctx: Context):
         """Brawl Stars band."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @bsband.command(name="info", pass_context=True, no_pm=True)
-    async def bsband_info(self, ctx: Context):
+    @bsdata.command(name="info", pass_context=True, no_pm=True)
+    async def bsdata_info(self, ctx: Context):
         """Information."""
-        # await self.update_data()
         server = ctx.message.server
-        # bands = self.settings["servers"][server.id]["bands"]
         bands = self.get_bands_settings(server.id)
         for k, band in bands.items():
             # update band data if it was never fetched
             if band["name"] is None:
                 await self.update_data(band["tag"])
-        embeds = [self.embed_bsband_info(band) for tag, band in bands.items()]
+        embeds = [self.embed_bsdata_info(band) for tag, band in bands.items()]
         embeds = sorted(embeds, key=lambda x: x.title)
 
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
@@ -371,7 +376,7 @@ class BSBand:
             em.color = discord.Color(value=color)
             await self.bot.say(embed=em)
 
-    def embed_bsband_info(self, band):
+    def embed_bsdata_info(self, band):
         """Return band info embed."""
         data = BSBandData(**band)
         em = discord.Embed(
@@ -387,20 +392,60 @@ class BSBand:
         # em.set_author(name=data.name)
         return em
 
-    @bsband.command(name="roster", pass_context=True, no_pm=True)
-    async def bsband_roster(self, ctx: Context, key):
-        """Return band roster by key
+    @bsdata.command(name="roster", pass_context=True, no_pm=True)
+    async def bsdata_roster(self, ctx: Context, key):
+        """Return band roster by key.
 
         Key of each band is set from [p]bsband addkey
         """
-        pass
+        server = ctx.message.server
+        bands = self.get_bands_settings(server.id)
+        band_result = None
+        for k, band in bands.items():
+            data = BSBandData(**band)
+            if data.key == key:
+                band_result = data
+                break
 
-    def embed_bsband_roster(self, band):
+        if band_result is None:
+            await self.bot.say("Cannot find key {} in settings.".format(key))
+            return
+
+        members = band_result.members
+        # split results as list of 25
+        # because embeds can only contain 25 fields
+        members_out = grouper(24, members, None)
+        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+        color = int(color, 16)
+        page = 1
+        for members in members_out:
+            em = self.embed_bsdata_roster(members)
+            em.title = band_result.name
+            em.description = (
+                "Tag: {} | "
+                "Required Trophies: {}").format(
+                    band_result.tag, band_result.required_score)
+            em.color = discord.Color(value=color)
+            em.set_footer(
+                text="Page {}".format(page),
+                icon_url=band_result.badge_url)
+            await self.bot.say(embed=em)
+            page = page + 1
+
+    def embed_bsdata_roster(self, members):
         """Return band roster embed."""
-        pass
+        em = discord.Embed(title=".")
+        for member in members:
+            if member is not None:
+                data = BSMemberData(**member)
+                name = data.name
+                value = "{}, {} ({})".format(
+                    data.role, data.trophies, data.experience_level)
+                em.add_field(name=name, value=value)
+        return em
 
-    @bsband.command(name="name", pass_context=True, no_pm=True)
-    async def bsband_name(self, ctx: Context, name):
+    @bsdata.command(name="name", pass_context=True, no_pm=True)
+    async def bsdata_name(self, ctx: Context, name):
         """Return roster."""
         pass
 
@@ -421,7 +466,7 @@ def setup(bot):
     """Setup bot."""
     check_folder()
     check_file()
-    n = BSBand(bot)
+    n = BSData(bot)
     bot.add_cog(n)
 
 

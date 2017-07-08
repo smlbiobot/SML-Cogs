@@ -1,9 +1,9 @@
 {
 	"AUTHOR": "SML",
-	"SHORT": "Brawl Stars band",
-	"DESCRIPTION": "Access Brawl Stars clans with API by Harmiox.",
+	"SHORT": "Brawl Stars band data",
+	"DESCRIPTION": "Access Brawl Stars bands with API by Harmiox.",
 	"DISABLED": false,
-	"NAME": "BSBand",
+	"NAME": "BSData",
 	"REQUIREMENTS": [],
 	"TAGS": ["bs", "brawlstars", "brawl-stars", "clan", "management" "utility"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please log an issue on my GitHub or message me on http://discord.me/sml"
