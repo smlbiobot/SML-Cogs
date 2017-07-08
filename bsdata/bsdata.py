@@ -338,15 +338,14 @@ class BSData:
             for tag, band in bands.items():
                 do_update = band_tag is None or band_tag == tag
                 if do_update:
+                    # async with self.get_band_data(tag) as data:
                     data = await self.get_band_data(tag)
                     bands[tag].update(data)
                     self.set_bands_settings(server_id, bands)
-
-            self.set_bands_settings(server_id, bands)
         return True
 
     @setbsdata.command(name="update", pass_context=True)
-    async def sebsdata_update(self, ctx: Context):
+    async def setbsdata_update(self, ctx: Context):
         """Update data from api."""
         success = await self.update_data()
         if success:
