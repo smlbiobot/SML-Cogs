@@ -269,7 +269,7 @@ class BSData:
         dataIO.save_json(JSON, self.settings)
 
     @commands.group(pass_context=True, no_pm=True)
-    @checks.serverowner_or_permissions(manage_server=True)
+    @checks.admin_or_permissions(manage_server=True)
     async def setbsdata(self, ctx):
         """Set Brawl Stars Data settings.
 
@@ -558,11 +558,15 @@ class BSData:
         em = discord.Embed(
             title=player.username,
             description="#{}".format(player.tag))
+        band = BSBandData(**player.band)
         em.color = discord.Color(value=self.random_color())
+
+        em.add_field(name=band.name, value=band.role)
         em.add_field(name="Trophies", value=player.trophies)
         em.add_field(name="Victories", value=player.wins)
+        em.add_field(name="Showdown Victories", value=player.survival_wins)
         em.add_field(name="Highest Trophies", value=player.highest_trophies)
-        em.add_field(name="Brawlers", value=player.brawler_count, inline=False)
+        em.add_field(name="Brawlers", value=player.brawler_count)
 
         for brawler in player.brawlers:
             data = BSBrawlerData(**brawler)
@@ -573,10 +577,22 @@ class BSData:
                 name='{} {}'.format(data.name, emoji),
                 value=data.highest_trophies)
 
+        text = (
+            '{0.name}'
+            ' Trophies: {0.trophies}'
+            ' Requirement: {0.requirement}'
+            ' Tag: {0.tag}'
+            ' Type: {0.type}').format(band)
+
+        em.set_footer(
+            text=text,
+            icon_url=band.badge_url)
+
         return em
 
     @staticmethod
     def random_color():
+        """Return random color as an integer."""
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
         return color
