@@ -638,9 +638,11 @@ class BSData:
             emoji = self.brawler_emoji(data.name)
             if emoji is None:
                 emoji = ''
+            name = '{} {} (Level {})'.format(data.name, emoji, data.level)
+            trophies = '{}/{}'.format(data.trophies, data.highest_trophies)
             em.add_field(
-                name='{} {}'.format(data.name, emoji),
-                value=data.highest_trophies)
+                name=name,
+                value=trophies)
 
         text = (
             '{0.name}'
