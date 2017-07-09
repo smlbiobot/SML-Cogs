@@ -294,7 +294,7 @@ class BSData:
         dataIO.save_json(JSON, self.settings)
 
     @commands.group(pass_context=True, no_pm=True)
-    @checks.admin_or_permissions(manage_server=True)
+    @checks.serverowner_or_permissions()
     async def setbsdata(self, ctx):
         """Set Brawl Stars Data settings.
 
@@ -342,6 +342,23 @@ class BSData:
 
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Member API URL updated.")
+
+    @setbsdata.command(name="swapplayers", pass_context=True)
+    async def setbsdata_swapplayers(self, ctx):
+        """LEGACY settings support: swap players dictionary.
+
+        From key to value.
+        Originally:
+        PlayerTag: MemberID
+        Now:
+        MmeberID: PlayerTag
+        """
+        for server_id in self.settings["servers"]:
+            players = self.settings["servers"][server_id]["players"]
+            updated_players = {v: k for k, v in players.items()}
+            self.settings["servers"][server_id]["players"] = updated_players
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Players settings updated.")
 
     async def get_band_data(self, tag):
         """Return band data JSON."""
@@ -571,19 +588,13 @@ class BSData:
             await send_cmd_help(ctx)
             return
 
-        player_tag = None
-        for tag, member_id in players.items():
-            if member_id == member.id:
-                player_tag = tag
-                break
-
-        if player_tag is None:
+        if member.id not in players:
             await self.bot.say(
                 "Member has not registered a player tag yet."
                 "Type [p]bsdata settag [member] [tag] to set it.")
             return
 
-        await ctx.invoke(self.bsdata_profiletag, player_tag)
+        await ctx.invoke(self.bsdata_profiletag, players[member.id])
 
     @bsdata.command(name="profiletag", pass_context=True, no_pm=True)
     async def bsdata_profiletag(self, ctx, tag=None):
@@ -669,18 +680,53 @@ class BSData:
             return None
         return server.get_member(member_id)
 
+    def set_player_settings(self, server_id, playertag, member_id):
+        """Set player tag to member id.
+
+        Remove previously stored playertags associated with member_id.
+        """
+        players = self.settings["servers"][server_id]["players"]
+        # players = {k: v for k, v in players.items() if k != member_id}
+        players[member_id] = playertag
+        self.settings["servers"][server_id]["players"] = players
+        dataIO.save_json(JSON, self.settings)
+
     @bsdata.command(name="settag", pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     async def bsdata_settag(
-            self, ctx, member: discord.Member, playertag=None):
-        """Set playertag to discord member."""
+            self, ctx, playertag=None, member: discord.Member=None):
+        """Set playertag to discord member.
+
+        Bot Comamnders can set tags for other players.
+        Regular users can set their own tag.
+        """
+        server = ctx.message.server
+        author = ctx.message.author
+
         if playertag is None:
             await send_cmd_help(ctx)
             return
 
-        server = ctx.message.server
-        self.settings["servers"][server.id]["players"][playertag] = member.id
-        dataIO.save_json(JSON, self.settings)
+        allowed = False
+        if member is None:
+            allowed = True
+        else:
+            botcommander_roles = [
+                discord.utils.get(
+                    server.roles, name=r) for r in BOTCOMMANDER_ROLES]
+            botcommander_roles = set(botcommander_roles)
+            author_roles = set(author.roles)
+            if len(author_roles.intersection(botcommander_roles)):
+                allowed = True
+
+        if not allowed:
+            await self.bot.say("Only Bot Commanders can set tags for others.")
+            return
+
+        if member is None:
+            member = ctx.message.author
+
+        self.set_player_settings(server.id, playertag, member.id)
+
         await self.bot.say("Associated player tag with Discord Member.")
 
     @staticmethod
