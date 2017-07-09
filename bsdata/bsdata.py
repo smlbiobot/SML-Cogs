@@ -412,7 +412,7 @@ class BSData:
     def get_bands_settings(self, server_id):
         """Return bands in settings."""
         self.check_server_settings(server_id)
-        return self.settings["servers"][server_id]["bands"].copy()
+        return self.settings["servers"][server_id]["bands"]
 
     def set_bands_settings(self, server_id, data):
         """Set bands data in settings."""
@@ -569,10 +569,10 @@ class BSData:
                 "Required Trophies: {}").format(
                     band_result.tag, band_result.required_score)
             em.color = discord.Color(value=color)
-            em.set_thumbnail(url=band_result.badge_url)
+            # em.set_thumbnail(url=band_result.badge_url)
             em.set_footer(
                 text="Page {}".format(page),
-                icon_url=server.icon_url)
+                icon_url=band_result.badge_url)
             await self.bot.say(embed=em)
             page = page + 1
 
