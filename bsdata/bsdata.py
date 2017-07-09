@@ -685,8 +685,9 @@ class BSData:
 
         Remove previously stored playertags associated with member_id.
         """
+        if "players" not in self.settings["servers"][server_id]:
+            self.settings["servers"][server_id]["players"] = {}
         players = self.settings["servers"][server_id]["players"]
-        # players = {k: v for k, v in players.items() if k != member_id}
         players[member_id] = playertag
         self.settings["servers"][server_id]["players"] = players
         dataIO.save_json(JSON, self.settings)
