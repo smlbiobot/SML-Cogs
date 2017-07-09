@@ -390,6 +390,18 @@ class BSData:
             self.set_bands_settings(server_id, bands)
         return True
 
+    def tag2member(self, tag=None):
+        """Return Discord member from player tag."""
+        for server in self.bot.servers:
+            try:
+                players = self.settings["servers"][server.id]["players"]
+                for member_id, v in players.items():
+                    if v == tag:
+                        return server.get_member(member_id)
+            except KeyError:
+                pass
+        return None
+
     @setbsdata.command(name="update", pass_context=True)
     async def setbsdata_update(self, ctx: Context):
         """Update data from api."""
@@ -571,10 +583,15 @@ class BSData:
             if member is not None:
                 data = BSBandMemberData(**member)
                 name = "{}, {}".format(data.name, data.role)
-                value = "{}, {} XP, #{}".format(
+                mention = ""
+                member = self.tag2member(data.tag)
+                if member is not None:
+                    mention = '\n{}'.format(member.mention)
+                value = "{}, {} XP, #{}{}".format(
                     data.trophies,
                     data.experience_level,
-                    data.tag)
+                    data.tag,
+                    mention)
                 em.add_field(name=name, value=value)
         return em
 
@@ -628,7 +645,7 @@ class BSData:
         return data
 
     def embed_player(self, player: BSPlayerData):
-        """Return band roster embed."""
+        """Return player embed."""
         em = discord.Embed(
             title=player.username,
             description="#{}".format(player.tag))
