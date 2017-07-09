@@ -579,14 +579,13 @@ class BSData:
         return em
 
     @bsdata.command(name="profile", pass_context=True, no_pm=True)
-    async def bsdata_profile(self, ctx, member: discord.Member):
+    async def bsdata_profile(self, ctx, member: discord.Member=None):
         """Return player profile by Discord member name or id."""
         server = ctx.message.server
         players = self.settings["servers"][server.id]["players"]
 
-        if not member:
-            await send_cmd_help(ctx)
-            return
+        if member is None:
+            member = ctx.message.author
 
         if member.id not in players:
             await self.bot.say(
