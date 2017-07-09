@@ -589,8 +589,8 @@ class BSData:
 
         if member.id not in players:
             await self.bot.say(
-                "Member has not registered a player tag yet."
-                "Type [p]bsdata settag [member] [tag] to set it.")
+                "Member has not registered a player tag yet.\n"
+                "Use `!bsdata settag` to set it.")
             return
 
         await ctx.invoke(self.bsdata_profiletag, players[member.id])
@@ -672,7 +672,9 @@ class BSData:
         member_id = None
         try:
             players = self.settings["servers"][server.id]["players"]
-            member_id = players[player_tag]
+            for k, v in players.items():
+                if v == player_tag:
+                    member_id = k
         except KeyError:
             pass
         if member_id is None:
@@ -696,8 +698,13 @@ class BSData:
             self, ctx, playertag=None, member: discord.Member=None):
         """Set playertag to discord member.
 
-        Bot Comamnders can set tags for other players.
-        Regular users can set their own tag.
+        Setting tag for yourself:
+        !bsdata settag 889QC9
+
+        Setting tag for others (requires Bot Commander role):
+        !bsdata settag 889QC9 SML
+        !bsdata settag 889QC9 @SML
+        !bsdata settag 889QC9 @SML#6443
         """
         server = ctx.message.server
         author = ctx.message.author
