@@ -609,7 +609,7 @@ class BSData:
 
         player = BSPlayerData(**data)
         server = ctx.message.server
-        player.discord_member = self.get_discord_member(server, player.tag)
+        player.discord_member = self.get_discord_member(server, tag)
         await self.bot.say(embed=self.embed_player(player))
 
     async def get_player_data(self, tag):
