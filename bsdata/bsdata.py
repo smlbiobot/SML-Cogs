@@ -603,8 +603,12 @@ class BSData:
             return
 
         data = await self.get_player_data(tag)
-        if data is None:
-            await self.bot.say("Error fetching player data.")
+        if not data:
+            await self.bot.say(
+                "Error fetching player data. "
+                "Please make sure that player tag is set correctly. "
+                "It is set to #{} at the moment. "
+                "Run `!bsdata settag` if you need to update it.".format(tag))
             return
 
         player = BSPlayerData(**data)
