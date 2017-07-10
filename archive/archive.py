@@ -74,12 +74,19 @@ class Archive:
 
         async for message in self.bot.logs_from(
                 channel, limit=count):
-            channel_messages.append({
+            msg ={
                 'author_id': message.author.id,
                 'content': message.content,
                 'timestamp': message.timestamp.isoformat(),
-                'id': message.id
-            })
+                'id': message.id,
+                'reactions': []
+            }
+            for reaction in message.reactions:
+                msg['reactions'].append({
+                    'emoji': reaction.emoji,
+                    'count': reaction.count
+                })
+            channel_messages.append(msg)
 
         channel_messages = sorted(
             channel_messages, key=lambda x: x['timestamp'])
@@ -107,6 +114,9 @@ class Archive:
             em = discord.Embed(
                 title=channel.name,
                 description=description)
+
+            for reaction in message['reactions']:
+                em.add_field(name=reaction['emoji'], value=reaction['count'])
             em.set_footer(text='{} - ID: {}'.format(timestamp, message_id))
             await self.bot.say(embed=em)
 
