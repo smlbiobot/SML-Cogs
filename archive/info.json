@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Archive",
+	"DESCRIPTION": "Archive channel message log from one to another",
+	"DISABLED": false,
+	"NAME": "Archive",
+	"REQUIREMENTS": [],
+	"TAGS": ["archive", "log", "messages", "utility"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
