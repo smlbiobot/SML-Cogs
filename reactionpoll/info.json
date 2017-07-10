@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "ReactionPoll",
+	"DESCRIPTION": "Monitor polling results with reactions from one channel and report results in another.",
+	"DISABLED": false,
+	"NAME": "ReactionPoll",
+	"REQUIREMENTS": [],
+	"TAGS": ["rcs", "reaction", "poll", "utility"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
