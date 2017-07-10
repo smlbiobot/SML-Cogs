@@ -82,10 +82,18 @@ class Archive:
                 'reactions': []
             }
             for reaction in message.reactions:
-                msg['reactions'].append({
-                    'emoji': reaction.emoji,
+                r = {
+                    'custom_emoji': reaction.custom_emoji,
                     'count': reaction.count
-                })
+                }
+                if reaction.custom_emoji:
+                    # <:emoji_name:emoji_id>
+                    r['emoji'] = '<:{}:{}>'.format(
+                        reaction.emoji.name,
+                        reaction.emoji.id)
+                else:
+                    r['emoji'] = reaction.emoji
+                msg['reactions'].append(r)
             channel_messages.append(msg)
 
         channel_messages = sorted(
@@ -117,6 +125,7 @@ class Archive:
 
             for reaction in message['reactions']:
                 em.add_field(name=reaction['emoji'], value=reaction['count'])
+
             em.set_footer(text='{} - ID: {}'.format(timestamp, message_id))
             await self.bot.say(embed=em)
 
