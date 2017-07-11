@@ -41,6 +41,7 @@ from discord.ext.commands import Context
 
 from __main__ import send_cmd_help
 from cogs.utils import checks
+from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 
@@ -151,14 +152,6 @@ class CRClanData:
             count = 0
         return '{}/50'.format(count)
 
-    # @property
-    # def badge_url(self):
-    #     """Return clan emblem URL."""
-    #     return (
-    #         "https://raw.githubusercontent.com"
-    #         "/smlbiobot/smlbiobot.github.io/master/img"
-    #         "/bs-badge/{}.png").format(self.badge)
-
 class CRClanMemberData:
     """Clash Royale Member data."""
 
@@ -167,18 +160,26 @@ class CRClanMemberData:
 
         Expected list of keywords:
         From API:
-            experience_level
-            id
+            arena
+            avatarId
                 high
                 low
                 unsigned
+            clanChestCrowns
+            currentRank
+            donations
+            expLevel
+            homeID
+                high
+                low
+                unsigned
+            league
             name
+            previousRank
             role
-            role_id
+            roleName
+            score
             tag
-            trophies
-            unk1
-            unk2
         """
         self.__dict__.update(kwargs)
         self._discord_member = None
@@ -192,6 +193,25 @@ class CRClanMemberData:
     def discord_member(self, value):
         """Discord user id."""
         self._discord_member = value
+
+    @property
+    def mention(self):
+        """Discord mention."""
+        # return self.discord_member.mention
+        return ""
+
+    @property
+    def role_name(self):
+        """Properly formatted role name."""
+        if self.role == 1:
+            return "Member"
+        elif self.role == 2:
+            return "Leader"
+        elif self.role == 3:
+            return "Elder"
+        elif self.role == 4:
+            return "Co-Leader"
+        return ""
 
 
 class CRPlayerData:
@@ -556,45 +576,54 @@ class CRClan:
             return
 
         members = clan_result.members
-        # split results as list of 24
-        # because embeds can only contain 25 fields
-        # if fields are displayed inline,
-        # 24 can fit both 2 and 3-column layout
-        members_out = grouper(24, members, None)
+        tag = self.key2tag(server.id, key)
+        await self.update_data(tag)
+
+        # split results as list of 25
+        members_out = grouper(25, members, None)
         color = self.random_color()
         page = 1
         for members in members_out:
             em = self.embed_crclan_roster(members)
             em.title = clan_result.name
-            em.description = (
-                "Tag: {} | "
-                "Required Trophies: {}").format(
-                    clan_result.tag, clan_result.required_score)
+            # em.description = (
+            #     "Tag: {} | "
+            #     "Required Trophies: {}").format(
+            #         clan_result.tag, clan_result.requiredScore)
             em.color = discord.Color(value=color)
-            # em.set_thumbnail(url=clan_result.badge_url)
+            badge_url = self.settings["badge_url"] + data.badge_url
             em.set_footer(
                 text="Page {}".format(page),
-                icon_url=clan_result.badge_url)
+                icon_url=badge_url)
             await self.bot.say(embed=em)
             page = page + 1
 
     def embed_crclan_roster(self, members):
         """Return clan roster embed."""
-        em = discord.Embed(title=".")
+        em = discord.Embed(title=" ")
         for member in members:
             if member is not None:
                 data = CRClanMemberData(**member)
-                name = "{}, {}".format(data.name, data.role)
-                mention = ""
-                member = self.tag2member(data.tag)
-                if member is not None:
-                    mention = '\n{}'.format(member.mention)
-                value = "{}, {} XP, #{}{}".format(
-                    data.trophies,
-                    data.experience_level,
-                    data.tag,
-                    mention)
-                em.add_field(name=name, value=value)
+                name = (
+                    "{0.name}, {0.role_name} "
+                    "(Lvl {0.expLevel}) ").format(data)
+                # mention = ""
+                # member = self.tag2member(data.tag)
+                # if member is not None:
+                #     mention = '\n{}'.format(member.mention)
+                # data.mention = mention
+                value = (
+                    "{0.score:,d}"
+                    " | {0.donations: >4} d"
+                    " | {0.clanChestCrowns: >3} c"
+                    " | #{0.tag}").format(data)
+                # value = (
+                #     "`{0.score:,d}` "
+                #     "| `{0.donations: >4}` donations "
+                #     "| `{0.clanChestCrowns: >4}` crowns"
+                #     "| `#{0.tag}`").format(data)
+                value = box(value, lang='py')
+                em.add_field(name=name, value=value, inline=False)
         return em
 
     @crclan.command(name="profile", pass_context=True, no_pm=True)
