@@ -61,11 +61,19 @@ class ReactionPoll:
         """Verify settings have all the keys."""
 
     @checks.mod_or_permissions()
-    @commands.group(pass_context=True, no_pm=True)
+    @commands.group(aliases=['rp'], pass_context=True, no_pm=True)
     async def reactionpoll(self, ctx):
         """Reaction polling utility."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    @checks.serverowner_or_permissions()
+    @reactionpoll.command(name="init", pass_context=True, no_pm=True)
+    async def reactionpoll_init(self, ctx):
+        """Initialize server settings."""
+        self.settings[ctx.message.server.id]["messages"] = {}
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Server setttings initialized.")
 
     @reactionpoll.command(name="add", pass_context=True, no_pm=True)
     async def reactionpoll_add(
@@ -81,7 +89,7 @@ class ReactionPoll:
         server = ctx.message.server
         message = await self.bot.get_message(channel, message_id)
 
-        em = self.reaction_embed(message)
+        em = await self.reaction_embed(message)
 
         embed_message = await self.bot.say(embed=em)
 
@@ -111,6 +119,7 @@ class ReactionPoll:
         """Monitor reactions if tracked."""
         message = reaction.message
         server = message.server
+        # print('Reaction add: {}: {}'.format(server.id, message.id))
         if message.id not in self.settings[server.id]['messages']:
             return
 
@@ -120,6 +129,7 @@ class ReactionPoll:
         """Monitor reactions if tracked."""
         message = reaction.message
         server = message.server
+        # print('Reaction remove: {}: {}'.format(server.id, message.id))
         if message.id not in self.settings[server.id]['messages']:
             return
 
@@ -127,6 +137,7 @@ class ReactionPoll:
 
     async def update_reation_embed(self, server, message):
         """Update reation embeds."""
+        print('Reaction update: {}: {}'.format(server.id, message.id))
         m = self.settings[server.id]['messages'][message.id]
 
         embed_channel = server.get_channel(m["embed_channel_id"])
@@ -139,12 +150,12 @@ class ReactionPoll:
             reaction_channel,
             m["message_id"])
 
+        em = await self.reaction_embed(reaction_message)
         await self.bot.edit_message(
             embed_message,
-            embed=self.reaction_embed(reaction_message))
+            embed=em)
 
-    def reaction_embed(
-            self, message: discord.Message):
+    async def reaction_embed(self, message: discord.Message):
         """Discord Embed of a message reaction."""
         title = message.channel.name
         description = message.content
@@ -153,19 +164,21 @@ class ReactionPoll:
             description=description)
 
         for reaction in message.reactions:
-            r = {
-                # 'custom_emoji': reaction.custom_emoji,
-                'count': reaction.count
-            }
             if reaction.custom_emoji:
                 # <:emoji_name:emoji_id>
-                r['emoji'] = '<:{}:{}>'.format(
+                emoji = '<:{}:{}>'.format(
                     reaction.emoji.name,
                     reaction.emoji.id)
             else:
-                r['emoji'] = reaction.emoji
+                emoji = reaction.emoji
 
-            em.add_field(name=r['emoji'], value=r['count'])
+            reaction_users = await self.bot.get_reaction_users(reaction)
+            users = ' '.join([m.mention for m in reaction_users])
+            name = emoji
+            count = reaction.count
+            value = '{}: {}'.format(count, users)
+
+            em.add_field(name=name, value=value, inline=True)
 
         em.set_footer(
             text='ID: {} | Updated: {}'.format(
