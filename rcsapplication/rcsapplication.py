@@ -23,7 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
-import datetime as date
+import datetime as dt
 import httplib2
 import aiohttp
 
@@ -66,13 +66,13 @@ class RCSApplication:
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
-    async def setapplication(self, ctx):
+    async def setrcsapplication(self, ctx):
         """Set app settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setapplication.command(name="servicekey", pass_context=True)
-    async def setapplication_servicekey(self, ctx):
+    @setrcsapplication.command(name="servicekey", pass_context=True)
+    async def setrcsapplication_servicekey(self, ctx):
         """Set Google API service account key.
 
         This is a json file downloaable from the Google API Console.
@@ -100,8 +100,8 @@ class RCSApplication:
         await self.bot.say(
             "Attachment received and saved as {}".format(SERVICE_KEY_JSON))
 
-    @setapplication.command(name="req", pass_context=True)
-    async def setapplication_req(self, ctx, *, requirements):
+    @setrcsapplication.command(name="req", pass_context=True)
+    async def setrcsapplication_req(self, ctx, *, requirements):
         """Set RCS Requirements.
 
         This is an open text field. It can be set to anything,
@@ -109,8 +109,8 @@ class RCSApplication:
         """
         pass
 
-    @setapplication.command(name="sheetid", pass_context=True)
-    async def setapplication_sheetid(self, ctx, id):
+    @setrcsapplication.command(name="sheetid", pass_context=True)
+    async def setrcsapplication_sheetid(self, ctx, id):
         """Set Google Spreadsheet ID.
 
         Example:
@@ -127,30 +127,32 @@ class RCSApplication:
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
-    async def application(self, ctx):
+    async def rcsapplication(self, ctx):
         """Set app settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @application.command(name="new", pass_context=True)
-    async def application_new(self, ctx, user: discord.Member):
+    @rcsapplication.command(name="new", pass_context=True)
+    async def rcsapplication_new(self, ctx, user: discord.Member):
         """Create a new application ID.
 
         This will additionally create a link to the Google Form and
         give instruction to the user re: what to do.
         """
+        pass
 
-    @application.command(name="get", pass_context=True)
-    async def application_get(self, ctx, app_id):
+    @rcsapplication.command(name="get", pass_context=True)
+    async def rcsapplication_get(self, ctx, app_id):
         """Get app results by application ID.
 
         Application ID is a field that is tied to an RCS clan application.
         This was given to the interviewee when they app.
         It is inserted into the sheet as a value in a cell.
         """
-
+        await self.bot.send_typing(ctx.message.channel)
         try:
-            out = self.get_application_response(ctx, app_id)
+            # out = self.get_application_response(ctx, app_id)
+            em = self.get_application_response_embed(ctx, app_id)
         except NoDataFound:
             await self.bot.say('No data found.')
             return
@@ -158,13 +160,12 @@ class RCSApplication:
             await self.bot.say("Application ID not found.")
             return
 
-        # output
-        for page in pagify(out, shorten_by=80):
-            await self.bot.say(page)
+        await self.bot.say(embed=em)
 
-    @application.command(name="getmd", pass_context=True)
-    async def application_getmd(self, ctx, app_id):
+    @rcsapplication.command(name="getmd", pass_context=True)
+    async def rcsapplication_getmd(self, ctx, app_id):
         """Return appliation info as markdown."""
+        await self.bot.send_typing(ctx.message.channel)
         try:
             out = self.get_application_response(ctx, app_id)
         except NoDataFound:
@@ -177,24 +178,9 @@ class RCSApplication:
         for page in pagify(out, shorten_by=80):
             await self.bot.say(box(page, lang="markdown"))
 
-
     def get_application_response(self, ctx, app_id):
         """Return application info as text."""
-        credentials = ServiceAccountCredentials.from_json_keyfile_name(
-            SERVICE_KEY_JSON, scopes=SCOPES)
-        http = credentials.authorize(httplib2.Http())
-        discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
-                        'version=v4')
-        service = discovery.build('sheets', 'v4', http=http,
-                                  discoveryServiceUrl=discoveryUrl)
-
-        server = ctx.message.server
-        spreadsheetId = self.settings[server.id]["SHEET_ID"]
-
-        # whole sheet
-        rangeName = 'FormResponses!A:O'
-        result = service.spreadsheets().values().get(
-            spreadsheetId=spreadsheetId, range=rangeName).execute()
+        result = self.get_gspread_result(ctx.message.server)
         values = result.get('values', [])
 
         if not values:
@@ -237,6 +223,66 @@ class RCSApplication:
 
         return '\n'.join(out)
 
+    def get_application_response_embed(self, ctx, app_id):
+        """Return application info as text."""
+        server = ctx.message.server
+        result = self.get_gspread_result(server)
+        values = result.get('values', [])
+
+        if not values:
+            raise NoDataFound()
+            return
+
+        # questions: first row
+        questions = values[0]
+        # questions contain legacy field at end
+        questions = questions[:-1]
+
+        # app id is column C
+        answers = None
+        forms = values[1:]
+        for form in forms:
+            if form[1] == app_id:
+                answers = form
+                break
+
+        # process answers
+        if answers is None:
+            # await self.bot.say("Application ID not found.")
+            raise ApplicationIdNotFound()
+            return
+
+        em = discord.Embed(
+            title="RCS Application Response",
+            description=answers[0])
+
+        for id, question in enumerate(questions):
+            if id > 0:
+                name = '{}. {}'.format(id, question)
+                value = answers[id]
+                em.add_field(name=name, value=value, inline=False)
+
+        em.set_footer(text=server.name, icon_url=server.icon_url)
+
+        return em
+
+    def get_gspread_result(self, server):
+        """Return Google Spreadsheet reuslt."""
+        credentials = ServiceAccountCredentials.from_json_keyfile_name(
+            SERVICE_KEY_JSON, scopes=SCOPES)
+        http = credentials.authorize(httplib2.Http())
+        discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
+                        'version=v4')
+        service = discovery.build('sheets', 'v4', http=http,
+                                  discoveryServiceUrl=discoveryUrl)
+        spreadsheetId = self.settings[server.id]["SHEET_ID"]
+
+        # whole sheet
+        rangeName = 'FormResponses!A:O'
+        result = service.spreadsheets().values().get(
+            spreadsheetId=spreadsheetId, range=rangeName).execute()
+
+        return result
 
 def check_folder():
     """Check folder."""
