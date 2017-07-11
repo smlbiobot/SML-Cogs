@@ -1,0 +1,1193 @@
+{
+    "badge": 16000167,
+    "badge_url": "http://statsroyale.com/images/badges/16000167.png",
+    "currentRank": 0,
+    "description": "Official Feeder for Reddit Charlie #2QUVVVP - 50/50 moved to Reddit Echo #LGVV2CG - discord.gg/racf - 4,300+🏆",
+    "donations": 7662,
+    "members": [
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 20,
+                "low": 750858,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 1,
+            "donations": 250,
+            "expLevel": 11,
+            "homeID": {
+                "high": 20,
+                "low": 750858,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "reklaw",
+            "previousRank": 2,
+            "role": 1,
+            "roleName": "member",
+            "score": 4585,
+            "tag": "2CQYGUGP"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 3,
+                "low": 889182,
+                "unsigned": false
+            },
+            "clanChestCrowns": 4,
+            "currenRank": 2,
+            "donations": 118,
+            "expLevel": 12,
+            "homeID": {
+                "high": 3,
+                "low": 889182,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "BufareteYouTube",
+            "previousRank": 6,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4566,
+            "tag": "8899YJG9"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 12,
+                "low": 5215094,
+                "unsigned": false
+            },
+            "clanChestCrowns": 33,
+            "currenRank": 3,
+            "donations": 231,
+            "expLevel": 12,
+            "homeID": {
+                "high": 12,
+                "low": 5215094,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "ricardo",
+            "previousRank": 7,
+            "role": 1,
+            "roleName": "member",
+            "score": 4517,
+            "tag": "URPPCYYJ"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 12,
+                "low": 1475412,
+                "unsigned": false
+            },
+            "clanChestCrowns": 12,
+            "currenRank": 4,
+            "donations": 100,
+            "expLevel": 12,
+            "homeID": {
+                "high": 12,
+                "low": 1475412,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "syshero",
+            "previousRank": 21,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4516,
+            "tag": "9G89VJC8"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 4,
+                "low": 84191,
+                "unsigned": false
+            },
+            "clanChestCrowns": 67,
+            "currenRank": 5,
+            "donations": 106,
+            "expLevel": 11,
+            "homeID": {
+                "high": 4,
+                "low": 84191,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Owen",
+            "previousRank": 15,
+            "role": 1,
+            "roleName": "member",
+            "score": 4485,
+            "tag": "8U20QJU"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 7,
+                "low": 685116,
+                "unsigned": false
+            },
+            "clanChestCrowns": 18,
+            "currenRank": 6,
+            "donations": 92,
+            "expLevel": 12,
+            "homeID": {
+                "high": 7,
+                "low": 685116,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Yenny",
+            "previousRank": 3,
+            "role": 1,
+            "roleName": "member",
+            "score": 4482,
+            "tag": "2RP2QQYV"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 13,
+                "low": 785640,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 7,
+            "donations": 94,
+            "expLevel": 12,
+            "homeID": {
+                "high": 13,
+                "low": 785640,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "UltimateHunter",
+            "previousRank": 5,
+            "role": 1,
+            "roleName": "member",
+            "score": 4472,
+            "tag": "2URVYU2Q"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 2,
+                "low": 405467,
+                "unsigned": false
+            },
+            "clanChestCrowns": 4,
+            "currenRank": 8,
+            "donations": 68,
+            "expLevel": 12,
+            "homeID": {
+                "high": 2,
+                "low": 405467,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "XpertGH",
+            "previousRank": 12,
+            "role": 1,
+            "roleName": "member",
+            "score": 4442,
+            "tag": "VJVVCQU"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 21,
+                "low": 878027,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 9,
+            "donations": 156,
+            "expLevel": 12,
+            "homeID": {
+                "high": 21,
+                "low": 878027,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "ZEUS",
+            "previousRank": 0,
+            "role": 1,
+            "roleName": "member",
+            "score": 4438,
+            "tag": "82CV20UY"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 15,
+                "low": 494170,
+                "unsigned": false
+            },
+            "clanChestCrowns": 24,
+            "currenRank": 10,
+            "donations": 166,
+            "expLevel": 12,
+            "homeID": {
+                "high": 15,
+                "low": 494170,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "RegManG",
+            "previousRank": 1,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4434,
+            "tag": "28C92PGQ"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 8,
+                "low": 282110,
+                "unsigned": false
+            },
+            "clanChestCrowns": 2,
+            "currenRank": 11,
+            "donations": 120,
+            "expLevel": 12,
+            "homeID": {
+                "high": 8,
+                "low": 282110,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "lynkelol",
+            "previousRank": 8,
+            "role": 1,
+            "roleName": "member",
+            "score": 4422,
+            "tag": "RG9VP9L"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 31,
+                "low": 4546447,
+                "unsigned": false
+            },
+            "clanChestCrowns": 45,
+            "currenRank": 12,
+            "donations": 341,
+            "expLevel": 12,
+            "homeID": {
+                "high": 31,
+                "low": 4546447,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "SML",
+            "previousRank": 19,
+            "role": 2,
+            "roleName": "leader",
+            "score": 4417,
+            "tag": "C0G20PR2"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 27,
+                "low": 836104,
+                "unsigned": false
+            },
+            "clanChestCrowns": 44,
+            "currenRank": 13,
+            "donations": 379,
+            "expLevel": 12,
+            "homeID": {
+                "high": 27,
+                "low": 836104,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Nhat",
+            "previousRank": 13,
+            "role": 1,
+            "roleName": "member",
+            "score": 4415,
+            "tag": "80YVRUPC"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 10,
+                "low": 1511815,
+                "unsigned": false
+            },
+            "clanChestCrowns": 37,
+            "currenRank": 14,
+            "donations": 196,
+            "expLevel": 12,
+            "homeID": {
+                "high": 10,
+                "low": 1511815,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Stuff",
+            "previousRank": 14,
+            "role": 1,
+            "roleName": "member",
+            "score": 4371,
+            "tag": "9RYGQVQU"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 39,
+                "low": 2150157,
+                "unsigned": false
+            },
+            "clanChestCrowns": 50,
+            "currenRank": 15,
+            "donations": 246,
+            "expLevel": 11,
+            "homeID": {
+                "high": 39,
+                "low": 2150157,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": " AJ ",
+            "previousRank": 16,
+            "role": 1,
+            "roleName": "member",
+            "score": 4359,
+            "tag": "Y92LYJQY"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 25,
+                "low": 1563128,
+                "unsigned": false
+            },
+            "clanChestCrowns": 75,
+            "currenRank": 16,
+            "donations": 0,
+            "expLevel": 11,
+            "homeID": {
+                "high": 25,
+                "low": 1563128,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Cyco",
+            "previousRank": 22,
+            "role": 1,
+            "roleName": "member",
+            "score": 4356,
+            "tag": "9C80Q8RC"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 27,
+                "low": 1926736,
+                "unsigned": false
+            },
+            "clanChestCrowns": 26,
+            "currenRank": 17,
+            "donations": 187,
+            "expLevel": 12,
+            "homeID": {
+                "high": 27,
+                "low": 1926736,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Lordnacho69xx",
+            "previousRank": 4,
+            "role": 1,
+            "roleName": "member",
+            "score": 4355,
+            "tag": "PRQ2QC9V"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 23,
+                "low": 3042837,
+                "unsigned": false
+            },
+            "clanChestCrowns": 49,
+            "currenRank": 18,
+            "donations": 80,
+            "expLevel": 11,
+            "homeID": {
+                "high": 23,
+                "low": 3042837,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "darth gane",
+            "previousRank": 36,
+            "role": 1,
+            "roleName": "member",
+            "score": 4346,
+            "tag": "QYLY2CCR"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 19,
+                "low": 386850,
+                "unsigned": false
+            },
+            "clanChestCrowns": 20,
+            "currenRank": 19,
+            "donations": 53,
+            "expLevel": 11,
+            "homeID": {
+                "high": 19,
+                "low": 386850,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "GhostlyDino",
+            "previousRank": 18,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4331,
+            "tag": "V82UVQV"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 12,
+                "low": 5470935,
+                "unsigned": false
+            },
+            "clanChestCrowns": 2,
+            "currenRank": 20,
+            "donations": 34,
+            "expLevel": 11,
+            "homeID": {
+                "high": 12,
+                "low": 5470935,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "nemauen",
+            "previousRank": 10,
+            "role": 1,
+            "roleName": "member",
+            "score": 4327,
+            "tag": "VP02RV28"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 5,
+                "low": 124096,
+                "unsigned": false
+            },
+            "clanChestCrowns": 4,
+            "currenRank": 21,
+            "donations": 0,
+            "expLevel": 12,
+            "homeID": {
+                "high": 5,
+                "low": 124096,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "theothertallguy",
+            "previousRank": 23,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4323,
+            "tag": "P90VLGY"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 25,
+                "low": 2007160,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 22,
+            "donations": 336,
+            "expLevel": 11,
+            "homeID": {
+                "high": 25,
+                "low": 2007160,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "SamSung",
+            "previousRank": 24,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4319,
+            "tag": "PU9YLUU2"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 0,
+                "low": 1994951,
+                "unsigned": false
+            },
+            "clanChestCrowns": 126,
+            "currenRank": 23,
+            "donations": 438,
+            "expLevel": 12,
+            "homeID": {
+                "high": 0,
+                "low": 1994951,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "FLONGAS",
+            "previousRank": 34,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4319,
+            "tag": "PCCG2UP0"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 13,
+                "low": 97031,
+                "unsigned": false
+            },
+            "clanChestCrowns": 11,
+            "currenRank": 24,
+            "donations": 20,
+            "expLevel": 12,
+            "homeID": {
+                "high": 13,
+                "low": 97031,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Cyrac",
+            "previousRank": 39,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4319,
+            "tag": "9P8GLL2"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 34,
+                "low": 5571954,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 25,
+            "donations": 486,
+            "expLevel": 12,
+            "homeID": {
+                "high": 34,
+                "low": 5571954,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Thane",
+            "previousRank": 25,
+            "role": 1,
+            "roleName": "member",
+            "score": 4316,
+            "tag": "VQL8ULYP"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 19,
+                "low": 200729,
+                "unsigned": false
+            },
+            "clanChestCrowns": 95,
+            "currenRank": 26,
+            "donations": 295,
+            "expLevel": 12,
+            "homeID": {
+                "high": 19,
+                "low": 200729,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "cenzer",
+            "previousRank": 17,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4314,
+            "tag": "LCQGUJQ"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 28,
+                "low": 5761334,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 27,
+            "donations": 0,
+            "expLevel": 11,
+            "homeID": {
+                "high": 28,
+                "low": 5761334,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Prince Thugga",
+            "previousRank": 0,
+            "role": 1,
+            "roleName": "member",
+            "score": 4306,
+            "tag": "VVUPUQCL"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 25,
+                "low": 6539687,
+                "unsigned": false
+            },
+            "clanChestCrowns": 43,
+            "currenRank": 28,
+            "donations": 201,
+            "expLevel": 12,
+            "homeID": {
+                "high": 25,
+                "low": 6539687,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "matt",
+            "previousRank": 27,
+            "role": 1,
+            "roleName": "member",
+            "score": 4306,
+            "tag": "22UPCJG2C"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 2,
+                "low": 3281305,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 29,
+            "donations": 145,
+            "expLevel": 12,
+            "homeID": {
+                "high": 2,
+                "low": 3281305,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "xiangflutist",
+            "previousRank": 26,
+            "role": 1,
+            "roleName": "member",
+            "score": 4305,
+            "tag": "QVQU9G2U"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 16,
+                "low": 729911,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 30,
+            "donations": 87,
+            "expLevel": 11,
+            "homeID": {
+                "high": 16,
+                "low": 729911,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "dylan",
+            "previousRank": 20,
+            "role": 1,
+            "roleName": "member",
+            "score": 4302,
+            "tag": "2JCL0R98"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 24,
+                "low": 987595,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 31,
+            "donations": 157,
+            "expLevel": 12,
+            "homeID": {
+                "high": 24,
+                "low": 987595,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "josekg",
+            "previousRank": 28,
+            "role": 1,
+            "roleName": "member",
+            "score": 4301,
+            "tag": "8YG2982J"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 2,
+                "low": 5742338,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 32,
+            "donations": 107,
+            "expLevel": 11,
+            "homeID": {
+                "high": 2,
+                "low": 5742338,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Calipao",
+            "previousRank": 29,
+            "role": 4,
+            "roleName": "coleader",
+            "score": 4300,
+            "tag": "VV9PPPG8"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 3,
+                "low": 257719,
+                "unsigned": false
+            },
+            "clanChestCrowns": 2,
+            "currenRank": 33,
+            "donations": 38,
+            "expLevel": 12,
+            "homeID": {
+                "high": 3,
+                "low": 257719,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "༄ WhiteSweet ༄",
+            "previousRank": 30,
+            "role": 1,
+            "roleName": "member",
+            "score": 4300,
+            "tag": "GJRYJG9"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 6,
+                "low": 693322,
+                "unsigned": false
+            },
+            "clanChestCrowns": 32,
+            "currenRank": 34,
+            "donations": 213,
+            "expLevel": 12,
+            "homeID": {
+                "high": 6,
+                "low": 693322,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Sartix",
+            "previousRank": 31,
+            "role": 1,
+            "roleName": "member",
+            "score": 4300,
+            "tag": "2RG092LL"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 19,
+                "low": 2476089,
+                "unsigned": false
+            },
+            "clanChestCrowns": 56,
+            "currenRank": 35,
+            "donations": 139,
+            "expLevel": 12,
+            "homeID": {
+                "high": 19,
+                "low": 2476089,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "ElPanaAngelYT",
+            "previousRank": 32,
+            "role": 1,
+            "roleName": "member",
+            "score": 4300,
+            "tag": "L08GYYQY"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 38,
+                "low": 1009236,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 36,
+            "donations": 206,
+            "expLevel": 12,
+            "homeID": {
+                "high": 38,
+                "low": 1009236,
+                "unsigned": false
+            },
+            "league": 2,
+            "name": "Bees?",
+            "previousRank": 33,
+            "role": 1,
+            "roleName": "member",
+            "score": 4300,
+            "tag": "8LPYL2VU"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 13,
+                "low": 1482540,
+                "unsigned": false
+            },
+            "clanChestCrowns": 82,
+            "currenRank": 37,
+            "donations": 125,
+            "expLevel": 12,
+            "homeID": {
+                "high": 13,
+                "low": 1482540,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "hao",
+            "previousRank": 35,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4273,
+            "tag": "9GYRLJCC"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 12,
+                "low": 33990,
+                "unsigned": false
+            },
+            "clanChestCrowns": 29,
+            "currenRank": 38,
+            "donations": 307,
+            "expLevel": 12,
+            "homeID": {
+                "high": 12,
+                "low": 33990,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "gondor",
+            "previousRank": 40,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4258,
+            "tag": "288Q28P"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 28,
+                "low": 879328,
+                "unsigned": false
+            },
+            "clanChestCrowns": 41,
+            "currenRank": 39,
+            "donations": 82,
+            "expLevel": 11,
+            "homeID": {
+                "high": 28,
+                "low": 879328,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "Sandor Clegane",
+            "previousRank": 43,
+            "role": 1,
+            "roleName": "member",
+            "score": 4258,
+            "tag": "82UQJL8G"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 2,
+                "low": 860781,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 40,
+            "donations": 74,
+            "expLevel": 11,
+            "homeID": {
+                "high": 2,
+                "low": 860781,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "~Kvothe~",
+            "previousRank": 44,
+            "role": 1,
+            "roleName": "member",
+            "score": 4257,
+            "tag": "829J82YG"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 8,
+                "low": 803092,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 41,
+            "donations": 298,
+            "expLevel": 12,
+            "homeID": {
+                "high": 8,
+                "low": 803092,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "drquicksilver",
+            "previousRank": 37,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4233,
+            "tag": "2VP9J0QL"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 26,
+                "low": 885093,
+                "unsigned": false
+            },
+            "clanChestCrowns": 1,
+            "currenRank": 42,
+            "donations": 48,
+            "expLevel": 12,
+            "homeID": {
+                "high": 26,
+                "low": 885093,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "Ratredd",
+            "previousRank": 41,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4218,
+            "tag": "882P89VG"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 0,
+                "low": 1715288,
+                "unsigned": false
+            },
+            "clanChestCrowns": 10,
+            "currenRank": 43,
+            "donations": 28,
+            "expLevel": 10,
+            "homeID": {
+                "high": 0,
+                "low": 1715288,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "Soonkyu",
+            "previousRank": 42,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4209,
+            "tag": "P8PLLU8P"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 19,
+                "low": 317339,
+                "unsigned": false
+            },
+            "clanChestCrowns": 19,
+            "currenRank": 44,
+            "donations": 74,
+            "expLevel": 12,
+            "homeID": {
+                "high": 19,
+                "low": 317339,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "DJ Yeesh",
+            "previousRank": 38,
+            "role": 4,
+            "roleName": "coleader",
+            "score": 4206,
+            "tag": "JC0RVRR"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 10,
+                "low": 803772,
+                "unsigned": false
+            },
+            "clanChestCrowns": 0,
+            "currenRank": 45,
+            "donations": 0,
+            "expLevel": 11,
+            "homeID": {
+                "high": 10,
+                "low": 803772,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "jamie blob",
+            "previousRank": 0,
+            "role": 1,
+            "roleName": "member",
+            "score": 4177,
+            "tag": "2VPG9LRU"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 46,
+                "low": 5143475,
+                "unsigned": false
+            },
+            "clanChestCrowns": 45,
+            "currenRank": 46,
+            "donations": 38,
+            "expLevel": 11,
+            "homeID": {
+                "high": 46,
+                "low": 5143475,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "Rukk",
+            "previousRank": 45,
+            "role": 1,
+            "roleName": "member",
+            "score": 4175,
+            "tag": "ULU9QJYG"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 24,
+                "low": 2022399,
+                "unsigned": false
+            },
+            "clanChestCrowns": 28,
+            "currenRank": 47,
+            "donations": 108,
+            "expLevel": 12,
+            "homeID": {
+                "high": 24,
+                "low": 2022399,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "Bill4FirstLady",
+            "previousRank": 46,
+            "role": 4,
+            "roleName": "coleader",
+            "score": 4164,
+            "tag": "PUJR0GU0"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 44,
+                "low": 3155814,
+                "unsigned": false
+            },
+            "clanChestCrowns": 2,
+            "currenRank": 48,
+            "donations": 0,
+            "expLevel": 12,
+            "homeID": {
+                "high": 44,
+                "low": 3155814,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "f1nesse13",
+            "previousRank": 47,
+            "role": 3,
+            "roleName": "elder",
+            "score": 4148,
+            "tag": "QRP2VVJP"
+        },
+        {
+            "arena": 11,
+            "avatarId": {
+                "high": 26,
+                "low": 49632,
+                "unsigned": false
+            },
+            "clanChestCrowns": 16,
+            "currenRank": 49,
+            "donations": 0,
+            "expLevel": 12,
+            "homeID": {
+                "high": 26,
+                "low": 49632,
+                "unsigned": false
+            },
+            "league": 1,
+            "name": "Garbcole",
+            "previousRank": 48,
+            "role": 1,
+            "roleName": "member",
+            "score": 4092,
+            "tag": "2RGJYGL"
+        }
+    ],
+    "name": "Reddit Delta",
+    "numberOfMembers": 49,
+    "region": 172,
+    "requiredScore": 4300,
+    "score": 43962,
+    "tag": "Y8GYCGV",
+    "type": 2,
+    "typeName": "Unknown type: alliance.types.2"
+}
