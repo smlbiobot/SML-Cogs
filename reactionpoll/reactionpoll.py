@@ -119,7 +119,7 @@ class ReactionPoll:
         """Monitor reactions if tracked."""
         message = reaction.message
         server = message.server
-        # print('Reaction add: {}: {}'.format(server.id, message.id))
+        print('Reaction add: {}: {}'.format(server.id, message.id))
         if message.id not in self.settings[server.id]['messages']:
             return
 
@@ -129,7 +129,7 @@ class ReactionPoll:
         """Monitor reactions if tracked."""
         message = reaction.message
         server = message.server
-        # print('Reaction remove: {}: {}'.format(server.id, message.id))
+        print('Reaction remove: {}: {}'.format(server.id, message.id))
         if message.id not in self.settings[server.id]['messages']:
             return
 
@@ -153,6 +153,7 @@ class ReactionPoll:
         em = await self.reaction_embed(reaction_message)
         await self.bot.edit_message(
             embed_message,
+            new_content=dt.datetime.utcnow().isoformat(),
             embed=em)
 
     async def reaction_embed(self, message: discord.Message):
@@ -205,4 +206,6 @@ def setup(bot):
     check_folder()
     check_file()
     n = ReactionPoll(bot)
+    # bot.add_listener(n.on_reaction_add, "on_reaction_add")
+    # bot.add_listener(n.on_reaction_remove, "on_reaction_remove")
     bot.add_cog(n)
