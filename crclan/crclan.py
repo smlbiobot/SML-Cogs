@@ -777,6 +777,9 @@ class CRClan:
             await send_cmd_help(ctx)
             return
 
+        if playertag.startswith('#'):
+            playertag = playertag[1:]
+
         allowed = False
         if member is None:
             allowed = True
