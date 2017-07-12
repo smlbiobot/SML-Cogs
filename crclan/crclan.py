@@ -801,9 +801,12 @@ class CRClan:
         await self.bot.say("Associated player tag with Discord Member.")
 
     @crclan.command(name="gettag", pass_context=True, no_pm=True)
-    async def crclan_gettag(self, ctx, member: discord.Member):
+    async def crclan_gettag(self, ctx, member: discord.Member=None):
         """Get playertag from Discord member."""
         server = ctx.message.server
+        author = ctx.message.author
+        if member is None:
+            member = author
         tag = self.member2tag(member.id, server.id)
         if tag is None:
             await self.bot.say("Cannot find associated player tag.")
