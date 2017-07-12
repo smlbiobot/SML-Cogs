@@ -67,6 +67,8 @@ SERVER_DEFAULTS = {
     "players": {}
 }
 
+CREDITS = 'Selfish + SML'
+
 
 def grouper(n, iterable, fillvalue=None):
     """Group lists into lists of items.
@@ -218,13 +220,8 @@ class CRClanMemberData:
     @property
     def rank(self):
         """Rank in clan with trend."""
-        rank_diff = self.currentRank - self.previousRank
-        # if rank_diff > 0:
-        #     emoji = ":arrow_up:"
-        # elif rank_diff < 0:
-        #     emoji = ":arrow_down:"
-        # else:
-        #     emoji = ":white_small_square:"
+        # rank diff is in reverse because lower is better
+        rank_diff = self.previousRank - self.currentRank
         if rank_diff > 0:
             rank_diff = "+{}".format(rank_diff)
         return "{} ({})".format(self.currentRank, rank_diff)
@@ -621,23 +618,23 @@ class CRClan:
             await self.update_data(tag)
 
         # split results as list of 25
+        # page_count = len(members) // 25 + 1
         members_out = grouper(25, members, None)
+
         color = self.random_color()
-        page = 1
-        for members in members_out:
+        for page, members in enumerate(members_out, start=1):
             em = self.embed_crclan_roster(members)
             em.title = clan_result.name
-            # em.description = (
-            #     "Tag: {} | "
-            #     "Required Trophies: {}").format(
-            #         clan_result.tag, clan_result.requiredScore)
             em.color = discord.Color(value=color)
             badge_url = self.settings["badge_url"] + data.badge_url
+            # show credits on last page
+            # credits = ''
+            # if page >= page_count:
+            #     credits = ' - ' + CREDITS
             em.set_footer(
                 text="Page {}".format(page),
                 icon_url=badge_url)
             await self.bot.say(embed=em)
-            page = page + 1
 
     def embed_crclan_roster(self, members):
         """Return clan roster embed."""
@@ -876,7 +873,6 @@ class CRClan:
                 if emoji.name == name:
                     return '<:{}:{}>'.format(emoji.name, emoji.id)
         return None
-
 
 
 def check_folder():
