@@ -210,6 +210,25 @@ class CRClanMemberData:
             return "Co-Leader"
         return ""
 
+    @property
+    def currentRank(self):
+        """API has typo."""
+        return self.currenRank
+
+    @property
+    def rank(self):
+        """Rank in clan with trend."""
+        rank_diff = self.currentRank - self.previousRank
+        # if rank_diff > 0:
+        #     emoji = ":arrow_up:"
+        # elif rank_diff < 0:
+        #     emoji = ":arrow_down:"
+        # else:
+        #     emoji = ":white_small_square:"
+        if rank_diff > 0:
+            rank_diff = "+{}".format(rank_diff)
+        return "{} ({})".format(self.currentRank, rank_diff)
+
 
 class CRPlayerData:
     """Clash Royale player data."""
@@ -574,7 +593,7 @@ class CRClan:
 
     @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @crclan.command(name="roster", pass_context=True, no_pm=True)
-    async def crclan_roster(self, ctx: Context, key):
+    async def crclan_roster(self, ctx: Context, key, update=False):
         """Return clan roster by key.
 
         Key of each clan is set from [p]bsclan addkey
@@ -596,7 +615,10 @@ class CRClan:
 
         members = clan_result.members
         tag = self.key2tag(server.id, key)
-        await self.update_data(tag)
+
+        # force update only if specified
+        if update:
+            await self.update_data(tag)
 
         # split results as list of 25
         members_out = grouper(25, members, None)
@@ -633,8 +655,11 @@ class CRClan:
                     " | {0.clanChestCrowns: >3} c"
                     " | #{0.tag}").format(data)
                 value = box(value, lang='py')
+                mention = ''
                 if discord_member is not None:
-                    value = '{}\n{}'.format(value, discord_member.mention)
+                    mention = discord_member.mention
+                value = '{} {}{}'.format(
+                    data.rank, mention, value)
                 em.add_field(name=name, value=value, inline=False)
         return em
 
