@@ -115,7 +115,7 @@ CR_CLAN_TYPE = {
 
 
 class CRClanData:
-    """Clash Royale Band data."""
+    """Clash Royale Clan data."""
 
     def __init__(self, **kwargs):
         """Init.
@@ -278,7 +278,7 @@ class CRClan:
 
     @setcrclan.command(name="init", pass_context=True)
     async def setcrclan_init(self, ctx: Context):
-        """Init BS Band settings."""
+        """Init CR Clan settings."""
         server = ctx.message.server
         self.settings["servers"][server.id] = SERVER_DEFAULTS
         dataIO.save_json(JSON, self.settings)
@@ -298,7 +298,7 @@ class CRClan:
         self.check_server_settings(server.id)
 
         dataIO.save_json(JSON, self.settings)
-        await self.bot.say("Band API URL updated.")
+        await self.bot.say("Clan API URL updated.")
 
     @setcrclan.command(name="badgeurl", pass_context=True)
     async def setcrclan_badgeurl(self, ctx: Context, url):
@@ -563,7 +563,7 @@ class CRClan:
         em = discord.Embed(
             title=data.name,
             description=data.description)
-        em.add_field(name="Band Trophies", value=data.score)
+        em.add_field(name="Clan Trophies", value=data.score)
         em.add_field(name="Type", value=CR_CLAN_TYPE[data.type])
         em.add_field(name="Required Trophies", value=data.requiredScore)
         em.add_field(name="Clan Tag", value=data.tag)
