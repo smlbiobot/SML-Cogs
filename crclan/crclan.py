@@ -361,6 +361,7 @@ class CRClan:
 
     async def update_data(self, clan_tag=None):
         """Perform data update from api."""
+        success = False
         for server_id in self.settings["servers"]:
             clans = self.get_clans_settings(server_id)
 
@@ -371,13 +372,13 @@ class CRClan:
                 elif clan_tag == tag:
                     do_update = True
                 if do_update:
-                    # async with self.get_clan_data(tag) as data:
                     data = await self.get_clan_data(tag)
                     if data is not None:
                         clans[tag].update(data)
+                        success = True
 
             self.set_clans_settings(server_id, clans)
-        return True
+        return success
 
     def key2tag(self, server_id, key):
         """Convert clan key to clan tag."""
@@ -404,7 +405,9 @@ class CRClan:
         """Update data from api."""
         success = await self.update_data()
         if success:
-            await self.bot.say("Data updated")
+            await self.bot.say("Data updated.")
+        else:
+            await self.bot.say("Data update failed.")
 
     def get_clans_settings(self, server_id):
         """Return clans in settings."""
@@ -604,25 +607,18 @@ class CRClan:
         for member in members:
             if member is not None:
                 data = CRClanMemberData(**member)
+                discord_member = self.tag2member(data.tag)
                 name = (
                     "{0.name}, {0.role_name} "
-                    "(Lvl {0.expLevel}) ").format(data)
-                # mention = ""
-                # member = self.tag2member(data.tag)
-                # if member is not None:
-                #     mention = '\n{}'.format(member.mention)
-                # data.mention = mention
+                    "(Lvl {0.expLevel})").format(data)
                 value = (
                     "{0.score:,d}"
                     " | {0.donations: >4} d"
                     " | {0.clanChestCrowns: >3} c"
                     " | #{0.tag}").format(data)
-                # value = (
-                #     "`{0.score:,d}` "
-                #     "| `{0.donations: >4}` donations "
-                #     "| `{0.clanChestCrowns: >4}` crowns"
-                #     "| `#{0.tag}`").format(data)
                 value = box(value, lang='py')
+                if discord_member is not None:
+                    value = '{}\n{}'.format(value, discord_member.mention)
                 em.add_field(name=name, value=value, inline=False)
         return em
 
@@ -751,12 +747,12 @@ class CRClan:
         """Set playertag to discord member.
 
         Setting tag for yourself:
-        !crclan settag 889QC9
+        !crclan settag C0G20PR2
 
         Setting tag for others (requires Bot Commander role):
-        !crclan settag 889QC9 SML
-        !crclan settag 889QC9 @SML
-        !crclan settag 889QC9 @SML#6443
+        !crclan settag C0G20PR2 SML
+        !crclan settag C0G20PR2 @SML
+        !crclan settag C0G20PR2 @SML#6443
         """
         server = ctx.message.server
         author = ctx.message.author
