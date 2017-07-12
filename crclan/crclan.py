@@ -56,9 +56,6 @@ BADGES_JSON = os.path.join(PATH, "badges.json")
 
 DATA_UPDATE_INTERVAL = timedelta(minutes=1).seconds
 
-RESULTS_MAX = 3
-PAGINATION_TIMEOUT = 20
-
 BOTCOMMANDER_ROLES = ["Bot Commander"]
 
 SETTINGS_DEFAULTS = {
@@ -555,6 +552,7 @@ class CRClan:
         # em.set_author(name=data.name)
         return em
 
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @crclan.command(name="roster", pass_context=True, no_pm=True)
     async def crclan_roster(self, ctx: Context, key):
         """Return clan roster by key.
