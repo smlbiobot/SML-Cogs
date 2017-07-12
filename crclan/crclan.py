@@ -373,7 +373,8 @@ class CRClan:
                 if do_update:
                     # async with self.get_clan_data(tag) as data:
                     data = await self.get_clan_data(tag)
-                    clans[tag].update(data)
+                    if data is not None:
+                        clans[tag].update(data)
 
             self.set_clans_settings(server_id, clans)
         return True
@@ -560,6 +561,7 @@ class CRClan:
         Key of each clan is set from [p]bsclan addkey
         """
         server = ctx.message.server
+        await self.bot.send_typing(ctx.message.channel)
         clans = self.get_clans_settings(server.id)
         clan_result = None
         for k, clan in clans.items():
