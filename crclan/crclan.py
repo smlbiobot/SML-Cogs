@@ -261,7 +261,7 @@ class CRClan:
 
     def badge_url(self, badge_id):
         """Return Badge URL by badge ID.
-        
+
         TODO: Depreciated. Will remove soon.
         """
         return (
@@ -549,7 +549,7 @@ class CRClan:
         for key in keys:
             await ctx.invoke(self.crclan_roster, key, update=False)
 
-    @commands.has_any_role(*BOTCOMMANDER_ROLES)
+    # @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @crclan.command(name="roster", pass_context=True, no_pm=True)
     async def crclan_roster(self, ctx: Context, key, update=False):
         """Return clan roster by key.
