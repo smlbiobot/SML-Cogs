@@ -30,7 +30,6 @@ import itertools
 import datetime as dt
 from random import choice
 import json
-from urllib.parse import urlunparse
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
@@ -151,6 +150,7 @@ class CRClanData:
             count = 0
         return '{}/50'.format(count)
 
+
 class CRClanMemberData:
     """Clash Royale Member data."""
 
@@ -232,62 +232,6 @@ class CRClanMemberData:
         return "{}\u00A0\u00A0\u00A0{}".format(self.currentRank, rank_str)
 
 
-class CRPlayerData:
-    """Clash Royale player data."""
-
-    def __init__(self, **kwargs):
-        """Init.
-
-        Expected list of keywords:
-        From API:
-            avatar
-            clan
-                badge
-                badge_id
-                high
-                low
-                member_count
-                name
-                requirement
-                role
-                role_id
-                tag
-                trophies
-                type
-                type_id
-            brawler_count
-            brawlers[]
-                highest_trophies
-                level
-                name
-                number
-                trophies
-                type
-                value
-            high
-            highest_trophies
-            low
-            survival_wins
-            tag
-            total_experience
-            trophies
-            username
-            wins
-        """
-        self.__dict__.update(kwargs)
-        self._discord_member = None
-
-    @property
-    def discord_member(self):
-        """Discord user id."""
-        return self._discord_member
-
-    @discord_member.setter
-    def discord_member(self, value):
-        """Discord user id."""
-        self._discord_member = value
-
-
 class CRClan:
     """Clash Royale Clan management."""
 
@@ -345,7 +289,7 @@ class CRClan:
         """CR Clan API URL base.
 
         Format:
-        If path is hhttp://domain.com/path/LQQ
+        If path is http://domain.com/path/LQQ
         Enter http://domain.com/path/
         """
         self.settings["clan_api_url"] = url
@@ -630,7 +574,6 @@ class CRClan:
             await self.update_data(tag)
 
         # split results as list of 25
-        # page_count = len(members) // 25 + 1
         members_out = grouper(25, members, None)
 
         color = self.random_color()
@@ -671,99 +614,6 @@ class CRClan:
                 value = '{} {}{}'.format(
                     data.rank, mention, value)
                 em.add_field(name=name, value=value, inline=False)
-        return em
-
-    # @crclan.command(name="profile", pass_context=True, no_pm=True)
-    # async def crclan_profile(self, ctx, member: discord.Member=None):
-    #     """Return player profile by Discord member name or id."""
-    #     server = ctx.message.server
-    #     players = self.settings["servers"][server.id]["players"]
-
-    #     if member is None:
-    #         member = ctx.message.author
-
-    #     if member.id not in players:
-    #         await self.bot.say(
-    #             "Member has not registered a player tag yet.\n"
-    #             "Use `!crclan settag` to set it.")
-    #         return
-
-    #     await ctx.invoke(self.crclan_profiletag, players[member.id])
-
-    # @crclan.command(name="profiletag", pass_context=True, no_pm=True)
-    # async def crclan_profiletag(self, ctx, tag=None):
-    #     """Return player profile by player tag."""
-    #     if tag is None:
-    #         await send_cmd_help(ctx)
-    #         return
-
-    #     data = await self.get_player_data(tag)
-    #     if not data:
-    #         await self.bot.say(
-    #             "Error fetching player data. "
-    #             "Please make sure that player tag is set correctly. "
-    #             "It is set to #{} at the moment. "
-    #             "Run `!crclan settag` if you need to update it.".format(tag))
-    #         return
-
-    #     player = CRPlayerData(**data)
-    #     server = ctx.message.server
-    #     player.discord_member = self.get_discord_member(server, tag)
-    #     await self.bot.say(embed=self.embed_player(player))
-
-    # async def get_player_data(self, tag):
-    #     """Return clan data JSON."""
-    #     url = "{}{}".format(self.settings["player_api_url"], tag)
-    #     async with aiohttp.ClientSession() as session:
-    #         async with session.get(url) as resp:
-    #             try:
-    #                 data = await resp.json()
-    #             except json.decoder.JSONDecodeError:
-    #                 data = None
-    #     return data
-
-    # def embed_player(self, player: CRPlayerData):
-    #     """Return player embed."""
-    #     em = discord.Embed(
-    #         title=player.username,
-    #         description="#{}".format(player.tag))
-    #     clan = CRClanData(**player.clan)
-    #     em.color = discord.Color(value=self.random_color())
-
-    #     if player.discord_member is not None:
-    #         em.description = '{} {}'.format(
-    #             em.description,
-    #             player.discord_member.mention)
-
-    #     em.add_field(name=clan.name, value=clan.role)
-    #     em.add_field(name="Trophies", value=player.trophies)
-    #     em.add_field(name="Victories", value=player.wins)
-    #     em.add_field(name="Showdown Victories", value=player.survival_wins)
-    #     em.add_field(name="Highest Trophies", value=player.highest_trophies)
-    #     em.add_field(name="Brawlers", value=player.brawler_count)
-
-    #     for brawler in player.brawlers:
-    #         data = BSBrawlerData(**brawler)
-    #         emoji = self.brawler_emoji(data.name)
-    #         if emoji is None:
-    #             emoji = ''
-    #         name = '{} {} (Level {})'.format(data.name, emoji, data.level)
-    #         trophies = '{}/{}'.format(data.trophies, data.highest_trophies)
-    #         em.add_field(
-    #             name=name,
-    #             value=trophies)
-
-    #     text = (
-    #         '{0.name}'
-    #         ' Trophies: {0.trophies}'
-    #         ' Requirement: {0.requirement}'
-    #         ' Tag: {0.tag}'
-    #         ' Type: {0.type}').format(clan)
-
-    #     em.set_footer(
-    #         text=text,
-    #         icon_url=clan.badge_url)
-
         return em
 
     def get_discord_member(self, server, player_tag):
