@@ -221,9 +221,12 @@ class CRClanMemberData:
     def rank(self):
         """Rank in clan with trend."""
         # rank diff is in reverse because lower is better
-        rank_diff = self.previousRank - self.currentRank
-        if rank_diff > 0:
-            rank_diff = "+{}".format(rank_diff)
+        # previous rank is 0 when user is new to clan
+        rank_diff = '-'
+        if self.previousRank != 0:
+            rank_diff = self.previousRank - self.currentRank
+            if rank_diff > 0:
+                rank_diff = "+{}".format(rank_diff)
         return "{} ({})".format(self.currentRank, rank_diff)
 
 
