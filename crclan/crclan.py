@@ -815,6 +815,20 @@ class CRClan:
             "Player tag for {} is #{}".format(
                 member.display_name, tag))
 
+    @crclan.command(name="statsroyale", pass_context=True, no_pm=True)
+    async def crclan_statsroyale(self, ctx, member: discord.Member=None):
+        """Return statsroyale URL from Discord member."""
+        server = ctx.message.server
+        author = ctx.message.author
+        if member is None:
+            member = author
+        tag = self.member2tag(member.id, server.id)
+        if tag is None:
+            await self.bot.say("Cannot find associated player tag.")
+            return
+        await self.bot.say(
+            "http://statsroyale.com/profile/{}".format(tag))
+
     @staticmethod
     def random_color():
         """Return random color as an integer."""
