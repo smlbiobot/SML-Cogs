@@ -642,7 +642,8 @@ class CRClan:
             # if page >= page_count:
             #     credits = ' - ' + CREDITS
             em.set_footer(
-                text="Page {}".format(page),
+                text="{} #{} - Page {}".format(
+                    data.name, data.tag, page),
                 icon_url=badge_url)
             await self.bot.say(embed=em)
 
