@@ -626,96 +626,96 @@ class CRClan:
                 em.add_field(name=name, value=value, inline=False)
         return em
 
-    @crclan.command(name="profile", pass_context=True, no_pm=True)
-    async def crclan_profile(self, ctx, member: discord.Member=None):
-        """Return player profile by Discord member name or id."""
-        server = ctx.message.server
-        players = self.settings["servers"][server.id]["players"]
+    # @crclan.command(name="profile", pass_context=True, no_pm=True)
+    # async def crclan_profile(self, ctx, member: discord.Member=None):
+    #     """Return player profile by Discord member name or id."""
+    #     server = ctx.message.server
+    #     players = self.settings["servers"][server.id]["players"]
 
-        if member is None:
-            member = ctx.message.author
+    #     if member is None:
+    #         member = ctx.message.author
 
-        if member.id not in players:
-            await self.bot.say(
-                "Member has not registered a player tag yet.\n"
-                "Use `!crclan settag` to set it.")
-            return
+    #     if member.id not in players:
+    #         await self.bot.say(
+    #             "Member has not registered a player tag yet.\n"
+    #             "Use `!crclan settag` to set it.")
+    #         return
 
-        await ctx.invoke(self.crclan_profiletag, players[member.id])
+    #     await ctx.invoke(self.crclan_profiletag, players[member.id])
 
-    @crclan.command(name="profiletag", pass_context=True, no_pm=True)
-    async def crclan_profiletag(self, ctx, tag=None):
-        """Return player profile by player tag."""
-        if tag is None:
-            await send_cmd_help(ctx)
-            return
+    # @crclan.command(name="profiletag", pass_context=True, no_pm=True)
+    # async def crclan_profiletag(self, ctx, tag=None):
+    #     """Return player profile by player tag."""
+    #     if tag is None:
+    #         await send_cmd_help(ctx)
+    #         return
 
-        data = await self.get_player_data(tag)
-        if not data:
-            await self.bot.say(
-                "Error fetching player data. "
-                "Please make sure that player tag is set correctly. "
-                "It is set to #{} at the moment. "
-                "Run `!crclan settag` if you need to update it.".format(tag))
-            return
+    #     data = await self.get_player_data(tag)
+    #     if not data:
+    #         await self.bot.say(
+    #             "Error fetching player data. "
+    #             "Please make sure that player tag is set correctly. "
+    #             "It is set to #{} at the moment. "
+    #             "Run `!crclan settag` if you need to update it.".format(tag))
+    #         return
 
-        player = CRPlayerData(**data)
-        server = ctx.message.server
-        player.discord_member = self.get_discord_member(server, tag)
-        await self.bot.say(embed=self.embed_player(player))
+    #     player = CRPlayerData(**data)
+    #     server = ctx.message.server
+    #     player.discord_member = self.get_discord_member(server, tag)
+    #     await self.bot.say(embed=self.embed_player(player))
 
-    async def get_player_data(self, tag):
-        """Return clan data JSON."""
-        url = "{}{}".format(self.settings["player_api_url"], tag)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                try:
-                    data = await resp.json()
-                except json.decoder.JSONDecodeError:
-                    data = None
-        return data
+    # async def get_player_data(self, tag):
+    #     """Return clan data JSON."""
+    #     url = "{}{}".format(self.settings["player_api_url"], tag)
+    #     async with aiohttp.ClientSession() as session:
+    #         async with session.get(url) as resp:
+    #             try:
+    #                 data = await resp.json()
+    #             except json.decoder.JSONDecodeError:
+    #                 data = None
+    #     return data
 
-    def embed_player(self, player: CRPlayerData):
-        """Return player embed."""
-        em = discord.Embed(
-            title=player.username,
-            description="#{}".format(player.tag))
-        clan = CRClanData(**player.clan)
-        em.color = discord.Color(value=self.random_color())
+    # def embed_player(self, player: CRPlayerData):
+    #     """Return player embed."""
+    #     em = discord.Embed(
+    #         title=player.username,
+    #         description="#{}".format(player.tag))
+    #     clan = CRClanData(**player.clan)
+    #     em.color = discord.Color(value=self.random_color())
 
-        if player.discord_member is not None:
-            em.description = '{} {}'.format(
-                em.description,
-                player.discord_member.mention)
+    #     if player.discord_member is not None:
+    #         em.description = '{} {}'.format(
+    #             em.description,
+    #             player.discord_member.mention)
 
-        em.add_field(name=clan.name, value=clan.role)
-        em.add_field(name="Trophies", value=player.trophies)
-        em.add_field(name="Victories", value=player.wins)
-        em.add_field(name="Showdown Victories", value=player.survival_wins)
-        em.add_field(name="Highest Trophies", value=player.highest_trophies)
-        em.add_field(name="Brawlers", value=player.brawler_count)
+    #     em.add_field(name=clan.name, value=clan.role)
+    #     em.add_field(name="Trophies", value=player.trophies)
+    #     em.add_field(name="Victories", value=player.wins)
+    #     em.add_field(name="Showdown Victories", value=player.survival_wins)
+    #     em.add_field(name="Highest Trophies", value=player.highest_trophies)
+    #     em.add_field(name="Brawlers", value=player.brawler_count)
 
-        for brawler in player.brawlers:
-            data = BSBrawlerData(**brawler)
-            emoji = self.brawler_emoji(data.name)
-            if emoji is None:
-                emoji = ''
-            name = '{} {} (Level {})'.format(data.name, emoji, data.level)
-            trophies = '{}/{}'.format(data.trophies, data.highest_trophies)
-            em.add_field(
-                name=name,
-                value=trophies)
+    #     for brawler in player.brawlers:
+    #         data = BSBrawlerData(**brawler)
+    #         emoji = self.brawler_emoji(data.name)
+    #         if emoji is None:
+    #             emoji = ''
+    #         name = '{} {} (Level {})'.format(data.name, emoji, data.level)
+    #         trophies = '{}/{}'.format(data.trophies, data.highest_trophies)
+    #         em.add_field(
+    #             name=name,
+    #             value=trophies)
 
-        text = (
-            '{0.name}'
-            ' Trophies: {0.trophies}'
-            ' Requirement: {0.requirement}'
-            ' Tag: {0.tag}'
-            ' Type: {0.type}').format(clan)
+    #     text = (
+    #         '{0.name}'
+    #         ' Trophies: {0.trophies}'
+    #         ' Requirement: {0.requirement}'
+    #         ' Tag: {0.tag}'
+    #         ' Type: {0.type}').format(clan)
 
-        em.set_footer(
-            text=text,
-            icon_url=clan.badge_url)
+    #     em.set_footer(
+    #         text=text,
+    #         icon_url=clan.badge_url)
 
         return em
 
