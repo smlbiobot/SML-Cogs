@@ -54,7 +54,7 @@ PATH = os.path.join("data", "crclan")
 JSON = os.path.join(PATH, "settings.json")
 BADGES_JSON = os.path.join(PATH, "badges.json")
 
-DATA_UPDATE_INTERVAL = timedelta(minutes=1).seconds
+DATA_UPDATE_INTERVAL = timedelta(minutes=5).seconds
 
 BOTCOMMANDER_ROLES = ["Bot Commander"]
 
