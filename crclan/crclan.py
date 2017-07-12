@@ -260,7 +260,10 @@ class CRClan:
         dataIO.save_json(JSON, self.settings)
 
     def badge_url(self, badge_id):
-        """Return Badge URL by badge ID."""
+        """Return Badge URL by badge ID.
+        
+        TODO: Depreciated. Will remove soon.
+        """
         return (
             "https://raw.githubusercontent.com"
             "/smlbiobot/smlbiobot.github.io/master"
@@ -313,74 +316,6 @@ class CRClan:
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Badge URL updated.")
 
-    async def get_clan_data(self, tag):
-        """Return clan data JSON."""
-        url = "{}{}".format(self.settings["clan_api_url"], tag)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                try:
-                    data = await resp.json()
-                except json.decoder.JSONDecodeError:
-                    data = None
-        return data
-
-    async def update_data(self, clan_tag=None):
-        """Perform data update from api."""
-        success = False
-        for server_id in self.settings["servers"]:
-            clans = self.get_clans_settings(server_id)
-
-            for tag, clan in clans.items():
-                do_update = False
-                if clan_tag is None:
-                    do_update = True
-                elif clan_tag == tag:
-                    do_update = True
-                if do_update:
-                    data = await self.get_clan_data(tag)
-                    if data is not None:
-                        clans[tag].update(data)
-                        success = True
-
-            self.set_clans_settings(server_id, clans)
-        return success
-
-    def key2tag(self, server_id, key):
-        """Convert clan key to clan tag."""
-        clans = self.get_clans_settings(server_id)
-        for tag, clan in clans.items():
-            if clan["key"].lower() == key.lower():
-                return tag
-        return None
-
-    def tag2member(self, tag=None, server_id=None):
-        """Return Discord member from player tag."""
-        for server in self.bot.servers:
-            if server_id is not None:
-                if server.id != server_id:
-                    continue
-            try:
-                players = self.settings["servers"][server.id]["players"]
-                for member_id, v in players.items():
-                    if v == tag:
-                        return server.get_member(member_id)
-            except KeyError:
-                pass
-        return None
-
-    def member2tag(self, member_id=None, server_id=None):
-        """Return player tag from member."""
-        for server in self.bot.servers:
-            if server_id is not None:
-                if server.id != server_id:
-                    continue
-            try:
-                players = self.settings["servers"][server.id]["players"]
-                return players[member_id]
-            except KeyError:
-                pass
-        return None
-
     @setcrclan.command(name="update", pass_context=True)
     async def setcrclan_update(self, ctx: Context):
         """Update data from api."""
@@ -389,17 +324,6 @@ class CRClan:
             await self.bot.say("Data updated.")
         else:
             await self.bot.say("Data update failed.")
-
-    def get_clans_settings(self, server_id):
-        """Return clans in settings."""
-        self.check_server_settings(server_id)
-        return self.settings["servers"][server_id]["clans"]
-
-    def set_clans_settings(self, server_id, data):
-        """Set clans data in settings."""
-        self.settings["servers"][server_id]["clans"] = data
-        dataIO.save_json(JSON, self.settings)
-        return True
 
     @setcrclan.command(name="add", pass_context=True)
     async def setcrclan_add(self, ctx: Context, tag=None, key=None, role=None):
@@ -489,6 +413,67 @@ class CRClan:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @crclan.command(name="settag", pass_context=True, no_pm=True)
+    async def crclan_settag(
+            self, ctx, playertag=None, member: discord.Member = None):
+        """Set playertag to discord member.
+
+        Setting tag for yourself:
+        !crclan settag C0G20PR2
+
+        Setting tag for others (requires Bot Commander role):
+        !crclan settag C0G20PR2 SML
+        !crclan settag C0G20PR2 @SML
+        !crclan settag C0G20PR2 @SML#6443
+        """
+        server = ctx.message.server
+        author = ctx.message.author
+
+        if playertag is None:
+            await send_cmd_help(ctx)
+            return
+
+        if playertag.startswith('#'):
+            playertag = playertag[1:]
+
+        allowed = False
+        if member is None:
+            allowed = True
+        else:
+            botcommander_roles = [
+                discord.utils.get(
+                    server.roles, name=r) for r in BOTCOMMANDER_ROLES]
+            botcommander_roles = set(botcommander_roles)
+            author_roles = set(author.roles)
+            if len(author_roles.intersection(botcommander_roles)):
+                allowed = True
+
+        if not allowed:
+            await self.bot.say("Only Bot Commanders can set tags for others.")
+            return
+
+        if member is None:
+            member = ctx.message.author
+
+        self.set_player_settings(server.id, playertag, member.id)
+
+        await self.bot.say("Associated player tag with Discord Member.")
+
+    @crclan.command(name="gettag", pass_context=True, no_pm=True)
+    async def crclan_gettag(self, ctx, member: discord.Member = None):
+        """Get playertag from Discord member."""
+        server = ctx.message.server
+        author = ctx.message.author
+        if member is None:
+            member = author
+        tag = self.member2tag(member.id, server.id)
+        if tag is None:
+            await self.bot.say("Cannot find associated player tag.")
+            return
+        await self.bot.say(
+            "Player tag for {} is #{}".format(
+                member.display_name, tag))
+
     @crclan.command(name="clantag", pass_context=True, no_pm=True)
     async def crclan_clantag(self, ctx, clantag=None):
         """Clan info and roster by tag."""
@@ -557,23 +542,6 @@ class CRClan:
         em.color = discord.Color(value=color)
         await self.bot.say(embed=em)
 
-    def embed_crclan_info(self, clan):
-        """Return clan info embed."""
-        data = CRClanData(**clan)
-        em = discord.Embed(
-            title=data.name,
-            description=data.description)
-        em.add_field(name="Clan Trophies", value=data.score)
-        em.add_field(name="Type", value=CR_CLAN_TYPE[data.type])
-        em.add_field(name="Required Trophies", value=data.requiredScore)
-        em.add_field(name="Clan Tag", value=data.tag)
-        em.add_field(
-            name="Members", value=data.member_count_str)
-        badge_url = self.settings["badge_url"] + data.badge_url
-        em.set_thumbnail(url=badge_url)
-        # em.set_author(name=data.name)
-        return em
-
     @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @crclan.command(name="multiroster", pass_context=True, no_pm=True)
     async def crclan_multiroster(self, ctx: Context, *keys):
@@ -629,6 +597,23 @@ class CRClan:
                 icon_url=badge_url)
             await self.bot.say(embed=em)
 
+    def embed_crclan_info(self, clan):
+        """Return clan info embed."""
+        data = CRClanData(**clan)
+        em = discord.Embed(
+            title=data.name,
+            description=data.description)
+        em.add_field(name="Clan Trophies", value=data.score)
+        em.add_field(name="Type", value=CR_CLAN_TYPE[data.type])
+        em.add_field(name="Required Trophies", value=data.requiredScore)
+        em.add_field(name="Clan Tag", value=data.tag)
+        em.add_field(
+            name="Members", value=data.member_count_str)
+        badge_url = self.settings["badge_url"] + data.badge_url
+        em.set_thumbnail(url=badge_url)
+        # em.set_author(name=data.name)
+        return em
+
     def embed_crclan_roster(self, members):
         """Return clan roster embed."""
         em = discord.Embed(title=" ")
@@ -679,80 +664,84 @@ class CRClan:
         self.settings["servers"][server_id]["players"] = players
         dataIO.save_json(JSON, self.settings)
 
-    @crclan.command(name="settag", pass_context=True, no_pm=True)
-    async def crclan_settag(
-            self, ctx, playertag=None, member: discord.Member=None):
-        """Set playertag to discord member.
+    def get_clans_settings(self, server_id):
+        """Return clans in settings."""
+        self.check_server_settings(server_id)
+        return self.settings["servers"][server_id]["clans"]
 
-        Setting tag for yourself:
-        !crclan settag C0G20PR2
+    def set_clans_settings(self, server_id, data):
+        """Set clans data in settings."""
+        self.settings["servers"][server_id]["clans"] = data
+        dataIO.save_json(JSON, self.settings)
+        return True
 
-        Setting tag for others (requires Bot Commander role):
-        !crclan settag C0G20PR2 SML
-        !crclan settag C0G20PR2 @SML
-        !crclan settag C0G20PR2 @SML#6443
-        """
-        server = ctx.message.server
-        author = ctx.message.author
+    async def get_clan_data(self, tag):
+        """Return clan data JSON."""
+        url = "{}{}".format(self.settings["clan_api_url"], tag)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                try:
+                    data = await resp.json()
+                except json.decoder.JSONDecodeError:
+                    data = None
+        return data
 
-        if playertag is None:
-            await send_cmd_help(ctx)
-            return
+    async def update_data(self, clan_tag=None):
+        """Perform data update from api."""
+        success = False
+        for server_id in self.settings["servers"]:
+            clans = self.get_clans_settings(server_id)
 
-        if playertag.startswith('#'):
-            playertag = playertag[1:]
+            for tag, clan in clans.items():
+                do_update = False
+                if clan_tag is None:
+                    do_update = True
+                elif clan_tag == tag:
+                    do_update = True
+                if do_update:
+                    data = await self.get_clan_data(tag)
+                    if data is not None:
+                        clans[tag].update(data)
+                        success = True
 
-        allowed = False
-        if member is None:
-            allowed = True
-        else:
-            botcommander_roles = [
-                discord.utils.get(
-                    server.roles, name=r) for r in BOTCOMMANDER_ROLES]
-            botcommander_roles = set(botcommander_roles)
-            author_roles = set(author.roles)
-            if len(author_roles.intersection(botcommander_roles)):
-                allowed = True
+            self.set_clans_settings(server_id, clans)
+        return success
 
-        if not allowed:
-            await self.bot.say("Only Bot Commanders can set tags for others.")
-            return
+    def key2tag(self, server_id, key):
+        """Convert clan key to clan tag."""
+        clans = self.get_clans_settings(server_id)
+        for tag, clan in clans.items():
+            if clan["key"].lower() == key.lower():
+                return tag
+        return None
 
-        if member is None:
-            member = ctx.message.author
+    def tag2member(self, tag=None, server_id=None):
+        """Return Discord member from player tag."""
+        for server in self.bot.servers:
+            if server_id is not None:
+                if server.id != server_id:
+                    continue
+            try:
+                players = self.settings["servers"][server.id]["players"]
+                for member_id, v in players.items():
+                    if v == tag:
+                        return server.get_member(member_id)
+            except KeyError:
+                pass
+        return None
 
-        self.set_player_settings(server.id, playertag, member.id)
-
-        await self.bot.say("Associated player tag with Discord Member.")
-
-    @crclan.command(name="gettag", pass_context=True, no_pm=True)
-    async def crclan_gettag(self, ctx, member: discord.Member=None):
-        """Get playertag from Discord member."""
-        server = ctx.message.server
-        author = ctx.message.author
-        if member is None:
-            member = author
-        tag = self.member2tag(member.id, server.id)
-        if tag is None:
-            await self.bot.say("Cannot find associated player tag.")
-            return
-        await self.bot.say(
-            "Player tag for {} is #{}".format(
-                member.display_name, tag))
-
-    @crclan.command(name="statsroyale", pass_context=True, no_pm=True)
-    async def crclan_statsroyale(self, ctx, member: discord.Member=None):
-        """Return statsroyale URL from Discord member."""
-        server = ctx.message.server
-        author = ctx.message.author
-        if member is None:
-            member = author
-        tag = self.member2tag(member.id, server.id)
-        if tag is None:
-            await self.bot.say("Cannot find associated player tag.")
-            return
-        await self.bot.say(
-            "http://statsroyale.com/profile/{}".format(tag))
+    def member2tag(self, member_id=None, server_id=None):
+        """Return player tag from member."""
+        for server in self.bot.servers:
+            if server_id is not None:
+                if server.id != server_id:
+                    continue
+            try:
+                players = self.settings["servers"][server.id]["players"]
+                return players[member_id]
+            except KeyError:
+                pass
+        return None
 
     @staticmethod
     def random_color():
@@ -760,20 +749,6 @@ class CRClan:
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
         return color
-
-    def brawler_emoji(self, name):
-        """Emoji of the brawler.
-
-        Find emoji against all known servers
-        to look for match
-        <:emoji_name:emoji_id>
-        """
-        for server in self.bot.servers:
-            for emoji in server.emojis:
-                if emoji.name == name:
-                    return '<:{}:{}>'.format(emoji.name, emoji.id)
-        return None
-
 
 def check_folder():
     """Check folder."""
