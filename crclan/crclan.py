@@ -388,14 +388,30 @@ class CRClan:
                 return tag
         return None
 
-    def tag2member(self, tag=None):
+    def tag2member(self, tag=None, server_id=None):
         """Return Discord member from player tag."""
         for server in self.bot.servers:
+            if server_id is not None:
+                if server.id != server_id:
+                    continue
             try:
                 players = self.settings["servers"][server.id]["players"]
                 for member_id, v in players.items():
                     if v == tag:
                         return server.get_member(member_id)
+            except KeyError:
+                pass
+        return None
+
+    def member2tag(self, member_id=None, server_id=None):
+        """Return player tag from member."""
+        for server in self.bot.servers:
+            if server_id is not None:
+                if server.id != server_id:
+                    continue
+            try:
+                players = self.settings["servers"][server.id]["players"]
+                return players[member_id]
             except KeyError:
                 pass
         return None
@@ -783,6 +799,18 @@ class CRClan:
         self.set_player_settings(server.id, playertag, member.id)
 
         await self.bot.say("Associated player tag with Discord Member.")
+
+    @crclan.command(name="gettag", pass_context=True, no_pm=True)
+    async def crclan_gettag(self, ctx, member: discord.Member):
+        """Get playertag from Discord member."""
+        server = ctx.message.server
+        tag = self.member2tag(member.id, server.id)
+        if tag is None:
+            await self.bot.say("Cannot find associated player tag.")
+            return
+        await self.bot.say(
+            "Player tag for {} is #{}".format(
+                member.display_name, tag))
 
     @staticmethod
     def random_color():
