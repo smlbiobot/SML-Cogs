@@ -222,12 +222,14 @@ class CRClanMemberData:
         """Rank in clan with trend."""
         # rank diff is in reverse because lower is better
         # previous rank is 0 when user is new to clan
-        rank_diff = '-'
+        rank_str = '--'
         if self.previousRank != 0:
-            rank_diff = self.previousRank - self.currentRank
+            rank_diff = self.currentRank - self.previousRank
             if rank_diff > 0:
-                rank_diff = "+{}".format(rank_diff)
-        return "{} ({})".format(self.currentRank, rank_diff)
+                rank_str = "↓ {}".format(rank_diff)
+            elif rank_diff < 0:
+                rank_str = "↑ {}".format(-rank_diff)
+        return "{}\u00A0\u00A0\u00A0{}".format(self.currentRank, rank_str)
 
 
 class CRPlayerData:
@@ -496,7 +498,7 @@ class CRClan:
     async def setcrclan_remove(self, ctx: Context, *clantags):
         """Remove clan tag(s).
 
-        [p]setbsclan remove LQQ 82RQLR 98VLYJ Q0YG8V
+        [p]setcrclan remove LQQ 82RQLR 98VLYJ Q0YG8V
 
         """
         if not clantags:
