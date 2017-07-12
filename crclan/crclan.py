@@ -489,6 +489,44 @@ class CRClan:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @crclan.command(name="clantag", pass_context=True, no_pm=True)
+    async def crclan_clantag(self, ctx, clantag=None):
+        """Clan info and roster by tag."""
+        if clantag is None:
+            await send_cmd_help(ctx)
+            return
+
+        if clantag.startswith('#'):
+            clantag = clantag[1:]
+
+        data = await self.get_clan_data(clantag)
+
+        if data is None:
+            await self.bot.say('Error fetching data from API. Site may be down. Please try again later.')
+            return
+
+        color = self.random_color()
+        await self.bot.send_typing(ctx.message.channel)
+
+        em = self.embed_crclan_info(data)
+        em.color = discord.Color(value=color)
+        await self.bot.say(embed=em)
+
+        data = CRClanData(**data)
+        members = data.members
+        members_out = grouper(25, members, None)
+
+        for page, members in enumerate(members_out, start=1):
+            em = self.embed_crclan_roster(members)
+            em.title = "\u00A0"
+            em.color = discord.Color(value=color)
+            badge_url = self.settings["badge_url"] + data.badge_url
+            em.set_footer(
+                text="{} #{} - Page {}".format(
+                    data.name, data.tag, page),
+                icon_url=badge_url)
+            await self.bot.say(embed=em)
+
     @crclan.command(name="info", pass_context=True, no_pm=True)
     async def crclan_info(self, ctx: Context, key=None):
         """Information."""
@@ -513,8 +551,7 @@ class CRClan:
         await self.update_data(tag)
 
         em = self.embed_crclan_info(found_clan)
-        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-        color = int(color, 16)
+        color = self.random_color()
 
         await self.bot.send_typing(ctx.message.channel)
         em.color = discord.Color(value=color)
