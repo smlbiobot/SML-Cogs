@@ -592,6 +592,13 @@ class CRClan:
         return em
 
     @commands.has_any_role(*BOTCOMMANDER_ROLES)
+    @crclan.command(name="multiroster", pass_context=True, no_pm=True)
+    async def crclan_multiroster(self, ctx: Context, *keys):
+        """Return all list of rosters by keys."""
+        for key in keys:
+            await ctx.invoke(self.crclan_roster, key, update=False)
+
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @crclan.command(name="roster", pass_context=True, no_pm=True)
     async def crclan_roster(self, ctx: Context, key, update=False):
         """Return clan roster by key.
