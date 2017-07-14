@@ -90,14 +90,23 @@ class CRRole(Enum):
     ELDER = 3
     COLEADER = 4
 
+    def __init__(self, type):
+        """Init."""
+        self.type = type
 
-CR_ROLES = {
-    CRRole.MEMBER: "Member",
-    CRRole.LEADER: "Leader",
-    CRRole.ELDER: "Elder",
-    CRRole.COLEADER: "Co-Leader"
-}
-
+    @property
+    def rolename(self):
+        """Convert type to name"""
+        roles = {
+            self.MEMBER: "Member",
+            self.LEADER: "Leader",
+            self.ELDER: "Elder",
+            self.COLEADER: "Co-Leader"
+        }
+        for k, v in roles:
+            if k == self.type:
+                return v
+        return None
 
 class CRClanType(Enum):
     """Clash Royale clan type."""
@@ -259,19 +268,9 @@ class CRClan:
             self.settings["servers"][server_id] = SERVER_DEFAULTS
         dataIO.save_json(JSON, self.settings)
 
-    def badge_url(self, badge_id):
-        """Return Badge URL by badge ID.
-
-        TODO: Depreciated. Will remove soon.
-        """
-        return (
-            "https://raw.githubusercontent.com"
-            "/smlbiobot/smlbiobot.github.io/master"
-            "/emblems/{}.png").format(self.badge[badge_id])
-
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
-    async def setcrclan(self, ctx):
+    async def crclanset(self, ctx):
         """Set Clash Royale Data settings.
 
         Require: Clash Royale API by Selfish.
@@ -279,16 +278,16 @@ class CRClan:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setcrclan.command(name="init", pass_context=True)
-    async def setcrclan_init(self, ctx: Context):
+    @crclanset.command(name="init", pass_context=True)
+    async def crclanset_init(self, ctx: Context):
         """Init CR Clan settings."""
         server = ctx.message.server
         self.settings["servers"][server.id] = SERVER_DEFAULTS
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Server settings initialized.")
 
-    @setcrclan.command(name="clanapi", pass_context=True)
-    async def setcrclan_clanapi(self, ctx: Context, url):
+    @crclanset.command(name="clanapi", pass_context=True)
+    async def crclanset_clanapi(self, ctx: Context, url):
         """CR Clan API URL base.
 
         Format:
@@ -303,8 +302,8 @@ class CRClan:
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Clan API URL updated.")
 
-    @setcrclan.command(name="badgeurl", pass_context=True)
-    async def setcrclan_badgeurl(self, ctx: Context, url):
+    @crclanset.command(name="badgeurl", pass_context=True)
+    async def crclanset_badgeurl(self, ctx: Context, url):
         """badge URL base.
 
         Format:
@@ -316,8 +315,8 @@ class CRClan:
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Badge URL updated.")
 
-    @setcrclan.command(name="update", pass_context=True)
-    async def setcrclan_update(self, ctx: Context):
+    @crclanset.command(name="update", pass_context=True)
+    async def crclanset_update(self, ctx: Context):
         """Update data from api."""
         success = await self.update_data()
         if success:
@@ -325,11 +324,11 @@ class CRClan:
         else:
             await self.bot.say("Data update failed.")
 
-    @setcrclan.command(name="add", pass_context=True)
-    async def setcrclan_add(self, ctx: Context, tag=None, key=None, role=None):
+    @crclanset.command(name="add", pass_context=True)
+    async def crclanset_add(self, ctx: Context, tag=None, key=None, role=None):
         """Add clan tag(s).
 
-        [p]setcrclan add 2CCCP alpha
+        [p]crclanset add 2CCCP alpha
 
         tag: clan tag without the # sign
         key: human readable key for easier calls for data
@@ -362,11 +361,11 @@ class CRClan:
 
         # await self.update_data()
 
-    @setcrclan.command(name="remove", pass_context=True)
-    async def setcrclan_remove(self, ctx: Context, *clantags):
+    @crclanset.command(name="remove", pass_context=True)
+    async def crclanset_remove(self, ctx: Context, *clantags):
         """Remove clan tag(s).
 
-        [p]setcrclan remove LQQ 82RQLR 98VLYJ Q0YG8V
+        [p]crclanset remove LQQ 82RQLR 98VLYJ Q0YG8V
 
         """
         if not clantags:
@@ -388,9 +387,9 @@ class CRClan:
             self.set_clans_settings(server.id, clans)
             await self.bot.say("Removed #{} from clans.".format(clantag))
 
-    @setcrclan.command(name="setkey", pass_context=True)
-    async def setcrclan_setkey(self, ctx, tag, key):
-        """Associate clan tag with human readable key.
+    @crclanset.command(name="key", pass_context=True)
+    async def crclanset_key(self, ctx, tag, key):
+        """Human readable key.
 
         This is used for running other commands to make
         fetching data easier without having to use
@@ -474,6 +473,16 @@ class CRClan:
             "Player tag for {} is #{}".format(
                 member.display_name, tag))
 
+    @crclan.command(name="clankey", pass_context=True, no_pm=True)
+    async def crclan_clankey(self, ctx: Context, key, update=False):
+        """Return clan roster by key.
+
+        Key of each clan is set from [p]bsclan addkey
+        """
+        server = ctx.message.server
+        tag = self.key2tag(server.id, key)
+        await ctx.invoke(self.crclan_clantag, tag)
+
     @crclan.command(name="clantag", pass_context=True, no_pm=True)
     async def crclan_clantag(self, ctx, clantag=None):
         """Clan info and roster by tag."""
@@ -487,30 +496,18 @@ class CRClan:
         data = await self.get_clan_data(clantag)
 
         if data is None:
-            await self.bot.say('Error fetching data from API. Site may be down. Please try again later.')
+            await self.bot.say(
+                'Error fetching data from API. '
+                'Site may be down. Please try again later.')
             return
 
-        color = self.random_color()
         await self.bot.send_typing(ctx.message.channel)
+        color = self.random_discord_color()
 
         em = self.embed_crclan_info(data)
-        em.color = discord.Color(value=color)
+        em.color = color
         await self.bot.say(embed=em)
-
-        data = CRClanData(**data)
-        members = data.members
-        members_out = grouper(25, members, None)
-
-        for page, members in enumerate(members_out, start=1):
-            em = self.embed_crclan_roster(members)
-            em.title = "\u00A0"
-            em.color = discord.Color(value=color)
-            badge_url = self.settings["badge_url"] + data.badge_url
-            em.set_footer(
-                text="{} #{} - Page {}".format(
-                    data.name, data.tag, page),
-                icon_url=badge_url)
-            await self.bot.say(embed=em)
+        await self.send_roster(CRClanData(**data), color=color)
 
     @crclan.command(name="info", pass_context=True, no_pm=True)
     async def crclan_info(self, ctx: Context, key=None):
@@ -535,21 +532,11 @@ class CRClan:
         tag = self.key2tag(server.id, key)
         await self.update_data(tag)
 
-        em = self.embed_crclan_info(found_clan)
-        color = self.random_color()
-
         await self.bot.send_typing(ctx.message.channel)
-        em.color = discord.Color(value=color)
+        em = self.embed_crclan_info(found_clan)
+        em.color = self.random_discord_color()
         await self.bot.say(embed=em)
 
-    @commands.has_any_role(*BOTCOMMANDER_ROLES)
-    @crclan.command(name="multiroster", pass_context=True, no_pm=True)
-    async def crclan_multiroster(self, ctx: Context, *keys):
-        """Return all list of rosters by keys."""
-        for key in keys:
-            await ctx.invoke(self.crclan_roster, key, update=False)
-
-    # @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @crclan.command(name="roster", pass_context=True, no_pm=True)
     async def crclan_roster(self, ctx: Context, key, update=False):
         """Return clan roster by key.
@@ -557,6 +544,11 @@ class CRClan:
         Key of each clan is set from [p]bsclan addkey
         """
         server = ctx.message.server
+
+        tag = self.key2tag(server.id, key)
+        if update:
+            await self.update_data(tag)
+
         await self.bot.send_typing(ctx.message.channel)
         clans = self.get_clans_settings(server.id)
         clan_result = None
@@ -571,31 +563,14 @@ class CRClan:
             await self.bot.say("Cannot find key {} in settings.".format(key))
             return
 
-        members = clan_result.members
-        tag = self.key2tag(server.id, key)
+        await self.send_roster(clan_result, color=self.random_discord_color())
 
-        # force update only if specified
-        if update:
-            await self.update_data(tag)
-
-        # split results as list of 25
-        members_out = grouper(25, members, None)
-
-        color = self.random_color()
-        for page, members in enumerate(members_out, start=1):
-            em = self.embed_crclan_roster(members)
-            em.title = clan_result.name
-            em.color = discord.Color(value=color)
-            badge_url = self.settings["badge_url"] + data.badge_url
-            # show credits on last page
-            # credits = ''
-            # if page >= page_count:
-            #     credits = ' - ' + CREDITS
-            em.set_footer(
-                text="{} #{} - Page {}".format(
-                    data.name, data.tag, page),
-                icon_url=badge_url)
-            await self.bot.say(embed=em)
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
+    @crclan.command(name="multiroster", pass_context=True, no_pm=True)
+    async def crclan_multiroster(self, ctx: Context, *keys):
+        """Return all list of rosters by keys."""
+        for key in keys:
+            await ctx.invoke(self.crclan_roster, key, update=False)
 
     def embed_crclan_info(self, clan):
         """Return clan info embed."""
@@ -607,16 +582,45 @@ class CRClan:
         em.add_field(name="Type", value=CR_CLAN_TYPE[data.type])
         em.add_field(name="Required Trophies", value=data.requiredScore)
         em.add_field(name="Clan Tag", value=data.tag)
-        em.add_field(
-            name="Members", value=data.member_count_str)
+        em.add_field(name="Members", value=data.member_count_str)
         badge_url = self.settings["badge_url"] + data.badge_url
         em.set_thumbnail(url=badge_url)
-        # em.set_author(name=data.name)
         return em
 
-    def embed_crclan_roster(self, members):
-        """Return clan roster embed."""
-        em = discord.Embed(title=" ")
+    async def send_roster(self, data: CRClanData, **kwargs):
+        """Send roster to destination according to context.
+
+        Results are split in groups of 25
+        because Discord Embeds allow 25 fields per embed.
+        """
+        members_out = grouper(25, data.members, None)
+        if 'color' in kwargs:
+            color = kwargs['color']
+        else:
+            color = self.random_discord_color()
+
+        for page, members in enumerate(members_out, start=1):
+            kwargs = {
+                'members': members,
+                'title': data.name,
+                'footer_text': '{} #{} - Page {}'.format(
+                    data.name, data.tag, page),
+                'footer_icon_url': self.settings["badge_url"] + data.badge_url
+            }
+            em = self.embed_roster(**kwargs)
+            em.color = color
+            await self.bot.say(embed=em)
+
+    def embed_roster(
+            self,
+            title=None, members=None,
+            footer_text=None, footer_icon_url=None):
+        """Return clan roster as Discord embed.
+
+        This represents a page of a roster.
+        """
+        em = discord.Embed(title=title)
+        em.set_footer(text=footer_text, icon_url=footer_icon_url)
         for member in members:
             if member is not None:
                 data = CRClanMemberData(**member)
@@ -744,11 +748,12 @@ class CRClan:
         return None
 
     @staticmethod
-    def random_color():
+    def random_discord_color():
         """Return random color as an integer."""
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
-        return color
+        return discord.Color(value=color)
+
 
 def check_folder():
     """Check folder."""
