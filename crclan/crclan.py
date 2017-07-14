@@ -56,6 +56,8 @@ BADGES_JSON = os.path.join(PATH, "badges.json")
 
 DATA_UPDATE_INTERVAL = timedelta(minutes=30).seconds
 
+API_FETCH_TIMEOUT = 30
+
 BOTCOMMANDER_ROLES = ["Bot Commander"]
 
 SETTINGS_DEFAULTS = {
@@ -85,6 +87,8 @@ def nested_dict():
 class SCTag:
     """SuperCell tags."""
 
+    TAG_CHARACTERS = list("0289PYLQGRJCUV")
+
     def __init__(self, tag):
         """Init.
 
@@ -101,6 +105,24 @@ class SCTag:
     def tag(self):
         """Return tag as str."""
         return self._tag
+
+    @property
+    def valid(self):
+        """Return true if tag is valid."""
+        for c in self.tag:
+            if c not in self.TAG_CHARACTERS:
+                return False
+        return True
+
+    @property
+    def invalid_chars(self):
+        """Return list of invalid characters."""
+        invalids = []
+        for c in self.tag:
+            if c not in self.TAG_CHARACTERS:
+                invalids.append(c)
+        return invalids
+
 
 class CRRole(Enum):
     """Clash Royale role."""
@@ -421,7 +443,7 @@ class Settings:
         data = None
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=15) as resp:
+                async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
                     data = await resp.json()
         except json.decoder.JSONDecodeError:
             pass
@@ -700,13 +722,25 @@ class CRClan:
             await send_cmd_help(ctx)
             return
 
+        clantag = SCTag(clantag)
+        if not clantag.valid:
+            await self.bot.say(
+                'The tag you have entered is not valid. \n'
+                'List of invalid characters in your tag: {}\n'
+                'List of valid characters for tags: {}'.format(
+                    ', '.join(clantag.invalid_chars),
+                    ', '.join(clantag.TAG_CHARACTERS)
+                ))
+            return
+
+
         server = ctx.message.server
         data = None
 
         try:
-            data = await self.settings.get_clan_data(server, tag=clantag)
-        except ClanKeyNotInSettings:
-            await self.bot.say("Cannot find key {} in settings.".format(key))
+            data = await self.settings.get_clan_data(server, tag=clantag.tag)
+        # except ClanKeyNotInSettings:
+        #     await self.bot.say("Cannot find key {} in settings.".format(key))
         except APIFetchError:
             await self.bot.say(
                 "Error fetching data for clan tag #{} from API. "
