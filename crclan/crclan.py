@@ -518,7 +518,6 @@ class CRClan:
         """Loop task: update data daily."""
         await self.bot.wait_until_ready()
         await self.settings.update_data()
-        await self.update_data()
         await asyncio.sleep(DATA_UPDATE_INTERVAL)
         if self is self.bot.get_cog('CRClan'):
             self.task = self.bot.loop.create_task(self.loop_task())
@@ -744,7 +743,7 @@ class CRClan:
         except APIFetchError:
             await self.bot.say(
                 "Error fetching data for clan tag #{} from API. "
-                "Please try again later.".format(clantag))
+                "Please `2  wtry again later.".format(clantag))
         else:
             if data is None:
                 await self.bot.say(
@@ -892,30 +891,6 @@ class CRClan:
                     data.rank, mention, value)
                 em.add_field(name=name, value=value, inline=False)
         return em
-
-
-    async def update_data(self, clan_tag=None):
-        """Perform data update from api."""
-        success = False
-        for server_id in self.settings["servers"]:
-            clans = self.get_clans_settings(server_id)
-
-            for tag, clan in clans.items():
-                do_update = False
-                if clan_tag is None:
-                    do_update = True
-                elif clan_tag == tag:
-                    do_update = True
-                if do_update:
-                    data = await self.get_clan_data(tag)
-                    if data is not None:
-                        clans[tag].update(data)
-                        success = True
-
-            self.set_clans_settings(server_id, clans)
-        return success
-
-
 
     @staticmethod
     def random_discord_color():
