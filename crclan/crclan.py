@@ -56,7 +56,7 @@ BADGES_JSON = os.path.join(PATH, "badges.json")
 
 DATA_UPDATE_INTERVAL = timedelta(minutes=30).seconds
 
-API_FETCH_TIMEOUT = 30
+API_FETCH_TIMEOUT = 5
 
 BOTCOMMANDER_ROLES = ["Bot Commander"]
 
@@ -321,7 +321,8 @@ class Settings:
     def __init__(self, filepath):
         """Init."""
         self.filepath = filepath
-        self.settings = dataIO.load_json(filepath)
+        self.settings = nested_dict()
+        self.settings.update(dataIO.load_json(filepath))
 
     def init_server(self, server):
         """Initialized server settings.
@@ -338,7 +339,7 @@ class Settings:
 
     def check_server(self, server):
         """Make sure server exists in settings."""
-        if server_id not in self.settings["servers"]:
+        if server.id not in self.settings["servers"]:
             self.settings["servers"][server.id] = self.SERVER_DEFAULTS
         self.save()
 
@@ -356,6 +357,7 @@ class Settings:
 
     def add_clan(self, server, tag, key, role_name):
         """Add a clan by server."""
+        self.check_server(server)
         tag = SCTag(tag).tag
         role = discord.utils.get(server.roles, name=role_name)
         role_id = None
@@ -392,6 +394,7 @@ class Settings:
 
         If tag already exists for member, overwrites it.
         """
+        self.check_server(server)
         tag = SCTag(tag).tag
         if "players" not in self.settings["servers"][server.id]:
             self.settings["servers"][server.id]["players"] = {}
@@ -432,9 +435,30 @@ class Settings:
             return None
 
         data = await self.update_clan_data(tag)
-        if data is None:
-            return None
+
+        # if data is None:
+        #     return None
         return CRClanData(**data)
+
+    def server_settings(self, server):
+        """Return server settings."""
+        return self.settings["servers"][server.id]
+
+    def discord_members_by_clankey(self, server, key=None, sort=True):
+        """Return list of Discord members by clan key.
+
+        This uses the role_id associated in settings to fetch
+        list of users on server.
+
+        Sorted alphabetically.
+        """
+        tag = self.key2tag(server, key)
+        clan = self.server_settings(server)["clans"][tag]
+        role = discord.utils.get(server.roles, id=clan['role_id'])
+        members = [m for m in server.members if role in m.roles]
+        if sort:
+            members = sorted(members, key=lambda x: x.display_name.lower())
+        return members
 
     async def update_clan_data(self, tag):
         """Update and save clan data from API."""
@@ -451,14 +475,14 @@ class Settings:
             pass
 
         filename = os.path.join(PATH_CLANS, '{}.json'.format(tag))
-        if data is not None:
-            dataIO.save_json(filename, data)
-            return data
 
-        # try to load data from disk if loading from url failed
         if data is None:
-            return dataIO.load_json(filename)
-        return None
+            if os.path.exists(filename):
+                data = dataIO.load_json(filename)
+        else:
+            dataIO.save_json(filename, data)
+
+        return data
 
     async def update_data(self):
         """Update all data and save to disk."""
@@ -500,6 +524,20 @@ class Settings:
         self.settings["badge_url"] = value
         self.save()
 
+
+class ErrorMessage:
+    """Error Messages"""
+    @staticmethod
+    def key_error(key):
+        return (
+            "Error fetching data from API for clan key {}. "
+            "Please try again later.").format(key)
+
+    @staticmethod
+    def tag_error(tag):
+        return(
+            "Error fetching data from API for clan tag #{}. "
+            "Please try again later.").format(tag)
 
 class CRClan:
     """Clash Royale Clan management."""
@@ -732,7 +770,6 @@ class CRClan:
                 ))
             return
 
-
         server = ctx.message.server
         data = None
 
@@ -741,14 +778,10 @@ class CRClan:
         # except ClanKeyNotInSettings:
         #     await self.bot.say("Cannot find key {} in settings.".format(key))
         except APIFetchError:
-            await self.bot.say(
-                "Error fetching data for clan tag #{} from API. "
-                "Please `2  wtry again later.".format(clantag))
+            await self.bot.say(ErrorMessage.tag_error(clantag))
         else:
             if data is None:
-                await self.bot.say(
-                    "Error fetching data for clan tag #{} from API. "
-                    "Please try again later.".format(clantag))
+                await self.bot.say(ErrorMessage.tag_error(clantag))
             else:
                 await self.bot.send_typing(ctx.message.channel)
                 color = self.random_discord_color()
@@ -770,14 +803,10 @@ class CRClan:
         except ClanKeyNotInSettings:
             await self.bot.say("Cannot find key {} in settings.".format(key))
         except APIFetchError:
-            await self.bot.say(
-                "Error fetching data from API for clan key {}. "
-                "Please try again later.".format(key))
+            await self.bot.say(ErrorMessage.key_error(key))
         else:
             if clan_data is None:
-                await self.bot.say(
-                    "Error fetching data from API for clan key {}. "
-                    "Please try again later.".format(key))
+                await self.bot.say(ErrorMessage.key_error(key))
             else:
                 await self.bot.send_typing(ctx.message.channel)
                 em = self.embed_crclan_info(clan_data)
@@ -786,39 +815,92 @@ class CRClan:
 
     @crclan.command(name="roster", pass_context=True, no_pm=True)
     async def crclan_roster(self, ctx, key):
-        """Return clan roster by key.
+        """Clan roster by key.
 
         Key of each clan is set from [p]bsclan addkey
         """
         server = ctx.message.server
 
-        await self.bot.send_typing(ctx.message.channel)
+        await self.bot.type()
 
         try:
             clan_data = await self.settings.get_clan_data(server, key=key)
         except ClanKeyNotInSettings:
             await self.bot.say("Cannot find key {} in settings.".format(key))
         except APIFetchError:
-            await self.bot.say(
-                "Error fetching data from API for clan key {}. "
-                "Please try again later.".format(key))
+            await self.bot.say(ErrorMessage.key_error(key))
         else:
             if clan_data is None:
-                await self.bot.say(
-                    "Error fetching data from API for clan key {}. "
-                    "Please try again later.".format(key))
+                await self.bot.say(ErrorMessage.key_error(key))
             else:
-                await self.send_roster(server, clan_data, color=self.random_discord_color())
+                await self.send_roster(ctx, server, clan_data, color=self.random_discord_color())
 
     @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @crclan.command(name="multiroster", pass_context=True, no_pm=True)
     async def crclan_multiroster(self, ctx, *keys):
-        """Return all list of rosters by keys.
+        """Multiple rosters by list of keys.
 
         [p]crclan multiroster alpha bravo charlie
         """
         for key in keys:
             await ctx.invoke(self.crclan_roster, key)
+
+    @crclan.command(name="audit", pass_context=True, no_pm=True)
+    async def crclan_audit(self, ctx, key):
+        """Compare roster with Discord roles.
+
+        This shows an alphabetically sorted list of members on the roster
+        side by side with that on Discord for easy auditing.
+        """
+        server = ctx.message.server
+
+        await self.bot.type()
+        data = await self.settings.get_clan_data(server, key=key)
+        if data is None:
+            await self.bot.say(ErrorMessage.key_error(key))
+            return
+
+        # alphabetical list of discord members with associated role
+        dc_members = self.settings.discord_members_by_clankey(server, key=key)
+        dc_names = [m.mention for m in dc_members]
+
+        # alphabetical list of members in CR App
+        cr_members = [CRClanMemberData(**m) for m in data.members]
+        cr_names = [m.name for m in cr_members]
+        cr_names = sorted(cr_names, key=lambda x: x.lower())
+
+        # split into groups because embed value size too large otherwise
+
+        split_count = 3
+
+        max_len = max(len(cr_names), len(dc_names))
+
+        group_size = max_len // split_count + 1
+        target_len = group_size * split_count
+
+        if len(cr_names) < target_len:
+            cr_names.extend(['_'] * (target_len-len(cr_names)))
+        if len(dc_names) < target_len:
+            dc_names.extend(['_'] * (target_len-len(dc_names)))
+
+        cr_names_group = list(grouper(group_size, cr_names, '_'))
+        dc_names_group = list(grouper(group_size, dc_names, '_'))
+
+        color = self.random_discord_color()
+
+        for i in range(split_count):
+            cr_list = ''
+            dc_list = ''
+            cr_list = '\n'.join(cr_names_group[i])
+            dc_list = '\n'.join(dc_names_group[i])
+
+            em = discord.Embed(title=data.name)
+            em.color = color
+            em.add_field(name="CR", value=cr_list, inline=True)
+            em.add_field(name="Discord", value=dc_list, inline=True)
+
+            # not sure why bot.say() fails again
+            await self.bot.send_message(ctx.message.channel, embed=em)
 
     def embed_crclan_info(self, data: CRClanData):
         """Return clan info embed."""
@@ -835,7 +917,7 @@ class CRClan:
         em.set_thumbnail(url=badge_url)
         return em
 
-    async def send_roster(self, server, data: CRClanData, **kwargs):
+    async def send_roster(self, ctx, server, data: CRClanData, **kwargs):
         """Send roster to destination according to context.
 
         Results are split in groups of 25
@@ -858,7 +940,7 @@ class CRClan:
             }
             em = self.embed_roster(**kwargs)
             em.color = color
-            await self.bot.say(embed=em)
+            await self.bot.send_message(ctx.message.channel, embed=em)
 
     def embed_roster(
             self,
