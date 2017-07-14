@@ -575,7 +575,7 @@ class CRClan:
 
         await self.bot.say(
             'Added clan #{} with key: {} and role: {}'.format(
-                tag, key, role))
+                tag, key, role_name))
 
     @crclanset.command(name="remove", pass_context=True)
     async def crclanset_remove(self, ctx, *clantags):
