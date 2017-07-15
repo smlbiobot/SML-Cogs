@@ -135,6 +135,48 @@ class SCTag:
         ))
 
 
+class CRArenaModel:
+    """Clash Royale arenas."""
+
+    def __init__(self, **kwargs):
+        """Init.
+
+        Keyword Args:
+            Name (str)
+            TID (str)
+            TIDText (str)
+            SubtitleTID (str)
+            SubtitleTIDText (str)
+            Arena (int)
+            ChestArena (str)
+            TvArena (str)
+            IsInUse (bool)
+            TrainingCamp (bool)
+            PVEArena (str)
+            TrophyLimit (int)
+            DemoteTrophyLimit (int)
+            SeasonTrophyReset (str)
+            ChestRewardMultiplier (int)
+            ChestShopPriceMultiplier (int)
+            RequestSize (int)
+            MaxDonationCountCommon (int)
+            MaxDonationCountRare (int)
+            MaxDonationCountEpic (int)
+            IconSWF (str)
+            IconExportName (str)
+            MainMenuIconExportName (str)
+            SmallIconExportName (str)
+            MatchmakingMinTrophyDelta (int)
+            MatchmakingMaxTrophyDelta (int)
+            MatchmakingMaxSeconds (int)
+            PvpLocation (str)
+            TeamVsTeamLocation (str)
+            DailyDonationCapacityLimit (int)
+            BattleRewardGold (str)
+            ReleaseDate (str)
+        """
+        self.__dict__.update(kwargs)
+
 class CRRole(Enum):
     """Clash Royale role."""
 
@@ -329,6 +371,14 @@ class CRClanMemberModel:
                 rank_str = "↑ {}".format(-rank_diff)
         return "{}\u00A0\u00A0\u00A0{}".format(self.currentRank, rank_str)
 
+    @property
+    def league_icon_url(self):
+        """League Icon URL"""
+        return (
+            'http://smlbiobot.github.io/img/leagues/'
+            'league{}.png'
+        ).format(self.league)
+
 
 class SettingsException(Exception):
     pass
@@ -362,6 +412,11 @@ class CogModel:
         self.filepath = filepath
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(filepath))
+
+        # arenas
+        arenas = dataIO.load_json(os.path.join(PATH, 'arenas.json'))
+        self.arenas = [CRArenaModel(**a) for a in arenas]
+        self.arenas = sorted(self.arenas, key=lambda x: x.TrophyLimit, reverse=True)
 
     def init_server(self, server):
         """Initialized server settings.
@@ -555,6 +610,17 @@ class CogModel:
         except KeyError:
             pass
         return None
+
+    def trophy2arena(self, trophy):
+        """Convert trophy to league based on Arenas."""
+        result = None
+        for arena in self.arenas:
+            if trophy >= arena.TrophyLimit:
+                result = arena
+                break
+
+        if result is not None:
+            return '{}: {}'.format(result.TIDText, result.SubtitleTIDText)
 
     @property
     def clan_api_url(self):
@@ -1061,6 +1127,12 @@ class CRClan:
 
         if data.is_cache:
             await self.bot.say(data.cache_message)
+
+    @crclan.command(name="trophy2arena", pass_context=True, no_pm=True)
+    async def crclan_trophy2arena(self, ctx, trophy: int):
+        """Convert trophies to arenas."""
+        text = self.model.trophy2arena(trophy)
+        await self.bot.say(text)
 
 
     @staticmethod
