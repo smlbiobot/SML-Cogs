@@ -243,9 +243,9 @@ class CRClanModel:
             minutes, seconds = divmod(remainder, 60)
             passed_str = '{} hours {} minutes {} seconds ago'.format(hours, minutes, seconds)
         return (
-            "Warning: Data returned was not fetched in real-time but is cached on disk. "
-            "In-app data may be different. \n"
-            "Last updated: {}.".format(passed_str)
+            "Warning: Unable to access API. Returning cached data. "
+            "Real-time data in CR may be different. \n"
+            "Displaying data from {}.".format(passed_str)
         )
 
 
