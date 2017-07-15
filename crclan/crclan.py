@@ -231,7 +231,7 @@ class CRClanType(Enum):
 class CRClanModel:
     """Clash Royale Clan data."""
 
-    def __init__(self, is_cache, timestamp, **kwargs):
+    def __init__(self, is_cache=False, timestamp=None, loaded=True, **kwargs):
         """Init.
 
         Expected list of keywords:
@@ -257,6 +257,7 @@ class CRClanModel:
         self.__dict__.update(kwargs)
         self.is_cache = is_cache
         self.timestamp = timestamp
+        self.loaded = loaded
 
     @property
     def member_count_str(self):
@@ -591,31 +592,32 @@ class CogModel:
         url = "{}{}".format(self.settings["clan_api_url"], tag)
         data = None
 
-        is_cache = False
-        timestamp = None
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
                     data = await resp.json()
         except json.decoder.JSONDecodeError:
-            pass
+            return False
         except asyncio.TimeoutError:
-            pass
+            return False
 
-        filename = os.path.join(PATH_CLANS, '{}.json'.format(tag))
+        filepath = self.cached_filepath(tag)
+        dataIO.save_json(filepath, data)
 
-        if data is None:
-            if os.path.exists(filename):
-                is_cache = True
-                data = dataIO.load_json(filename)
-                timestamp = dt.datetime.fromtimestamp(os.path.getmtime(filename))
-        else:
-            dataIO.save_json(filename, data)
-            timestamp = dt.datenow.utcnow()
+        is_cache = False
+        timestamp = dt.datetime.utcnow()
 
-        data = CRClanModel(is_cache, timestamp, **data)
+        return CRClanModel(is_cache, timestamp, **data)
 
-        return data
+    def cached_clan_data(self, tag):
+        """Load cached clan data. Used when live update failed."""
+        filepath = self.cached_filepath(tag)
+        if os.path.exists(filepath):
+            is_cache = True
+            data = dataIO.load_json(filepath)
+            timestamp = dt.datetime.fromtimestamp(os.path.getmtime(filepath))
+            return CRClanModel(is_cache, timestamp, **data)
+        return None
 
     def cached_filepath(self, tag):
         """Cached clan data file path"""
@@ -623,10 +625,17 @@ class CogModel:
 
     async def update_data(self):
         """Update all data and save to disk."""
+        dataset = []
         for server_id in self.settings["servers"]:
             clans = self.settings["servers"][server_id]["clans"]
             for tag in clans.keys():
-                await self.update_clan_data(tag)
+                data = await self.update_clan_data(tag)
+                if not data:
+                    data = self.cached_clan_data(tag)
+                if data is None:
+                    data = CRClanModel(loaded=False, tag=tag)
+                dataset.append(data)
+        return dataset
 
     def member2tag(self, server, member):
         """Return player tag from member."""
@@ -711,10 +720,10 @@ class CRClan:
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
     async def crclanset(self, ctx):
-        """Set Clash Royale Data settings.
+        """Clash Royale clan management API.
 
-        Require: Clash Royale API by Selfish.
-        May not work for you."""
+        Requires: Clash Royale API access by Selfish.
+        """
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
@@ -757,11 +766,15 @@ class CRClan:
     @crclanset.command(name="update", pass_context=True)
     async def crclanset_update(self, ctx):
         """Update data from api."""
-        success = await self.update_data()
-        if success:
-            await self.bot.say("Data updated.")
-        else:
-            await self.bot.say("Data update failed.")
+        await self.bot.type()
+        dataset = await self.model.update_data()
+        for data in dataset:
+            if not data.loaded:
+                await self.bot.send_message(ctx.message.channel, "Cannot load data for {}.".format(data.tag))
+            if data.is_cache:
+                await self.bot.send_message(ctx.message.channel, data.cache_message)
+            else:
+                await self.bot.send_message(ctx.message.channel, "Data for {} updated".format(data.name))
 
     @crclanset.command(name="add", pass_context=True)
     async def crclanset_add(self, ctx, tag, key=None, role_name=None):
@@ -809,11 +822,14 @@ class CRClan:
 
     @crclanset.command(name="key", pass_context=True)
     async def crclanset_key(self, ctx, tag, key):
-        """Human readable key.
+        """Human readable key for clan tags.
 
         This is used for running other commands to make
         fetching data easier without having to use
         clan tag every time.
+
+        You can also set this key when adding clans
+        with [p]crclanset add [tag] [key]
         """
         server = ctx.message.server
 
@@ -900,20 +916,21 @@ class CRClan:
 
     @crclan.command(name="clankey", pass_context=True, no_pm=True)
     async def crclan_clankey(self, ctx, key):
-        """Return clan roster by key.
+        """Clan info + roster by key.
 
         Key of each clan is set from [p]bsclan addkey
         """
-        # server = ctx.message.server
-        # tag = self.model.key2tag(server, key)
-        # await ctx.invoke(self.crclan_clantag, tag)
         success = await self.send_clan(ctx, key=key)
         if not success:
             await self.bot.say("Unable to get clan info by key entered.")
 
     @crclan.command(name="clantag", pass_context=True, no_pm=True)
     async def crclan_clantag(self, ctx, tag):
-        """Clan info and roster by tag."""
+        """Clan info and roster by tag.
+
+        Clan tag is the alphanumeric digits after the # sign
+        found in the clan description.
+        """
         success =await self.send_clan(ctx, tag=tag)
         if not success:
             await self.bot.say("Unable to get clan info by tag entered.")
@@ -1060,7 +1077,10 @@ class CRClan:
 
     @crclan.command(name="info", pass_context=True, no_pm=True)
     async def crclan_info(self, ctx, key=None):
-        """Information."""
+        """Clan info.
+
+        Display clan name, description, trophy requirements, etc.
+        """
         server = ctx.message.server
 
         await self.bot.send_typing(ctx.message.channel)
@@ -1076,15 +1096,13 @@ class CRClan:
                 await self.bot.say(ErrorMessage.key_error(key))
             else:
                 await self.send_info(ctx, clan_data, cache_warning=True)
-                # await self.bot.send_typing(ctx.message.channel)
-                # em = self.embed_info(clan_data, color=self.random_discord_color(), cache_warning=True)
-                # await self.bot.say(embed=em)
 
     @crclan.command(name="roster", pass_context=True, no_pm=True)
     async def crclan_roster(self, ctx, key):
         """Clan roster by key.
 
         Key of each clan is set from [p]bsclan addkey
+        Roster includes member donations and crown contributions.
         """
         server = ctx.message.server
 
