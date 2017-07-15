@@ -1046,7 +1046,7 @@ class CRClan:
                         rank_delta_str = "↓ {:\u00A0>2}".format(rank_delta)
                     elif data.rankdelta < 0:
                         rank_delta_str = "↑ {:\u00A0>2}".format(-rank_delta)
-                value = '`{rank_current} {rankdelta}` {mention} {emoji} {arena} {stats}'.format(
+                value = '`{rank_current} {rankdelta}` {emoji} {arena} {mention} {stats} '.format(
                     rank_current=rank_current,
                     rankdelta=rank_delta_str,
                     mention=mention,
