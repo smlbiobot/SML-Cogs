@@ -40,8 +40,7 @@ from discord.ext.commands import Context
 
 from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
+from cogs.utils.chat_formatting import box, inline, pagify
 from cogs.utils.dataIO import dataIO
 
 try:
@@ -1027,10 +1026,10 @@ class CRClan:
                     "(Lvl {0.expLevel})").format(data)
                 stats = (
                     "{0.score:,d}"
-                    " | {0.donations: >4} d"
-                    " | {0.clanChestCrowns: >3} c"
+                    " | {0.donations:\u00A0>4} d"
+                    " | {0.clanChestCrowns:\u00A0>3} c"
                     " | #{0.tag}").format(data)
-                stats = box(stats, lang='py')
+                stats = inline(stats)
                 mention = ''
                 if discord_member is not None:
                     mention = discord_member.mention
@@ -1046,7 +1045,7 @@ class CRClan:
                         rank_delta_str = "↓ {:\u00A0>2}".format(rank_delta)
                     elif data.rankdelta < 0:
                         rank_delta_str = "↑ {:\u00A0>2}".format(-rank_delta)
-                value = '`{rank_current} {rankdelta}` {emoji} {arena} {mention} {stats} '.format(
+                value = '`{rank_current} {rankdelta}` {emoji} {arena} {mention}\n{stats} '.format(
                     rank_current=rank_current,
                     rankdelta=rank_delta_str,
                     mention=mention,
