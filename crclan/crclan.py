@@ -1038,13 +1038,13 @@ class CRClan:
                 41 ↓ 31 
                 """
                 rank_delta = data.rankdelta
-                rank_delta_str = '.' * 4
-                rank_current = '{:\u00A0<2}'.format(data.currentRank)
+                rank_delta_str = '.  .'
+                rank_current = '{: <2}'.format(data.currentRank)
                 if data.rankdelta is not None:
                     if data.rankdelta > 0:
-                        rank_delta_str = "↓ {:\u00A0>2}".format(rank_delta)
+                        rank_delta_str = "↓ {: >2}".format(rank_delta)
                     elif data.rankdelta < 0:
-                        rank_delta_str = "↑ {:\u00A0>2}".format(-rank_delta)
+                        rank_delta_str = "↑ {: >2}".format(-rank_delta)
                 value = '`{rank_current} {rankdelta}` {emoji} {arena} {mention}\n{stats} '.format(
                     rank_current=rank_current,
                     rankdelta=rank_delta_str,
