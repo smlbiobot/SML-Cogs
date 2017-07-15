@@ -359,9 +359,14 @@ class CRClanMemberModel:
 
     @property
     def rank(self):
-        """Rank in clan with trend."""
-        # rank diff is in reverse because lower is better
-        # previous rank is 0 when user is new to clan
+        """Rank in clan with trend.
+
+        Rank diffis in reverse because lower is better.
+        Previous rank is 0 when user is new to the clan.
+
+        \u00A0 is a non-breaking space.
+
+        """
         rank_str = '--'
         if self.previousRank != 0:
             rank_diff = self.currentRank - self.previousRank
@@ -369,15 +374,39 @@ class CRClanMemberModel:
                 rank_str = "↓ {}".format(rank_diff)
             elif rank_diff < 0:
                 rank_str = "↑ {}".format(-rank_diff)
-        return "{}\u00A0\u00A0\u00A0{}".format(self.currentRank, rank_str)
+        return "`{0:\u00A0>8} {1:\u00A0<16}`".format(self.currentRank, rank_str)
+
+    @property
+    def rankdelta(self):
+        """Difference in rank.
+
+        Return None if previous rank is 0
+        """
+        if self.previousRank == 0:
+            return None
+        else:
+            return self.currentRank - self.previousRank
+
 
     @property
     def league_icon_url(self):
-        """League Icon URL"""
+        """League Icon URL."""
         return (
             'http://smlbiobot.github.io/img/leagues/'
             'league{}.png'
         ).format(self.league)
+
+    def league_emoji(self, bot):
+        """League emoji.
+
+        Goes through all servers the bot is on to find the emoji.
+        """
+        name = 'league{}'.format(self.league)
+        for server in bot.servers:
+            for emoji in server.emojis:
+                if emoji.name == name:
+                    return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
 
 
 class SettingsException(Exception):
@@ -996,17 +1025,34 @@ class CRClan:
                 name = (
                     "{0.name}, {0.role_name} "
                     "(Lvl {0.expLevel})").format(data)
-                value = (
+                stats = (
                     "{0.score:,d}"
                     " | {0.donations: >4} d"
                     " | {0.clanChestCrowns: >3} c"
                     " | #{0.tag}").format(data)
-                value = box(value, lang='py')
+                stats = box(stats, lang='py')
                 mention = ''
                 if discord_member is not None:
                     mention = discord_member.mention
-                value = '{} {}{}'.format(
-                    data.rank, mention, value)
+                arena = self.model.trophy2arena(data.score)
+                """ Rank str
+                41 ↓ 31 
+                """
+                rank_delta = data.rankdelta
+                rank_delta_str = '.' * 4
+                rank_current = '{:\u00A0<2}'.format(data.currentRank)
+                if data.rankdelta is not None:
+                    if data.rankdelta > 0:
+                        rank_delta_str = "↓ {:\u00A0>2}".format(rank_delta)
+                    elif data.rankdelta < 0:
+                        rank_delta_str = "↑ {:\u00A0>2}".format(-rank_delta)
+                value = '`{rank_current} {rankdelta}` {mention} {emoji} {arena} {stats}'.format(
+                    rank_current=rank_current,
+                    rankdelta=rank_delta_str,
+                    mention=mention,
+                    emoji=data.league_emoji(self.bot),
+                    arena=arena,
+                    stats=stats)
                 em.add_field(name=name, value=value, inline=False)
         if color is None:
             color = self.random_discord_color()
