@@ -235,7 +235,7 @@ class CRClanModel:
     @property
     def cache_message(self):
         """Cache message."""
-        passed = dt.datetime.utcnow() - dt.datetime.fromtimestamp(self.timestamp)
+        passed = dt.datetime.utcnow() - self.timestamp
         if passed.days > 0:
             passed_str = '{} days ago'.format(passed.days)
         else:
@@ -525,7 +525,7 @@ class CogModel:
             if os.path.exists(filename):
                 is_cache = True
                 data = dataIO.load_json(filename)
-                timestamp = os.path.getmtime(filename)
+                timestamp = dt.datetime.fromtimestamp(os.path.getmtime(filename))
         else:
             dataIO.save_json(filename, data)
             timestamp = dt.datenow.utcnow()
