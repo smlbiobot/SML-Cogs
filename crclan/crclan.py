@@ -275,12 +275,13 @@ class CRClanModel:
     def cache_message(self):
         """Cache message."""
         passed = dt.datetime.utcnow() - self.timestamp
-        if passed.days > 0:
-            passed_str = '{} days ago'.format(passed.days)
-        else:
-            hours, remainder = divmod(passed.seconds, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            passed_str = '{} hours {} minutes {} seconds ago'.format(hours, minutes, seconds)
+
+        days = passed.days
+        hours, remainder = divmod(passed.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        days_str = '{} days '.format(days) if days > 0 else ''
+        passed_str = '{} {} hours {} minutes {} seconds ago'.format(days_str, hours, minutes, seconds)
         return (
             "Warning: Unable to access API. Returning cached data. "
             "Real-time data in CR may be different. \n"
@@ -598,6 +599,7 @@ class CogModel:
         except json.decoder.JSONDecodeError:
             return False
         except asyncio.TimeoutError:
+            # return CRClanModel(loaded=False, tag=tag)
             return False
 
         filepath = self.cached_filepath(tag)
@@ -959,26 +961,46 @@ class CRClan:
 
         server = ctx.message.server
         data = await self.model.get_clan_data(server, tag=sctag.tag)
-
-        if not data.valid:
-            await self.bot.say(ErrorMessage.tag_error(sctag.tag))
-            return False
+        data_is_cached = False
+        if not data:
+            data_is_cached = True
+            data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            if data is None:
+                await self.bot.say("Cannot find key {} in settings.".format(key))
+                return
 
         color = self.random_discord_color()
         await self.send_info(ctx, data, color=color)
         await self.send_roster(ctx, server, data, color=color)
 
-        if data.is_cache:
+        if data_is_cached:
             await self.bot.say(data.cache_message)
 
         return True
 
-    async def send_info(self, ctx, data: CRClanModel, color=None, cache_warning=False, **kwargs):
+    @crclan.command(name="info", pass_context=True, no_pm=True)
+    async def crclan_info(self, ctx, key=None):
+        """Clan info.
+
+        Display clan name, description, trophy requirements, etc.
+        """
+        server = ctx.message.server
+        await self.bot.send_typing(ctx.message.channel)
+
+        clan_data = await self.model.get_clan_data(server, key=key)
+        data_is_cached = False
+        if not clan_data:
+            data_is_cached = True
+            clan_data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            if clan_data is None:
+                await self.bot.say("Cannot find key {} in settings.".format(key))
+                return
+        await self.send_info(ctx, clan_data, cache_warning=data_is_cached)
+
+    async def send_info(
+            self, ctx, data: CRClanModel,
+            color=None, cache_warning=False, **kwargs):
         """Send info to destination according to context."""
-        # if 'color' in kwargs:
-        #     color = kwargs['color']
-        # else:
-        #     color = self.random_discord_color()
         em = self.embed_info(data, color=color)
         await self.bot.send_message(ctx.message.channel, embed=em)
         if cache_warning and data.is_cache:
@@ -1001,6 +1023,36 @@ class CRClan:
             color = self.random_discord_color()
         em.color = color
         return em
+
+    @crclan.command(name="roster", pass_context=True, no_pm=True)
+    async def crclan_roster(self, ctx, key):
+        """Clan roster by key.
+
+        Key of each clan is set from [p]bsclan addkey
+        Roster includes member donations and crown contributions.
+        """
+        server = ctx.message.server
+        await self.bot.send_typing(ctx.message.channel)
+        clan_data = await self.model.get_clan_data(server, key=key)
+        data_is_cached = False
+        if not clan_data:
+            data_is_cached = True
+            clan_data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            if clan_data is None:
+                await self.bot.say("Cannot find key {} in settings.".format(key))
+                return
+        await self.send_roster(
+            ctx, server, clan_data, cache_warning=data_is_cached, color=self.random_discord_color())
+
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
+    @crclan.command(name="multiroster", pass_context=True, no_pm=True)
+    async def crclan_multiroster(self, ctx, *keys):
+        """Multiple rosters by list of keys.
+
+        [p]crclan multiroster alpha bravo charlie
+        """
+        for key in keys:
+            await ctx.invoke(self.crclan_roster, key)
 
     async def send_roster(self, ctx, server, data: CRClanModel, color=None, cache_warning=False, **kwargs):
         """Send roster to destination according to context.
@@ -1077,62 +1129,6 @@ class CRClan:
         em.color = color
         return em
 
-    @crclan.command(name="info", pass_context=True, no_pm=True)
-    async def crclan_info(self, ctx, key=None):
-        """Clan info.
-
-        Display clan name, description, trophy requirements, etc.
-        """
-        server = ctx.message.server
-
-        await self.bot.send_typing(ctx.message.channel)
-
-        try:
-            clan_data = await self.model.get_clan_data(server, key=key)
-        except ClanKeyNotInSettings:
-            await self.bot.say("Cannot find key {} in settings.".format(key))
-        except APIFetchError:
-            await self.bot.say(ErrorMessage.key_error(key))
-        else:
-            if clan_data is None:
-                await self.bot.say(ErrorMessage.key_error(key))
-            else:
-                await self.send_info(ctx, clan_data, cache_warning=True)
-
-    @crclan.command(name="roster", pass_context=True, no_pm=True)
-    async def crclan_roster(self, ctx, key):
-        """Clan roster by key.
-
-        Key of each clan is set from [p]bsclan addkey
-        Roster includes member donations and crown contributions.
-        """
-        server = ctx.message.server
-
-        await self.bot.type()
-
-        try:
-            clan_data = await self.model.get_clan_data(server, key=key)
-        except ClanKeyNotInSettings:
-            await self.bot.say("Cannot find key {} in settings.".format(key))
-        except APIFetchError:
-            await self.bot.say(ErrorMessage.key_error(key))
-        else:
-            if clan_data is None:
-                await self.bot.say(ErrorMessage.key_error(key))
-            else:
-                await self.send_roster(
-                    ctx, server, clan_data, color=self.random_discord_color(), cache_warning=True)
-
-    @commands.has_any_role(*BOTCOMMANDER_ROLES)
-    @crclan.command(name="multiroster", pass_context=True, no_pm=True)
-    async def crclan_multiroster(self, ctx, *keys):
-        """Multiple rosters by list of keys.
-
-        [p]crclan multiroster alpha bravo charlie
-        """
-        for key in keys:
-            await ctx.invoke(self.crclan_roster, key)
-
     @crclan.command(name="audit", pass_context=True, no_pm=True)
     async def crclan_audit(self, ctx, key):
         """Compare roster with Discord roles.
@@ -1143,10 +1139,17 @@ class CRClan:
         server = ctx.message.server
 
         await self.bot.type()
+
         data = await self.model.get_clan_data(server, key=key)
-        if data is None:
-            await self.bot.say(ErrorMessage.key_error(key))
-            return
+        data_is_cached = False
+        if not data:
+            data_is_cached = True
+            data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            if data is None:
+                await self.bot.send_message(
+                    ctx.message.channel,
+                    "API cannot be reached, and no cached data is available.")
+                return
 
         # alphabetical list of discord members with associated role
         dc_members = self.model.discord_members_by_clankey(server, key=key)
@@ -1188,7 +1191,7 @@ class CRClan:
             # not sure why bot.say() fails again
             await self.bot.send_message(ctx.message.channel, embed=em)
 
-        if data.is_cache:
+        if data_is_cached:
             await self.bot.say(data.cache_message)
 
     @crclan.command(name="trophy2arena", pass_context=True, no_pm=True)
