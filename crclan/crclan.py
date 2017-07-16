@@ -29,6 +29,7 @@ import aiohttp
 import argparse
 import datetime as dt
 import itertools
+import io
 import json
 import os
 from collections import defaultdict
@@ -41,7 +42,7 @@ from __main__ import send_cmd_help
 from discord.ext import commands
 
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline
+from cogs.utils.chat_formatting import inline, box
 from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "crclan")
@@ -1031,11 +1032,34 @@ class CRClan:
     async def crclan_roster(self, ctx, key, *args):
         """Clan roster by key.
 
-        Key of each clan is set from [p]bsclan addkey
-        Roster includes member donations and crown contributions.
+        To associate a key with a clan tag:
+        [p]bsclan addkey
         
         Optional arguments:
+        --sort {name,trophies,level,donations,crowns}
+        
+        Example: Display clan roster associated with key “alpha”, sorted by donations
+        [p]bsclan roster alpha --sort donations
         """
+        # Process arguments
+        parser = argparse.ArgumentParser(prog='[p]crclan roster')
+        # parser.add_argument('key')
+        parser.add_argument(
+            '--sort',
+            choices=['name', 'trophies', 'level', 'donations', 'crowns'],
+            default="trophies",
+            help='Sort roster')
+
+        try:
+            p_args = parser.parse_args(args)
+        except SystemExit:
+            # await self.bot.send_message(ctx.message.channel, box(parser.format_help()))
+            await send_cmd_help(ctx)
+            return
+
+        # key = p_args.key
+
+        # Load data
         server = ctx.message.server
         await self.bot.send_typing(ctx.message.channel)
         clan_data = await self.model.get_clan_data(server, key=key)
@@ -1047,15 +1071,7 @@ class CRClan:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
 
-        # Process arguments
-        parser = argparse.ArgumentParser(prog='[p]crclan roster')
-        parser.add_argument(
-            '--sort',
-            choices=['name', 'trophies', 'level', 'donations', 'crowns'],
-            default="trophies",
-            help='Sort roster')
-        p_args = parser.parse_args(args)
-
+        # Sort data
         if p_args.sort == 'trophies':
             clan_data.members = sorted(clan_data.members, key=lambda member: -member['score'])
         elif p_args.sort == 'name':
