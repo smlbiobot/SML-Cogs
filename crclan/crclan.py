@@ -1028,11 +1028,13 @@ class CRClan:
         return em
 
     @crclan.command(name="roster", pass_context=True, no_pm=True)
-    async def crclan_roster(self, ctx, key):
+    async def crclan_roster(self, ctx, key, *args):
         """Clan roster by key.
 
         Key of each clan is set from [p]bsclan addkey
         Roster includes member donations and crown contributions.
+        
+        Optional arguments:
         """
         server = ctx.message.server
         await self.bot.send_typing(ctx.message.channel)
@@ -1044,6 +1046,27 @@ class CRClan:
             if clan_data is None:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
+
+        # Process arguments
+        parser = argparse.ArgumentParser(prog='[p]crclan roster')
+        parser.add_argument(
+            '--sort',
+            choices=['name', 'trophies', 'level', 'donations', 'crowns'],
+            default="trophies",
+            help='Sort roster')
+        p_args = parser.parse_args(args)
+
+        if p_args.sort == 'trophies':
+            clan_data.members = sorted(clan_data.members, key=lambda member: -member['score'])
+        elif p_args.sort == 'name':
+            clan_data.members = sorted(clan_data.members, key=lambda member: member['name'].lower())
+        elif p_args.sort == 'level':
+            clan_data.members = sorted(clan_data.members, key=lambda member: -member['expLevel'])
+        elif p_args.sort == 'donations':
+            clan_data.members = sorted(clan_data.members, key=lambda member: -member['donations'])
+        elif p_args.sort == 'crowns':
+            clan_data.members = sorted(clan_data.members, key=lambda member: -member['clanChestCrowns'])
+
         await self.roster_view.send(
             ctx, server, clan_data, cache_warning=data_is_cached, color=random_discord_color())
 
@@ -1155,6 +1178,10 @@ class CRClanRosterView:
         self.bot = bot
         self.model = model
 
+    async def display(self, ctx, server, data: CRClanModel, color=None, cache_warning=False):
+        """Intermediate step to sort data if necessary."""
+        await self.send(ctx, server, data, color=color, cache_warning=cache_warning)
+
     async def send(self, ctx, server, data: CRClanModel, color=None, cache_warning=False):
         """Send roster to destination according to context.
 
@@ -1217,9 +1244,9 @@ class CRClanRosterView:
                         rank_delta_str = "↓ {: >2}".format(rank_delta)
                     elif data.rankdelta < 0:
                         rank_delta_str = "↑ {: >2}".format(-rank_delta)
-                value = '`{rank_current} {rankdelta}` {emoji} {arena} {mention}\n{stats} '.format(
+                value = '`{rank_current} {rank_delta}` {emoji} {arena} {mention}\n{stats} '.format(
                     rank_current=rank_current,
-                    rankdelta=rank_delta_str,
+                    rank_delta=rank_delta_str,
                     mention=mention,
                     emoji=data.league_emoji(self.bot),
                     arena=arena,
