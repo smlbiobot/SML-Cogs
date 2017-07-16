@@ -1045,7 +1045,7 @@ class CRClan:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
         await self.roster_view.send(
-            ctx, server, clan_data, cache_warning=data_is_cached, color=self.random_discord_color())
+            ctx, server, clan_data, cache_warning=data_is_cached, color=random_discord_color())
 
     @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @crclan.command(name="multiroster", pass_context=True, no_pm=True)
