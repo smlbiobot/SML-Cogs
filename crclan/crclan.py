@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 
 import asyncio
 import aiohttp
+import argparse
 import datetime as dt
 import itertools
 import json
@@ -710,6 +711,7 @@ class CRClan:
         self.task = bot.loop.create_task(self.loop_task())
         self.model = CogModel(JSON)
         # self.badges = dataIO.load_json(BADGES_JSON)
+        self.roster_view = CRClanRosterView(bot, self.model)
 
     def __unload(self):
         self.task.cancel()
@@ -971,7 +973,8 @@ class CRClan:
 
         color = self.random_discord_color()
         await self.send_info(ctx, data, color=color)
-        await self.send_roster(ctx, server, data, color=color)
+        # await self.send_roster(ctx, server, data, color=color)
+        await self.roster_view.send(ctx, server, data, color=color)
 
         if data_is_cached:
             await self.bot.say(data.cache_message)
@@ -1041,7 +1044,7 @@ class CRClan:
             if clan_data is None:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
-        await self.send_roster(
+        await self.roster_view.send(
             ctx, server, clan_data, cache_warning=data_is_cached, color=self.random_discord_color())
 
     @commands.has_any_role(*BOTCOMMANDER_ROLES)
@@ -1053,81 +1056,6 @@ class CRClan:
         """
         for key in keys:
             await ctx.invoke(self.crclan_roster, key)
-
-    async def send_roster(self, ctx, server, data: CRClanModel, color=None, cache_warning=False, **kwargs):
-        """Send roster to destination according to context.
-
-        Results are split in groups of 25
-        because Discord Embeds allow 25 fields per embed.
-        """
-        members_out = grouper(25, data.members, None)
-
-        for page, members in enumerate(members_out, start=1):
-            kwargs = {
-                'server': server,
-                'members': members,
-                'title': data.name,
-                'footer_text': '{} #{} - Page {}'.format(
-                    data.name, data.tag, page),
-                'footer_icon_url': self.model.badge_url + data.badge_url
-            }
-            em = self.embed_roster(color=color, **kwargs)
-            await self.bot.send_message(ctx.message.channel, embed=em)
-
-        if cache_warning and data.is_cache:
-            await self.bot.say(data.cache_message)
-
-    def embed_roster(
-            self,
-            server=None, title=None, members=None,
-            footer_text=None, footer_icon_url=None,
-            color=None):
-        """Return clan roster as Discord embed.
-
-        This represents a page of a roster.
-        """
-        em = discord.Embed(title=title)
-        em.set_footer(text=footer_text, icon_url=footer_icon_url)
-        for member in members:
-            if member is not None:
-                data = CRClanMemberModel(**member)
-                discord_member = self.model.tag2member(server, data.tag)
-                name = (
-                    "{0.name}, {0.role_name} "
-                    "(Lvl {0.expLevel})").format(data)
-                stats = (
-                    "{0.score:,d}"
-                    " | {0.donations:\u00A0>4} d"
-                    " | {0.clanChestCrowns:\u00A0>3} c"
-                    " | #{0.tag}").format(data)
-                stats = inline(stats)
-                mention = ''
-                if discord_member is not None:
-                    mention = discord_member.mention
-                arena = self.model.trophy2arena(data.score)
-                """ Rank str
-                41 ↓ 31
-                """
-                rank_delta = data.rankdelta
-                rank_delta_str = '.  .'
-                rank_current = '{: <2}'.format(data.currentRank)
-                if data.rankdelta is not None:
-                    if data.rankdelta > 0:
-                        rank_delta_str = "↓ {: >2}".format(rank_delta)
-                    elif data.rankdelta < 0:
-                        rank_delta_str = "↑ {: >2}".format(-rank_delta)
-                value = '`{rank_current} {rankdelta}` {emoji} {arena} {mention}\n{stats} '.format(
-                    rank_current=rank_current,
-                    rankdelta=rank_delta_str,
-                    mention=mention,
-                    emoji=data.league_emoji(self.bot),
-                    arena=arena,
-                    stats=stats)
-                em.add_field(name=name, value=value, inline=False)
-        if color is None:
-            color = self.random_discord_color()
-        em.color = color
-        return em
 
     @crclan.command(name="audit", pass_context=True, no_pm=True)
     async def crclan_audit(self, ctx, key):
@@ -1206,6 +1134,101 @@ class CRClan:
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
         return discord.Color(value=color)
+
+
+def random_discord_color():
+    """Return random color as an integer."""
+    color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+    color = int(color, 16)
+    return discord.Color(value=color)
+
+
+class CRClanRosterView:
+    """Clan roster view.
+    
+    Trying to see if breaking this out in its own class can make
+    processing all those arguments easier to see.
+    """
+
+    def __init__(self, bot, model):
+        """Init."""
+        self.bot = bot
+        self.model = model
+
+    async def send(self, ctx, server, data: CRClanModel, color=None, cache_warning=False):
+        """Send roster to destination according to context.
+
+        Results are split in groups of 25
+        because Discord Embeds allow 25 fields per embed.
+        """
+        members_out = grouper(25, data.members, None)
+
+        for page, members in enumerate(members_out, start=1):
+            kwargs = {
+                'server': server,
+                'members': members,
+                'title': data.name,
+                'footer_text': '{} #{} - Page {}'.format(
+                    data.name, data.tag, page),
+                'footer_icon_url': self.model.badge_url + data.badge_url
+            }
+            em = self.embed(color=color, **kwargs)
+            await self.bot.send_message(ctx.message.channel, embed=em)
+
+        if cache_warning and data.is_cache:
+            await self.bot.say(data.cache_message)
+
+    def embed(
+            self,
+            server=None, title=None, members=None,
+            footer_text=None, footer_icon_url=None,
+            color=None):
+        """Return clan roster as Discord embed.
+
+        This represents a page of a roster.
+        """
+        em = discord.Embed(title=title)
+        em.set_footer(text=footer_text, icon_url=footer_icon_url)
+        for member in members:
+            if member is not None:
+                data = CRClanMemberModel(**member)
+                discord_member = self.model.tag2member(server, data.tag)
+                name = (
+                    "{0.name}, {0.role_name} "
+                    "(Lvl {0.expLevel})").format(data)
+                stats = (
+                    "{0.score:,d}"
+                    " | {0.donations:\u00A0>4} d"
+                    " | {0.clanChestCrowns:\u00A0>3} c"
+                    " | #{0.tag}").format(data)
+                stats = inline(stats)
+                mention = ''
+                if discord_member is not None:
+                    mention = discord_member.mention
+                arena = self.model.trophy2arena(data.score)
+                """ Rank str
+                41 ↓ 31
+                """
+                rank_delta = data.rankdelta
+                rank_delta_str = '.  .'
+                rank_current = '{: <2}'.format(data.currentRank)
+                if data.rankdelta is not None:
+                    if data.rankdelta > 0:
+                        rank_delta_str = "↓ {: >2}".format(rank_delta)
+                    elif data.rankdelta < 0:
+                        rank_delta_str = "↑ {: >2}".format(-rank_delta)
+                value = '`{rank_current} {rankdelta}` {emoji} {arena} {mention}\n{stats} '.format(
+                    rank_current=rank_current,
+                    rankdelta=rank_delta_str,
+                    mention=mention,
+                    emoji=data.league_emoji(self.bot),
+                    arena=arena,
+                    stats=stats)
+                em.add_field(name=name, value=value, inline=False)
+        if color is None:
+            color = random_discord_color()
+        em.color = color
+        return em
 
 
 def check_folder():
