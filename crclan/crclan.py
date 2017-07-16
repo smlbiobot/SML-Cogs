@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import asyncio
+import aiohttp
 import datetime as dt
 import itertools
 import json
@@ -1053,7 +1054,7 @@ class CRClan:
                     mention = discord_member.mention
                 arena = self.model.trophy2arena(data.score)
                 """ Rank str
-                41 ↓ 31 
+                41 ↓ 31
                 """
                 rank_delta = data.rankdelta
                 rank_delta_str = '.  .'
