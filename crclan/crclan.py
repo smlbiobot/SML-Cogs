@@ -24,29 +24,23 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import os
 import asyncio
-import itertools
 import datetime as dt
-from random import choice
+import itertools
 import json
+import os
 from collections import defaultdict
 from datetime import timedelta
 from enum import Enum
+from random import choice
 
 import discord
-from discord.ext import commands
-from discord.ext.commands import Context
-
 from __main__ import send_cmd_help
-from cogs.utils import checks
-from cogs.utils.chat_formatting import box, inline, pagify
-from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
-try:
-    import aiohttp
-except ImportError:
-    raise ImportError("Please install the aiohttp package.") from None
+from cogs.utils import checks
+from cogs.utils.chat_formatting import inline
+from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "crclan")
 PATH_CLANS = os.path.join(PATH, "clans")
@@ -82,6 +76,7 @@ def grouper(n, iterable, fillvalue=None):
 def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
+
 
 class SCTag:
     """SuperCell tags."""
@@ -131,7 +126,7 @@ class SCTag:
             'List of valid characters for tags: {}'.format(
                 ', '.join(self.invalid_chars),
                 ', '.join(self.TAG_CHARACTERS)
-        ))
+            ))
 
 
 class CRArenaModel:
@@ -176,6 +171,7 @@ class CRArenaModel:
         """
         self.__dict__.update(kwargs)
 
+
 class CRRole(Enum):
     """Clash Royale role."""
 
@@ -184,9 +180,9 @@ class CRRole(Enum):
     ELDER = 3
     COLEADER = 4
 
-    def __init__(self, type):
+    def __init__(self, role_type):
         """Init."""
-        self.type = type
+        self.type = role_type
 
     @property
     def rolename(self):
@@ -210,9 +206,9 @@ class CRClanType(Enum):
     INVITE_ONLY = 2
     CLOSED = 3
 
-    def __init__(self, type):
+    def __init__(self, clan_type):
         """Init."""
-        self.type = type
+        self.type = clan_type
 
     @property
     def typename(self):
@@ -387,7 +383,6 @@ class CRClanMemberModel:
         else:
             return self.currentRank - self.previousRank
 
-
     @property
     def league_icon_url(self):
         """League Icon URL."""
@@ -412,14 +407,18 @@ class CRClanMemberModel:
 class SettingsException(Exception):
     pass
 
+
 class ClanTagNotInSettings(SettingsException):
     pass
+
 
 class ClanKeyNotInSettings(SettingsException):
     pass
 
+
 class APIFetchError(SettingsException):
     pass
+
 
 class CogModel:
     """Cog settings.
@@ -590,7 +589,6 @@ class CogModel:
         """
         tag = SCTag(tag).tag
         url = "{}{}".format(self.settings["clan_api_url"], tag)
-        data = None
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -619,7 +617,8 @@ class CogModel:
             return CRClanModel(is_cache, timestamp, **data)
         return None
 
-    def cached_filepath(self, tag):
+    @staticmethod
+    def cached_filepath(tag):
         """Cached clan data file path"""
         return os.path.join(PATH_CLANS, '{}.json'.format(tag))
 
@@ -676,7 +675,7 @@ class CogModel:
         return self.settings["badge_url"]
 
     @badge_url.setter
-    def clan_api_url(self, value):
+    def badge_url(self, value):
         """lan Badge URL"""
         self.settings["badge_url"] = value
         self.save()
@@ -684,6 +683,7 @@ class CogModel:
 
 class ErrorMessage:
     """Error Messages"""
+
     @staticmethod
     def key_error(key):
         return (
@@ -692,10 +692,12 @@ class ErrorMessage:
 
     @staticmethod
     def tag_error(tag):
-        return(
+        return (
             "Error fetching data from API for clan tag #{}. "
             "Please try again later.").format(tag)
 
+
+# noinspection PyUnusedLocal
 class CRClan:
     """Clash Royale Clan management."""
 
@@ -854,7 +856,7 @@ class CRClan:
 
     @crclan.command(name="settag", pass_context=True, no_pm=True)
     async def crclan_settag(
-            self, ctx, playertag, member: discord.Member=None):
+            self, ctx, playertag, member: discord.Member = None):
         """Set playertag to discord member.
 
         Setting tag for yourself:
@@ -931,7 +933,7 @@ class CRClan:
         Clan tag is the alphanumeric digits after the # sign
         found in the clan description.
         """
-        success =await self.send_clan(ctx, tag=tag)
+        success = await self.send_clan(ctx, tag=tag)
         if not success:
             await self.bot.say("Unable to get clan info by tag entered.")
 
@@ -980,7 +982,6 @@ class CRClan:
         await self.bot.send_message(ctx.message.channel, embed=em)
         if cache_warning and data.is_cache:
             await self.bot.say(data.cache_message)
-
 
     def embed_info(self, data: CRClanModel, color=None):
         """Return clan info embed."""
@@ -1165,9 +1166,9 @@ class CRClan:
         target_len = group_size * split_count
 
         if len(cr_names) < target_len:
-            cr_names.extend(['_'] * (target_len-len(cr_names)))
+            cr_names.extend(['_'] * (target_len - len(cr_names)))
         if len(dc_names) < target_len:
-            dc_names.extend(['_'] * (target_len-len(dc_names)))
+            dc_names.extend(['_'] * (target_len - len(dc_names)))
 
         cr_names_group = list(grouper(group_size, cr_names, '_'))
         dc_names_group = list(grouper(group_size, dc_names, '_'))
@@ -1175,8 +1176,6 @@ class CRClan:
         color = self.random_discord_color()
 
         for i in range(split_count):
-            cr_list = ''
-            dc_list = ''
             cr_list = '\n'.join(cr_names_group[i])
             dc_list = '\n'.join(dc_names_group[i])
 
@@ -1196,7 +1195,6 @@ class CRClan:
         """Convert trophies to arenas."""
         text = self.model.trophy2arena(trophy)
         await self.bot.say(text)
-
 
     @staticmethod
     def random_discord_color():
@@ -1226,5 +1224,3 @@ def setup(bot):
     check_file()
     n = CRClan(bot)
     bot.add_cog(n)
-
-
