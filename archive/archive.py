@@ -154,7 +154,7 @@ class Archive:
         if channel is None:
             await self.bot.say("Channel not found.")
             return
-        message = self.bot.get_message(channel, message_id)
+        message = await self.bot.get_message(channel, message_id)
 
         await self.log_server_channel(ctx, server, channel, count, after=message)
         await self.bot.say("Channel logged.")
@@ -165,6 +165,8 @@ class Archive:
         """Save channel messages."""
         channel_messages = []
 
+        await self.bot.say("Logging messages after message ID: {}".format(after.id))
+
         async for message in self.bot.logs_from(
                 channel, limit=count, before=before, after=after, reverse=reverse):
             msg ={
@@ -172,7 +174,8 @@ class Archive:
                 'content': message.content,
                 'timestamp': message.timestamp.isoformat(),
                 'id': message.id,
-                'reactions': []
+                'reactions': [],
+                'attachments': []
             }
             for reaction in message.reactions:
                 r = {
@@ -187,13 +190,16 @@ class Archive:
                 else:
                     r['emoji'] = reaction.emoji
                 msg['reactions'].append(r)
+
+            for attach in message.attachments:
+                msg['attachments'].append(attach['url'])
             channel_messages.append(msg)
 
         channel_messages = sorted(
             channel_messages, key=lambda x: x['timestamp'])
 
-        # self.settings[server.id][channel.id] = channel_messages
-        # dataIO.save_json(JSON, self.settings)
+        self.settings[server.id][channel.id] = channel_messages
+        dataIO.save_json(JSON, self.settings)
 
         # write out
         for message in channel_messages:
@@ -214,6 +220,9 @@ class Archive:
 
             for reaction in message['reactions']:
                 em.add_field(name=reaction['emoji'], value=reaction['count'])
+
+            for attach in message['attachments']:
+                em.set_image(url=attach)
 
             em.set_footer(text='{} - ID: {}'.format(timestamp, message_id))
             await self.bot.say(embed=em)
