@@ -80,6 +80,13 @@ def nested_dict():
     return defaultdict(nested_dict)
 
 
+def random_discord_color():
+    """Return random color as an integer."""
+    color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+    color = int(color, 16)
+    return discord.Color(value=color)
+
+
 class SCTag:
     """SuperCell tags."""
 
@@ -423,6 +430,22 @@ class APIFetchError(SettingsException):
     pass
 
 
+class ServerModel:
+    """Discord server data model.
+    
+    Sets per-server settings since the bot can be run on multiple servers.
+    """
+    DEFAULTS = {
+        "clans": {},
+        "players": {}
+    }
+
+    def __init__(self, data=None):
+        """Init."""
+        if data is None:
+            data = self.DEFAULTS
+        self.settings = data
+
 class CogModel:
     """Cog settings.
 
@@ -712,6 +735,7 @@ class CRClan:
         self.model = CogModel(JSON)
         # self.badges = dataIO.load_json(BADGES_JSON)
         self.roster_view = CRClanRosterView(bot, self.model)
+        self.info_view = CRClanInfoView(bot, self.model)
 
     def __unload(self):
         self.task.cancel()
@@ -971,8 +995,9 @@ class CRClan:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
 
-        color = self.random_discord_color()
-        await self.send_info(ctx, data, color=color)
+        color = random_discord_color()
+        # await self.send_info(ctx, data, color=color)
+        await self.info_view.send(ctx, data, color=color)
         # await self.send_roster(ctx, server, data, color=color)
         await self.roster_view.send(ctx, server, data, color=color)
 
@@ -998,34 +1023,8 @@ class CRClan:
             if clan_data is None:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
-        await self.send_info(ctx, clan_data, cache_warning=data_is_cached)
 
-    async def send_info(
-            self, ctx, data: CRClanModel,
-            color=None, cache_warning=False, **kwargs):
-        """Send info to destination according to context."""
-        em = self.embed_info(data, color=color)
-        await self.bot.send_message(ctx.message.channel, embed=em)
-        if cache_warning and data.is_cache:
-            await self.bot.say(data.cache_message)
-
-    def embed_info(self, data: CRClanModel, color=None):
-        """Return clan info embed."""
-        # data = CRClanData(**clan)
-        em = discord.Embed(
-            title=data.name,
-            description=data.description)
-        em.add_field(name="Clan Trophies", value=data.score)
-        em.add_field(name="Type", value=CRClanType(data.type).typename)
-        em.add_field(name="Required Trophies", value=data.requiredScore)
-        em.add_field(name="Clan Tag", value=data.tag)
-        em.add_field(name="Members", value=data.member_count_str)
-        badge_url = self.model.badge_url + data.badge_url
-        em.set_thumbnail(url=badge_url)
-        if color is None:
-            color = self.random_discord_color()
-        em.color = color
-        return em
+        await self.info_view.send(ctx, clan_data, cache_warning=data_is_cached)
 
     @crclan.command(name="roster", pass_context=True, no_pm=True)
     async def crclan_roster(self, ctx, key, *args):
@@ -1143,7 +1142,7 @@ class CRClan:
         cr_names_group = list(grouper(group_size, cr_names, '_'))
         dc_names_group = list(grouper(group_size, dc_names, '_'))
 
-        color = self.random_discord_color()
+        color = random_discord_color()
 
         for i in range(split_count):
             cr_list = '\n'.join(cr_names_group[i])
@@ -1166,19 +1165,44 @@ class CRClan:
         text = self.model.trophy2arena(trophy)
         await self.bot.say(text)
 
-    @staticmethod
-    def random_discord_color():
-        """Return random color as an integer."""
-        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-        color = int(color, 16)
-        return discord.Color(value=color)
 
+class CRClanInfoView:
+    """Clan info view.
+    
+    This shows the clan’s general information 
+    e.g. trophy requirements, trophies, number of members, etc.
+    """
 
-def random_discord_color():
-    """Return random color as an integer."""
-    color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-    color = int(color, 16)
-    return discord.Color(value=color)
+    def __init__(self, bot, model):
+        """Init."""
+        self.bot = bot
+        self.model = model
+
+    async def send(
+            self, ctx, data: CRClanModel,
+            color=None, cache_warning=False, **kwargs):
+        """Send info to destination according to context."""
+        em = self.embed(data, color=color)
+        await self.bot.send_message(ctx.message.channel, embed=em)
+        if cache_warning and data.is_cache:
+            await self.bot.say(data.cache_message)
+
+    def embed(self, data: CRClanModel, color=None):
+        """Return clan info embed."""
+        em = discord.Embed(
+            title=data.name,
+            description=data.description)
+        em.add_field(name="Clan Trophies", value=data.score)
+        em.add_field(name="Type", value=CRClanType(data.type).typename)
+        em.add_field(name="Required Trophies", value=data.requiredScore)
+        em.add_field(name="Clan Tag", value=data.tag)
+        em.add_field(name="Members", value=data.member_count_str)
+        badge_url = self.model.badge_url + data.badge_url
+        em.set_thumbnail(url=badge_url)
+        if color is None:
+            color = random_discord_color()
+        em.color = color
+        return em
 
 
 class CRClanRosterView:
