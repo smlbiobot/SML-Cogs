@@ -103,6 +103,45 @@ class ReactionPoll:
 
         # await self.bot.delete_message(ctx.message)
 
+    @reactionpoll.command(name="addserver", pass_context=True, no_pm=True)
+    async def reactionpoll_add(
+            self, ctx, server_name, channel_name, message_id=None):
+        """Add message to track.
+
+        message_id: the message to track
+        """
+        if message_id is None:
+            await send_cmd_help(ctx)
+            return
+
+        server = None
+        for bot_server in self.bot.servers:
+            if bot_server.name == server_name:
+                server = bot_server
+
+        if server is None:
+            await self.bot.say("Cannot find that server.")
+            return
+
+        channel = discord.utils.get(server.channels, name=channel_name)
+        if server is None:
+            await self.bot.say("Cannot find that channel on that server.")
+            return
+
+        message = await self.bot.get_message(channel, message_id)
+
+        em = await self.reaction_embed(message)
+
+        embed_message = await self.bot.say(embed=em)
+
+        self.settings[server.id]["messages"][message_id] = {
+            'channel_id': channel.id,
+            'message_id': message_id,
+            'embed_channel_id': ctx.message.channel.id,
+            'embed_message_id': embed_message.id
+        }
+        dataIO.save_json(JSON, self.settings)
+
     @reactionpoll.command(name="del", pass_context=True, no_pm=True)
     async def reactionpoll_del(self, ctx, message_id=None):
         """Remove message from being tracked."""

@@ -29,7 +29,6 @@ import aiohttp
 import argparse
 import datetime as dt
 import itertools
-import io
 import json
 import os
 from collections import defaultdict

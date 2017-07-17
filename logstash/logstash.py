@@ -26,7 +26,7 @@ import asyncio
 import logging
 import os
 import re
-import pprint
+import json
 from datetime import timedelta
 
 import logstash
@@ -119,15 +119,19 @@ class Logstash:
         self.log_all_gauges()
         await self.bot.say("Logged all.")
 
-    @logstash.command(name="debug", pass_context=True)
-    async def logstash_debug(self, ctx, *, msg):
-        """Send debug event."""
-        extra = {
-            'debug': 'debug',
-            'debug_message': msg
-        }
-        self.log_discord_event(event_key="discord.debug", extra=extra)
-        await self.bot.say("logstash debug")
+    @logstash.command(name="log", pass_context=True)
+    async def logstash_log(self, ctx, key, *, json_str):
+        """Log an arbitrary event with key an json input.
+        
+        [p]logstash log key_name {"x": 1, "y": 2, "z": 3}
+        """
+        try:
+            extra = json.loads(json_str)
+        except json.JSONDecodeError:
+            await self.bot.say("Invalid JSON entered.")
+            return
+        self.logger.info(key, extra=extra)
+        await self.bot.say("Logged.")
 
     async def on_channel_create(self, channel: Channel):
         """Track channel creation."""
@@ -317,6 +321,13 @@ class Logstash:
     def get_event_key(self, name: str):
         """Return event name used in logger."""
         return "discord.logger.{}".format(name)
+
+    def log(self, key, extra=None):
+        """Generic logging.
+        
+        Used to allow other cogs to log with this cog.
+        """
+        self.logger.info(key, extra=extra)
 
     def log_command(self, command, ctx):
         """Log bot commands."""
