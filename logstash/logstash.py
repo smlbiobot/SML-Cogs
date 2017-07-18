@@ -46,6 +46,11 @@ from discord.ext.commands import Context
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 
+from elasticsearch import Elasticsearch
+from elasticsearch_dsl import Search
+from elasticsearch_dsl.query import QueryString
+from elasticsearch_dsl.query import Range
+
 HOST = 'localhost'
 PORT = 5959
 INTERVAL = timedelta(hours=4).seconds
@@ -92,19 +97,19 @@ class Logstash:
 
     async def loop_task(self):
         """Loop task."""
-        pass
+        # pass
         # disabled to see if it is causing memory problems
-        # await self.bot.wait_until_ready()
-        # self.extra = {
-        #     'log_type': 'discord.logger',
-        #     'application': 'red',
-        #     'bot_id': self.bot.user.id,
-        #     'bot_name': self.bot.user.name
-        # }
-        # self.log_all_gauges()
-        # await asyncio.sleep(INTERVAL)
-        # if self is self.bot.get_cog('Logstash'):
-        #     self.task = self.bot.loop.create_task(self.loop_task())
+        await self.bot.wait_until_ready()
+        self.extra = {
+            'log_type': 'discord.logger',
+            'application': 'red',
+            'bot_id': self.bot.user.id,
+            'bot_name': self.bot.user.name
+        }
+        self.log_all_gauges()
+        await asyncio.sleep(INTERVAL)
+        if self is self.bot.get_cog('Logstash'):
+            self.task = self.bot.loop.create_task(self.loop_task())
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(manage_server=True)
