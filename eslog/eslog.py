@@ -232,7 +232,10 @@ class ESLog:
         await self.bot.say("Note: This operation may take a few minutes if you are running on a server with many users.")
         status = await self.bot.say("Processed: 0/{} users.".format(len(server.members)))
 
-        for i, member in enumerate(server.members, 1):
+        # use a copy because if member joins when iterations is going, it will break
+        server_members = server.members.copy()
+
+        for i, member in enumerate(server_members, 1):
             query_str = (
                 "discord_event:message"
                 " AND server.name:\"{server_name}\""
