@@ -229,7 +229,10 @@ class ESLog:
 
         hit_counts = []
 
-        for member in server.members:
+        await self.bot.say("Note: This operation may take a few minutes if you are running on a server with many users.")
+        status = await self.bot.say("Processed: 0/{} users.".format(len(server.members)))
+
+        for i, member in enumerate(server.members, 1):
             query_str = (
                 "discord_event:message"
                 " AND server.name:\"{server_name}\""
@@ -266,6 +269,8 @@ class ESLog:
             }
 
             hit_counts.append(hit_count)
+
+            await self.bot.edit_message(status, new_content="Processed: {}/{} users.".format(i, len(server.members)))
 
         hit_counts = sorted(hit_counts, key=lambda m: m["count"], reverse=True)
 
