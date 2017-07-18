@@ -183,15 +183,22 @@ class ESLog:
         """Message count by params.
         
         Params:
-        --time TIME    
+        --time TIME, -t    
           Time in ES notation. 7d for 7 days, 1h for 1 hour
-        --count COUNT   
+          Default: 7d (7 days)
+        --count COUNT, -c   
           Number of results to show
-        --excludechannels EXCLUDECHANNEL [EXCLUDECHANNEL ...]
+          Default: 10
+        --excludechannels EXCLUDECHANNEL [EXCLUDECHANNEL ...], -ec
           List of channels to exclude
-        --includechannels INCLUDECHANNEL [INCLUDECHANNEL ...]
+        --includechannels INCLUDECHANNEL [INCLUDECHANNEL ...], -ic
           List of channels to include
-        --excludebot
+        --excludebot, -eb
+          Exclude bot accounts
+        
+        Example:
+        [p]eslog messagecount --time 2d --count 20 --include general some-channel
+        Counts number of messages sent by authors within last 2 days in channels #general and #some-channel
         """
         # Process arguments
         parser = argparse.ArgumentParser(prog='[p]eslog messagecount')
@@ -202,22 +209,22 @@ class ESLog:
             help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
         )
         parser.add_argument(
-            '--count',
+            '--count', '-c',
             type=int,
             default="10",
             help='Number of results')
         parser.add_argument(
-            '--excludechannels',
+            '--excludechannels', '-ec',
             nargs='+',
             help='List of channels to exclude'
         )
         parser.add_argument(
-            '--includechannels',
+            '--includechannels', '-ic',
             nargs='+',
             help='List of channels to exclude'
         )
         parser.add_argument(
-            '--excludebot',
+            '--excludebot', '-eb',
             action='store_true'
         )
 
