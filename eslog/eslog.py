@@ -58,8 +58,6 @@ import elasticsearch_dsl
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
-from elasticsearch_dsl import MultiSearch
-from elasticsearch_dsl import Q
 
 from elasticsearch_dsl.query import QueryString
 from elasticsearch_dsl.query import Range
@@ -251,12 +249,10 @@ class ESLog:
                 query_str += " AND !channel.name:\"{}\"".format(channel_name)
         if p_args.includechannels is not None:
             qs = ""
-            add_or = False
-            for channel_name in p_args.includechannels:
-                if add_or:
+            for i, channel_name in enumerate(p_args.includechannels):
+                if i > 0:
                     qs += " OR"
                 qs += " channel.name:\"{}\"".format(channel_name)
-                add_or = True
             query_str += " AND ({})".format(qs)
 
         # print(query_str)
