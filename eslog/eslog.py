@@ -58,9 +58,12 @@ import elasticsearch_dsl
 
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
+from elasticsearch_dsl import MultiSearch
 from elasticsearch_dsl import Q
 
-from elasticsearch_dsl.query import QueryString, Range
+from elasticsearch_dsl.query import QueryString
+from elasticsearch_dsl.query import Range
+
 
 HOST = 'localhost'
 PORT = 9200
@@ -141,6 +144,7 @@ class ESLog:
 
         self.es = Elasticsearch()
         self.search = Search(using=self.es, index="logstash-*")
+
 
     @commands.group(pass_context=True, no_pm=True)
     async def eslog(self, ctx):
@@ -228,55 +232,43 @@ class ESLog:
 
         server = ctx.message.server
 
-        hit_counts = []
+        query_str = (
+            "discord_event:message"
+            " AND server.name:\"{server_name}\""
+        ).format(server_name=server.name)
 
-        await self.bot.say("Note: This operation may take a few minutes if you are running on a server with many users.")
-        status = await self.bot.say("Processed: 0/{} users.".format(len(server.members)))
+        if p_args.excludebot:
+            query_str += " AND author.bot:false"
+        if p_args.excludechannels is not None:
+            for channel_name in p_args.excludechannels:
+                query_str += " AND !channel.name:\"{}\"".format(channel_name)
+        if p_args.includechannels is not None:
+            qs = ""
+            add_or = False
+            for channel_name in p_args.includechannels:
+                if add_or:
+                    qs += " OR"
+                qs += " channel.name:\"{}\"".format(channel_name)
+                add_or = True
+            query_str += " AND ({})".format(qs)
 
-        # use a copy because if member joins when iterations is going, it will break
-        server_member_ids = [m.id for m in server.members]
+        # print(query_str)
 
-        for i, member_id in enumerate(server_member_ids, 1):
-            query_str = (
-                "discord_event:message"
-                " AND server.name:\"{server_name}\""
-                " AND author.id:{author_id}"
-            ).format(server_name=server.name, author_id=member_id)
+        qs = QueryString(query=query_str)
+        r = Range(**{'@timestamp': {'gte': time_gte, 'lt': 'now'}})
 
-            if p_args.excludebot:
-                query_str += " AND author.bot:false"
-            if p_args.excludechannels is not None:
-                for channel_name in p_args.excludechannels:
-                    query_str += " AND !channel.name:\"{}\"".format(channel_name)
-            if p_args.includechannels is not None:
-                qs = ""
-                add_or = False
-                for channel_name in p_args.includechannels:
-                    if add_or:
-                        qs += " OR"
-                    qs += " channel.name:\"{}\"".format(channel_name)
-                    add_or = True
-                query_str += " AND ({})".format(qs)
+        s = self.search.query(qs).query(r).source(['author.id'])
+        # response = s.execute()
 
-            # print(query_str)
+        hit_counts = {}
+        for hit in s.scan():
+            if hit.author.id in hit_counts:
+                hit_counts[hit.author.id] += 1
+            else:
+                hit_counts[hit.author.id] = 1
 
-            qs = QueryString(query=query_str)
-            r = Range(**{'@timestamp': {'gte': time_gte, 'lt': 'now'}})
-
-            s = self.search.query(qs).query(r)
-
-            count = s.count()
-
-            hit_count = {
-                "author_id": member_id,
-                "count": count
-            }
-
-            hit_counts.append(hit_count)
-
-            await self.bot.edit_message(status, new_content="Processed: {}/{} users.".format(i, len(server_member_ids)))
-
-        hit_counts = sorted(hit_counts, key=lambda m: m["count"], reverse=True)
+        hit_counts = [{"author_id": k, "count": v} for k, v in hit_counts.items()]
+        hit_counts = sorted(hit_counts, key=lambda hit: hit["count"], reverse=True)
 
         max_results = p_args.count
 
@@ -285,8 +277,9 @@ class ESLog:
         out = []
         for i, hit_count in enumerate(hit_counts, 1):
             member = server.get_member(hit_count["author_id"])
-            out.append('{rank}. {author}: {count}'.format(
-                rank=i, author=member.display_name, count=hit_count["count"]))
+            if member is not None:
+                out.append('{rank}. {author}: {count}'.format(
+                    rank=i, author=member.display_name, count=hit_count["count"]))
 
         await self.bot.say('\n'.join(out))
 
