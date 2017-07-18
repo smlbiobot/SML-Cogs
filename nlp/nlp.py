@@ -73,7 +73,7 @@ LANG = OrderedDict([
     ("lt", "Lithuanian"),
     ("no", "Norwegian"),
     ("fa", "Persian"),
-    ("pl", "Polis"),
+    ("pl", "Polish"),
     ("pt", "Portuguese"),
     ("ro", "Romanian"),
     ("ru", "Russian"),
