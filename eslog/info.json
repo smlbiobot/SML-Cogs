@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Elastic Search: logging + searching",
+	"DESCRIPTION": "Directly interface with Elastic Search for logging and searching using official API",
+	"DISABLED": false,
+	"NAME": "ESLog",
+	"REQUIREMENTS": ["elasticsearch", "elasticsearch_dsl"],
+	"TAGS": ["log", "logging", "elasticsearch"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
