@@ -209,22 +209,22 @@ class ESLog:
             help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
         )
         parser.add_argument(
-            '--count', '-c',
+            '-c', '--count',
             type=int,
             default="10",
             help='Number of results')
         parser.add_argument(
-            '--excludechannels', '-ec',
+            '-ec', '--excludechannels',
             nargs='+',
             help='List of channels to exclude'
         )
         parser.add_argument(
-            '--includechannels', '-ic',
+            '-ic', '--includechannels',
             nargs='+',
             help='List of channels to exclude'
         )
         parser.add_argument(
-            '--excludebot', '-eb',
+            '-eb', '--excludebot',
             action='store_true'
         )
 
@@ -285,8 +285,11 @@ class ESLog:
         for i, hit_count in enumerate(hit_counts, 1):
             member = server.get_member(hit_count["author_id"])
             if member is not None:
-                out.append('{rank}. {author}: {count}'.format(
-                    rank=i, author=member.display_name, count=hit_count["count"]))
+                name = member.display_name
+            else:
+                name = "User ID: {}".format(hit_count["author_id"])
+            out.append('{rank}. {author}: {count}'.format(
+                rank=i, author=name, count=hit_count["count"]))
 
         await self.bot.say('\n'.join(out))
 
