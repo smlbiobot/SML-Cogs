@@ -35,6 +35,7 @@ from datetime import timedelta
 import logstash
 from __main__ import send_cmd_help
 import discord
+import argparse
 from discord import Channel
 from discord import ChannelType
 from discord import Game
@@ -49,6 +50,7 @@ from discord.ext.commands import Context
 
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from cogs.utils.chat_formatting import box
 
 import elasticsearch
 import elasticsearch_dsl
@@ -172,13 +174,56 @@ class ESLog:
             await self.bot.say(embed=em)
 
     @eslog.command(name="messagecount", pass_context=True, no_pm=True)
-    async def eslog_messagecount(self, ctx, time="7d", count=10):
+    async def eslog_messagecount(self, ctx, *args):
         """Message count by params.
         
         Params:
-        time: in ES format, e.g. 7d for 7 days
+        --time TIME    
+          Time in ES notation. 7d for 7 days, 1h for 1 hour
+        --count COUNT   
+          Number of results to show
+        --excludechannels EXCLUDECHANNEL [EXCLUDECHANNEL ...]
+          List of channels to exclude
+        --includechannels INCLUDECHANNEL [INCLUDECHANNEL ...]
+          List of channels to include
+        --excludebot
         """
-        time_gte = 'now-{}'.format(time)
+        # Process arguments
+        parser = argparse.ArgumentParser(prog='[p]eslog messagecount')
+        # parser.add_argument('key')
+        parser.add_argument(
+            '--time',
+            default="7d",
+            help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
+        )
+        parser.add_argument(
+            '--count',
+            type=int,
+            default="10",
+            help='Number of results')
+        parser.add_argument(
+            '--excludechannels',
+            nargs='+',
+            help='List of channels to exclude'
+        )
+        parser.add_argument(
+            '--includechannels',
+            nargs='+',
+            help='List of channels to exclude'
+        )
+        parser.add_argument(
+            '--excludebot',
+            action='store_true'
+        )
+
+        try:
+            p_args = parser.parse_args(args)
+        except SystemExit:
+            # await self.bot.send_message(ctx.message.channel, box(parser.format_help()))
+            await send_cmd_help(ctx)
+            return
+
+        time_gte = 'now-{}'.format(p_args.time)
 
         server = ctx.message.server
 
@@ -187,15 +232,32 @@ class ESLog:
         for member in server.members:
             query_str = (
                 "discord_event:message"
-                " AND author.bot:false"
                 " AND server.name:\"{server_name}\""
                 " AND author.id:{author_id}"
             ).format(server_name=server.name, author_id=member.id)
+
+            if p_args.excludebot:
+                query_str += " AND author.bot:false"
+            if p_args.excludechannels is not None:
+                for channel_name in p_args.excludechannels:
+                    query_str += " AND !channel.name:\"{}\"".format(channel_name)
+            if p_args.includechannels is not None:
+                qs = ""
+                add_or = False
+                for channel_name in p_args.includechannels:
+                    if add_or:
+                        qs += " OR"
+                    qs += " channel.name:\"{}\"".format(channel_name)
+                    add_or = True
+                query_str += " AND ({})".format(qs)
+
+            # print(query_str)
 
             qs = QueryString(query=query_str)
             r = Range(**{'@timestamp': {'gte': time_gte, 'lt': 'now'}})
 
             s = self.search.query(qs).query(r)
+
             count = s.count()
 
             hit_count = {
@@ -203,22 +265,19 @@ class ESLog:
                 "count": count
             }
 
-            # print(s.to_dict())
-
             hit_counts.append(hit_count)
-
-            # print(hit_count)
 
         hit_counts = sorted(hit_counts, key=lambda m: m["count"], reverse=True)
 
-        max_results = 10
+        max_results = p_args.count
 
         hit_counts = hit_counts[:max_results]
 
         out = []
-        for hit_count in hit_counts:
+        for i, hit_count in enumerate(hit_counts, 1):
             member = server.get_member(hit_count["author_id"])
-            out.append('+ {author}: {count}'.format(author=member.display_name, count=hit_count["count"]))
+            out.append('{rank}. {author}: {count}'.format(
+                rank=i, author=member.display_name, count=hit_count["count"]))
 
         await self.bot.say('\n'.join(out))
 
