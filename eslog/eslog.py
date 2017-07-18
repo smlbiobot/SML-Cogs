@@ -29,6 +29,7 @@ import logging
 import os
 import re
 import json
+import copy
 from collections import defaultdict
 from datetime import timedelta
 
@@ -233,14 +234,14 @@ class ESLog:
         status = await self.bot.say("Processed: 0/{} users.".format(len(server.members)))
 
         # use a copy because if member joins when iterations is going, it will break
-        server_members = server.members.copy()
+        server_member_ids = [m.id for m in server.members]
 
-        for i, member in enumerate(server_members, 1):
+        for i, member_id in enumerate(server_member_ids, 1):
             query_str = (
                 "discord_event:message"
                 " AND server.name:\"{server_name}\""
                 " AND author.id:{author_id}"
-            ).format(server_name=server.name, author_id=member.id)
+            ).format(server_name=server.name, author_id=member_id)
 
             if p_args.excludebot:
                 query_str += " AND author.bot:false"
@@ -267,13 +268,13 @@ class ESLog:
             count = s.count()
 
             hit_count = {
-                "author_id": member.id,
+                "author_id": member_id,
                 "count": count
             }
 
             hit_counts.append(hit_count)
 
-            await self.bot.edit_message(status, new_content="Processed: {}/{} users.".format(i, len(server.members)))
+            await self.bot.edit_message(status, new_content="Processed: {}/{} users.".format(i, len(server_member_ids)))
 
         hit_counts = sorted(hit_counts, key=lambda m: m["count"], reverse=True)
 
