@@ -128,6 +128,16 @@ class ESLogModel:
             '-eb', '--excludebot',
             action='store_true'
         )
+        parser.add_argument(
+            '-er', '--excluderoles',
+            nargs='+',
+            help='List of roles to exclude'
+        )
+        parser.add_argument(
+            '-ir', '--includeroles',
+            nargs='+',
+            help='List of roles to include'
+        )
         return parser
 
     @staticmethod
@@ -154,8 +164,16 @@ class ESLogModel:
                     qs += " OR"
                 qs += " channel.name:\"{}\"".format(channel_name)
             query_str += " AND ({})".format(qs)
-
-        # print(query_str)
+        if p_args.excluderoles is not None:
+            for role_name in p_args.excluderoles:
+                query_str += " AND !author.roles.name:\"{}\"".format(role_name)
+        if p_args.includeroles is not None:
+            qs = ""
+            for i, role_name in enumerate(p_args.includeroles):
+                if i > 0:
+                    qs += " OR"
+                qs += " author.roles.name:\"{}\"".format(role_name)
+            query_str += " AND ({})".format(qs)
 
         qs = QueryString(query=query_str)
         r = Range(**{'@timestamp': {'gte': time_gte, 'lt': 'now'}})
@@ -248,6 +266,10 @@ class ESLog:
           List of channels to exclude
         --includechannels INCLUDECHANNEL [INCLUDECHANNEL ...], -ic
           List of channels to include
+        --excluderoles EXCLUDEROLE [EXCLUDEROLE ...], -er
+          List of roles to exclude
+        --includeroles INCLUDEROLE [INCLUDEROLE ...], -ir
+          List of roles to include
         --excludebot, -eb
           Exclude bot accounts
         
