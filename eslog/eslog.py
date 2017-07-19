@@ -105,7 +105,7 @@ class ESLogModel:
         parser = argparse.ArgumentParser(prog='[p]eslog messagecount')
         # parser.add_argument('key')
         parser.add_argument(
-            '--time',
+            '-t', '--time',
             default="7d",
             help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
         )
