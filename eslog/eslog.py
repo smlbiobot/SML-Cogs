@@ -54,6 +54,7 @@ from elasticsearch_dsl.query import Range
 
 from cogs.utils.chat_formatting import inline
 from cogs.utils.dataIO import dataIO
+from cogs.utils import checks
 
 HOST = 'localhost'
 PORT = 9200
@@ -901,37 +902,40 @@ class ESLog:
         self.eslogger.log_all_gauges()
         await self.bot.say("Logged all gauges.")
 
+    @checks.serverowner_or_permissions()
+    @commands.group(pass_context=True, no_pm=True)
+    async def ownereslog(self, ctx):
+        """Bot owner level data access.
+        
+        Mainly difference is that the bot owner is allowed to see data from another server
+        since he/she admins those servers.
+        """
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @ownereslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
+    async def ownereslog_user(self, ctx, server_name, *args):
+        """Message count by user."""
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        if server is None:
+            await self.bot.say("Cannot find server named {}.".format(server_name))
+            return
+        await self.search_eslog_user(ctx, server, *args)
+
+    @ownereslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
+    async def ownereslog_channel(self, ctx, server_name, *args):
+        """Message count by user."""
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        if server is None:
+            await self.bot.say("Cannot find server named {}.".format(server_name))
+            return
+        await self.search_eslog_channel(ctx, server, *args)
+
     @commands.group(pass_context=True, no_pm=True)
     async def eslog(self, ctx):
         """Elastic Search Logging."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
-
-    @eslog.command(name="message", pass_context=True, no_pm=True)
-    async def eslog_message(self, ctx, time="7d", server_name=None):
-        """Search ES.
-        
-        TODO
-        
-        Params:
-            time: in ES format, e.g. 7d for 7 days
-        
-        """
-        if server_name is None:
-            server_name = ctx.message.server.name
-
-        time_gte = 'now-{}'.format(time)
-
-        qs = QueryString(query="discord_event:message AND author.bot:false AND server.name:\"Reddit Alpha Clan Family\"")
-        r = Range(** {'@timestamp': {'gte': time_gte, 'lt': 'now'}})
-
-        s = self.search.query(qs).query(r)
-        response = s.execute()
-        await self.bot.say("Number of results: {}".format(s.count()))
-
-        for h in response:
-            em = ESLogView.embed_message(h)
-            await self.bot.say(embed=em)
 
     @eslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
     async def eslog_user(self, ctx, *args):
@@ -964,6 +968,11 @@ class ESLog:
         Note:
         It might take a few minutes to process for servers which have many users and activity.
         """
+        server = ctx.message.server
+        await self.search_eslog_user(ctx, server, *args)
+
+    async def search_eslog_user(self, ctx, server, *args):
+        """Perform the search for authors."""
         parser = ESLogModel.parser()
 
         try:
@@ -975,7 +984,6 @@ class ESLog:
 
         await self.bot.type()
 
-        server = ctx.message.server
         s = ESLogModel.es_query_author(p_args, self.search, server)
 
         # print(s.to_dict())
@@ -1030,6 +1038,11 @@ class ESLog:
         Note:
         It might take a few minutes to process for servers which have many users and activity.
         """
+        server = ctx.message.server
+        await self.search_eslog_channel(ctx, server, *args)
+
+    async def search_eslog_channel(self, ctx, server, *args):
+        """Perform search for channels."""
         parser = ESLogModel.parser()
 
         try:
@@ -1041,7 +1054,6 @@ class ESLog:
 
         await self.bot.type()
 
-        server = ctx.message.server
         s = ESLogModel.es_query_channel(p_args, self.search, server)
 
         # print(s.to_dict())
