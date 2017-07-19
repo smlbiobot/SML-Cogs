@@ -28,12 +28,21 @@ import argparse
 import itertools
 import os
 import re
+import datetime as dt
 from collections import defaultdict
 from datetime import timedelta
 from random import choice
 
 import discord
 from __main__ import send_cmd_help
+from discord import Channel
+from discord import ChannelType
+from discord import Game
+from discord import Member
+from discord import Message
+from discord import Role
+from discord import Server
+from discord import Status
 from discord.ext import commands
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
@@ -184,9 +193,7 @@ class ESLogModel:
             query_str += ' '.join(prefix_qs)
 
         qs = QueryString(query=query_str)
-        r = Range(**{'@timestamp': {'gte': time_gte, 'lt': 'now'}})
-
-        # print(qs.to_dict())
+        r = Range(timestamp={'gte': time_gte, 'lt': 'now'})
 
         s = search.query(qs).query(r).source(['author.id', 'author.roles'])
         return s
@@ -276,7 +283,14 @@ class ESLog:
         self.model = ESLogModel(JSON)
 
         self.es = Elasticsearch()
-        self.search = Search(using=self.es, index="logstash-*")
+        self.search = Search(using=self.es, index="discord-*")
+
+        self.extra = {
+            'log_type': 'discord.logger',
+            'application': 'red',
+            'bot_id': self.bot.user.id,
+            'bot_name': self.bot.user.name
+        }
 
 
     @commands.group(pass_context=True, no_pm=True)
@@ -356,6 +370,9 @@ class ESLog:
         server = ctx.message.server
         s = ESLogModel.es_query(p_args, self.search, server)
 
+        # print(s.to_dict())
+        # print(s.count())
+
         # perform search using scan()
         hit_counts = {}
         for hit in s.scan():
@@ -373,6 +390,193 @@ class ESLog:
 
         for em in ESLogView.embeds_user_rank(hit_counts, p_args, server):
             await self.bot.say(embed=em)
+
+    # Logging
+    async def on_message(self, message: Message):
+        """Track on message."""
+        self.log_message(message)
+
+    def log_message(self, message: Message):
+        """Log message."""
+        extra = {'content': message.content}
+        extra.update(self.get_sca_params(message))
+        extra.update(self.get_mentions_extra(message))
+        self.log_discord_event('message', extra)
+
+    def log_discord(self, key=None, is_event=False, is_gauge=False, extra=None):
+        """Log Discord logs"""
+        if key is None:
+            return
+        if self.extra is None:
+            return
+        if extra is None:
+            extra = {}
+        extra.update(self.extra.copy())
+        if is_event:
+            extra['discord_event'] = key
+        if is_gauge:
+            extra['discord_gauge'] = key
+
+
+
+        now = dt.datetime.utcnow()
+        now_str = now.strftime('%Y.%m.%d')
+
+        extra['timestamp'] = now
+
+        self.es.index(
+            index='discord-{}'.format(now_str),
+            doc_type='discord',
+            body=extra,
+            timestamp=now
+        )
+
+        # self.logger.info(self.get_event_key(key), extra=extra)
+
+    def log_discord_event(self, key=None, extra=None):
+        """Log Discord events."""
+        self.log_discord(key=key, is_event=True, extra=extra)
+
+    def get_message_sca(self, message: Message):
+        """Return server, channel and author from message."""
+        return message.server, message.channel, message.author
+
+    def get_server_params(self, server: Server):
+        """Return extra fields for server."""
+        extra = {
+            'id': server.id,
+            'name': server.name,
+        }
+        return extra
+
+    def get_channel_params(self, channel: Channel):
+        """Return extra fields for channel."""
+        extra = {
+            'id': channel.id,
+            'name': channel.name,
+            'server': self.get_server_params(channel.server),
+            'position': channel.position,
+            'is_default': channel.is_default,
+            'created_at': channel.created_at.isoformat(),
+            'type': {
+                'text': channel.type == ChannelType.text,
+                'voice': channel.type == ChannelType.voice,
+                'private': channel.type == ChannelType.private,
+                'group': channel.type == ChannelType.group
+            }
+        }
+        return extra
+
+    def get_server_channel_params(self, channel: Channel):
+        """Return digested version of channel params"""
+        extra = {
+            'id': channel.id,
+            'name': channel.name,
+            'position': channel.position,
+            'is_default': channel.is_default,
+            'created_at': channel.created_at.isoformat(),
+        }
+        return extra
+
+    def get_member_params(self, member: Member):
+        """Return data for member."""
+        extra = {
+            'name': member.display_name,
+            'username': member.name,
+            'display_name': member.display_name,
+            'id': member.id,
+            'bot': member.bot
+        }
+
+        if isinstance(member, Member):
+            extra.update({
+                'status': self.get_extra_status(member.status),
+                'game': self.get_game_params(member.game),
+                'top_role': self.get_role_params(member.top_role),
+                'joined_at': member.joined_at.isoformat()
+            })
+
+        if hasattr(member, 'server'):
+            extra['server'] = self.get_server_params(member.server)
+            # message sometimes reference a user and has no roles info
+            if hasattr(member, 'roles'):
+                extra['roles'] = [self.get_role_params(r) for r in member.server.role_hierarchy if r in member.roles]
+
+        return extra
+
+    def get_role_params(self, role: Role):
+        """Return data for role."""
+        if not role:
+            return {}
+        extra = {
+            'name': role.name,
+            'id': role.id
+        }
+        return extra
+
+    def get_extra_status(self, status: Status):
+        """Return data for status."""
+        extra = {
+            'online': status == Status.online,
+            'offline': status == Status.offline,
+            'idle': status == Status.idle,
+            'dnd': status == Status.dnd,
+            'invisible': status == Status.invisible
+        }
+        return extra
+
+    def get_game_params(self, game: Game):
+        """Return ata for game."""
+        if game is None:
+            return {}
+        extra = {
+            'name': game.name,
+            'url': game.url,
+            'type': game.type
+        }
+        return extra
+
+    def get_sca_params(self, message: Message):
+        """Return extra fields from messages."""
+        server = message.server
+        channel = message.channel
+        author = message.author
+
+        extra = {}
+
+        if author is not None:
+            extra['author'] = self.get_member_params(author)
+
+        if channel is not None:
+            extra['channel'] = self.get_channel_params(channel)
+
+        if server is not None:
+            extra['server'] = self.get_server_params(server)
+
+        return extra
+
+    def get_mentions_extra(self, message: Message):
+        """Return mentions in message."""
+        mentions = set(message.mentions.copy())
+        names = [m.display_name for m in mentions]
+        ids = [m.id for m in mentions]
+        return {
+            'mention_names': names,
+            'mention_ids': ids
+        }
+
+    def get_emojis_params(self, message: Message):
+        """Return list of emojis used in messages."""
+        emojis = []
+        emojis.append(EMOJI_P.findall(message.content))
+        emojis.append(UEMOJI_P.findall(message.content))
+        return {
+            'emojis': emojis
+        }
+
+    def get_event_key(self, name: str):
+        """Return event name used in logger."""
+        return "discord.logger.{}".format(name)
 
 
 def check_folder():
