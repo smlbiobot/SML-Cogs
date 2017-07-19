@@ -138,6 +138,10 @@ class ESLogModel:
             nargs='+',
             help='List of roles to include'
         )
+        parser.add_argument(
+            '-ebc', '--excludebotcommands',
+            action='store_true'
+        )
         return parser
 
     @staticmethod
@@ -174,9 +178,15 @@ class ESLogModel:
                     qs += " AND"
                 qs += " author.roles.name:\"{}\"".format(role_name)
             query_str += " AND ({})".format(qs)
+        if p_args.excludebotcommands:
+            cmd_prefix = ['!', '?', ';', '$']
+            prefix_qs = [' AND !content.keyword:\{}*'.format(p) for p in cmd_prefix]
+            query_str += ' '.join(prefix_qs)
 
         qs = QueryString(query=query_str)
         r = Range(**{'@timestamp': {'gte': time_gte, 'lt': 'now'}})
+
+        # print(qs.to_dict())
 
         s = search.query(qs).query(r).source(['author.id', 'author.roles'])
         return s
@@ -206,17 +216,19 @@ class ESLogView:
 
         title = 'Message count by author'
         descriptions = []
-        descriptions.append('Time: {}. '.format(p_args.time))
+        descriptions.append('Time: {}.'.format(p_args.time))
         if p_args.includechannels is not None:
-            descriptions.append('Including channels: {}. '.format(', '.join(p_args.includechannels)))
+            descriptions.append('Including channels: {}.'.format(', '.join(p_args.includechannels)))
         if p_args.excludechannels is not None:
-            descriptions.append('Excluding channels: {}. '.format(', '.join(p_args.excludechannels)))
+            descriptions.append('Excluding channels: {}.'.format(', '.join(p_args.excludechannels)))
         if p_args.includeroles is not None:
-            descriptions.append('Including roles: {}. '.format(', '.join(p_args.includeroles)))
+            descriptions.append('Including roles: {}.'.format(', '.join(p_args.includeroles)))
         if p_args.excluderoles is not None:
-            descriptions.append('Excluding roles: {}.v'.format(', '.join(p_args.excluderoles)))
+            descriptions.append('Excluding roles: {}.'.format(', '.join(p_args.excluderoles)))
         if p_args.excludebot:
-            descriptions.append('Excluding bot users. ')
+            descriptions.append('Excluding bot users.')
+        if p_args.excludebotcommands:
+            descriptions.append('Excluding bot commands.')
         descriptions.append('Showing top {} results.'.format(p_args.count))
         description = ' '.join(descriptions)
         footer_text = server.name
@@ -299,9 +311,9 @@ class ESLog:
             em = ESLogView.embed_message(h)
             await self.bot.say(embed=em)
 
-    @eslog.command(name="messagecount", aliases=['mc'], pass_context=True, no_pm=True)
-    async def eslog_messagecount(self, ctx, *args):
-        """Message count by params.
+    @eslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
+    async def eslog_user(self, ctx, *args):
+        """Message count by users.
         
         Params:
         --time TIME, -t    
@@ -320,6 +332,8 @@ class ESLog:
           List of roles to include (multiples are interpreted as AND)
         --excludebot, -eb
           Exclude bot accounts
+        --excludebotcommands, -ebc
+          Exclude bot commands. 
         
         Example:
         [p]eslog messagecount --time 2d --count 20 --include general some-channel
@@ -359,7 +373,7 @@ class ESLog:
 
         for em in ESLogView.embeds_user_rank(hit_counts, p_args, server):
             await self.bot.say(embed=em)
-            
+
 
 def check_folder():
     """Check folder."""
