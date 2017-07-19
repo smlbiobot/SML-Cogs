@@ -189,6 +189,9 @@ class ESLog:
         Example:
         [p]eslog messagecount --time 2d --count 20 --include general some-channel
         Counts number of messages sent by authors within last 2 days in channels #general and #some-channel
+        
+        Note:
+        It might take a few minutes to process for servers which have many users and activity.
         """
         # Process arguments
         parser = argparse.ArgumentParser(prog='[p]eslog messagecount')
@@ -224,6 +227,8 @@ class ESLog:
             # await self.bot.send_message(ctx.message.channel, box(parser.format_help()))
             await send_cmd_help(ctx)
             return
+
+        await self.bot.type()
 
         time_gte = 'now-{}'.format(p_args.time)
 
