@@ -171,7 +171,7 @@ class ESLogModel:
             qs = ""
             for i, role_name in enumerate(p_args.includeroles):
                 if i > 0:
-                    qs += " OR"
+                    qs += " AND"
                 qs += " author.roles.name:\"{}\"".format(role_name)
             query_str += " AND ({})".format(qs)
 
@@ -265,11 +265,11 @@ class ESLog:
         --excludechannels EXCLUDECHANNEL [EXCLUDECHANNEL ...], -ec
           List of channels to exclude
         --includechannels INCLUDECHANNEL [INCLUDECHANNEL ...], -ic
-          List of channels to include
+          List of channels to include (multiples are interpreted as OR)
         --excluderoles EXCLUDEROLE [EXCLUDEROLE ...], -er
           List of roles to exclude
         --includeroles INCLUDEROLE [INCLUDEROLE ...], -ir
-          List of roles to include
+          List of roles to include (multiples are interpreted as AND)
         --excludebot, -eb
           Exclude bot accounts
         
