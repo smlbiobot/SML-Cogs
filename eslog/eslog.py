@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 
 import asyncio
 import logging
+import itertools
 import os
 import re
 import json
@@ -81,7 +82,15 @@ UEMOJI_P = re.compile(u'['
 
 # global ES connection
 from elasticsearch_dsl.connections import connections
-connections.create_connection(hosts=['localhost'], timeout=20)
+connections.create_connection(hosts=[HOST], timeout=20)
+
+
+def grouper(n, iterable, fillvalue=None):
+    """Group lists into lists of items.
+
+    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
+    args = [iter(iterable)] * n
+    return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
 def nested_dict():
@@ -94,6 +103,63 @@ def random_discord_color():
     color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
     color = int(color, 16)
     return discord.Color(value=color)
+
+
+class BarChart:
+    """Plotting bar charts as ASCII.
+
+    Based on https://github.com/mkaz/termgraph
+    """
+
+    def __init__(self, labels, data, width):
+        """Init."""
+        self.tick = '▇'
+        self.sm_tick = '░'
+        self.labels = labels
+        self.data = data
+        self.width = width
+
+    def chart(self):
+        """Plot chart."""
+        # verify data
+        m = len(self.labels)
+        if m != len(self.data):
+            print(">> Error: Label and data array sizes don't match")
+            return None
+
+        # massage data
+        # normalize for graph
+        max_ = 0
+        for i in range(m):
+            if self.data[i] > max_:
+                max_ = self.data[i]
+
+        step = max_ / self.width
+        label_width = max([len(label) for label in self.labels])
+
+        out = []
+        # display graph
+        for i in range(m):
+            out.append(
+                self.chart_blocks(
+                    self.labels[i], self.data[i], step,
+                    label_width))
+
+        return '\n'.join(out)
+
+    def chart_blocks(
+            self, label, count, step,
+            label_width):
+        """Plot each block."""
+        blocks = int(count / step)
+        out = "{0:>16}: ".format(label)
+        if count < step:
+            out += self.sm_tick
+        else:
+            for i in range(blocks):
+                out += self.tick
+        out += '  {}'.format(count)
+        return out
 
 
 class ESLogModel:
@@ -125,6 +191,10 @@ class ESLogView:
         em.add_field(name="content", value=hit.content)
         em.set_footer(text=hit["@timestamp"])
         return em
+
+    @staticmethod
+    def embed_user_rank(hit):
+        """User rank display."""
 
 
 class ESLog:
@@ -260,9 +330,9 @@ class ESLog:
         qs = QueryString(query=query_str)
         r = Range(**{'@timestamp': {'gte': time_gte, 'lt': 'now'}})
 
-        s = self.search.query(qs).query(r).source(['author.id'])
-        # response = s.execute()
+        s = self.search.query(qs).query(r).source(['author.id', 'author.roles'])
 
+        # perform search using scan()
         hit_counts = {}
         for hit in s.scan():
             if hit.author.id in hit_counts:
@@ -277,17 +347,63 @@ class ESLog:
 
         hit_counts = hit_counts[:max_results]
 
-        out = []
-        for i, hit_count in enumerate(hit_counts, 1):
-            member = server.get_member(hit_count["author_id"])
-            if member is not None:
-                name = member.display_name
-            else:
-                name = "User ID: {}".format(hit_count["author_id"])
-            out.append('{rank}. {author}: {count}'.format(
-                rank=i, author=name, count=hit_count["count"]))
+        # ESLogView.embed_user_rank(hit_counts)
 
-        await self.bot.say('\n'.join(out))
+        # group by 25 for embeds
+        hit_counts_group = grouper(25, hit_counts)
+
+        title = 'Message count by author'
+        descriptions = []
+        descriptions.append('Time: {}'.format(p_args.time))
+        if p_args.includechannels is not None:
+            descriptions.append('Including channels: {}'.format(', '.join(p_args.includechannels)))
+        if p_args.excludechannels is not None:
+            descriptions.append('Excluding channels: {}'.format(', '.join(p_args.excludechannels)))
+        if p_args.excludebot:
+            descriptions.append('Excluding bot users')
+        descriptions.append('Showing top {} results.'.format(p_args.count))
+        description = ', '.join(descriptions)
+        footer_text = server.name
+
+        chart = BarChart([''] * len(hit_counts), [h["count"] for h in hit_counts], 30)
+        lines = chart.chart().split('\n')
+
+        rank = 1
+        max_count = None
+        for hit_counts in hit_counts_group:
+            em = discord.Embed(title=title, description=description)
+            for hit_count in hit_counts:
+                if hit_count is not None:
+                    count = hit_count["count"]
+                    member = server.get_member(hit_count["author_id"])
+                    if member is not None:
+                        name = member.display_name
+                        mention = member.mention
+                    else:
+                        name = "User ID: {}".format(hit_count["author_id"])
+                        mention = ''
+                    if max_count is None:
+                        max_count = count
+                    width = 30
+                    chart = '▇' * int(width * (count / max_count))
+                    em.add_field(name='{}. {}: {}'.format(rank, name, count), value=box(chart), inline=False)
+                    rank += 1
+            em.set_footer(text=footer_text)
+            await self.bot.say(embed=em)
+
+
+        # standard view
+        # out = []
+        # for i, hit_count in enumerate(hit_counts, 1):
+        #     member = server.get_member(hit_count["author_id"])
+        #     if member is not None:
+        #         name = member.display_name
+        #     else:
+        #         name = "User ID: {}".format(hit_count["author_id"])
+        #     out.append('{rank}. {author}: {count}'.format(
+        #         rank=i, author=name, count=hit_count["count"]))
+        #
+        # await self.bot.say('\n'.join(out))
 
 
 def check_folder():
