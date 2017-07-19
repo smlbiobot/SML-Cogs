@@ -316,15 +316,19 @@ class ESLog:
 
         title = 'Message count by author'
         descriptions = []
-        descriptions.append('Time: {}'.format(p_args.time))
+        descriptions.append('Time: {}. '.format(p_args.time))
         if p_args.includechannels is not None:
-            descriptions.append('Including channels: {}'.format(', '.join(p_args.includechannels)))
+            descriptions.append('Including channels: {}. '.format(', '.join(p_args.includechannels)))
         if p_args.excludechannels is not None:
-            descriptions.append('Excluding channels: {}'.format(', '.join(p_args.excludechannels)))
+            descriptions.append('Excluding channels: {}. '.format(', '.join(p_args.excludechannels)))
+        if p_args.includeroles is not None:
+            descriptions.append('Including roles: {}. '.format(', '.join(p_args.includeroles)))
+        if p_args.excluderoles is not None:
+            descriptions.append('Excluding roles: {}.v'.format(', '.join(p_args.excluderoles)))
         if p_args.excludebot:
-            descriptions.append('Excluding bot users')
+            descriptions.append('Excluding bot users. ')
         descriptions.append('Showing top {} results.'.format(p_args.count))
-        description = ', '.join(descriptions)
+        description = ' '.join(descriptions)
         footer_text = server.name
         footer_icon_url = server.icon_url
 
