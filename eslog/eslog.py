@@ -198,8 +198,56 @@ class ESLogView:
         return em
 
     @staticmethod
-    def embed_user_rank(hit):
+    def embeds_user_rank(hit_counts, p_args, server):
         """User rank display."""
+        embeds = []
+        # group by 25 for embeds
+        hit_counts_group = grouper(25, hit_counts)
+
+        title = 'Message count by author'
+        descriptions = []
+        descriptions.append('Time: {}. '.format(p_args.time))
+        if p_args.includechannels is not None:
+            descriptions.append('Including channels: {}. '.format(', '.join(p_args.includechannels)))
+        if p_args.excludechannels is not None:
+            descriptions.append('Excluding channels: {}. '.format(', '.join(p_args.excludechannels)))
+        if p_args.includeroles is not None:
+            descriptions.append('Including roles: {}. '.format(', '.join(p_args.includeroles)))
+        if p_args.excluderoles is not None:
+            descriptions.append('Excluding roles: {}.v'.format(', '.join(p_args.excluderoles)))
+        if p_args.excludebot:
+            descriptions.append('Excluding bot users. ')
+        descriptions.append('Showing top {} results.'.format(p_args.count))
+        description = ' '.join(descriptions)
+        footer_text = server.name
+        footer_icon_url = server.icon_url
+
+        rank = 1
+        max_count = None
+        color = random_discord_color()
+        for hit_counts in hit_counts_group:
+            em = discord.Embed(title=title, description=description, color=color)
+            for hit_count in hit_counts:
+                if hit_count is not None:
+                    count = hit_count["count"]
+                    member = server.get_member(hit_count["author_id"])
+                    if member is not None:
+                        name = member.display_name
+                    else:
+                        name = "User ID: {}".format(hit_count["author_id"])
+                    if max_count is None:
+                        max_count = count
+
+                    # chart
+                    width = 30
+                    bar_count = int(width * (count / max_count))
+                    chart = '▇' * bar_count if bar_count > 0 else '░'
+
+                    em.add_field(name='{}. {}: {}'.format(rank, name, count), value=inline(chart), inline=False)
+                    rank += 1
+            em.set_footer(text=footer_text, icon_url=footer_icon_url)
+            embeds.append(em)
+        return embeds
 
 
 class ESLog:
@@ -309,55 +357,9 @@ class ESLog:
 
         hit_counts = hit_counts[:max_results]
 
-        # ESLogView.embed_user_rank(hit_counts)
-
-        # group by 25 for embeds
-        hit_counts_group = grouper(25, hit_counts)
-
-        title = 'Message count by author'
-        descriptions = []
-        descriptions.append('Time: {}. '.format(p_args.time))
-        if p_args.includechannels is not None:
-            descriptions.append('Including channels: {}. '.format(', '.join(p_args.includechannels)))
-        if p_args.excludechannels is not None:
-            descriptions.append('Excluding channels: {}. '.format(', '.join(p_args.excludechannels)))
-        if p_args.includeroles is not None:
-            descriptions.append('Including roles: {}. '.format(', '.join(p_args.includeroles)))
-        if p_args.excluderoles is not None:
-            descriptions.append('Excluding roles: {}.v'.format(', '.join(p_args.excluderoles)))
-        if p_args.excludebot:
-            descriptions.append('Excluding bot users. ')
-        descriptions.append('Showing top {} results.'.format(p_args.count))
-        description = ' '.join(descriptions)
-        footer_text = server.name
-        footer_icon_url = server.icon_url
-
-        rank = 1
-        max_count = None
-        color = random_discord_color()
-        for hit_counts in hit_counts_group:
-            em = discord.Embed(title=title, description=description, color=color)
-            for hit_count in hit_counts:
-                if hit_count is not None:
-                    count = hit_count["count"]
-                    member = server.get_member(hit_count["author_id"])
-                    if member is not None:
-                        name = member.display_name
-                    else:
-                        name = "User ID: {}".format(hit_count["author_id"])
-                    if max_count is None:
-                        max_count = count
-
-                    # chart
-                    width = 30
-                    bar_count = int(width * (count / max_count))
-                    chart = '▇' * bar_count if bar_count > 0 else '░'
-
-                    em.add_field(name='{}. {}: {}'.format(rank, name, count), value=inline(chart), inline=False)
-                    rank += 1
-            em.set_footer(text=footer_text, icon_url=footer_icon_url)
+        for em in ESLogView.embeds_user_rank(hit_counts, p_args, server):
             await self.bot.say(embed=em)
-
+            
 
 def check_folder():
     """Check folder."""
