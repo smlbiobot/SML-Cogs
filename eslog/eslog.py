@@ -24,45 +24,24 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import asyncio
-import logging
+import argparse
 import itertools
 import os
 import re
-import json
-import copy
 from collections import defaultdict
 from datetime import timedelta
+from random import choice
 
-import logstash
-from __main__ import send_cmd_help
 import discord
-import argparse
-from discord import Channel
-from discord import ChannelType
-from discord import Game
-from discord import Member
-from discord import Message
-from discord import Role
-from discord import Server
-from discord import Status
+from __main__ import send_cmd_help
 from discord.ext import commands
-from discord.ext.commands import Command
-from discord.ext.commands import Context
-
-from cogs.utils import checks
-from cogs.utils.dataIO import dataIO
-from cogs.utils.chat_formatting import box
-
-import elasticsearch
-import elasticsearch_dsl
-
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
-
 from elasticsearch_dsl.query import QueryString
 from elasticsearch_dsl.query import Range
 
+from cogs.utils.chat_formatting import inline
+from cogs.utils.dataIO import dataIO
 
 HOST = 'localhost'
 PORT = 9200
@@ -103,63 +82,6 @@ def random_discord_color():
     color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
     color = int(color, 16)
     return discord.Color(value=color)
-
-
-class BarChart:
-    """Plotting bar charts as ASCII.
-
-    Based on https://github.com/mkaz/termgraph
-    """
-
-    def __init__(self, labels, data, width):
-        """Init."""
-        self.tick = '▇'
-        self.sm_tick = '░'
-        self.labels = labels
-        self.data = data
-        self.width = width
-
-    def chart(self):
-        """Plot chart."""
-        # verify data
-        m = len(self.labels)
-        if m != len(self.data):
-            print(">> Error: Label and data array sizes don't match")
-            return None
-
-        # massage data
-        # normalize for graph
-        max_ = 0
-        for i in range(m):
-            if self.data[i] > max_:
-                max_ = self.data[i]
-
-        step = max_ / self.width
-        label_width = max([len(label) for label in self.labels])
-
-        out = []
-        # display graph
-        for i in range(m):
-            out.append(
-                self.chart_blocks(
-                    self.labels[i], self.data[i], step,
-                    label_width))
-
-        return '\n'.join(out)
-
-    def chart_blocks(
-            self, label, count, step,
-            label_width):
-        """Plot each block."""
-        blocks = int(count / step)
-        out = "{0:>16}: ".format(label)
-        if count < step:
-            out += self.sm_tick
-        else:
-            for i in range(blocks):
-                out += self.tick
-        out += '  {}'.format(count)
-        return out
 
 
 class ESLogModel:
@@ -246,7 +168,7 @@ class ESLog:
             em = ESLogView.embed_message(h)
             await self.bot.say(embed=em)
 
-    @eslog.command(name="messagecount", pass_context=True, no_pm=True)
+    @eslog.command(name="messagecount", aliases=['mc'], pass_context=True, no_pm=True)
     async def eslog_messagecount(self, ctx, *args):
         """Message count by params.
         
@@ -364,46 +286,33 @@ class ESLog:
         descriptions.append('Showing top {} results.'.format(p_args.count))
         description = ', '.join(descriptions)
         footer_text = server.name
-
-        chart = BarChart([''] * len(hit_counts), [h["count"] for h in hit_counts], 30)
-        lines = chart.chart().split('\n')
+        footer_icon_url = server.icon_url
 
         rank = 1
         max_count = None
+        color = random_discord_color()
         for hit_counts in hit_counts_group:
-            em = discord.Embed(title=title, description=description)
+            em = discord.Embed(title=title, description=description, color=color)
             for hit_count in hit_counts:
                 if hit_count is not None:
                     count = hit_count["count"]
                     member = server.get_member(hit_count["author_id"])
                     if member is not None:
                         name = member.display_name
-                        mention = member.mention
                     else:
                         name = "User ID: {}".format(hit_count["author_id"])
-                        mention = ''
                     if max_count is None:
                         max_count = count
+
+                    # chart
                     width = 30
-                    chart = '▇' * int(width * (count / max_count))
-                    em.add_field(name='{}. {}: {}'.format(rank, name, count), value=box(chart), inline=False)
+                    bar_count = int(width * (count / max_count))
+                    chart = '▇' * bar_count if bar_count > 0 else '░'
+
+                    em.add_field(name='{}. {}: {}'.format(rank, name, count), value=inline(chart), inline=False)
                     rank += 1
-            em.set_footer(text=footer_text)
+            em.set_footer(text=footer_text, icon_url=footer_icon_url)
             await self.bot.say(embed=em)
-
-
-        # standard view
-        # out = []
-        # for i, hit_count in enumerate(hit_counts, 1):
-        #     member = server.get_member(hit_count["author_id"])
-        #     if member is not None:
-        #         name = member.display_name
-        #     else:
-        #         name = "User ID: {}".format(hit_count["author_id"])
-        #     out.append('{rank}. {author}: {count}'.format(
-        #         rank=i, author=name, count=hit_count["count"]))
-        #
-        # await self.bot.say('\n'.join(out))
 
 
 def check_folder():
