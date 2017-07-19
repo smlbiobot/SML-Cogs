@@ -98,6 +98,71 @@ class ESLogModel:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(file_path))
 
+    @staticmethod
+    def parser():
+        """Process arguments."""
+        # Process arguments
+        parser = argparse.ArgumentParser(prog='[p]eslog messagecount')
+        # parser.add_argument('key')
+        parser.add_argument(
+            '--time',
+            default="7d",
+            help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
+        )
+        parser.add_argument(
+            '-c', '--count',
+            type=int,
+            default="10",
+            help='Number of results')
+        parser.add_argument(
+            '-ec', '--excludechannels',
+            nargs='+',
+            help='List of channels to exclude'
+        )
+        parser.add_argument(
+            '-ic', '--includechannels',
+            nargs='+',
+            help='List of channels to exclude'
+        )
+        parser.add_argument(
+            '-eb', '--excludebot',
+            action='store_true'
+        )
+        return parser
+
+    @staticmethod
+    def es_query(parser_arguments, search, server):
+        """Construct Elasticsearch query."""
+        p_args = parser_arguments
+
+        time_gte = 'now-{}'.format(p_args.time)
+
+        query_str = (
+            "discord_event:message"
+            " AND server.name:\"{server_name}\""
+        ).format(server_name=server.name)
+
+        if p_args.excludebot:
+            query_str += " AND author.bot:false"
+        if p_args.excludechannels is not None:
+            for channel_name in p_args.excludechannels:
+                query_str += " AND !channel.name:\"{}\"".format(channel_name)
+        if p_args.includechannels is not None:
+            qs = ""
+            for i, channel_name in enumerate(p_args.includechannels):
+                if i > 0:
+                    qs += " OR"
+                qs += " channel.name:\"{}\"".format(channel_name)
+            query_str += " AND ({})".format(qs)
+
+        # print(query_str)
+
+        qs = QueryString(query=query_str)
+        r = Range(**{'@timestamp': {'gte': time_gte, 'lt': 'now'}})
+
+        s = search.query(qs).query(r).source(['author.id', 'author.roles'])
+        return s
+
 
 class ESLogView:
     """ESLog views.
@@ -193,33 +258,7 @@ class ESLog:
         Note:
         It might take a few minutes to process for servers which have many users and activity.
         """
-        # Process arguments
-        parser = argparse.ArgumentParser(prog='[p]eslog messagecount')
-        # parser.add_argument('key')
-        parser.add_argument(
-            '--time',
-            default="7d",
-            help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
-        )
-        parser.add_argument(
-            '-c', '--count',
-            type=int,
-            default="10",
-            help='Number of results')
-        parser.add_argument(
-            '-ec', '--excludechannels',
-            nargs='+',
-            help='List of channels to exclude'
-        )
-        parser.add_argument(
-            '-ic', '--includechannels',
-            nargs='+',
-            help='List of channels to exclude'
-        )
-        parser.add_argument(
-            '-eb', '--excludebot',
-            action='store_true'
-        )
+        parser = ESLogModel.parser()
 
         try:
             p_args = parser.parse_args(args)
@@ -230,34 +269,8 @@ class ESLog:
 
         await self.bot.type()
 
-        time_gte = 'now-{}'.format(p_args.time)
-
         server = ctx.message.server
-
-        query_str = (
-            "discord_event:message"
-            " AND server.name:\"{server_name}\""
-        ).format(server_name=server.name)
-
-        if p_args.excludebot:
-            query_str += " AND author.bot:false"
-        if p_args.excludechannels is not None:
-            for channel_name in p_args.excludechannels:
-                query_str += " AND !channel.name:\"{}\"".format(channel_name)
-        if p_args.includechannels is not None:
-            qs = ""
-            for i, channel_name in enumerate(p_args.includechannels):
-                if i > 0:
-                    qs += " OR"
-                qs += " channel.name:\"{}\"".format(channel_name)
-            query_str += " AND ({})".format(qs)
-
-        # print(query_str)
-
-        qs = QueryString(query=query_str)
-        r = Range(**{'@timestamp': {'gte': time_gte, 'lt': 'now'}})
-
-        s = self.search.query(qs).query(r).source(['author.id', 'author.roles'])
+        s = ESLogModel.es_query(p_args, self.search, server)
 
         # perform search using scan()
         hit_counts = {}
