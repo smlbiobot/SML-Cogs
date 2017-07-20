@@ -747,10 +747,6 @@ class AuthorHits:
         self.authors[hit.author.id].add_channel(hit)
 
     def sorted_author_list(self, count):
-        for k, v in self.authors.items():
-            print(v.to_dict())
-        # print(self.authors.items())
-
         max_count = 25
         count = min(max_count, count)
         authors = [v for k, v in self.authors.items()]
@@ -779,6 +775,12 @@ class AuthorHit:
             }
         else:
             self.channels[channel_id]["count"] += 1
+
+    def sorted_channels(self):
+        """List of channels sorted by count"""
+        channels = [v for k, v in self.channels.items()]
+        channels = sorted(channels, key = lambda c: c["count"], reverse=True)
+        return channels
 
     def to_dict(self):
         return {
@@ -835,8 +837,11 @@ class ESLogView:
         return inline(chart)
 
     @staticmethod
-    def channel_count(split, count, max_count):
-        """Inline bar chart with split. """
+    def channel_count(author_hit: AuthorHit):
+        """Channel count. """
+        channels = author_hit.sorted_channels()
+        chart = ['{}: {}'.format(c["channel_name"], c["count"]) for c in channels]
+        return ', '.join(chart)
 
     @staticmethod
     def embeds_user_rank(author_hits: AuthorHits, p_args, server):
@@ -857,17 +862,19 @@ class ESLogView:
                 name = member.display_name
             else:
                 name = "User ID: {}".format(author_id)
-            # if max_count is None:
-            #     max_count = 25
 
             max_count = author_hits.max_author_count()
 
             if p_args.split is None:
                 chart = ESLogView.inline_barchart(counter, max_count)
             elif p_args.split == 'channel':
-                chart = ESLogView.inline_barchart(counter, max_count)
-                # chart = ESLogView.channel_count(
-                #     hit_count["channel"])
+                chart = '{}\n{}'.format(
+                    ESLogView.inline_barchart(counter, max_count),
+                    ESLogView.channel_count(author_hit)
+                )
+                # chart = ESLogView.inline_barchart(counter, max_count)
+                # chart = ESLogView.channel_count(author_hit)
+                # chart = ESLogView.inline_barchart(counter, max_count)
 
             em.add_field(
                 name='{}. {}: {}'.format(rank, name, counter),
@@ -971,13 +978,9 @@ class ESLog:
         Thanks Kowlin!
         """
         pass
-        # self.logger.removeHandler(self.handler)
-        # logging.getLogger("red").removeHandler(self.handler)
 
     async def loop_task(self):
         """Loop task."""
-        # pass
-        # disabled to see if it is causing memory problems
         await self.bot.wait_until_ready()
         self.eslogger.init_extra()
         # temporarily disable gauges
@@ -1084,21 +1087,9 @@ class ESLog:
 
         s = ESLogModel.es_query_author(p_args, self.search, server)
 
-        # print(s.to_dict())
-        # print(s.count())
-
-        # perform search using scan()
-        # hit_counts = {}
-        # hits = {}
-
         author_hits = AuthorHits()
 
         for hit in s.scan():
-            # if hit.author.id in hit_counts:
-            #     hit_counts[hit.author.id] += 1
-            # else:
-            #     hit_counts[hit.author.id] = 1
-
             author_hits.add_hit(hit)
 
         for em in ESLogView.embeds_user_rank(author_hits, p_args, server):
@@ -1152,9 +1143,6 @@ class ESLog:
         await self.bot.type()
 
         s = ESLogModel.es_query_channel(p_args, self.search, server)
-
-        # print(s.to_dict())
-        # print(s.count())
 
         # perform search using scan()
         hit_counts = {}
