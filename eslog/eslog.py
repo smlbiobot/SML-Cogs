@@ -596,6 +596,10 @@ class ESLogModel:
             '-ebc', '--excludebotcommands',
             action='store_true'
         )
+        parser.add_argument(
+            '-s', '--split',
+            choices=['channel']
+        )
         return parser
 
     @staticmethod
@@ -637,10 +641,15 @@ class ESLogModel:
             prefix_qs = [' AND !content.keyword:\{}*'.format(p) for p in cmd_prefix]
             query_str += ' '.join(prefix_qs)
 
+        source_list = ['author.id', 'author.roles', 'channel.id', 'channel.name']
+        # if p_args.split is not None:
+        #     if p_args.split == 'channel':
+        #         source_list.extend(['channel.id', 'channel.name'])
+
         qs = QueryString(query=query_str)
         r = Range(timestamp={'gte': time_gte, 'lt': 'now'})
 
-        s = search.query(qs).query(r).source(['author.id', 'author.roles'])
+        s = search.query(qs).query(r).source(source_list)
         return s
 
     @staticmethod
@@ -701,6 +710,87 @@ class ESLogModel:
         return s
 
 
+class AuthorHits:
+    """
+    Construct results in this format:
+    {
+        "11111": {
+            "author_id": "11111",
+            "count": 100,
+            "channels": {
+                "12345": {
+                    "channel_name": "Channel Name 1",
+                    "count": 100,
+                    "channel_id": "12345"
+                },
+                "23456": {
+                    "channel_name": "Channel Name 2",
+                    "count": 200,
+                    "channel_id": "23456"
+                },       
+            } 
+        }
+    }
+    """
+
+    def __init__(self):
+        self.authors = {}
+
+    def max_author_count(self):
+        """Maximum author count."""
+        return max([ah.counter for k, ah in self.authors.items()])
+
+    def add_hit(self, hit):
+        if hit.author.id not in self.authors:
+            self.authors[hit.author.id] = AuthorHit(hit)
+        self.authors[hit.author.id].add_count()
+        self.authors[hit.author.id].add_channel(hit)
+
+    def sorted_author_list(self, count):
+        for k, v in self.authors.items():
+            print(v.to_dict())
+        # print(self.authors.items())
+
+        max_count = 25
+        count = min(max_count, count)
+        authors = [v for k, v in self.authors.items()]
+        authors = sorted(authors, key=lambda ah: ah.counter, reverse=True)
+        authors = authors[:count]
+        return authors
+
+
+class AuthorHit:
+    def __init__(self, hit):
+        self.author_id = hit.author.id
+        self.counter = 0
+        self.channels = nested_dict()
+
+    def add_count(self):
+        self.counter += 1
+
+    def add_channel(self, hit):
+        channel_id = hit.channel.id
+        channel_name = hit.channel.name
+        if channel_id not in self.channels:
+            self.channels[channel_id] = {
+                "channel_name": channel_name,
+                "channel_id": channel_id,
+                "count": 1
+            }
+        else:
+            self.channels[channel_id]["count"] += 1
+
+    def to_dict(self):
+        return {
+            'counter': self.counter,
+            'channels': [{
+                'channel_name': v['channel_name'],
+                'channel_id': v['channel_id'],
+                'count': v['count']
+            } for k, v in self.channels.items()]
+        }
+
+
 class ESLogView:
     """ESLog views.
     
@@ -745,6 +835,10 @@ class ESLogView:
         return inline(chart)
 
     @staticmethod
+    def channel_count(split, count, max_count):
+        """Inline bar chart with split. """
+
+    @staticmethod
     def embeds_user_rank(hit_counts, p_args, server):
         """User rank display."""
         embeds = []
@@ -773,14 +867,66 @@ class ESLogView:
                     if max_count is None:
                         max_count = count
 
+                    if p_args.split is None:
+                        chart = ESLogView.inline_barchart(count, max_count)
+                    elif p_args.split == 'channel':
+                        chart = ESLogView.channel_count(
+                            hit_count["channel"])
+
                     em.add_field(
                         name='{}. {}: {}'.format(rank, name, count),
-                        value=ESLogView.inline_barchart(count, max_count),
+                        value=chart,
                         inline=False)
                     rank += 1
             em.set_footer(text=footer_text, icon_url=footer_icon_url)
             embeds.append(em)
         return embeds
+
+    @staticmethod
+    def embeds_user_rank2(author_hits: AuthorHits, p_args, server):
+        """User rank display."""
+        embeds = []
+        # group by 25 for embeds
+        # hit_counts_group = grouper(25, hit_counts)
+
+        title = 'Message count by author'
+        description = ESLogView.description(p_args)
+        color = random_discord_color()
+        footer_text = server.name
+        footer_icon_url = server.icon_url
+
+        rank = 1
+        # max_count = None
+
+        em = discord.Embed(title=title, description=description, color=color)
+        for author_hit in author_hits.sorted_author_list(25):
+            counter = author_hit.counter
+            author_id = author_hit.author_id
+            member = server.get_member(author_id)
+            if member is not None:
+                name = member.display_name
+            else:
+                name = "User ID: {}".format(author_id)
+            # if max_count is None:
+            #     max_count = 25
+
+            max_count = author_hits.max_author_count()
+
+            if p_args.split is None:
+                chart = ESLogView.inline_barchart(counter, max_count)
+            elif p_args.split == 'channel':
+                chart = ESLogView.inline_barchart(counter, max_count)
+                # chart = ESLogView.channel_count(
+                #     hit_count["channel"])
+
+            em.add_field(
+                name='{}. {}: {}'.format(rank, name, counter),
+                value=chart,
+                inline=False)
+            rank += 1
+        em.set_footer(text=footer_text, icon_url=footer_icon_url)
+
+        return [em]
 
     @staticmethod
     def embeds_channel_rank(hit_counts, p_args, server):
@@ -836,6 +982,9 @@ class ESLogView:
             em.set_footer(text=footer_text, icon_url=footer_icon_url)
             embeds.append(em)
         return embeds
+
+
+
 
 
 class ESLog:
@@ -957,6 +1106,8 @@ class ESLog:
           Exclude bot accounts
         --excludebotcommands, -ebc
           Exclude bot commands. 
+        --split {none, channel}, -s
+          Split chart
         
         Example:
         [p]eslog user --time 2d --count 20 --include general some-channel
@@ -988,20 +1139,31 @@ class ESLog:
 
         # perform search using scan()
         hit_counts = {}
+        # hits = {}
+
+        author_hits = AuthorHits()
+
         for hit in s.scan():
             if hit.author.id in hit_counts:
                 hit_counts[hit.author.id] += 1
             else:
                 hit_counts[hit.author.id] = 1
 
+            author_hits.add_hit(hit)
+
         hit_counts = [{"author_id": k, "count": v} for k, v in hit_counts.items()]
-        hit_counts = sorted(hit_counts, key=lambda hit: hit["count"], reverse=True)
+        hit_counts = sorted(hit_counts, key=lambda h: h["count"], reverse=True)
 
         max_results = p_args.count
 
         hit_counts = hit_counts[:max_results]
 
-        for em in ESLogView.embeds_user_rank(hit_counts, p_args, server):
+        # author_hits.keep(max_results)
+
+        # for em in ESLogView.embeds_user_rank(hit_counts, p_args, server):
+        #     await self.bot.say(embed=em)
+
+        for em in ESLogView.embeds_user_rank2(author_hits, p_args, server):
             await self.bot.say(embed=em)
 
     @eslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
