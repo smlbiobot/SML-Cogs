@@ -31,7 +31,7 @@ import itertools
 import os
 import re
 from collections import defaultdict
-from collections import namedtuple
+from collections import Counter
 from datetime import timedelta
 from random import choice
 
@@ -50,6 +50,7 @@ from discord.ext.commands import Command
 from discord.ext.commands import Context
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
+from elasticsearch_dsl.response import Response
 from elasticsearch_dsl.query import QueryString
 from elasticsearch_dsl.query import Range
 
@@ -546,11 +547,12 @@ class ESLogModel:
     even though it still is under the hood.
     """
 
-    def __init__(self, file_path):
+    def __init__(self, file_path, search: Search):
         """Init."""
         self.file_path = file_path
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(file_path))
+        self.search = search
 
     @staticmethod
     def parser():
@@ -602,8 +604,26 @@ class ESLogModel:
         )
         return parser
 
-    @staticmethod
-    def es_query_author(parser_arguments, search, server):
+    def es_query_author(self, parser_arguments, server, member: Member):
+        """Elasticsearch query for author"""
+        p_args = parser_arguments
+
+        time_gte = 'now-{}'.format(p_args.time)
+        r = Range(timestamp={'gte': time_gte, 'lt': 'now'})
+
+        source_list = ['author.id', 'author.roles', 'channel.id', 'channel.name']
+
+        query_str = (
+            'discord_event:message'
+            ' AND server.name:\"{server_name}\"'
+            ' AND author.id:{author_id}'
+        ).format(server_name=server.name, author_id=member.id)
+        qs = QueryString(query=query_str)
+
+        s = self. search.query(qs).query(r).source(source_list)
+        return s
+
+    def es_query_authors(self, parser_arguments, server):
         """Construct Elasticsearch query."""
         p_args = parser_arguments
 
@@ -642,18 +662,14 @@ class ESLogModel:
             query_str += ' '.join(prefix_qs)
 
         source_list = ['author.id', 'author.roles', 'channel.id', 'channel.name']
-        # if p_args.split is not None:
-        #     if p_args.split == 'channel':
-        #         source_list.extend(['channel.id', 'channel.name'])
 
         qs = QueryString(query=query_str)
         r = Range(timestamp={'gte': time_gte, 'lt': 'now'})
-
-        s = search.query(qs).query(r).source(source_list)
+        s = self.search.query(qs).query(r).source(source_list)
         return s
 
     @staticmethod
-    def es_query_channel(parser_arguments, search, server):
+    def es_query_channels(parser_arguments, search, server):
         """Construct Elasticsearch query."""
         p_args = parser_arguments
 
@@ -746,13 +762,21 @@ class AuthorHits:
         self.authors[hit.author.id].add_count()
         self.authors[hit.author.id].add_channel(hit)
 
-    def sorted_author_list(self, count):
-        max_count = 25
-        count = min(max_count, count)
+    def sorted_author_list(self):
+        """Sorted author list.
+        Sort author list by author count and return result.
+        
+        """
         authors = [v for k, v in self.authors.items()]
         authors = sorted(authors, key=lambda ah: ah.counter, reverse=True)
-        authors = authors[:count]
         return authors
+
+    def author_count_rank(self, author_id):
+        """Return author rank by count."""
+        authors = self.sorted_author_list()
+        for rank, author_hit in enumerate(authors):
+            if author_id == author_hit.author_id:
+                return rank + 1
 
 
 class AuthorHit:
@@ -793,11 +817,50 @@ class AuthorHit:
         }
 
 
+class UserActivityModel:
+    """User activitiy model."""
+
+    def __init__(self, *args, **kwargs):
+        """Init.
+        
+        Parameters:
+        """
+        self.__dict__.update(kwargs)
+
+
 class ESLogView:
     """ESLog views.
     
     A collection of views depending on result types
     """
+    def __init__(self, bot):
+        self.bot = bot
+
+    async def user_activity(self, server: Server, member: Member, hits, p_args, rank="_"):
+        """User actvity"""
+        await self.bot.type()
+
+        title = "Member Activity: {}".format(member.display_name)
+        description = self.description(p_args, show_top=False)
+        color = random_discord_color()
+
+        em = discord.Embed(title=title, description=description, color=color)
+
+        em.add_field(name="Rank", value='{} / {}'.format(rank, len(server.members)))
+        em.add_field(name="Messages", value='{}'.format(len(hits)))
+        em.add_field(name="_", value="_")
+
+        channel_ids = []
+        for hit in hits:
+            channel_ids.append(hit.channel.id)
+        channel_id_counter = Counter(channel_ids)
+
+        for channel_id, count in channel_id_counter.most_common(10):
+            channel = server.get_channel(channel_id)
+            em.add_field(name=channel.name, value='{} messages'.format(count))
+
+        await self.bot.say(embed=em)
+
     @staticmethod
     def embed_message(hit):
         """Message events."""
@@ -809,7 +872,7 @@ class ESLogView:
         return em
 
     @staticmethod
-    def description(p_args):
+    def description(p_args, show_top=True):
         """Embed description based on supplied arguments."""
         descriptions = []
         descriptions.append('Time: {}.'.format(p_args.time))
@@ -825,7 +888,8 @@ class ESLogView:
             descriptions.append('Excluding bot users.')
         if p_args.excludebotcommands:
             descriptions.append('Excluding bot commands.')
-        descriptions.append('Showing top {} results.'.format(p_args.count))
+        if show_top:
+            descriptions.append('Showing top {} results.'.format(p_args.count))
         return ' '.join(descriptions)
 
     @staticmethod
@@ -854,7 +918,9 @@ class ESLogView:
         num_results = p_args.count
 
         em = discord.Embed(title=title, description=description, color=color)
-        for rank, author_hit in enumerate(author_hits.sorted_author_list(num_results), 1):
+        sorted_author_list = author_hits.sorted_author_list()
+        sorted_author_list = sorted_author_list[:num_results]
+        for rank, author_hit in enumerate(sorted_author_list, 1):
             counter = author_hit.counter
             author_id = author_hit.author_id
             member = server.get_member(author_id)
@@ -955,10 +1021,10 @@ class ESLog:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.model = ESLogModel(JSON)
 
         self.es = Elasticsearch()
         self.search = Search(using=self.es, index="discord-*")
+        self.model = ESLogModel(JSON, self.search)
 
         self.extra = {
             'log_type': 'discord.logger',
@@ -971,6 +1037,8 @@ class ESLog:
 
         # temporarily disable gauges
         self.task = bot.loop.create_task(self.loop_task())
+
+        self.view = ESLogView(bot)
 
     def __unload(self):
         """Unhook logger when unloaded.
@@ -1012,14 +1080,14 @@ class ESLog:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @ownereslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def ownereslog_user(self, ctx, server_name, *args):
+    @ownereslog.command(name="users", aliases=['us'], pass_context=True, no_pm=True)
+    async def ownereslog_users(self, ctx, server_name, *args):
         """Message count by user."""
         server = discord.utils.get(self.bot.servers, name=server_name)
         if server is None:
             await self.bot.say("Cannot find server named {}.".format(server_name))
             return
-        await self.search_eslog_user(ctx, server, *args)
+        await self.search_message_authors(ctx, server, *args)
 
     @ownereslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
     async def ownereslog_channel(self, ctx, server_name, *args):
@@ -1036,8 +1104,8 @@ class ESLog:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @eslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def eslog_user(self, ctx, *args):
+    @eslog.command(name="users", aliases=['us'], pass_context=True, no_pm=True)
+    async def eslog_users(self, ctx, *args):
         """Message count by users.
         
         Params:
@@ -1070,30 +1138,7 @@ class ESLog:
         It might take a few minutes to process for servers which have many users and activity.
         """
         server = ctx.message.server
-        await self.search_eslog_user(ctx, server, *args)
-
-    async def search_eslog_user(self, ctx, server, *args):
-        """Perform the search for authors."""
-        parser = ESLogModel.parser()
-
-        try:
-            p_args = parser.parse_args(args)
-        except SystemExit:
-            # await self.bot.send_message(ctx.message.channel, box(parser.format_help()))
-            await send_cmd_help(ctx)
-            return
-
-        await self.bot.type()
-
-        s = ESLogModel.es_query_author(p_args, self.search, server)
-
-        author_hits = AuthorHits()
-
-        for hit in s.scan():
-            author_hits.add_hit(hit)
-
-        for em in ESLogView.embeds_user_rank(author_hits, p_args, server):
-            await self.bot.say(embed=em)
+        await self.search_message_authors(ctx, server, *args)
 
     @eslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
     async def eslog_channel(self, ctx, *args):
@@ -1129,6 +1174,72 @@ class ESLog:
         server = ctx.message.server
         await self.search_eslog_channel(ctx, server, *args)
 
+    @eslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
+    async def eslog_user(self, ctx, member: Member, *args):
+        """Message statistics for a user."""
+        server = ctx.message.server
+        await self.search_user(ctx, server, member, *args)
+
+    async def search_user(self, ctx, server, member: Member, *args):
+        """Perform the server for users.
+        
+        1. Search against all authors to find relative rank in activity.
+        2. Filter just that user to display other stats.
+        """
+        parser = ESLogModel.parser()
+        try:
+            p_args = parser.parse_args(args)
+        except SystemExit:
+            await send_cmd_help(ctx)
+            return
+
+        if member is None:
+            await self.bot.say("Invalid user.")
+            await send_cmd_help(ctx)
+            return
+
+        await self.bot.type()
+
+        # 1. Get author activity rank
+        s = self.model.es_query_authors(p_args, server)
+        author_hits = AuthorHits()
+        for hit in s.scan():
+            author_hits.add_hit(hit)
+
+        rank = author_hits.author_count_rank(member.id)
+
+        # 2. Get author activity
+        s = self.model.es_query_author(p_args, server, member)
+        hits = []
+        for hit in s.scan():
+            hits.append(hit)
+
+        await self.view.user_activity(server, member, hits, p_args, rank=rank)
+
+    async def search_message_authors(self, ctx, server, *args):
+        """Perform the search for authors."""
+        parser = ESLogModel.parser()
+
+        try:
+            p_args = parser.parse_args(args)
+        except SystemExit:
+            # await self.bot.send_message(ctx.message.channel, box(parser.format_help()))
+            await send_cmd_help(ctx)
+            return
+
+        await self.bot.type()
+
+        # s = ESLogModel.es_query_authors(p_args, self.search, server)
+        s = self.model.es_query_authors(p_args, server)
+
+        author_hits = AuthorHits()
+
+        for hit in s.scan():
+            author_hits.add_hit(hit)
+
+        for em in ESLogView.embeds_user_rank(author_hits, p_args, server):
+            await self.bot.say(embed=em)
+
     async def search_eslog_channel(self, ctx, server, *args):
         """Perform search for channels."""
         parser = ESLogModel.parser()
@@ -1142,7 +1253,7 @@ class ESLog:
 
         await self.bot.type()
 
-        s = ESLogModel.es_query_channel(p_args, self.search, server)
+        s = ESLogModel.es_query_channels(p_args, self.search, server)
 
         # perform search using scan()
         hit_counts = {}
