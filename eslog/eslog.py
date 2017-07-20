@@ -31,6 +31,7 @@ import itertools
 import os
 import re
 from collections import defaultdict
+from collections import namedtuple
 from datetime import timedelta
 from random import choice
 
@@ -716,13 +717,8 @@ class ESLogView:
         return em
 
     @staticmethod
-    def embeds_user_rank(hit_counts, p_args, server):
-        """User rank display."""
-        embeds = []
-        # group by 25 for embeds
-        hit_counts_group = grouper(25, hit_counts)
-
-        title = 'Message count by author'
+    def description(p_args):
+        """Embed description based on supplied arguments."""
         descriptions = []
         descriptions.append('Time: {}.'.format(p_args.time))
         if p_args.includechannels is not None:
@@ -738,13 +734,32 @@ class ESLogView:
         if p_args.excludebotcommands:
             descriptions.append('Excluding bot commands.')
         descriptions.append('Showing top {} results.'.format(p_args.count))
-        description = ' '.join(descriptions)
+        return ' '.join(descriptions)
+
+    @staticmethod
+    def inline_barchart(count, max_count):
+        """Inline bar chart."""
+        width = 30
+        bar_count = int(width * (count / max_count))
+        chart = '▇' * bar_count if bar_count > 0 else '░'
+        return inline(chart)
+
+    @staticmethod
+    def embeds_user_rank(hit_counts, p_args, server):
+        """User rank display."""
+        embeds = []
+        # group by 25 for embeds
+        hit_counts_group = grouper(25, hit_counts)
+
+        title = 'Message count by author'
+        description = ESLogView.description(p_args)
+        color = random_discord_color()
         footer_text = server.name
         footer_icon_url = server.icon_url
 
         rank = 1
         max_count = None
-        color = random_discord_color()
+
         for hit_counts in hit_counts_group:
             em = discord.Embed(title=title, description=description, color=color)
             for hit_count in hit_counts:
@@ -758,12 +773,10 @@ class ESLogView:
                     if max_count is None:
                         max_count = count
 
-                    # chart
-                    width = 30
-                    bar_count = int(width * (count / max_count))
-                    chart = '▇' * bar_count if bar_count > 0 else '░'
-
-                    em.add_field(name='{}. {}: {}'.format(rank, name, count), value=inline(chart), inline=False)
+                    em.add_field(
+                        name='{}. {}: {}'.format(rank, name, count),
+                        value=ESLogView.inline_barchart(count, max_count),
+                        inline=False)
                     rank += 1
             em.set_footer(text=footer_text, icon_url=footer_icon_url)
             embeds.append(em)
@@ -794,28 +807,14 @@ class ESLogView:
         hit_counts_group = grouper(25, hit_counts)
 
         title = 'Message count by channel'
-        descriptions = []
-        descriptions.append('Time: {}.'.format(p_args.time))
-        if p_args.includechannels is not None:
-            descriptions.append('Including channels: {}.'.format(', '.join(p_args.includechannels)))
-        if p_args.excludechannels is not None:
-            descriptions.append('Excluding channels: {}.'.format(', '.join(p_args.excludechannels)))
-        if p_args.includeroles is not None:
-            descriptions.append('Including roles: {}.'.format(', '.join(p_args.includeroles)))
-        if p_args.excluderoles is not None:
-            descriptions.append('Excluding roles: {}.'.format(', '.join(p_args.excluderoles)))
-        if p_args.excludebot:
-            descriptions.append('Excluding bot users.')
-        if p_args.excludebotcommands:
-            descriptions.append('Excluding bot commands.')
-        descriptions.append('Showing top {} results.'.format(p_args.count))
-        description = ' '.join(descriptions)
+        description = ESLogView.description(p_args)
+        color = random_discord_color()
         footer_text = server.name
         footer_icon_url = server.icon_url
 
         rank = 1
         max_count = None
-        color = random_discord_color()
+
         for hit_counts in hit_counts_group:
             em = discord.Embed(title=title, description=description, color=color)
             for hit_count in hit_counts:
@@ -829,12 +828,10 @@ class ESLogView:
                     if max_count is None:
                         max_count = count
 
-                    # chart
-                    width = 30
-                    bar_count = int(width * (count / max_count))
-                    chart = '▇' * bar_count if bar_count > 0 else '░'
-
-                    em.add_field(name='{}. {}: {}'.format(rank, name, count), value=inline(chart), inline=False)
+                    em.add_field(
+                        name='{}. {}: {}'.format(rank, name, count),
+                        value=ESLogView.inline_barchart(count, max_count),
+                        inline=False)
                     rank += 1
             em.set_footer(text=footer_text, icon_url=footer_icon_url)
             embeds.append(em)
