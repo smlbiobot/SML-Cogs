@@ -611,7 +611,7 @@ class ESLogModel:
         time_gte = 'now-{}'.format(p_args.time)
         r = Range(timestamp={'gte': time_gte, 'lt': 'now'})
 
-        source_list = ['author.id', 'author.roles', 'channel.id', 'channel.name']
+        source_list = ['author.id', 'author.roles', 'channel.id', 'channel.name', 'timestamp']
 
         query_str = (
             'discord_event:message'
@@ -848,7 +848,18 @@ class ESLogView:
 
         em.add_field(name="Rank", value='{} / {}'.format(rank, len(server.members)))
         em.add_field(name="Messages", value='{}'.format(len(hits)))
-        em.add_field(name="_", value="_")
+
+        # sort hits chronologically
+        hits = sorted(hits, key=lambda hit: hit.timestamp)
+
+        last_hit = hits[-1]
+        if hasattr(last_hit, 'timestamp'):
+            value = hits[-1].timestamp
+            dt_ts = dt.datetime.strptime(hits[-1].timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+            value = dt_ts.strftime("%Y-%m-%d %H:%M:%S UTC")
+            em.add_field(name="Last seen", value=value)
+        else:
+            em.add_field(name="_", value="_")
 
         channel_ids = []
         for hit in hits:
@@ -1079,6 +1090,15 @@ class ESLog:
         """
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    @ownereslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
+    async def ownereslog_user(self, ctx, server_name, member: Member, *args):
+        """User activity."""
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        if server is None:
+            await self.bot.say("Cannot find server named {}.".format(server_name))
+            return
+        await self.search_user(ctx, server, member, *args)
 
     @ownereslog.command(name="users", aliases=['us'], pass_context=True, no_pm=True)
     async def ownereslog_users(self, ctx, server_name, *args):
