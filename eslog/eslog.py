@@ -839,67 +839,17 @@ class ESLogView:
         """Inline bar chart with split. """
 
     @staticmethod
-    def embeds_user_rank(hit_counts, p_args, server):
+    def embeds_user_rank(author_hits: AuthorHits, p_args, server):
         """User rank display."""
-        embeds = []
-        # group by 25 for embeds
-        hit_counts_group = grouper(25, hit_counts)
-
         title = 'Message count by author'
         description = ESLogView.description(p_args)
         color = random_discord_color()
         footer_text = server.name
         footer_icon_url = server.icon_url
-
-        rank = 1
-        max_count = None
-
-        for hit_counts in hit_counts_group:
-            em = discord.Embed(title=title, description=description, color=color)
-            for hit_count in hit_counts:
-                if hit_count is not None:
-                    count = hit_count["count"]
-                    member = server.get_member(hit_count["author_id"])
-                    if member is not None:
-                        name = member.display_name
-                    else:
-                        name = "User ID: {}".format(hit_count["author_id"])
-                    if max_count is None:
-                        max_count = count
-
-                    if p_args.split is None:
-                        chart = ESLogView.inline_barchart(count, max_count)
-                    elif p_args.split == 'channel':
-                        chart = ESLogView.channel_count(
-                            hit_count["channel"])
-
-                    em.add_field(
-                        name='{}. {}: {}'.format(rank, name, count),
-                        value=chart,
-                        inline=False)
-                    rank += 1
-            em.set_footer(text=footer_text, icon_url=footer_icon_url)
-            embeds.append(em)
-        return embeds
-
-    @staticmethod
-    def embeds_user_rank2(author_hits: AuthorHits, p_args, server):
-        """User rank display."""
-        embeds = []
-        # group by 25 for embeds
-        # hit_counts_group = grouper(25, hit_counts)
-
-        title = 'Message count by author'
-        description = ESLogView.description(p_args)
-        color = random_discord_color()
-        footer_text = server.name
-        footer_icon_url = server.icon_url
-
-        rank = 1
-        # max_count = None
+        num_results = p_args.count
 
         em = discord.Embed(title=title, description=description, color=color)
-        for author_hit in author_hits.sorted_author_list(25):
+        for rank, author_hit in enumerate(author_hits.sorted_author_list(num_results), 1):
             counter = author_hit.counter
             author_id = author_hit.author_id
             member = server.get_member(author_id)
@@ -1138,32 +1088,20 @@ class ESLog:
         # print(s.count())
 
         # perform search using scan()
-        hit_counts = {}
+        # hit_counts = {}
         # hits = {}
 
         author_hits = AuthorHits()
 
         for hit in s.scan():
-            if hit.author.id in hit_counts:
-                hit_counts[hit.author.id] += 1
-            else:
-                hit_counts[hit.author.id] = 1
+            # if hit.author.id in hit_counts:
+            #     hit_counts[hit.author.id] += 1
+            # else:
+            #     hit_counts[hit.author.id] = 1
 
             author_hits.add_hit(hit)
 
-        hit_counts = [{"author_id": k, "count": v} for k, v in hit_counts.items()]
-        hit_counts = sorted(hit_counts, key=lambda h: h["count"], reverse=True)
-
-        max_results = p_args.count
-
-        hit_counts = hit_counts[:max_results]
-
-        # author_hits.keep(max_results)
-
-        # for em in ESLogView.embeds_user_rank(hit_counts, p_args, server):
-        #     await self.bot.say(embed=em)
-
-        for em in ESLogView.embeds_user_rank2(author_hits, p_args, server):
+        for em in ESLogView.embeds_user_rank(author_hits, p_args, server):
             await self.bot.say(embed=em)
 
     @eslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
