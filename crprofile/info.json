@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Clash Royale player profile",
+	"DESCRIPTION": "Display player profile for the mobile game Clash Royale",
+	"DISABLED": false,
+	"NAME": "CRProfile",
+	"REQUIREMENTS": ["aiohttp"],
+	"TAGS": ["Clash Royale", "clash royale", "data"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
