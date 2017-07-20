@@ -158,7 +158,7 @@ class ReactionPoll:
         """Monitor reactions if tracked."""
         message = reaction.message
         server = message.server
-        print('Reaction add: {}: {}'.format(server.id, message.id))
+        # print('Reaction add: {}: {}'.format(server.id, message.id))
         if message.id not in self.settings[server.id]['messages']:
             return
 
@@ -168,7 +168,7 @@ class ReactionPoll:
         """Monitor reactions if tracked."""
         message = reaction.message
         server = message.server
-        print('Reaction remove: {}: {}'.format(server.id, message.id))
+        # print('Reaction remove: {}: {}'.format(server.id, message.id))
         if message.id not in self.settings[server.id]['messages']:
             return
 
