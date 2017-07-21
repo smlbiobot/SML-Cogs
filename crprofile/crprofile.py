@@ -25,23 +25,21 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import asyncio
-import aiohttp
-import inflect
 import datetime as dt
 import itertools
 import json
 import os
 from collections import defaultdict
 from datetime import timedelta
-from enum import Enum
 from random import choice
 
+import aiohttp
 import discord
+import inflect
 from __main__ import send_cmd_help
 from discord.ext import commands
 
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline, box
 from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "crprofile")
@@ -346,21 +344,6 @@ class CRPlayerModel:
                 if emoji.name == name:
                     return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
-
-class ServerModel:
-    """Discord server data model.
-
-    Sets per-server settings since the bot can be run on multiple servers.
-    """
-    DEFAULTS = {
-        "players": {}
-    }
-
-    def __init__(self, data=None):
-        """Init."""
-        if data is None:
-            data = self.DEFAULTS
-        self.settings = data
 
 
 class Settings:
