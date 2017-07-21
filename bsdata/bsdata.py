@@ -123,15 +123,31 @@ class BSBandData:
 
         Expected list of keywords:
         From API:
-            badge
+            badge_export
             badge_id
             description
             id
+                high
+                low
+                unsigned
             member_count
             members
+                avatar
+                avatar_export
+                experience_elvel
+                id
+                    high
+                    low
+                    unsigned
+                name
+                role
+                role_id
+                tag
+                trophies
             name
             required_score
             score
+            tag
             type
             type_id
             unk1
@@ -155,9 +171,8 @@ class BSBandData:
     def badge_url(self):
         """Return band emblem URL."""
         return (
-            "https://raw.githubusercontent.com"
-            "/smlbiobot/smlbiobot.github.io/master/img"
-            "/bs-badge/{}.png").format(self.badge)
+            "http://smlbiobot.github.io/img"
+            "/bs-badge/{}.png").format(self.badge_export)
 
 class BSBandMemberData:
     """Brawl Stars Member data."""
