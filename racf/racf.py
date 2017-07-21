@@ -31,7 +31,7 @@ import cogs
 from cogs.utils.chat_formatting import pagify
 from cogs.utils import checks
 from random import choice
-import math
+import aiohttp
 from __main__ import send_cmd_help
 from cogs.economy import SetParser
 
@@ -350,10 +350,7 @@ class RACF:
 
         if member is None:
             member = author
-        avatar_url = member.avatar_url
-        data = discord.Embed()
-        data.set_image(url=avatar_url)
-        await self.bot.say(embed=data)
+        await self.bot.say(member.avatar_url)
 
     @commands.command(pass_context=True, no_pm=True)
     async def serverinfo2(self, ctx: Context):
