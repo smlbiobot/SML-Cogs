@@ -227,6 +227,33 @@ class CRPlayerModel:
         self.is_cache = is_cache
 
     @property
+    def xp(self):
+        """Experience in current / total format."""
+        xp_levels = [
+            "0",
+            "20",
+            "50",
+            "100",
+            "200",
+            "400",
+            "1000",
+            "2000",
+            "5000",
+            "10000",
+            "30000",
+            "40000",
+            "80000",
+            "MAX"
+        ]
+        if str(self.experience).isdigit():
+            current = '{:,}'.format(int(self.experience))
+            total = '{:,}'.format(int(xp_levels[self.level]))
+        else:
+            current = 'MAX'
+            total = 'MAX'
+        return '{} / {}'.format(current, total)
+
+    @property
     def clan_name(self):
         """Clan name."""
         return self.clan["name"]
@@ -755,19 +782,24 @@ class CRProfile:
                 )
             )
 
-        for em in self.embeds_profile(player_data, resources=resources):
+        server = ctx.message.server
+        for em in self.embeds_profile(player_data, server=server, resources=resources):
             await self.bot.send_message(ctx.message.channel, embed=em)
 
-    def embeds_profile(self, player: CRPlayerModel, resources=False):
+    def embeds_profile(self, player: CRPlayerModel, server=None, resources=False):
         """Return Discord Embed of player profile."""
         embeds = []
         color = random_discord_color()
 
-        emoji_xp = self.model.emoji(name="experience")
+        # emoji_xp = self.model.emoji(name="experience")
+        member = self.model.tag2member(server, player.tag)
+        mention = ''
+        if member is not None:
+            mention = member.mention
 
         # header
         title = player.username
-        description = '#{}'.format(player.tag)
+        description = '#{} {}'.format(player.tag, mention)
         em = discord.Embed(title=title, description=description, color=color)
 
         # clan
@@ -776,7 +808,7 @@ class CRProfile:
             player.clan_name: player.clan_role,
             'Clan Tag': player.clan_tag,
             'Level': player.level,
-            'Experience': player.experience
+            'Experience': player.xp
         }
         for k, v in header.items():
             em.add_field(name=k, value=v)
