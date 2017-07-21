@@ -175,7 +175,7 @@ class CRArenaModel:
 class CRPlayerModel:
     """Clash Royale arenas."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, is_cache=False, **kwargs):
         """Init.
 
         Keyword Args:
@@ -224,6 +224,7 @@ class CRPlayerModel:
             areana_url (str, url)
         """
         self.__dict__.update(kwargs)
+        self.is_cache = is_cache
 
     @property
     def clan_name(self):
@@ -278,7 +279,7 @@ class ServerModel:
         self.settings = data
 
 
-class CogModel:
+class Settings:
     """Cog settings.
 
     Functionally the CRClan cog model.
@@ -290,6 +291,7 @@ class CogModel:
     }
 
     SERVER_DEFAULTS = {
+        "show_resources": False,
         "players": {}
     }
 
@@ -371,14 +373,28 @@ class CogModel:
                 async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
                     data = await resp.json()
         except json.decoder.JSONDecodeError:
-            return None
+            raise
         except asyncio.TimeoutError:
-            return None
+            raise
 
         file_path = self.cached_filepath(tag)
         dataIO.save_json(file_path, data)
 
         return CRPlayerModel(**data)
+
+    def cached_player_data(self, tag):
+        """Return cached data by tag."""
+        file_path = self.cached_filepath(tag)
+        if not os.path.exists(file_path):
+            return None
+        data = dataIO.load_json(file_path)
+        return CRPlayerModel(is_cache=True, **data)
+
+    def cached_player_data_timestamp(self, tag):
+        """Return timestamp of cached data."""
+        file_path = self.cached_filepath(tag)
+        timestamp = dt.datetime.fromtimestamp(os.path.getmtime(file_path))
+        return timestamp
 
     @staticmethod
     def cached_filepath(tag):
@@ -454,6 +470,16 @@ class CogModel:
         self.settings["badge_url"] = value
         self.save()
 
+    def set_resources(self, server, value):
+        """Show gold/gems or not."""
+        self.settings[server.id]["show_resources"] = value
+
+    def show_resources(self, server):
+        """Show gold/gems or not."""
+        try:
+            return self.settings[server.id]["show_resources"]
+        except KeyError:
+            return False
 
 # noinspection PyUnusedLocal
 class CRProfile:
@@ -462,7 +488,7 @@ class CRProfile:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.model = CogModel(bot, JSON)
+        self.model = Settings(bot, JSON)
         # self.badges = dataIO.load_json(BADGES_JSON)
 
     @commands.group(pass_context=True, no_pm=True)
@@ -510,6 +536,14 @@ class CRProfile:
         """
         self.model.badge_url = url
         await self.bot.say("Badge URL updated.")
+
+    @crprofileset.command(name="resources", pass_context=True)
+    async def crprofileset_resources(self, ctx, enable:bool):
+        """Show gold/gems in profile."""
+        self.model.set_resources(ctx.message.server, enable)
+        await self.bot.say(
+            "CR profiles {} show resources.".format('will' if enable else 'will not')
+        )
 
     @commands.group(pass_context=True, no_pm=True)
     async def crprofile(self, ctx):
@@ -585,6 +619,7 @@ class CRProfile:
 
         Display player info
         """
+        await self.bot.type()
         sctag = SCTag(tag)
 
         if not sctag.valid:
@@ -599,13 +634,15 @@ class CRProfile:
 
         if member is not entered, retrieve own profile
         """
+        await self.bot.type()
         author = ctx.message.author
         server = ctx.message.server
         resources = False
 
         if member is None:
             member = author
-            resources = True
+            if self.model.show_resources(server):
+                resources = True
 
         tag = self.model.member2tag(server, member)
         await self.display_profile(ctx, tag, resources=resources)
@@ -617,9 +654,28 @@ class CRProfile:
             await self.bot.say(sctag.invalid_error_msg)
             return
 
-        player = await self.model.player_data(sctag.tag)
-        for em in self.embeds_profile(player, resources=resources):
-            await self.bot.say(embed=em)
+        try:
+            player_data = await self.model.player_data(sctag.tag)
+        except json.decoder.JSONDecodeError:
+            player_data = self.model.cached_player_data(tag)
+        except asyncio.TimeoutError:
+            player_data = self.model.cached_player_data(tag)
+
+        if player_data is None:
+            await self.bot.say("Unable to load from API.")
+            return
+        if player_data.is_cache:
+            await self.bot.send_message(
+                ctx.message.channel,
+                (
+                    "Unable to load from API. "
+                    "Showing cached data from: {} UTC.".format(
+                        self.model.cached_player_data_timestamp(tag))
+                )
+            )
+
+        for em in self.embeds_profile(player_data, resources=resources):
+            await self.bot.send_message(ctx.message.channel, embed=em)
 
     def embeds_profile(self, player: CRPlayerModel, resources=False):
         """Return Discord Embed of player profile."""
@@ -645,19 +701,20 @@ class CRProfile:
             em.add_field(name=k, value=v)
         embeds.append(em)
 
-
         # trophies
         em = discord.Embed(title=" ", color=color)
 
-        e = self.model.emoji
+        def fmt(num, emoji_name):
+            emoji = self.model.emoji(name=emoji_name)
+            return '{:,} {}'.format(num, emoji)
 
         stats = {
-            'Trophies': '{:,} {}'.format(player.trophy_current, e(name='trophy')),
-            'Highest Trophies': '{:,} {}'.format(player.trophy_highest, e(name='trophy')),
-            'Cards Found': '{:,} {}'.format(player.cards_found, e(name='cards')),
-            'Wins': player.wins,
-            'Losses': player.losses,
-            'Draws': player.draws
+            'Trophies': fmt(player.trophy_current, 'trophy'),
+            'Highest Trophies': fmt(player.trophy_highest, 'trophy'),
+            'Cards Found': fmt(player.cards_found, 'cards'),
+            'Wins': fmt(player.wins, 'battle'),
+            'Losses': fmt(player.losses, 'battle'),
+            'Draws': fmt(player.draws, 'battle')
         }
         for k, v in stats.items():
             em.add_field(name=k, value=v)
@@ -689,7 +746,6 @@ class CRProfile:
         embeds.append(em)
 
         return embeds
-
 
     @crprofile.command(name="trophy2arena", pass_context=True, no_pm=True)
     async def crprofile_trophy2arena(self, ctx, trophy: int):
