@@ -26,7 +26,7 @@ DEALINGS IN THE SOFTWARE.
 
 import asyncio
 import aiohttp
-import argparse
+import inflect
 import datetime as dt
 import itertools
 import json
@@ -263,6 +263,64 @@ class CRPlayerModel:
         """Legendary trophies."""
         return self.trophies["legend"]
 
+    @property
+    def chest_magical_index(self):
+        """First index of magical chest"""
+        return self.chests["fullcycle"].index("Magic")
+
+    @property
+    def chest_giant_index(self):
+        """First index of magical chest"""
+        return self.chests["fullcycle"].index("Giant")
+
+    @property
+    def win_ratio(self):
+        """Win ratio."""
+        return '{0:.3f}%'.format(
+            (self.wins + self.draws * 0.5) / (self.wins + self.draws + self.losses) * 100)
+
+    @property
+    def arena(self):
+        """League. Can be either Arena or league."""
+        arenas = dataIO.load_json(os.path.join(PATH, 'arenas.json'))
+        arenas = [CRArenaModel(**a) for a in arenas]
+        arenas = sorted(arenas, key=lambda x: x.TrophyLimit, reverse=True)
+
+        result = None
+        for arena in arenas:
+            if self.trophy_current >= arena.TrophyLimit:
+                result = arena
+                break
+
+        return result
+
+    @property
+    def arena_text(self):
+        """Arena text."""
+        return self.arena.TIDText
+
+    @property
+    def arena_subtitle(self):
+        """Arena subtitle"""
+        return self.arena.SubtitleTIDText
+
+    @property
+    def league(self):
+        """League (int)."""
+        league = max(self.arena.Arena - 11, 0)
+        return league
+
+    def arena_emoji(self, bot):
+        if self.league > 0:
+            name = 'league{}'.format(self.league)
+        else:
+            name = 'arena{}'.format(self.arena.Arena)
+        for server in bot.servers:
+            for emoji in server.emojis:
+                if emoji.name == name:
+                    return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
+
 class ServerModel:
     """Discord server data model.
 
@@ -391,10 +449,32 @@ class Settings:
         return CRPlayerModel(is_cache=True, **data)
 
     def cached_player_data_timestamp(self, tag):
-        """Return timestamp of cached data."""
+        """Return timestamp in days-since format of cached data."""
         file_path = self.cached_filepath(tag)
         timestamp = dt.datetime.fromtimestamp(os.path.getmtime(file_path))
-        return timestamp
+
+        passed = dt.datetime.now() - timestamp
+
+        days = passed.days
+        hours, remainder = divmod(passed.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        p = inflect.engine()
+
+        days_str = '{} {} '.format(days, p.plural("day", days)) if days > 0 else ''
+        passed_str = (
+            '{days} {hours} {hr} {minutes} {mn} {seconds} {sec} ago'
+        ).format(
+            days=days_str,
+            hours=hours,
+            hr=p.plural("hour", hours),
+            minutes=minutes,
+            mn=p.plural("minute", minutes),
+            seconds=seconds,
+            sec=p.plural("second", seconds)
+        )
+
+        return passed_str
 
     @staticmethod
     def cached_filepath(tag):
@@ -435,6 +515,8 @@ class Settings:
         emojis = {
             'Silver': 'chestsilver',
             'Gold': 'chestgold',
+            'Giant': 'chestgiant',
+            'Magic': 'chestmagical',
             'super_magical': 'chestsupermagical',
             'legendary': 'chestlegendary',
             'epic': 'chestepic'
@@ -483,13 +565,12 @@ class Settings:
 
 # noinspection PyUnusedLocal
 class CRProfile:
-    """Clash Royale Clan management."""
+    """Clash Royale player profile."""
 
     def __init__(self, bot):
         """Init."""
         self.bot = bot
         self.model = Settings(bot, JSON)
-        # self.badges = dataIO.load_json(BADGES_JSON)
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
@@ -669,7 +750,7 @@ class CRProfile:
                 ctx.message.channel,
                 (
                     "Unable to load from API. "
-                    "Showing cached data from: {} UTC.".format(
+                    "Showing cached data from: {}.".format(
                         self.model.cached_player_data_timestamp(tag))
                 )
             )
@@ -713,38 +794,33 @@ class CRProfile:
             'Highest Trophies': fmt(player.trophy_highest, 'trophy'),
             'Cards Found': fmt(player.cards_found, 'cards'),
             'Wins': fmt(player.wins, 'battle'),
+            'Draws': fmt(player.draws, 'battle'),
             'Losses': fmt(player.losses, 'battle'),
-            'Draws': fmt(player.draws, 'battle')
+            'Win Ratio': player.win_ratio,
+            'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
+            player.arena_text: '{} {}'.format(
+                player.arena_subtitle,
+                player.arena_emoji(self.bot))
         }
         for k, v in stats.items():
             em.add_field(name=k, value=v)
 
         # chests
+        # special chests
         key_list = ['super_magical', 'legendary', 'epic']
         chests = [(k, v) for k, v in player.chests.items() if k in key_list]
+        # giant magical
+        chests.append(('Giant', player.chest_giant_index))
+        chests.append(('Magic', player.chest_magical_index))
         chests = sorted(chests, key=lambda c: c[1])
+
         cycle = [self.model.emoji(key=chest) for chest in player.chests["cycle"]]
         chest_str = ''.join(cycle)
-        for chest in chests:
-            chest_str = '{} {}{}'.format(
-                chest_str,
-                self.model.emoji(key=chest[0]),
-                chest[1]
-            )
+        chest_out = ['{}{}'.format(self.model.emoji(key=c[0]), c[1]) for c in chests]
+        chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
+
         em.add_field(name="Chests", value=chest_str, inline=False)
-
-        # gold / gems
-        if resources:
-            resources = '{}{} {}{}'.format(
-                self.model.emoji(name="gold"),
-                player.gold,
-                self.model.emoji(name="gems"),
-                player.gems
-            )
-            em.add_field(name="Resources", value=resources, inline=False)
-
         embeds.append(em)
-
         return embeds
 
     @crprofile.command(name="trophy2arena", pass_context=True, no_pm=True)
