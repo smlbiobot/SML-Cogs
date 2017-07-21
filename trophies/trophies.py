@@ -39,6 +39,7 @@ PATH = os.path.join("data", "trophies")
 JSON = os.path.join(PATH, "settings.json")
 
 set_allowed_role = 'Bot Commander'
+bs_set_allowed_roles = ['Bot Commander', 'BS-Co-Leader']
 
 
 class ClanType:
@@ -146,7 +147,7 @@ class Trophies:
         await self.bot.say(embed=data)
 
     @bstrophies.command(name="set", pass_context=True, no_pm=True)
-    @commands.has_role(set_allowed_role)
+    @commands.has_any_role(*bs_set_allowed_roles)
     async def bstrophies_set(self, ctx, clan: str, *, req: str):
         """Set the trophy requirements for clans."""
         await self.run_trophies_set(ctx, ClanType.BS, clan, req)

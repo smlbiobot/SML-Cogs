@@ -225,7 +225,6 @@ class CRPlayerModel:
         """
         self.__dict__.update(kwargs)
 
-
 class ServerModel:
     """Discord server data model.
 
@@ -323,6 +322,25 @@ class CogModel:
     def server_settings(self, server):
         """Return server settings."""
         return self.settings["servers"][server.id]
+
+    async def get_player(self, tag):
+        """Return CRPlayerModel by tag."""
+        tag = SCTag(tag).tag
+        url = "{}{}".format(self.settings["profile_api_url"], tag)
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
+                    data = await resp.json()
+        except json.decoder.JSONDecodeError:
+            return False
+        except asyncio.TimeoutError:
+            return False
+
+        file_path = self.cached_filepath(tag)
+        dataIO.save_json(file_path, data)
+
+        return CRPlayerModel(**data)
 
     @staticmethod
     def cached_filepath(tag):
@@ -498,14 +516,35 @@ class CRProfile:
             "Player tag for {} is #{}".format(
                 member.display_name, tag))
 
-    @crprofile.command(name="get", pass_context=True, no_pm=True)
-    async def crprofile_info(self, ctx, key=None):
-        """Player profile.
+    @crprofile.command(name="tag", pass_context=True, no_pm=True)
+    async def crprofile_tag(self, ctx, tag):
+        """Player profile by tag
 
-        Display clan name, description, trophy requirements, etc.
+        Display player info
         """
-        server = ctx.message.server
-        await self.bot.type()
+        sctag = SCTag(tag)
+
+        if not sctag.valid:
+            await self.bot.say(sctag.invalid_error_msg)
+            return
+
+        player = await self.model.get_player(sctag.tag)
+
+        title = player.username
+        description = '#' + sctag.tag
+
+        em = discord.Embed(title=title, description=description, color=random_discord_color())
+        em.add_field(name="Trophies", value=player.trophies["current"])
+        em.add_field(name="PB", value=player.trophies["highest"])
+        em.add_field(name="Level", value=player.level)
+        em.add_field(name="Experience", value=player.experience)
+        em.add_field(name="Gold", value=player.gold)
+        em.add_field(name="Gems", value=player.gems)
+        em.add_field(name="Wins", value=player.wins)
+        em.add_field(name="Losses", value=player.losses)
+        em.add_field(name="Draws", value=player.draws)
+        em.add_field(name="Cards Found", value=player.cards_found)
+        await self.bot.say(embed=em)
 
 
     @crprofile.command(name="trophy2arena", pass_context=True, no_pm=True)
