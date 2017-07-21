@@ -225,6 +225,43 @@ class CRPlayerModel:
         """
         self.__dict__.update(kwargs)
 
+    @property
+    def clan_name(self):
+        """Clan name."""
+        return self.clan["name"]
+
+    @property
+    def clan_tag(self):
+        """Clan tag."""
+        return self.clan["tag"]
+
+    @property
+    def clan_role(self):
+        """Clan role."""
+        return self.clan["role"]
+
+    @property
+    def clan_badge_url(self):
+        """Clan badge url."""
+        badges = dataIO.load_json(BADGES_JSON)
+        key = str(self.clan["badge_id"] - 1 + 16000000)
+        return 'https://smlbiobot.github.io/img/emblems/{}.png'.format(badges[key])
+
+    @property
+    def trophy_current(self):
+        """Current trophies."""
+        return self.trophies["current"]
+
+    @property
+    def trophy_highest(self):
+        """Personal best."""
+        return self.trophies["highest"]
+
+    @property
+    def trophy_legendary(self):
+        """Legendary trophies."""
+        return self.trophies["legend"]
+
 class ServerModel:
     """Discord server data model.
 
@@ -256,8 +293,9 @@ class CogModel:
         "players": {}
     }
 
-    def __init__(self, filepath):
+    def __init__(self, bot, filepath):
         """Init."""
+        self.bot = bot
         self.filepath = filepath
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(filepath))
@@ -323,7 +361,7 @@ class CogModel:
         """Return server settings."""
         return self.settings["servers"][server.id]
 
-    async def get_player(self, tag):
+    async def player_data(self, tag):
         """Return CRPlayerModel by tag."""
         tag = SCTag(tag).tag
         url = "{}{}".format(self.settings["profile_api_url"], tag)
@@ -333,9 +371,9 @@ class CogModel:
                 async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
                     data = await resp.json()
         except json.decoder.JSONDecodeError:
-            return False
+            return None
         except asyncio.TimeoutError:
-            return False
+            return None
 
         file_path = self.cached_filepath(tag)
         dataIO.save_json(file_path, data)
@@ -369,6 +407,31 @@ class CogModel:
         if result is not None:
             return '{}: {}'.format(result.TIDText, result.SubtitleTIDText)
 
+        return ''
+
+    def emoji(self, name=None, key=None):
+        """Chest emojis by api key name or key.
+        
+        name is used by this cog.
+        key is values returned by the api.
+        Use key only if name is not set
+        """
+        emojis = {
+            'Silver': 'chestsilver',
+            'Gold': 'chestgold',
+            'super_magical': 'chestsupermagical',
+            'legendary': 'chestlegendary',
+            'epic': 'chestepic'
+        }
+        if name is None:
+            if key in emojis:
+                name = emojis[key]
+        for server in self.bot.servers:
+            for emoji in server.emojis:
+                if emoji.name == name:
+                    return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
+
     @property
     def profile_api_url(self):
         """Clan API URL."""
@@ -399,7 +462,7 @@ class CRProfile:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.model = CogModel(JSON)
+        self.model = CogModel(bot, JSON)
         # self.badges = dataIO.load_json(BADGES_JSON)
 
     @commands.group(pass_context=True, no_pm=True)
@@ -412,15 +475,15 @@ class CRProfile:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @crprofileset.command(name="init", pass_context=True)
-    async def crprofileset_init(self, ctx):
+    @crprofileset.command(name="initserver", pass_context=True)
+    async def crprofileset_initserver(self, ctx):
         """Init CR Clan: server settings."""
         server = ctx.message.server
         self.model.init_server(server)
         await self.bot.say("Server settings initialized.")
 
     @crprofileset.command(name="initplayers", pass_context=True)
-    async def crprofileset_init(self, ctx):
+    async def crprofileset_initplayers(self, ctx):
         """Init CR Clan: players settings."""
         server = ctx.message.server
         self.model.init_players(server)
@@ -528,23 +591,104 @@ class CRProfile:
             await self.bot.say(sctag.invalid_error_msg)
             return
 
-        player = await self.model.get_player(sctag.tag)
+        await self.display_profile(ctx, tag)
 
+    @crprofile.command(name="get", pass_context=True, no_pm=True)
+    async def crprofile_get(self, ctx, member: discord.Member = None):
+        """Player profile
+
+        if member is not entered, retrieve own profile
+        """
+        author = ctx.message.author
+        server = ctx.message.server
+        resources = False
+
+        if member is None:
+            member = author
+            resources = True
+
+        tag = self.model.member2tag(server, member)
+        await self.display_profile(ctx, tag, resources=resources)
+
+    async def display_profile(self, ctx, tag, resources=False):
+        """Display profile."""
+        sctag = SCTag(tag)
+        if not sctag.valid:
+            await self.bot.say(sctag.invalid_error_msg)
+            return
+
+        player = await self.model.player_data(sctag.tag)
+        for em in self.embeds_profile(player, resources=resources):
+            await self.bot.say(embed=em)
+
+    def embeds_profile(self, player: CRPlayerModel, resources=False):
+        """Return Discord Embed of player profile."""
+        embeds = []
+        color = random_discord_color()
+
+        emoji_xp = self.model.emoji(name="experience")
+
+        # header
         title = player.username
-        description = '#' + sctag.tag
+        description = '#{}'.format(player.tag)
+        em = discord.Embed(title=title, description=description, color=color)
 
-        em = discord.Embed(title=title, description=description, color=random_discord_color())
-        em.add_field(name="Trophies", value=player.trophies["current"])
-        em.add_field(name="PB", value=player.trophies["highest"])
-        em.add_field(name="Level", value=player.level)
-        em.add_field(name="Experience", value=player.experience)
-        em.add_field(name="Gold", value=player.gold)
-        em.add_field(name="Gems", value=player.gems)
-        em.add_field(name="Wins", value=player.wins)
-        em.add_field(name="Losses", value=player.losses)
-        em.add_field(name="Draws", value=player.draws)
-        em.add_field(name="Cards Found", value=player.cards_found)
-        await self.bot.say(embed=em)
+        # clan
+        em.set_thumbnail(url=player.clan_badge_url)
+        header = {
+            player.clan_name: player.clan_role,
+            'Clan Tag': player.clan_tag,
+            'Level': player.level,
+            'Experience': player.experience
+        }
+        for k, v in header.items():
+            em.add_field(name=k, value=v)
+        embeds.append(em)
+
+
+        # trophies
+        em = discord.Embed(title=" ", color=color)
+
+        e = self.model.emoji
+
+        stats = {
+            'Trophies': '{:,} {}'.format(player.trophy_current, e(name='trophy')),
+            'Highest Trophies': '{:,} {}'.format(player.trophy_highest, e(name='trophy')),
+            'Cards Found': '{:,} {}'.format(player.cards_found, e(name='cards')),
+            'Wins': player.wins,
+            'Losses': player.losses,
+            'Draws': player.draws
+        }
+        for k, v in stats.items():
+            em.add_field(name=k, value=v)
+
+        # chests
+        key_list = ['super_magical', 'legendary', 'epic']
+        chests = [(k, v) for k, v in player.chests.items() if k in key_list]
+        chests = sorted(chests, key=lambda c: c[1])
+        cycle = [self.model.emoji(key=chest) for chest in player.chests["cycle"]]
+        chest_str = ''.join(cycle)
+        for chest in chests:
+            chest_str = '{} {}{}'.format(
+                chest_str,
+                self.model.emoji(key=chest[0]),
+                chest[1]
+            )
+        em.add_field(name="Chests", value=chest_str, inline=False)
+
+        # gold / gems
+        if resources:
+            resources = '{}{} {}{}'.format(
+                self.model.emoji(name="gold"),
+                player.gold,
+                self.model.emoji(name="gems"),
+                player.gems
+            )
+            em.add_field(name="Resources", value=resources, inline=False)
+
+        embeds.append(em)
+
+        return embeds
 
 
     @crprofile.command(name="trophy2arena", pass_context=True, no_pm=True)
