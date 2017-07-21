@@ -852,8 +852,9 @@ class ESLogView:
         # sort hits chronologically
         hits = sorted(hits, key=lambda hit: hit.timestamp)
 
-        last_hit = hits[-1]
-        if hasattr(last_hit, 'timestamp'):
+        # skip if no results
+        if len(hits) and hasattr(last_hit, 'timestamp'):
+            last_hit = hits[-1]
             value = hits[-1].timestamp
             dt_ts = dt.datetime.strptime(hits[-1].timestamp, "%Y-%m-%dT%H:%M:%S.%f")
             value = dt_ts.strftime("%Y-%m-%d %H:%M:%S UTC")
