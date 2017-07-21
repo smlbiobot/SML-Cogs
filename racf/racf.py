@@ -29,7 +29,7 @@ from discord.ext import commands
 from discord.ext.commands import Context
 import cogs
 from cogs.utils.chat_formatting import pagify
-from .utils import checks
+from cogs.utils import checks
 from random import choice
 import math
 from __main__ import send_cmd_help
@@ -971,6 +971,14 @@ class RACF:
         """Self-Quick fix to iOS bug."""
         await self.bot.say("iOS Fix me")
         await self.run_iosfix(ctx, ctx.message.author)
+
+    @checks.serverowner_or_permissions()
+    @commands.command(pass_context=True, no_pm=True)
+    async def say(self, ctx, *, msg):
+        """Have bot say stuff. Remove command after run."""
+        message = ctx.message
+        await self.bot.delete_message(message)
+        await self.bot.say(msg)
 
     async def run_iosfix(self, ctx: Context, *members: discord.Member):
         """Actual fix to allow members without the bot commander to run on themselves."""
