@@ -247,9 +247,8 @@ class CRPlayerModel:
         ]
         current = 'MAX'
         total = 'MAX'
-        if str(self.experience).isdigit():
-            current = '{:,}'.format(int(self.experience))
         if xp_levels[self.level].isdigit():
+            current = '{:,}'.format(int(self.experience))
             total = '{:,}'.format(int(xp_levels[self.level]))
         return '{} / {}'.format(current, total)
 
