@@ -925,24 +925,24 @@ class CRProfile:
         em = discord.Embed(title=" ", color=color)
 
         def fmt(num, emoji_name):
-            emoji = self.model.emoji(name=emoji_name)
+            emoji = bem(emoji_name)
             return '{:,} {}'.format(num, emoji)
 
         stats = {
             'Wins / Draws / Losses': player.win_draw_losses(bem('battle')),
-            'Win Ratio': player.win_ratio,
+            'Win Ratio': '{} {}'.format(player.win_ratio, bem('battle')),
             'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
-            'Cards Found': fmt(player.cards_found, 'cards'),
-            'Favorite Card': player.fave_card(self.bot_emoji),
             'Level': player.level,
             'Experience': player.xp,
-            'Chests opened': fmt(player.chests_opened, 'chest')
+            'Cards Found': fmt(player.cards_found, 'cards'),
+            'Favorite Card': player.fave_card(self.bot_emoji)
         }
         for k, v in stats.items():
             em.add_field(name=k, value=v)
 
         # chests
-        em.add_field(name="Chests", value=player.chest_list(self.bot_emoji), inline=False)
+        chest_name = 'Chests ({:,} opened)'.format(player.chests_opened)
+        em.add_field(name=chest_name, value=player.chest_list(self.bot_emoji), inline=False)
 
         # deck
         em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
