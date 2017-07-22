@@ -853,12 +853,12 @@ class ESLogView:
         hits = sorted(hits, key=lambda hit: hit.timestamp)
 
         # skip if no results
-        if len(hits) and hasattr(last_hit, 'timestamp'):
+        if len(hits):
             last_hit = hits[-1]
-            value = hits[-1].timestamp
-            dt_ts = dt.datetime.strptime(hits[-1].timestamp, "%Y-%m-%dT%H:%M:%S.%f")
-            value = dt_ts.strftime("%Y-%m-%d %H:%M:%S UTC")
-            em.add_field(name="Last seen", value=value)
+            if hasattr(last_hit, 'timestamp'):
+                dt_ts = dt.datetime.strptime(hits[-1].timestamp, "%Y-%m-%dT%H:%M:%S.%f")
+                value = dt_ts.strftime("%Y-%m-%d %H:%M:%S UTC")
+                em.add_field(name="Last seen", value=value)
         else:
             em.add_field(name="_", value="_")
 
