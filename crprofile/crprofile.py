@@ -76,6 +76,41 @@ def random_discord_color():
     return discord.Color(value=color)
 
 
+class BotEmoji:
+    """Emojis available in bot."""
+    def __init__(self, bot):
+        self.bot = bot
+        self.map = {
+            'Silver': 'chestsilver',
+            'Gold': 'chestgold',
+            'Giant': 'chestgiant',
+            'Magic': 'chestmagical',
+            'super_magical': 'chestsupermagical',
+            'legendary': 'chestlegendary',
+            'epic': 'chestepic'
+        }
+
+    def name(self, name):
+        """Emoji by name."""
+        for server in self.bot.servers:
+            for emoji in server.emojis:
+                if emoji.name == name:
+                    return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
+
+    def key(self, key):
+        """Chest emojis by api key name or key.
+
+        name is used by this cog.
+        key is values returned by the api.
+        Use key only if name is not set
+        """
+        if key in self.map:
+            name = self.map[key]
+            return self.name(name)
+        return ''
+
+
 class SCTag:
     """SuperCell tags."""
 
@@ -293,12 +328,30 @@ class CRPlayerModel:
         """Legendary trophies."""
         return self.trophies["legend"]
 
-    @property
-    def rank_str(self):
+    def trophy_value(self, emoji):
+        """Trophy values.
+        
+        Current / Highest (PB)
+        """
+        return '{} / {} PB {}'.format(
+            '{:,}'.format(self.trophies['current']),
+            '{:,}'.format(self.trophies['highest']),
+            emoji)
+
+    def win_draw_losses(self, emoji):
+        """Win / draw / losses."""
+        return '{} / {} / {} {}'.format(
+            '{:,}'.format(self.wins),
+            '{:,}'.format(self.draws),
+            '{:,}'.format(self.losses),
+            emoji
+        )
+
+    def rank_str(self, bot_emoji: BotEmoji):
         """Rank in ordinal format."""
         p = inflect.engine()
         o = p.ordinal(self.rank)[-2:]
-        return '{:,}{}'.format(self.rank, o)
+        return '{:,}{} {}'.format(self.rank, o, bot_emoji.name('rank'))
 
     @property
     def chest_magical_index(self):
@@ -309,6 +362,27 @@ class CRPlayerModel:
     def chest_giant_index(self):
         """First index of magical chest"""
         return self.chests["fullcycle"].index("Giant")
+
+    @property
+    def chests_opened(self):
+        """Number of chests opened."""
+        return self.chests["index"]
+
+    def chest_list(self, bot_emoji: BotEmoji):
+        """List of chests."""
+        # chests
+        # special chests
+        key_list = ['super_magical', 'legendary', 'epic']
+        chests = [(k, v) for k, v in self.chests.items() if k in key_list]
+        # giant magical
+        chests.append(('Giant', self.chest_giant_index))
+        chests.append(('Magic', self.chest_magical_index))
+        chests = sorted(chests, key=lambda c: c[1])
+
+        cycle = [bot_emoji.key(c) for c in self.chests['cycle']]
+        chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1]) for c in chests]
+        chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
+        return chest_str
 
     @property
     def win_ratio(self):
@@ -347,32 +421,27 @@ class CRPlayerModel:
         league = max(self.arena.Arena - 11, 0)
         return league
 
-    @property
-    def chests_opened(self):
-        """Number of chests opened."""
-        return self.chests["index"]
-
-    def fave_card(self, bot):
+    def fave_card(self, bot_emoji: BotEmoji):
         """Favorite card in emoji and name."""
-        emoji = self.api_cardname_to_emoji(self.favorite_card, bot)
+        emoji = self.api_cardname_to_emoji(self.favorite_card, bot_emoji)
         return '{} {}'.format(self.favorite_card, emoji)
 
-    def arena_emoji(self, bot):
+    def arena_emoji(self, bot_emoji: BotEmoji):
         if self.league > 0:
             name = 'league{}'.format(self.league)
         else:
             name = 'arena{}'.format(self.arena.Arena)
-        return self.emoji(bot, name)
+        return bot_emoji.name(name)
 
-    def deck_list(self, bot):
+    def deck_list(self, bot_emoji: BotEmoji):
         """Deck with emoji"""
         cards = [card["name"] for card in self.deck]
-        cards = [self.api_cardname_to_emoji(name, bot) for name in cards]
+        cards = [self.api_cardname_to_emoji(name, bot_emoji) for name in cards]
         levels = [card["level"] for card in self.deck]
         deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
         return ' '.join(deck)
 
-    def api_cardname_to_emoji(self, name, bot):
+    def api_cardname_to_emoji(self, name, bot_emoji: BotEmoji):
         """Convert api card id to card emoji."""
         cr = dataIO.load_json(os.path.join(PATH, "clashroyale.json"))
         cards = cr["Cards"]
@@ -384,17 +453,7 @@ class CRPlayerModel:
         if result is None:
             return None
         result = result.replace('-', '')
-        return self.emoji(bot, result)
-
-    @staticmethod
-    def emoji(bot, name):
-        for server in bot.servers:
-            for emoji in server.emojis:
-                if emoji.name == name:
-                    return '<:{}:{}>'.format(emoji.name, emoji.id)
-        return ''
-
-
+        return bot_emoji.name(result)
 
 
 class Settings:
@@ -631,6 +690,7 @@ class CRProfile:
         """Init."""
         self.bot = bot
         self.model = Settings(bot, JSON)
+        self.bot_emoji = BotEmoji(bot)
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
@@ -846,10 +906,10 @@ class CRProfile:
         header = {
             player.clan_name: player.clan_role,
             'Clan Tag': player.clan_tag,
-            'Level': player.level,
-            'Experience': player.xp,
-            'Rank': player.rank_str,
-            'Favorite Card': player.fave_card(self.bot)
+            player.arena_text: '{} {}'.format(
+                player.arena_subtitle,
+                player.arena_emoji(self.bot_emoji)),
+            'Rank': player.rank_str(self.bot_emoji),
         }
         for k, v in header.items():
             em.add_field(name=k, value=v)
@@ -862,40 +922,27 @@ class CRProfile:
             emoji = self.model.emoji(name=emoji_name)
             return '{:,} {}'.format(num, emoji)
 
+        bem = self.bot_emoji.name
+
         stats = {
-            'Trophies': fmt(player.trophy_current, 'trophy'),
-            'Highest Trophies': fmt(player.trophy_highest, 'trophy'),
-            'Cards Found': fmt(player.cards_found, 'cards'),
-            'Wins': fmt(player.wins, 'battle'),
-            'Draws': fmt(player.draws, 'battle'),
-            'Losses': fmt(player.losses, 'battle'),
+            'Trophies': player.trophy_value(bem('trophy')),
+            'Wins / Draws / Losses': player.win_draw_losses(bem('battle')),
             'Win Ratio': player.win_ratio,
             'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
-            player.arena_text: '{} {}'.format(
-                player.arena_subtitle,
-                player.arena_emoji(self.bot)),
+            'Cards Found': fmt(player.cards_found, 'cards'),
+            'Favorite Card': player.fave_card(self.bot_emoji),
+            'Level': player.level,
+            'Experience': player.xp,
             'Chests opened': fmt(player.chests_opened, 'chest')
         }
         for k, v in stats.items():
             em.add_field(name=k, value=v)
 
         # chests
-        # special chests
-        key_list = ['super_magical', 'legendary', 'epic']
-        chests = [(k, v) for k, v in player.chests.items() if k in key_list]
-        # giant magical
-        chests.append(('Giant', player.chest_giant_index))
-        chests.append(('Magic', player.chest_magical_index))
-        chests = sorted(chests, key=lambda c: c[1])
-
-        cycle = [self.model.emoji(key=chest) for chest in player.chests["cycle"]]
-        chest_str = ''.join(cycle)
-        chest_out = ['{}{}'.format(self.model.emoji(key=c[0]), c[1]) for c in chests]
-        chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
-        em.add_field(name="Chests", value=chest_str, inline=False)
+        em.add_field(name="Chests", value=player.chest_list(self.bot_emoji), inline=False)
 
         # deck
-        em.add_field(name="Deck", value=player.deck_list(self.bot), inline=False)
+        em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
 
         embeds.append(em)
         return embeds
