@@ -438,6 +438,15 @@ class CRPlayerModel:
             name = 'arena{}'.format(self.arena.Arena)
         return bot_emoji.name(name)
 
+    @property
+    def arena_url(self):
+        """Arena Icon URL."""
+        if self.league > 0:
+            url = 'http://smlbiobot.github.io/img/leagues/league{}.png'.format(self.league)
+        else:
+            url = 'http://smlbiobot.github.io/img/arenas/arena-{}.png'.format(self.arena.Arena)
+        return url
+
     def deck_list(self, bot_emoji: BotEmoji):
         """Deck with emoji"""
         cards = [card["name"] for card in self.deck]
@@ -888,7 +897,8 @@ class CRProfile:
 
         server = ctx.message.server
         for em in self.embeds_profile(player_data, server=server, resources=resources):
-            await self.bot.send_message(ctx.message.channel, embed=em)
+            await self.bot.say(embed=em)
+            # await self.bot.send_message(ctx.message.channel, embed=em)
 
     def embeds_profile(self, player: CRPlayerModel, server=None, resources=False):
         """Return Discord Embed of player profile."""
@@ -898,24 +908,24 @@ class CRProfile:
 
         # emoji_xp = self.model.emoji(name="experience")
         member = self.model.tag2member(server, player.tag)
-        mention = ''
+        mention = '_'
         if member is not None:
             mention = member.mention
 
         # header
-        title = player.username
-        description = '#{} {}'.format(player.tag, mention)
-        em = discord.Embed(title=title, description=description, color=color)
+        em = discord.Embed(title=player.clan_role, description=player.clan_name_tag, color=color)
 
         # clan
+        author_name = '{} #{}'.format(player.username, player.tag)
+        em.set_author(name=author_name)
+        # em.set_author(name=author_name, icon_url=player.clan_badge_url)
+        # em.set_thumbnail(url=player.arena_url)
         em.set_thumbnail(url=player.clan_badge_url)
         header = {
-            player.clan_role: player.clan_name_tag,
-            player.arena_text: '{} {}'.format(
-                player.arena_subtitle,
-                player.arena_emoji(self.bot_emoji)),
             'Trophies': player.trophy_value(bem('trophy')),
+            player.arena_text: '{} {}'.format(player.arena_subtitle, player.arena_emoji(self.bot_emoji)),
             'Rank': player.rank_str(self.bot_emoji),
+            'Discord': mention
         }
         for k, v in header.items():
             em.add_field(name=k, value=v)
