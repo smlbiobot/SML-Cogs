@@ -288,6 +288,13 @@ class CRPlayerModel:
         return self.trophies["legend"]
 
     @property
+    def rank_str(self):
+        """Rank in ordinal format."""
+        p = inflect.engine()
+        o = p.ordinal(self.rank)[-2:]
+        return '{:,}{}'.format(self.rank, o)
+
+    @property
     def chest_magical_index(self):
         """First index of magical chest"""
         return self.chests["fullcycle"].index("Magic")
@@ -835,7 +842,7 @@ class CRProfile:
             'Clan Tag': player.clan_tag,
             'Level': player.level,
             'Experience': player.xp,
-            'Rank': player.rank,
+            'Rank': player.rank_str,
             'Favorite Card': player.fave_card(self.bot)
         }
         for k, v in header.items():
