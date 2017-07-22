@@ -253,6 +253,8 @@ class CRPlayerModel:
     @property
     def clan_name(self):
         """Clan name."""
+        if self.clan["name"] is None:
+            return "No Clan"
         return self.clan["name"]
 
     @property
@@ -269,8 +271,11 @@ class CRPlayerModel:
     def clan_badge_url(self):
         """Clan badge url."""
         badges = dataIO.load_json(BADGES_JSON)
-        key = str(self.clan["badge_id"] - 1 + 16000000)
-        return 'https://smlbiobot.github.io/img/emblems/{}.png'.format(badges[key])
+        try:
+            key = str(self.clan["badge_id"] - 1 + 16000000)
+            return 'https://smlbiobot.github.io/img/emblems/{}.png'.format(badges[key])
+        except KeyError:
+            return 'https://smlbiobot.github.io/img/emblems/NoClan.png'
 
     @property
     def trophy_current(self):
