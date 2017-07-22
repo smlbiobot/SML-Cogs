@@ -81,16 +81,15 @@ class SCTag:
 
     TAG_CHARACTERS = list("0289PYLQGRJCUV")
 
-    def __init__(self, tag):
+    def __init__(self, tag: str):
         """Init.
 
         Remove # if found.
         Convert to uppercase.
         """
-        if tag is not None:
-            if tag.startswith('#'):
-                tag = tag[:1]
-            tag = tag.upper()
+        if tag.startswith('#'):
+            tag = tag[1:]
+        tag = tag.upper()
         self._tag = tag
 
     @property
