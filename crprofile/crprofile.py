@@ -334,16 +334,54 @@ class CRPlayerModel:
         league = max(self.arena.Arena - 11, 0)
         return league
 
+    @property
+    def chests_opened(self):
+        """Number of chests opened."""
+        return self.chests["index"]
+
+    def fave_card(self, bot):
+        """Favorite card in emoji and name."""
+        emoji = self.api_cardname_to_emoji(self.favorite_card, bot)
+        return '{} {}'.format(self.favorite_card, emoji)
+
     def arena_emoji(self, bot):
         if self.league > 0:
             name = 'league{}'.format(self.league)
         else:
             name = 'arena{}'.format(self.arena.Arena)
+        return self.emoji(bot, name)
+
+    def deck_list(self, bot):
+        """Deck with emoji"""
+        cards = [card["name"] for card in self.deck]
+        cards = [self.api_cardname_to_emoji(name, bot) for name in cards]
+        levels = [card["level"] for card in self.deck]
+        deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
+        return ' '.join(deck)
+
+    def api_cardname_to_emoji(self, name, bot):
+        """Convert api card id to card emoji."""
+        cr = dataIO.load_json(os.path.join(PATH, "clashroyale.json"))
+        cards = cr["Cards"]
+        result = None
+        for crid, o in cards.items():
+            if o["api_id"] == name:
+                result = crid
+                break
+        if result is None:
+            return None
+        result = result.replace('-', '')
+        return self.emoji(bot, result)
+
+    @staticmethod
+    def emoji(bot, name):
         for server in bot.servers:
             for emoji in server.emojis:
                 if emoji.name == name:
                     return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
+
+
 
 
 class Settings:
@@ -796,7 +834,9 @@ class CRProfile:
             player.clan_name: player.clan_role,
             'Clan Tag': player.clan_tag,
             'Level': player.level,
-            'Experience': player.xp
+            'Experience': player.xp,
+            'Rank': player.rank,
+            'Favorite Card': player.fave_card(self.bot)
         }
         for k, v in header.items():
             em.add_field(name=k, value=v)
@@ -820,7 +860,8 @@ class CRProfile:
             'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
             player.arena_text: '{} {}'.format(
                 player.arena_subtitle,
-                player.arena_emoji(self.bot))
+                player.arena_emoji(self.bot)),
+            'Chests opened': fmt(player.chests_opened, 'chest')
         }
         for k, v in stats.items():
             em.add_field(name=k, value=v)
@@ -838,8 +879,11 @@ class CRProfile:
         chest_str = ''.join(cycle)
         chest_out = ['{}{}'.format(self.model.emoji(key=c[0]), c[1]) for c in chests]
         chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
-
         em.add_field(name="Chests", value=chest_str, inline=False)
+
+        # deck
+        em.add_field(name="Deck", value=player.deck_list(self.bot), inline=False)
+
         embeds.append(em)
         return embeds
 

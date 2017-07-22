@@ -1,0 +1,872 @@
+{
+    "Cards": {
+        "archers": {
+            "aka": [
+                "arch"
+            ],
+            "api_id": "Archers",
+            "cpid": "Archers",
+            "elixir": 3,
+            "rarity": "common",
+            "sfid": "archers",
+            "tid": "TID_SPELL_INFO_ARCHERS"
+        },
+        "arrows": {
+            "aka": [
+                "arrow",
+                "arr"
+            ],
+            "api_id": "Arrows",
+            "cpid": "Arrows",
+            "elixir": 3,
+            "rarity": "common",
+            "sfid": "arrows",
+            "tid": "TID_SPELL_INFO_ARROWS"
+        },
+        "baby-dragon": {
+            "aka": [
+                "bbd",
+                "babyd",
+                "bd"
+            ],
+            "api_id": "Baby Dragon",
+            "cpid": "Baby Dragon",
+            "elixir": 4,
+            "rarity": "epic",
+            "sfid": "baby_dragon",
+            "tid": "TID_SPELL_INFO_BABY_DRAGON"
+        },
+        "balloon": {
+            "aka": [
+                "loon"
+            ],
+            "api_id": "Balloon",
+            "cpid": "Balloon",
+            "elixir": 5,
+            "rarity": "epic",
+            "sfid": "balloon",
+            "tid": "TID_SPELL_INFO_BALLOON"
+        },
+        "bandit": {
+            "aka": [],
+            "api_id": "Bandit",
+            "cpid": "Bandit",
+            "elixir": 3,
+            "rarity": "legendary",
+            "sfid": "bandit",
+            "tid": "TID_SPELL_INFO_ASSASSIN"
+        },
+        "barbarian-hut": {
+            "aka": [
+                "barb-hut",
+                "bh"
+            ],
+            "api_id": "Barbarian Hut",
+            "cpid": "Barbarian Hut",
+            "elixir": 7,
+            "rarity": "rare",
+            "sfid": "barbarian_hut",
+            "tid": "TID_SPELL_INFO_BARBARIAN_HUT"
+        },
+        "barbarians": {
+            "aka": [
+                "barb",
+                "barbs"
+            ],
+            "api_id": "Barbarians",
+            "cpid": "Barbarians",
+            "elixir": 5,
+            "rarity": "common",
+            "sfid": "barbarians",
+            "tid": "TID_SPELL_INFO_BARBARIANS"
+        },
+        "bats": {
+            "aka": [
+                "bat"
+            ],
+            "api_id": "Bats",
+            "cpid": "Bats",
+            "elixir": 2,
+            "rarity": "common",
+            "sfid": "bats",
+            "tid": "TID_SPELL_INFO_BATS"
+        },
+        "battle-ram": {
+            "aka": [
+                "br",
+                "ram"
+            ],
+            "api_id": "Battle Ram",
+            "cpid": "Battle Ram",
+            "elixir": 4,
+            "rarity": "rare",
+            "sfid": "battle_ram",
+            "tid": "TID_SPELL_INFO_BATTLE_RAM"
+        },
+        "bomb-tower": {
+            "aka": [
+                "bt"
+            ],
+            "api_id": "Bomb Tower",
+            "cpid": "Bomb Tower",
+            "elixir": 5,
+            "rarity": "rare",
+            "sfid": "bomb_tower",
+            "tid": "TID_SPELL_INFO_BOMB_TOWER"
+        },
+        "bomber": {
+            "aka": [],
+            "api_id": "Bomber",
+            "cpid": "Bomber",
+            "elixir": 3,
+            "rarity": "common",
+            "sfid": "bomber",
+            "tid": "TID_SPELL_INFO_BOMBER"
+        },
+        "bowler": {
+            "aka": [],
+            "api_id": "Bowler",
+            "cpid": "Bowler",
+            "elixir": 5,
+            "rarity": "epic",
+            "sfid": "bowler",
+            "tid": "TID_SPELL_INFO_BOWLER"
+        },
+        "cannon": {
+            "aka": [],
+            "api_id": "Cannon",
+            "cpid": "Cannon",
+            "elixir": 3,
+            "rarity": "common",
+            "sfid": "cannon",
+            "tid": "TID_SPELL_INFO_CANNON"
+        },
+        "cannon-cart": {
+            "aka": [
+                "cc",
+                "cart"
+            ],
+            "api_id": "Cannon Cart",
+            "cpid": "Cannon Cart",
+            "elixir": 5,
+            "rarity": "epic",
+            "sfid": "cannon_cart",
+            "tid": "TID_SPELL_MOVING_CANNON"
+        },
+        "clone": {
+            "aka": [],
+            "api_id": "Clone",
+            "cpid": "Clone",
+            "elixir": 3,
+            "rarity": "epic",
+            "sfid": "clone",
+            "tid": "TID_SPELL_INFO_CLONE"
+        },
+        "dark-prince": {
+            "aka": [
+                "dp",
+                "dank-prince"
+            ],
+            "api_id": "Dark Prince",
+            "cpid": "Dark Prince",
+            "elixir": 4,
+            "rarity": "epic",
+            "sfid": "dark_prince",
+            "tid": "TID_SPELL_INFO_DARK_PRINCE"
+        },
+        "dart-goblin": {
+            "aka": [
+                "dg",
+                "dart-gob",
+                "dart-gobs"
+            ],
+            "api_id": "Dart Goblin",
+            "cpid": "Dart Goblin",
+            "elixir": 3,
+            "rarity": "rare",
+            "sfid": "dart_goblin",
+            "tid": "TID_SPELL_INFO_BLOWDART_GOBLIN"
+        },
+        "electro-wizard": {
+            "aka": [
+                "ew",
+                "ewiz",
+                "ewizard"
+            ],
+            "api_id": "Electro Wizard",
+            "cpid": "Electro Wizard",
+            "elixir": 4,
+            "rarity": "legendary",
+            "sfid": "electro_wizard",
+            "tid": "TID_SPELL_INFO_ELECTRO_WIZARD"
+        },
+        "elite-barbarians": {
+            "aka": [
+                "eb",
+                "ebarb",
+                "ebarbs"
+            ],
+            "api_id": "Elite Barbarians",
+            "cpid": "Elite Barbarians",
+            "elixir": 6,
+            "rarity": "common",
+            "sfid": "elite_barbarians",
+            "tid": "TID_SPELL_INFO_ANGRY_BARBARIANS"
+        },
+        "elixir-collector": {
+            "aka": [
+                "ec",
+                "pump",
+                "collector"
+            ],
+            "api_id": "Elixir Collector",
+            "cpid": "Elixir Collector",
+            "elixir": 6,
+            "rarity": "rare",
+            "sfid": "elixir_collector",
+            "tid": "TID_SPELL_INFO_ELIXIR_COLLECTOR"
+        },
+        "executioner": {
+            "aka": [
+                "ex",
+                "exe",
+                "exec"
+            ],
+            "api_id": "Executioner",
+            "cpid": "Executioner",
+            "elixir": 5,
+            "rarity": "epic",
+            "sfid": "executioner",
+            "tid": "TID_SPELL_INFO_AXEMAN"
+        },
+        "fire-spirits": {
+            "aka": [
+                "fs"
+            ],
+            "api_id": "Fire Spirits",
+            "cpid": "Fire Spirits",
+            "elixir": 2,
+            "rarity": "common",
+            "sfid": "fire_spirits",
+            "tid": "TID_SPELL_INFO_FIRE_SPIRITS"
+        },
+        "fireball": {
+            "aka": [
+                "fb"
+            ],
+            "api_id": "Fireball",
+            "cpid": "Fireball",
+            "elixir": 4,
+            "rarity": "rare",
+            "sfid": "fireball",
+            "tid": "TID_SPELL_INFO_FIREBALL"
+        },
+        "flying-machine": {
+            "aka": [
+                "fm",
+                "fly",
+                "machine"
+            ],
+            "api_id": "Flying Machine",
+            "cpid": "Flying Machine",
+            "elixir": 4,
+            "rarity": "rare",
+            "sfid": "flying_machine",
+            "tid": "TID_SPELL_INFO_FLYING_MACHINE"
+        },
+        "freeze": {
+            "aka": [],
+            "api_id": "Freeze",
+            "cpid": "Freeze",
+            "elixir": 4,
+            "rarity": "epic",
+            "sfid": "freeze",
+            "tid": "TID_SPELL_INFO_FREEZE"
+        },
+        "furnace": {
+            "aka": [],
+            "api_id": "Furnace",
+            "cpid": "Furnace",
+            "elixir": 4,
+            "rarity": "rare",
+            "sfid": "furnace",
+            "tid": "TID_SPELL_INFO_FIRE_SPIRIT_HUT"
+        },
+        "giant": {
+            "aka": [],
+            "api_id": "Giant",
+            "cpid": "Giant",
+            "elixir": 5,
+            "rarity": "rare",
+            "sfid": "giant",
+            "tid": "TID_SPELL_INFO_GIANT"
+        },
+        "giant-skeleton": {
+            "aka": [
+                "gs"
+            ],
+            "api_id": "Giant Skeleton",
+            "cpid": "Giant Skeleton",
+            "elixir": 6,
+            "rarity": "epic",
+            "sfid": "giant_skeleton",
+            "tid": "TID_SPELL_INFO_GIANT_SKELETON"
+        },
+        "goblin-barrel": {
+            "aka": [
+                "gb",
+                "gob-barrel",
+                "barrel"
+            ],
+            "api_id": "Goblin Barrel",
+            "cpid": "Goblin Barrel",
+            "elixir": 3,
+            "rarity": "epic",
+            "sfid": "goblin_barrel",
+            "tid": "TID_SPELL_INFO_GOBLIN_BARREL"
+        },
+        "goblin-gang": {
+            "aka": [
+                "gg",
+                "gob-gang"
+            ],
+            "api_id": "Goblin Gang",
+            "cpid": "Goblin Gang",
+            "elixir": 3,
+            "rarity": "common",
+            "sfid": "goblin_gang",
+            "tid": "TID_SPELL_INFO_GOBLIN_GANG"
+        },
+        "goblin-hut": {
+            "aka": [
+                "gob-hut",
+                "gh"
+            ],
+            "api_id": "Goblin Hut",
+            "cpid": "Goblin Hut",
+            "elixir": 5,
+            "rarity": "rare",
+            "sfid": "goblin_hut",
+            "tid": "TID_SPELL_INFO_GOBLIN_HUT"
+        },
+        "goblins": {
+            "aka": [
+                "gobs",
+                "gob",
+                "stab-gobs",
+                "stab-gob"
+            ],
+            "api_id": "Goblins",
+            "cpid": "Goblins",
+            "elixir": 2,
+            "rarity": "common",
+            "sfid": "goblins",
+            "tid": "TID_SPELL_INFO_GOBLINS"
+        },
+        "golem": {
+            "aka": [],
+            "api_id": "Golem",
+            "cpid": "Golem",
+            "elixir": 8,
+            "rarity": "epic",
+            "sfid": "golem",
+            "tid": "TID_SPELL_INFO_GOLEM"
+        },
+        "graveyard": {
+            "aka": [
+                "gy",
+                "skillyard"
+            ],
+            "api_id": "Graveyard",
+            "cpid": "Graveyard",
+            "elixir": 5,
+            "rarity": "legendary",
+            "sfid": "graveyard",
+            "tid": "TID_SPELL_INFO_GRAVEYARD"
+        },
+        "guards": {
+            "aka": [],
+            "api_id": "Guards",
+            "cpid": "Guards",
+            "elixir": 3,
+            "rarity": "epic",
+            "sfid": "guards",
+            "tid": "TID_SPELL_INFO_SKELETON_WARRIORS"
+        },
+        "heal": {
+            "aka": [],
+            "api_id": "Heal",
+            "cpid": "Heal",
+            "elixir": 3,
+            "rarity": "rare",
+            "sfid": "heal",
+            "tid": "TID_SPELL_INFO_HEAL"
+        },
+        "hog-rider": {
+            "aka": [
+                "hog"
+            ],
+            "api_id": "Hog Rider",
+            "cpid": "Hog Rider",
+            "elixir": 4,
+            "rarity": "rare",
+            "sfid": "hog_rider",
+            "tid": "TID_SPELL_INFO_HOG_RIDER"
+        },
+        "ice-golem": {
+            "aka": [
+                "ig"
+            ],
+            "api_id": "Ice Golem",
+            "cpid": "Ice Golem",
+            "elixir": 2,
+            "rarity": "rare",
+            "sfid": "ice_golem",
+            "tid": "TID_SPELL_INFO_ICEGOLEMITE"
+        },
+        "ice-spirit": {
+            "aka": [
+                "is"
+            ],
+            "api_id": "Ice Spirit",
+            "cpid": "Ice Spirit",
+            "elixir": 1,
+            "rarity": "common",
+            "sfid": "ice_spirit",
+            "tid": "TID_SPELL_INFO_ICE_SPIRITS"
+        },
+        "ice-wizard": {
+            "aka": [
+                "iw",
+                "ice-wiz",
+                "iwiz"
+            ],
+            "api_id": "Ice Wizard",
+            "cpid": "Ice Wizard",
+            "elixir": 3,
+            "rarity": "legendary",
+            "sfid": "ice_wizard",
+            "tid": "TID_SPELL_INFO_ICE_WIZARD"
+        },
+        "inferno-dragon": {
+            "aka": [
+                "id"
+            ],
+            "api_id": "Inferno Dragon",
+            "cpid": "Inferno Dragon",
+            "elixir": 4,
+            "rarity": "legendary",
+            "sfid": "inferno_dragon",
+            "tid": "TID_SPELL_INFO_INFERNO_DRAGON"
+        },
+        "inferno-tower": {
+            "aka": [
+                "inferno",
+                "it"
+            ],
+            "api_id": "Inferno Tower",
+            "cpid": "Inferno Tower",
+            "elixir": 5,
+            "rarity": "rare",
+            "sfid": "inferno_tower",
+            "tid": "TID_SPELL_INFO_INFERNO"
+        },
+        "knight": {
+            "aka": [],
+            "api_id": "Knight",
+            "cpid": "Knight",
+            "elixir": 3,
+            "rarity": "common",
+            "sfid": "knight",
+            "tid": "TID_SPELL_INFO_KNIGHT"
+        },
+        "lava-hound": {
+            "aka": [
+                "lava",
+                "lh",
+                "hound"
+            ],
+            "api_id": "Lava Hound",
+            "cpid": "Lava Hound",
+            "elixir": 7,
+            "rarity": "legendary",
+            "sfid": "lava_hound",
+            "tid": "TID_SPELL_INFO_LAVA_HOUND"
+        },
+        "lightning": {
+            "aka": [],
+            "api_id": "Lightning",
+            "cpid": "Lightning",
+            "elixir": 6,
+            "rarity": "epic",
+            "sfid": "lightning",
+            "tid": "TID_SPELL_INFO_LIGHTNING"
+        },
+        "lumberjack": {
+            "aka": [
+                "lj"
+            ],
+            "api_id": "Lumberjack",
+            "cpid": "Lumberjack",
+            "elixir": 4,
+            "rarity": "legendary",
+            "sfid": "lumberjack",
+            "tid": "TID_SPELL_INFO_RAGE_BARBARIAN"
+        },
+        "mega-knight": {
+            "aka": [
+                "mk",
+                "mknight"
+            ],
+            "api_id": "Mega Knight",
+            "cpid": "Mega Knight",
+            "elixir": 7,
+            "rarity": "legendary",
+            "sfid": "mega_knight",
+            "tid": "TID_SPELL_INFO_MEGAKNIGHT"
+        },
+        "mega-minion": {
+            "aka": [
+                "mm",
+                "meta-minion",
+                "mega"
+            ],
+            "api_id": "Mega Minion",
+            "cpid": "Mega Minion",
+            "elixir": 3,
+            "rarity": "rare",
+            "sfid": "mega_minion",
+            "tid": "TID_SPELL_INFO_MEGAMINION"
+        },
+        "miner": {
+            "aka": [],
+            "api_id": "Miner",
+            "cpid": "Miner",
+            "elixir": 3,
+            "rarity": "legendary",
+            "sfid": "miner",
+            "tid": "TID_SPELL_INFO_MINER"
+        },
+        "mini-pekka": {
+            "aka": [
+                "minip",
+                "mini-p",
+                "mp"
+            ],
+            "api_id": "Mini P.E.K.K.A",
+            "cpid": "Mini P.E.K.K.A",
+            "elixir": 4,
+            "rarity": "rare",
+            "sfid": "mini_pekka",
+            "tid": "TID_SPELL_INFO_MINIPEKKA"
+        },
+        "minion-horde": {
+            "aka": [
+                "mh",
+                "horde"
+            ],
+            "api_id": "Minion Horde",
+            "cpid": "Minion Horde",
+            "elixir": 5,
+            "rarity": "common",
+            "sfid": "minion_horde",
+            "tid": "TID_SPELL_INFO_MINION_HORDE"
+        },
+        "minions": {
+            "aka": [],
+            "api_id": "Minions",
+            "cpid": "Minions",
+            "elixir": 3,
+            "rarity": "common",
+            "sfid": "minions",
+            "tid": "TID_SPELL_INFO_MINIONS"
+        },
+        "mirror": {
+            "aka": [],
+            "api_id": "Mirror",
+            "cpid": "Mirror",
+            "elixir": 0,
+            "rarity": "epic",
+            "sfid": "mirror",
+            "tid": "TID_SPELL_INFO_MIRROR"
+        },
+        "mortar": {
+            "aka": [],
+            "api_id": "Mortar",
+            "cpid": "Mortar",
+            "elixir": 4,
+            "rarity": "common",
+            "sfid": "mortar",
+            "tid": "TID_SPELL_INFO_MORTAR"
+        },
+        "musketeer": {
+            "aka": [
+                "1m",
+                "musk"
+            ],
+            "api_id": "Musketeer",
+            "cpid": "Musketeer",
+            "elixir": 4,
+            "rarity": "rare",
+            "sfid": "musketeer",
+            "tid": "TID_SPELL_INFO_MUSKETEER"
+        },
+        "night-witch": {
+            "aka": [
+                "nwitch",
+                "nw"
+            ],
+            "api_id": "Night Witch",
+            "cpid": "Night Witch",
+            "elixir": 4,
+            "rarity": "legendary",
+            "sfid": "night_witch",
+            "tid": "TID_SPELL_INFO_DARK_WITCH"
+        },
+        "pekka": {
+            "aka": [],
+            "api_id": "P.E.K.K.A",
+            "cpid": "P.E.K.K.A",
+            "elixir": 7,
+            "rarity": "epic",
+            "sfid": "pekka",
+            "tid": "TID_SPELL_INFO_PEKKA"
+        },
+        "poison": {
+            "aka": [],
+            "api_id": "Poison",
+            "cpid": "Poison",
+            "elixir": 4,
+            "rarity": "rare",
+            "sfid": "poison",
+            "tid": "TID_SPELL_INFO_POISON"
+        },
+        "prince": {
+            "aka": [],
+            "api_id": "Prince",
+            "cpid": "Prince",
+            "elixir": 5,
+            "rarity": "epic",
+            "sfid": "prince",
+            "tid": "TID_SPELL_INFO_PRINCE"
+        },
+        "princess": {
+            "aka": [],
+            "api_id": "Princess",
+            "cpid": "Princess",
+            "elixir": 3,
+            "rarity": "legendary",
+            "sfid": "princess",
+            "tid": "TID_SPELL_INFO_PRINCESS"
+        },
+        "rage": {
+            "aka": [],
+            "api_id": "Rage",
+            "cpid": "Rage",
+            "elixir": 2,
+            "rarity": "epic",
+            "sfid": "rage",
+            "tid": "TID_SPELL_INFO_RAGE"
+        },
+        "rocket": {
+            "aka": [],
+            "api_id": "Rocket",
+            "cpid": "Rocket",
+            "elixir": 6,
+            "rarity": "rare",
+            "sfid": "rocket",
+            "tid": "TID_SPELL_INFO_ROCKET"
+        },
+        "royal-giant": {
+            "aka": [
+                "rg",
+                "rgg"
+            ],
+            "api_id": "Royal Giant",
+            "cpid": "Royal Giant",
+            "elixir": 6,
+            "rarity": "common",
+            "sfid": "royal_giant",
+            "tid": "TID_SPELL_INFO_ROYAL_GIANT"
+        },
+        "skeleton-army": {
+            "aka": [
+                "skarmy",
+                "sa"
+            ],
+            "api_id": "Skeleton Army",
+            "cpid": "Skeleton Army",
+            "elixir": 3,
+            "rarity": "epic",
+            "sfid": "skeleton_army",
+            "tid": "TID_SPELL_INFO_SKELETON_HORDE"
+        },
+        "skeleton-barrel": {
+            "aka": [
+                "sbarrel",
+                "sb"
+            ],
+            "api_id": "Skeleton Barrel",
+            "cpid": "Skeleton Barrel",
+            "elixir": 3,
+            "rarity": "common",
+            "sfid": "skeleton_barrel",
+            "tid": "TID_SPELL_SKELETON_BALLOON"
+        },
+        "skeletons": {
+            "aka": [
+                "skele"
+            ],
+            "api_id": "Skeletons",
+            "cpid": "Skeletons",
+            "elixir": 1,
+            "rarity": "common",
+            "sfid": "skeletons",
+            "tid": "TID_SPELL_INFO_SKELETONS"
+        },
+        "soon": {
+            "aka": [],
+            "api_id": "Soon",
+            "cpid": "Soon",
+            "elixir": 0,
+            "rarity": "common",
+            "sfid": "soon",
+            "tid": "TID_SPELL_INFO_SOON"
+        },
+        "sparky": {
+            "aka": [],
+            "api_id": "Sparky",
+            "cpid": "Sparky",
+            "elixir": 6,
+            "rarity": "legendary",
+            "sfid": "sparky",
+            "tid": "TID_SPELL_INFO_ZAPMACHINE"
+        },
+        "spear-goblins": {
+            "aka": [
+                "spear-gobs",
+                "spear-gob",
+                "sgobs",
+                "sgob"
+            ],
+            "api_id": "Spear Goblins",
+            "cpid": "Spear Goblins",
+            "elixir": 2,
+            "rarity": "common",
+            "sfid": "spear_goblins",
+            "tid": "TID_SPELL_INFO_SPEAR_GOBLINS"
+        },
+        "tesla": {
+            "aka": [],
+            "api_id": "Tesla",
+            "cpid": "Tesla",
+            "elixir": 4,
+            "rarity": "common",
+            "sfid": "tesla",
+            "tid": "TID_SPELL_INFO_TESLA"
+        },
+        "the-log": {
+            "aka": [
+                "log"
+            ],
+            "api_id": "The Log",
+            "cpid": "The Log",
+            "elixir": 2,
+            "rarity": "legendary",
+            "sfid": "the_log",
+            "tid": "TID_SPELL_INFO_LOG"
+        },
+        "three-musketeers": {
+            "aka": [
+                "3m",
+                "3musk",
+                "3musks"
+            ],
+            "api_id": "Three Musketeers",
+            "cpid": "Three Musketeers",
+            "elixir": 9,
+            "rarity": "rare",
+            "sfid": "three_musketeers",
+            "tid": "TID_SPELL_INFO_THREE_MUSKETEERS"
+        },
+        "tombstone": {
+            "aka": [
+                "ts"
+            ],
+            "api_id": "Tombstone",
+            "cpid": "Tombstone",
+            "elixir": 3,
+            "rarity": "rare",
+            "sfid": "tombstone",
+            "tid": "TID_SPELL_INFO_TOMBSTONE"
+        },
+        "tornado": {
+            "aka": [
+                "nado"
+            ],
+            "api_id": "Tornado",
+            "cpid": "Tornado",
+            "elixir": 3,
+            "rarity": "epic",
+            "sfid": "tornado",
+            "tid": "TID_SPELL_INFO_TORNADO"
+        },
+        "valkyrie": {
+            "aka": [
+                "valk"
+            ],
+            "api_id": "Valkyrie",
+            "cpid": "Valkyrie",
+            "elixir": 4,
+            "rarity": "rare",
+            "sfid": "valkyrie",
+            "tid": "TID_SPELL_INFO_VALKYRIE"
+        },
+        "witch": {
+            "aka": [],
+            "api_id": "Witch",
+            "cpid": "Witch",
+            "elixir": 5,
+            "rarity": "epic",
+            "sfid": "witch",
+            "tid": "TID_SPELL_INFO_WITCH"
+        },
+        "wizard": {
+            "aka": [
+                "wiz"
+            ],
+            "api_id": "Wizard",
+            "cpid": "Wizard",
+            "elixir": 5,
+            "rarity": "rare",
+            "sfid": "wizard",
+            "tid": "TID_SPELL_INFO_WIZARD"
+        },
+        "xbow": {
+            "aka": [
+                "x-bow"
+            ],
+            "api_id": "X-Bow",
+            "cpid": "X-Bow",
+            "elixir": 6,
+            "rarity": "epic",
+            "sfid": "x_bow",
+            "tid": "TID_SPELL_INFO_XBOW"
+        },
+        "zap": {
+            "aka": [],
+            "api_id": "Zap",
+            "cpid": "Zap",
+            "elixir": 2,
+            "rarity": "common",
+            "sfid": "zap",
+            "tid": "TID_SPELL_INFO_ZAP"
+        }
+    },
+    "Rarity": [
+        "common",
+        "rare",
+        "epic",
+        "legendary"
+    ]
+}
