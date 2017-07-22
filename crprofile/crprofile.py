@@ -304,6 +304,11 @@ class CRPlayerModel:
         return self.clan["role"]
 
     @property
+    def clan_name_tag(self):
+        """Clan name and tag."""
+        return '{} #{}'.format(self.clan["name"], self.clan["tag"])
+
+    @property
     def clan_badge_url(self):
         """Clan badge url."""
         badges = dataIO.load_json(BADGES_JSON)
@@ -889,6 +894,7 @@ class CRProfile:
         """Return Discord Embed of player profile."""
         embeds = []
         color = random_discord_color()
+        bem = self.bot_emoji.name
 
         # emoji_xp = self.model.emoji(name="experience")
         member = self.model.tag2member(server, player.tag)
@@ -904,11 +910,11 @@ class CRProfile:
         # clan
         em.set_thumbnail(url=player.clan_badge_url)
         header = {
-            player.clan_name: player.clan_role,
-            'Clan Tag': player.clan_tag,
+            player.clan_role: player.clan_name_tag,
             player.arena_text: '{} {}'.format(
                 player.arena_subtitle,
                 player.arena_emoji(self.bot_emoji)),
+            'Trophies': player.trophy_value(bem('trophy')),
             'Rank': player.rank_str(self.bot_emoji),
         }
         for k, v in header.items():
@@ -922,10 +928,7 @@ class CRProfile:
             emoji = self.model.emoji(name=emoji_name)
             return '{:,} {}'.format(num, emoji)
 
-        bem = self.bot_emoji.name
-
         stats = {
-            'Trophies': player.trophy_value(bem('trophy')),
             'Wins / Draws / Losses': player.win_draw_losses(bem('battle')),
             'Win Ratio': player.win_ratio,
             'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
