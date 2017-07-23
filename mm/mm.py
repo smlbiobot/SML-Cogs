@@ -166,7 +166,6 @@ class MemberManagement:
     async def mm(self, ctx, *args):
         """Member management by roles.
         
-
         !mm [-h] [-x EXCLUDEROLES [EXCLUDEROLES ...]]
              [-o {id,mention,mentiononly}] [-r1] [-e] [-s {join,alpha}]
              [-r {embed,csv,list}] [-m MACRO]
@@ -176,8 +175,13 @@ class MemberManagement:
         !mm Member Elder
         
         Find members with roles: Member, Elder but not: Heist, CoC
+        !mm Member Elder -excluderoles Heist CoC
         !mm Member Elder -x Heist CoC
-
+        
+        Output ID
+        !mm Alpha Elder --output id
+        !mm Alpha Elder -o id
+        
         Optional arguments
         --excluderoles, -x
             Exclude list of roles
