@@ -49,15 +49,6 @@ class BotEmoji:
     """Emojis available in bot."""
     def __init__(self, bot):
         self.bot = bot
-        self.map = {
-            'Silver': 'chestsilver',
-            'Gold': 'chestgold',
-            'Giant': 'chestgiant',
-            'Magic': 'chestmagical',
-            'super_magical': 'chestsupermagical',
-            'legendary': 'chestlegendary',
-            'epic': 'chestepic'
-        }
 
     def name(self, name):
         """Emoji by name."""
@@ -99,7 +90,7 @@ class CRDataEnhanced:
             await send_cmd_help(ctx)
 
     @crdatae.command(name="search", pass_context=True, no_pm=True)
-    async def crdata_search(self, ctx, *cards):
+    async def crdatae_search(self, ctx, *cards):
         """Search decks on the Global 200 and output as embed using card emojis
 
         1. Include card(s) to search for
@@ -119,105 +110,10 @@ class CRDataEnhanced:
             await send_cmd_help(ctx)
             return
 
-        elixir_p = re.compile('elixir=([\d\.]*)-([\d\.]*)')
-
-        elixir_min = 0
-        elixir_max = 10
-        elixir = [c for c in cards if elixir_p.match(c)]
-        if elixir:
-            elixir = elixir[0]
-            cards = [c for c in cards if not elixir_p.match(c)]
-            m = elixir_p.match(elixir)
-            if m.group(1):
-                elixir_min = float(m.group(1))
-            if m.group(2):
-                elixir_max = float(m.group(2))
-
-        # break lists out by include and exclude
-        include_cards = [c for c in cards if not c.startswith('-')]
-        exclude_cards = [c[1:] for c in cards if c.startswith('-')]
-
-        # validate card input is valid
-        invalid_cards = []
-        invalid_cards.extend(self.crdata.get_invalid_cards(include_cards))
-        invalid_cards.extend(self.crdata.get_invalid_cards(exclude_cards))
-        if len(invalid_cards) > 0:
-            await self.bot.say(
-                'Invalid card names: {}'.format(', '.join(invalid_cards)))
-            await self.bot.say(
-                'Type `!crdata cardnames` to see a list of valid input.')
-            return
-
-        include_cards = self.crdata.normalize_deck_data(include_cards)
-        include_sfids = [self.crdata.id_to_sfid(c) for c in include_cards]
-        exclude_cards = self.crdata.normalize_deck_data(exclude_cards)
-        exclude_sfids = [self.crdata.id_to_sfid(c) for c in exclude_cards]
-
-        data = self.crdata.get_last_data()
-        decks = data["decks"]
-
-        # sort card in decks
-        sorted_decks = []
-        for deck in decks:
-            # when data is not clean, "key" may be missin
-            # if this is the case, fix it
-            clean_deck = []
-            for card in deck.copy():
-                if not "key" in card:
-                    card["key"] = "soon"
-                    card["level"] = 13
-                clean_deck.append(card)
-            deck = clean_deck
-
-            # for unknown reasons deck could sometimes be None in data src
-            if deck is not None:
-                sorted_decks.append(
-                    sorted(
-                        deck.copy(),
-                        key=lambda x: x["key"]))
-        decks = sorted_decks
-
-        found_decks = []
-        unique_decks = []
-
-        # debug: to show uniques or not
-        unique_only = False
-
-        for rank, deck in enumerate(decks):
-            # in unknown instances, starfi.re returns empty rows
-            if deck is not None:
-                deck_cards = [card["key"] for card in deck]
-                deck_elixir = self.crdata.deck_elixir_by_sfid(deck_cards)
-                if set(include_sfids) <= set(deck_cards):
-                    include_deck = True
-                    if len(exclude_sfids):
-                        for sfid in exclude_sfids:
-                            if sfid in deck_cards:
-                                include_deck = False
-                                break
-                    if not elixir_min <= deck_elixir <= elixir_max:
-                        include_deck = False
-                    if include_deck:
-                        found_deck = {
-                            "deck": deck,
-                            "cards": set([c["key"] for c in deck]),
-                            "count": 1,
-                            "ranks": [str(rank + 1)]
-                        }
-                        if found_deck["cards"] in unique_decks:
-                            found_deck["count"] += 1
-                            found_deck["ranks"].append(str(rank + 1))
-                            if not unique_only:
-                                unique_decks.append(found_deck["cards"])
-                        else:
-                            found_decks.append(found_deck)
-                            unique_decks.append(found_deck["cards"])
-
-        await self.bot.say("Found {} decks.".format(
-            len(found_decks)))
+        found_decks = await self.crdata.search(ctx, *cards)
 
         # embeds
-        per_page = 24
+        per_page = 25
         found_decks_group = grouper(per_page, found_decks)
         color = random_discord_color()
 
@@ -226,7 +122,7 @@ class CRDataEnhanced:
             em = discord.Embed(title="Clash Royale: Global Top 200 Decks", color=color)
 
             for data in fd:
-                print(data)
+                # print(data)
                 if data is not None:
                     deck = data["deck"]
                     rank = ", ".join(data["ranks"])
@@ -243,7 +139,9 @@ class CRDataEnhanced:
                     desc = desc[:-1]
 
                     deck_name = "Rank {}".format(rank)
-                    cards_str = ''.join([self.be.name(c) for c in cards])
+                    cards_levels = zip(cards, levels)
+                    cards_str = ''.join([
+                        '{}`{:.<2}`'.format(self.be.name(cl[0]), cl[1]) for cl in cards_levels])
 
                     em.add_field(name=deck_name, value=cards_str, inline=False)
 
@@ -251,7 +149,8 @@ class CRDataEnhanced:
             #     em.set_footer(text="Data provided by http://starfi.re")
 
             await self.bot.say(embed=em)
-            await self.bot.say("Data provided by <http://starfi.re>")
+
+        await self.bot.say("Data provided by <http://starfi.re>")
 
 
 def setup(bot):
