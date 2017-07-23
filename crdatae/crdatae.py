@@ -24,7 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 import itertools
 import re
-
+from random import choice
 from __main__ import send_cmd_help
 from discord.ext import commands
 import discord
@@ -36,6 +36,13 @@ def grouper(n, iterable, fillvalue=None):
     grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
     args = [iter(iterable)] * n
     return itertools.zip_longest(*args, fillvalue=fillvalue)
+
+
+def random_discord_color():
+    """Return random color as an integer."""
+    color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+    color = int(color, 16)
+    return discord.Color(value=color)
 
 
 class BotEmoji:
@@ -210,11 +217,13 @@ class CRDataEnhanced:
             len(found_decks)))
 
         # embeds
-        found_decks_group = grouper(24, found_decks)
+        per_page = 24
+        found_decks_group = grouper(per_page, found_decks)
+        color = random_discord_color()
 
-        for fd in found_decks_group:
+        for em_id, fd in enumerate(found_decks_group):
 
-            em = discord.Embed(title="Top 200 Decks")
+            em = discord.Embed(title="Clash Royale: Global Top 200 Decks", color=color)
 
             for data in fd:
                 print(data)
@@ -238,19 +247,11 @@ class CRDataEnhanced:
 
                     em.add_field(name=deck_name, value=cards_str, inline=False)
 
-                    # show_next = await self.crdata.show_result_row(
-                    #     ctx,
-                    #     cards,
-                    #     i,
-                    #     len(decks),
-                    #     deck_name="Rank {}".format(rank),
-                    #     author="Top 200 Decks",
-                    #     description=desc[:-1])
+            # if em_id == (len(found_decks) // per_page):
+            #     em.set_footer(text="Data provided by http://starfi.re")
 
             await self.bot.say(embed=em)
-
-
-
+            await self.bot.say("Data provided by <http://starfi.re>")
 
 
 def setup(bot):
