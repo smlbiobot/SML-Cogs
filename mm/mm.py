@@ -131,7 +131,7 @@ class MemberManagement:
             default='_',
             help='Include roles')
         parser.add_argument(
-            '-x', '--excluderoles',
+            '-x', '--exclude',
             nargs='+',
             help='Exclude roles')
         parser.add_argument(
@@ -166,7 +166,7 @@ class MemberManagement:
     async def mm(self, ctx, *args):
         """Member management by roles.
         
-        !mm [-h] [-x EXCLUDEROLES [EXCLUDEROLES ...]]
+        !mm [-h] [-x EXCLUDE [EXCLUDE ...]]
              [-o {id,mention,mentiononly}] [-r1] [-e] [-s {join,alpha}]
              [-r {embed,csv,list,none}] [-m MACRO]
              [roles [roles ...]]
@@ -175,7 +175,7 @@ class MemberManagement:
         !mm Member Elder
         
         Find members with roles: Member, Elder but not: Heist, CoC
-        !mm Member Elder -excluderoles Heist CoC
+        !mm Member Elder -exclude Heist CoC
         !mm Member Elder -x Heist CoC
         
         Output ID
@@ -183,7 +183,7 @@ class MemberManagement:
         !mm Alpha Elder -o id
         
         Optional arguments
-        --excluderoles, -x
+        --exclude, -x
             Exclude list of roles
         --output, -o {id, mention, meniononly}
             id: Append list of user ids in the result.
@@ -222,8 +222,8 @@ class MemberManagement:
         server_roles_names = [r.name.lower() for r in server.roles]
         plus = set([r.lower() for r in pargs.roles if r.lower() in server_roles_names])
         minus = set()
-        if pargs.excluderoles is not None:
-            minus = set([r.lower() for r in pargs.excluderoles if r.lower() in server_roles_names])
+        if pargs.exclude is not None:
+            minus = set([r.lower() for r in pargs.exclude if r.lower() in server_roles_names])
 
         out = ["**Member Management**"]
 
