@@ -53,6 +53,23 @@ try:
 except ImportError:
     raise ImportError("Please install the aiohttp package.") from None
 
+elasticsearch_available = False
+
+try:
+    # global ES connection
+    HOST = 'localhost'
+    PORT = 9200
+    from elasticsearch import Elasticsearch
+    from elasticsearch_dsl import Search
+    from elasticsearch_dsl.response import Response
+    from elasticsearch_dsl.query import QueryString
+    from elasticsearch_dsl.query import Range
+    from elasticsearch_dsl.connections import connections
+    connections.create_connection(hosts=[HOST], timeout=20)
+    elasticsearch_available = True
+except ImportError:
+    pass
+
 PATH = os.path.join("data", "crdata")
 SETTINGS_JSON = os.path.join(PATH, "settings.json")
 CLASHROYALE_JSON = os.path.join(PATH, "clashroyale.json")
@@ -167,7 +184,7 @@ class CRData:
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions(manage_server=True)
-    async def setcrdata(self, ctx: Context):
+    async def crdataset(self, ctx: Context):
         """Set Clash Royale Data settings.
 
         Require: Starfire access permission.
@@ -175,29 +192,29 @@ class CRData:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setcrdata.command(name="username", pass_context=True)
-    async def setcrdata_username(self, ctx: Context, username):
+    @crdataset.command(name="username", pass_context=True)
+    async def crdataset_username(self, ctx: Context, username):
         """Set Starfire username."""
         self.settings["STARFIRE_USERNAME"] = username
         await self.bot.say("Starfire username saved.")
         dataIO.save_json(SETTINGS_JSON, self.settings)
 
-    @setcrdata.command(name="password", pass_context=True)
-    async def setcrdata_password(self, ctx: Context, password):
+    @crdataset.command(name="password", pass_context=True)
+    async def crdataset_password(self, ctx: Context, password):
         """Set Starfire password."""
         self.settings["STARFIRE_PASSWORD"] = password
         await self.bot.say("Starfire password saved.")
         dataIO.save_json(SETTINGS_JSON, self.settings)
 
-    @setcrdata.command(name="url", pass_context=True)
-    async def setcrdata_url(self, ctx: Context, url):
+    @crdataset.command(name="url", pass_context=True)
+    async def crdataset_url(self, ctx: Context, url):
         """Set Starfire url."""
         self.settings["STARFIRE_URL"] = url
         await self.bot.say("Starfire URL saved.")
         dataIO.save_json(SETTINGS_JSON, self.settings)
 
-    @setcrdata.command(name="update", pass_context=True)
-    async def setcrdata_update(self, ctx):
+    @crdataset.command(name="update", pass_context=True)
+    async def crdataset_update(self, ctx):
         """Grab data from Starfire if does not exist."""
         data = await self.update_data()
         if data is not None:
@@ -205,8 +222,8 @@ class CRData:
         else:
             await self.bot.say("Data already downloaded.")
 
-    @setcrdata.command(name="forceupdate", pass_context=True)
-    async def setcrdata_forceupdate(self, ctx):
+    @crdataset.command(name="forceupdate", pass_context=True)
+    async def crdataset_forceupdate(self, ctx):
         """Update data even if exists."""
         data =  await self.update_data(forceupdate=True)
         if data is None:
@@ -214,8 +231,8 @@ class CRData:
         else:
             await self.bot.say("Data saved.")
 
-    @setcrdata.command(name="lastdata", pass_context=True)
-    async def setcrdata_lastdata(self, ctx):
+    @crdataset.command(name="lastdata", pass_context=True)
+    async def crdataset_lastdata(self, ctx):
         """Return last known data filename."""
         time = dt.datetime.utcnow()
         file = time.strftime(CARDPOP_FILE)
@@ -226,8 +243,8 @@ class CRData:
             path = os.path.join(PATH, file)
         await self.bot.say("Last known data path: {}".format(path))
 
-    @setcrdata.command(name="cleandata", pass_context=True)
-    async def setcrdata_cleandata(self, ctx):
+    @crdataset.command(name="cleandata", pass_context=True)
+    async def crdataset_cleandata(self, ctx):
         """Remove all bad data files.
 
         Operation for legacy data files.
@@ -245,6 +262,25 @@ class CRData:
                         os.remove(path)
                         await self.bot.say(
                             "Removed invalid JSON: {}".format(path))
+
+    @crdataset.command(name="elasticsearch", pass_context=True)
+    async def crdataset_elasticsearch(self, ctx, enable:bool):
+        """Enable / disabkle elasticsearch."""
+        self.settings["ELASTICSEARCH"] = enable
+        if enable:
+            await self.bot.say("Elastic Search enabled.")
+        else:
+            await self.bot.say("ELastic Search disabled.")
+        dataIO.save_json(SETTINGS_JSON, self.settings)
+
+    @property
+    def elasticsearch_enabled(self):
+        """Use elasticsearch or not."""
+        if elasticsearch_available \
+                and "ELASTICSEARCH" in self.settings \
+                and self.settings["ELASTICSEARCH"]:
+            return True
+        return False
 
     async def update_data(self, forceupdate=False):
         """Update data and return data."""
@@ -270,6 +306,20 @@ class CRData:
                         data = None
         if data is not None:
             dataIO.save_json(now_path, data)
+
+            if self.elasticsearch_enabled:
+                es = Elasticsearch()
+                now = dt.datetime.utcnow()
+                now_str = now.strftime('%Y.%m.%d')
+                body = data.copy()
+                body['timestamp'] = now
+
+                es.index(
+                    index='crdata-lb-{}'.format(now_str),
+                    doc_type='crdata-lb',
+                    body=body,
+                    timestamp=now
+                )
         return data
 
     async def get_now_data(self):

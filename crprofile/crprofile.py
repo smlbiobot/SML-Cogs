@@ -913,7 +913,9 @@ class CRProfile:
             mention = member.mention
 
         # header
-        em = discord.Embed(title=player.clan_role, description=player.clan_name_tag, color=color)
+        title = player.clan_name
+        description = '#{}\n{}'.format(player.clan_tag, player.clan_role)
+        em = discord.Embed(title=title, description=description, color=color)
 
         # clan
         author_name = '{} #{}'.format(player.username, player.tag)

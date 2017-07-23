@@ -119,6 +119,13 @@ class CRDataEnhanced:
 
         found_decks = await self.crdata.search(ctx, *cards)
 
+        if found_decks is None:
+            await self.bot.say("Found 0 decks.")
+            return
+        if not len(found_decks):
+            await self.bot.say("Found 0 decks.")
+            return
+
         # embeds
         per_page = 25
         found_decks_group = grouper(per_page, found_decks)
