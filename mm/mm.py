@@ -153,7 +153,7 @@ class MemberManagement:
             help='Sort options')
         parser.add_argument(
             '-r', '--result',
-            choices=['embed', 'csv', 'list'],
+            choices=['embed', 'csv', 'list', 'none'],
             default='embed',
             help='How to display results')
         parser.add_argument(
@@ -168,7 +168,7 @@ class MemberManagement:
         
         !mm [-h] [-x EXCLUDEROLES [EXCLUDEROLES ...]]
              [-o {id,mention,mentiononly}] [-r1] [-e] [-s {join,alpha}]
-             [-r {embed,csv,list}] [-m MACRO]
+             [-r {embed,csv,list,none}] [-m MACRO]
              [roles [roles ...]]
         
         Find members with roles: Member, Elder
@@ -192,11 +192,12 @@ class MemberManagement:
         --sort, s {join, alpha}
             join (default): Sort by date joined.
             alpha: Sort alphabetically
-        --result, -r {embed, csv, list}
+        --result, -r {embed, csv, list, none}
             Result display options
             embed (default): Display as Discord Embed.
             csv: Display as comma-separated values.
             list: Display as a list.
+            none: Do not display results (show only count + output specified.
         --everyone
             Include everyone. Useful for finding members without specific roles.
         """
@@ -214,6 +215,7 @@ class MemberManagement:
         option_sort_alpha = (pargs.sort == 'alpha')
         option_csv = (pargs.result == 'csv')
         option_list = (pargs.result == 'list')
+        option_none = (pargs.result == 'none')
         option_only_role = pargs.onlyrole
 
         server = ctx.message.server
@@ -279,7 +281,9 @@ class MemberManagement:
 
             # embed output
             if not option_output_mentions_only:
-                if option_csv:
+                if option_none:
+                    pass
+                elif option_csv:
                     for page in pagify(
                             self.get_member_csv(out_members), shorten_by=50):
                         await self.bot.say(page)
