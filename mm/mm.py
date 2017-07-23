@@ -24,6 +24,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import argparse
+import os
+from collections import defaultdict
 import discord
 from discord.ext import commands
 from discord.ext.commands import Context
@@ -31,9 +34,30 @@ from random import choice
 import itertools
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
+from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
 from __main__ import send_cmd_help
 
-BOTCOMMANDER_ROLE = ["Bot Commander", "High-Elder"]
+BOT_COMMANDER_ROLES = ["Bot Commander", "High-Elder"]
+PATH = os.path.join("data", "mm")
+JSON = os.path.join(PATH, "settings.json")
+
+
+def grouper(n, iterable, fillvalue=None):
+    """Helper function to split lists.
+
+    Example:
+    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
+    """
+    args = [iter(iterable)] * n
+    return (
+        [e for e in t if e is not None]
+        for t in itertools.zip_longest(*args))
+
+
+def nested_dict():
+    """Recursively nested defaultdict."""
+    return defaultdict(nested_dict)
 
 
 class MemberManagement:
@@ -42,87 +66,160 @@ class MemberManagement:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
+        self.settings = nested_dict()
+        self.settings.update(dataIO.load_json(JSON))
 
-    @staticmethod
-    def grouper(n, iterable, fillvalue=None):
-        """Helper function to split lists.
+    @commands.group(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
+    async def mmset(self, ctx):
+        """Member management settings."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
 
-        Example:
-        grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
+    @mmset.group(name="role", pass_context=True, no_pm=True)
+    async def mmset_role(self, ctx):
+        """Role permissions.
+        
+        Specify list of roles allowed to run mm.
+        This is a per-server setting.
         """
-        args = [iter(iterable)] * n
-        return (
-            [e for e in t if e is not None]
-            for t in itertools.zip_longest(*args))
+        if ctx.invoked_subcommand is None or \
+                isinstance(ctx.invoked_subcommand, commands.Group):
+            await send_cmd_help(ctx)
+
+    @mmset_role.command(name="add", pass_context=True, no_pm=True)
+    async def mmset_role_add(self, ctx, role_name):
+        """Add role by name"""
+        server = ctx.message.server
+        role = discord.utils.get(server.roles, name=role_name)
+        if role is None:
+            await self.bot.say("Cannot find that role on this server.")
+            return
+        role_settings = self.settings[server.id]["roles"]
+        role_settings[role.id] = role_name
+        roles = [discord.utils.get(server.roles, id=role_id) for role_id in role_settings]
+        role_names = [r.name for r in roles]
+        await self.bot.say("List of permitted roles updated: {}".format(', '.join(role_names)))
+        dataIO.save_json(JSON, self.settings)
+
+    @mmset.group(name="macro", pass_context=True, no_pm=True)
+    async def mmset_macro(self, ctx):
+        """Add / remove macro."""
+        if ctx.invoked_subcommand is None or \
+                isinstance(ctx.invoked_subcommand, commands.Group):
+            await send_cmd_help(ctx)
+
+    @mmset_macro.command(name="add", pass_context=True, no_pm=True)
+    async def mmset_macro_add(self, ctx, name, *, args):
+        """Add macro.
+        
+        name: name of the macro
+        args: list of arguments to run.
+        """
+        server = ctx.message.server
+        role_settings = self.settings[server.id]["macro"]
+
+
+    def parser(self):
+        """Process MM arguments."""
+        # Process arguments
+        parser = argparse.ArgumentParser(prog='[p]mm')
+        # parser.add_argument('key')
+        parser.add_argument(
+            'roles',
+            nargs='*',
+            default='_',
+            help='Include roles')
+        parser.add_argument(
+            '-x', '--excluderoles',
+            nargs='+',
+            help='Exclude roles')
+        parser.add_argument(
+            '-o', '--output',
+            choices=['id', 'mention', 'mentiononly'],
+            help='Output options')
+        parser.add_argument(
+            '-r1', '--onlyrole',
+            action='store_true',
+            help='Check members with exactly one role')
+        parser.add_argument(
+            '-e', '--everyone',
+            action='store_true',
+            help='Include everyone.')
+        parser.add_argument(
+            '-s', '--sort',
+            choices=['join', 'alpha'],
+            default='join',
+            help='Sort options')
+        parser.add_argument(
+            '-r', '--result',
+            choices=['embed', 'csv', 'list'],
+            default='embed',
+            help='How to display results')
+        parser.add_argument(
+            '-m', '--macro',
+            help='Macro name. Create using [p]mmset')
+        return parser
 
     @commands.command(pass_context=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    @commands.has_any_role(*BOT_COMMANDER_ROLES)
     async def mm(self, ctx, *args):
-        """Member management command.
+        """Member management by roles.
+        
 
-        Get a list of users that satisfy a list of roles supplied.
-
-        e.g.
-        !mm S M -L
-        !mm +S +M -L
-        fetches a list of users who has the roles S, M but not the role L.
-        S is the same as +S. + is an optional prefix for includes.
+        !mm [-h] [-x EXCLUDEROLES [EXCLUDEROLES ...]]
+             [-o {id,mention,mentiononly}] [-r1] [-e] [-s {join,alpha}]
+             [-r {embed,csv,list}] [-m MACRO]
+             [roles [roles ...]]
+        
+        Find members with roles: Member, Elder
+        !mm Member Elder
+        
+        Find members with roles: Member, Elder but not: Heist, CoC
+        !mm Member Elder -x Heist CoC
 
         Optional arguments
-        --output-mentions
-            Append a string of user mentions for users displayed.
-        --output-id
-            Append a string ot user ids for the results.
-        --output-mentions-only
-            Don’t display the long list and
-            only display the list of member mentions
-        --members-without-clan-tag
-            RACF specific option. Equivalent to typing
-            Member -Alpha -Bravo -Charlie -Delta -Echo -Foxtrot -Golf -Hotel
-        --list
-            Display as inline list
-        --only-role
-            Check member has one and exactly one role
+        --excluderoles, -x
+            Exclude list of roles
+        --output, -o {id, mention, meniononly}
+            id: Append list of user ids in the result.
+            mention: Append list of user mentions in the result.
+            mentiononly: Append list of user mentions only.
+        --sort, s {join, alpha}
+            join (default): Sort by date joined.
+            alpha: Sort alphabetically
+        --result, -r {embed, csv, list}
+            Result display options
+            embed (default): Display as Discord Embed.
+            csv: Display as comma-separated values.
+            list: Display as a list.
         --everyone
-            Include everyone
+            Include everyone. Useful for finding members without specific roles.
         """
-        # Extract optional arguments if exist
-        option_output_mentions = "--output-mentions" in args
-        option_output_id = "--output-id" in args
-        option_output_mentions_only = "--output-mentions-only" in args
-        option_members_without_clan_tag = "--members-without-clan-tag" in args
-        option_everyone = "--everyone" in args
-        option_sort_alpha = "--sort-alpha" in args
-        option_csv = "--csv" in args
-        option_list = "--list" in args
-        option_only_role = "--only-role" in args
+        parser = self.parser()
+        try:
+            pargs = parser.parse_args(args)
+        except SystemExit:
+            await send_cmd_help(ctx)
+            return
+
+        option_output_mentions = (pargs.output == 'mention')
+        option_output_id = (pargs.output == 'id')
+        option_output_mentions_only = (pargs.output == 'mentiononly')
+        option_everyone = pargs.everyone or 'everyone' in pargs.roles
+        option_sort_alpha = (pargs.sort == 'alpha')
+        option_csv = (pargs.result == 'csv')
+        option_list = (pargs.result == 'list')
+        option_only_role = pargs.onlyrole
 
         server = ctx.message.server
         server_roles_names = [r.name.lower() for r in server.roles]
+        plus = set([r.lower() for r in pargs.roles if r.lower() in server_roles_names])
+        minus = set()
+        if pargs.excluderoles is not None:
+            minus = set([r.lower() for r in pargs.excluderoles if r.lower() in server_roles_names])
 
-        # get list of arguments which are valid server role names
-        # as dictionary {flag, name}
         out = ["**Member Management**"]
-
-        if option_members_without_clan_tag:
-            args = ['Member', '-Alpha', '-Bravo', '-Charlie',
-                    '-Delta', '-Echo',
-                    '-Foxtrot', '-Golf', '-Hotel',
-                    '-eSports', '-Special']
-
-        role_args = []
-        flags = ['+', '-']
-        if args is not None:
-            for arg in args:
-                has_flag = arg[0] in flags
-                flag = arg[0] if has_flag else '+'
-                name = arg[1:] if has_flag else arg
-
-                if name.lower() in server_roles_names:
-                    role_args.append({'flag': flag, 'name': name.lower()})
-
-        plus = set([r['name'] for r in role_args if r['flag'] == '+'])
-        minus = set([r['name'] for r in role_args if r['flag'] == '-'])
 
         # Used for output only, so it won’t mention everyone in chat
         plus_out = plus.copy()
@@ -174,7 +271,7 @@ class MemberManagement:
             # sort alpha
             if option_sort_alpha:
                 out_members = list(out_members)
-                out_members.sort(key=lambda x: x.display_name)
+                out_members.sort(key=lambda x: x.display_name.lower())
 
             # embed output
             if not option_output_mentions_only:
@@ -187,7 +284,7 @@ class MemberManagement:
                             self.get_member_list(out_members), shorten_by=50):
                         await self.bot.say(page)
                 else:
-                    for data in self.get_member_embeds(ctx, out_members):
+                    for data in self.get_member_embeds(out_members, ctx.message.timestamp):
                         try:
                             await self.bot.say(embed=data)
                         except discord.HTTPException:
@@ -228,7 +325,8 @@ class MemberManagement:
             out.append('+ {}'.format(m.display_name))
         return '\n'.join(out)
 
-    def get_member_embeds(self, ctx, members):
+    @staticmethod
+    def get_member_embeds(members, timestamp):
         """Discord embed of data display."""
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
@@ -236,7 +334,7 @@ class MemberManagement:
 
         # split embed output to multiples of 25
         # because embed only supports 25 max fields
-        out_members_group = self.grouper(25, members)
+        out_members_group = grouper(25, members)
 
         for out_members_list in out_members_group:
             data = discord.Embed(
@@ -247,7 +345,7 @@ class MemberManagement:
                 value.append(', '.join(roles))
 
                 name = m.display_name
-                since_joined = (ctx.message.timestamp - m.joined_at).days
+                since_joined = (timestamp - m.joined_at).days
 
                 data.add_field(
                     name=str(name),
@@ -290,7 +388,7 @@ class MemberManagement:
             await self.bot.say(page)
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    @checks.mod_or_permissions(manage_roles=True)
     async def changerole(self, ctx, member: discord.Member=None, *roles: str):
         """Change roles of a user.
 
@@ -350,7 +448,7 @@ class MemberManagement:
                                 role.name, member.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    @commands.has_any_role(*BOT_COMMANDER_ROLES)
     async def searchmember(self, ctx, name=None):
         """Search member on server by name."""
         if name is None:
@@ -383,7 +481,21 @@ class MemberManagement:
             await self.bot.say('\n'.join(out))
 
 
+def check_folder():
+    """Check folder."""
+    if not os.path.exists(PATH):
+        os.makedirs(PATH)
+
+
+def check_file():
+    """Check files."""
+    if not dataIO.is_valid_json(JSON):
+        dataIO.save_json(JSON, {})
+
+
 def setup(bot):
     """Setup."""
+    check_folder()
+    check_file()
     n = MemberManagement(bot)
     bot.add_cog(n)
