@@ -977,6 +977,29 @@ class RACF:
         await self.bot.delete_message(message)
         await self.bot.say(msg)
 
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    @commands.command(pass_context=True, no_pm=True)
+    async def crsettag(self, ctx, tag, member: discord.Member=None):
+        """Set CR tags for members.
+        
+        This is the equivalent of running:
+        !crclan settag [tag] [member]
+        !crprofile settag [tag] [member]
+        
+        If those cogs are not loaded, it will just ignore it.
+        """
+        if member is None:
+            member = ctx.message.author
+
+        crclan = self.bot.get_cog("CRClan")
+        crprofile = self.bot.get_cog("CRProfile")
+
+        if crclan is not None:
+            await ctx.invoke(crclan.crclan_settag, tag, member)
+        if crprofile is not None:
+            await ctx.invoke(crprofile.crprofile_settag, tag, member)
+
+
     async def run_iosfix(self, ctx: Context, *members: discord.Member):
         """Actual fix to allow members without the bot commander to run on themselves."""
         for member in members:
