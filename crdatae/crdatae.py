@@ -23,11 +23,17 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import itertools
-import re
+import os
 from random import choice
+
+import discord
 from __main__ import send_cmd_help
 from discord.ext import commands
-import discord
+
+from cogs.utils.dataIO import dataIO
+
+PATH = os.path.join("data", "crdatae")
+CLASH_ROYALE_JSON = os.path.join(PATH, "clashroyale.json")
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -82,6 +88,7 @@ class CRDataEnhanced:
         self.bot = bot
         self.crdata = self.bot.get_cog('CRData')
         self.be = BotEmoji(bot)
+        self.clashroyale = dataIO.load_json(CLASH_ROYALE_JSON)
 
     @commands.group(pass_context=True, no_pm=True)
     async def crdatae(self, ctx):
@@ -128,22 +135,31 @@ class CRDataEnhanced:
                     rank = ", ".join(data["ranks"])
                     usage = data["count"]
                     cards = [self.crdata.sfid_to_id(card["key"]) for card in deck]
+
+                    card_elixirs = [self.card_elixir(c) for c in cards]
+                    # Remove from calculation if elixir is 0
+                    card_elixirs = [e for e in card_elixirs if e != 0]
+                    avg_elixir = sum(card_elixirs) / len(card_elixirs)
+
                     cards = [c.replace('-', '') for c in cards]
                     levels = [card["level"] for card in deck]
 
                     # desc = "**Rank {}: (Usage: {})**".format(rank, usage)
-                    desc = "**Rank {}: **".format(rank)
-                    for j, card in enumerate(cards):
-                        desc += "{} ".format(self.crdata.id_to_name(card))
-                        desc += "({}), ".format(levels[j])
-                    desc = desc[:-1]
+                    # desc = "**Rank {}: **".format(rank)
+                    # for j, card in enumerate(cards):
+                    #     desc += "{} ".format(self.crdata.id_to_name(card))
+                    #     desc += "({}), ".format(levels[j])
+                    # desc = desc[:-1]
+                    # field_name = desc
 
-                    deck_name = "Rank {}".format(rank)
+                    field_name = "Rank {}.".format(rank)
+
                     cards_levels = zip(cards, levels)
                     cards_str = ''.join([
                         '{}`{:.<2}`'.format(self.be.name(cl[0]), cl[1]) for cl in cards_levels])
+                    field_value = '{}\nAvg Elixir: {:.3f}'.format(cards_str, avg_elixir)
 
-                    em.add_field(name=deck_name, value=cards_str, inline=False)
+                    em.add_field(name=field_name, value=field_value, inline=False)
 
             # if em_id == (len(found_decks) // per_page):
             #     em.set_footer(text="Data provided by http://starfi.re")
@@ -151,6 +167,12 @@ class CRDataEnhanced:
             await self.bot.say(embed=em)
 
         await self.bot.say("Data provided by <http://starfi.re>")
+
+    def card_elixir(self, card):
+        """Return elixir of a card."""
+        if card not in self.clashroyale["Cards"].keys():
+            return 0
+        return self.clashroyale["Cards"][card]["elixir"]
 
 
 def setup(bot):
