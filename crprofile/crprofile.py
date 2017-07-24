@@ -962,12 +962,11 @@ class CRProfile:
         embeds.append(em)
         return embeds
 
-    @crprofile.command(name="trophy2arena", pass_context=True, no_pm=True)
+    @crprofile.command(name="trophy2arena", aliases=['t2a'], pass_context=True, no_pm=True)
     async def crprofile_trophy2arena(self, ctx, trophy: int):
         """Convert trophies to arenas."""
         text = self.model.trophy2arena(trophy)
         await self.bot.say(text)
-
 
 
 def check_folder():
