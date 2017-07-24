@@ -276,10 +276,6 @@ class ESLogger:
             'emojis': emojis
         }
 
-    def get_event_key(self, name: str):
-        """Return event name used in logger."""
-        return "discord.logger.{}".format(name)
-
     def log(self, key, extra=None):
         """Generic logging.
 
