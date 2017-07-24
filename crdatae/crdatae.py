@@ -117,9 +117,10 @@ class Card():
         self.key = key
         self.level = level
 
+    @property
     def elixir(self):
         """Elixir value."""
-        return ClashRoyale().card_elixir(self.name)
+        return ClashRoyale().card_elixir(self.key)
 
     def emoji(self, be: BotEmoji):
         """Emoji representation of the card."""
@@ -155,6 +156,11 @@ class Deck():
         """Average elixir of the deck."""
         elixirs = [c.elixir for c in self.cards if c.elixir != 0]
         return sum(elixirs) / len(elixirs)
+
+    @property
+    def avg_elixir_str(self):
+        """Average elixir with format."""
+        return 'Average Elixir: {:.3}'.format(self.avg_elixir)
 
     def emoji_repr(self, be: BotEmoji, show_levels=False):
         """Emoji representaion."""
@@ -254,13 +260,13 @@ class CRDataEnhanced:
 
         for deck_id, deck in enumerate(decks):
             if deck is not None:
-                result_number = per_page * (page - 1) + (deck_id + 1)
-
                 usage_str = ''
                 if deck.usage and show_usage:
                     usage_str = '(Usage: {})'.format(deck.usage)
                 field_name = "Rank {} {}".format(deck.rank, usage_str)
-                field_value = deck.emoji_repr(self.be, show_levels=True)
+                field_value = '{}\n{}'.format(
+                    deck.emoji_repr(self.be, show_levels=True),
+                    deck.avg_elixir_str)
                 em.add_field(name=field_name, value=field_value)
 
         em.set_footer(text=footer_text)
@@ -356,7 +362,9 @@ class CRDataEnhanced:
                 if deck.usage and show_usage:
                     usage_str = '(Usage: {})'.format(deck.usage)
                 field_name = "{}: Rank {} {}".format(result_number, deck.rank, usage_str)
-                field_value = deck.emoji_repr(self.be, show_levels=True)
+                field_value = '{}\n{}'.format(
+                    deck.emoji_repr(self.be, show_levels=True),
+                    deck.avg_elixir_str)
                 em.add_field(name=field_name, value=field_value)
 
         em.set_footer(text=footer_text)
