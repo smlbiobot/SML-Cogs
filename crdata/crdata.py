@@ -549,35 +549,6 @@ class CRData:
 
         return found_decks
 
-        # await self.bot.say("Found {} decks.".format(
-        #     len(found_decks)))
-        #
-        # for i, data in enumerate(found_decks):
-        #     deck = data["deck"]
-        #     rank = ", ".join(data["ranks"])
-        #     usage = data["count"]
-        #     cards = [self.sfid_to_id(card["key"]) for card in deck]
-        #     levels = [card["level"] for card in deck]
-        #
-        #     # desc = "**Rank {}: (Usage: {})**".format(rank, usage)
-        #     desc = "**Rank {}: **".format(rank)
-        #     for j, card in enumerate(cards):
-        #         desc += "{} ".format(self.id_to_name(card))
-        #         desc += "({}), ".format(levels[j])
-        #     desc = desc[:-1]
-        #
-        #     show_next = await self.show_result_row(
-        #         ctx,
-        #         cards,
-        #         i,
-        #         len(decks),
-        #         deck_name="Rank {}".format(rank),
-        #         author="Top 200 Decks",
-        #         description=desc[:-1])
-        #
-        #     if not show_next:
-        #         return
-
     async def search_results(self, ctx, found_decks):
         """Show search results."""
         await self.bot.say("Found {} decks.".format(len(found_decks)))
