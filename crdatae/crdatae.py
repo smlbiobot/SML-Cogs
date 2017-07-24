@@ -197,52 +197,78 @@ class CRDataEnhanced:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    # @crdatae.command(name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
-    # async def crdatae_leaderboard(self, ctx):
-    #     """Leaderboard."""
-    #     crdata = self.bot.get_cog('CRData')
-    #     if crdata is None:
-    #         await self.bot.say(self.error_msg["requires_crdata"])
-    #         return
-    #
-    #     data = crdata.get_last_data()
-    #     decks = data["decks"]
-    #
-    #     for i, deck in enumerate(decks):
-    #         cards = [crdata.sfid_to_id(card["key"]) for card in deck]
-    #         levels = [card["level"] for card in deck]
-    #
-    #         desc = "**Rank {}: **".format(i + 1)
-    #         for j, card in enumerate(cards):
-    #             desc += "{} ".format(crdata.id_to_name(card))
-    #             desc += "({}), ".format(levels[j])
-    #
-    #     # embeds
-    #     per_page = 25
-    #     found_decks_group = list(grouper(per_page, found_decks))
-    #     color = random_discord_color()
-    #
-    #     for em_id, fd in enumerate(found_decks_group):
-    #
-    #         em = self.embed_decks(
-    #             fd,
-    #             page=(em_id + 1),
-    #             title="Clash Royale: Global Top 200 Decks",
-    #             description="Found {} decks.".format(len(found_decks)),
-    #             color=color,
-    #             footer_text="Data provided by http://starfi.re"
-    #         )
-    #
-    #         await self.bot.say(embed=em)
-    #
-    #         if em_id < len(found_decks_group) - 1:
-    #             show_next = await self.show_next_page(ctx)
-    #             if not show_next:
-    #                 break
+    @crdatae.command(name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
+    async def crdatae_leaderboard(self, ctx):
+        """Leaderboard."""
+        crdata = self.bot.get_cog('CRData')
+        if crdata is None:
+            await self.bot.say(self.error_msg["requires_crdata"])
+            return
+
+        data = crdata.get_last_data()
+        # decks = data["decks"]
+
+        decks = []
+        for rank, deck in enumerate(data["decks"], 1):
+            cards = [crdata.sfid_to_id(card["key"]) for card in deck]
+            levels = [card["level"] for card in deck]
+            decks.append(Deck(card_keys=cards, card_levels=levels, rank=rank))
+
+        # embeds
+        per_page = 25
+        decks_group = list(grouper(per_page, decks))
+        color = random_discord_color()
+
+        for em_id, decks in enumerate(decks_group):
+
+            em = self.embed_decks_leaderboard(
+                decks,
+                page=(em_id + 1),
+                title="Clash Royale: Global Top 200 Decks",
+                color=color,
+                footer_text="Data provided by http://starfi.re"
+            )
+
+            await self.bot.say(embed=em)
+
+            if em_id < len(decks_group) - 1:
+                show_next = await self.show_next_page(ctx)
+                if not show_next:
+                    await self.bot.say("Search results aborted.")
+                    break
+
+    def embed_decks_leaderboard(self, decks, **kwargs):
+        """Show embed decks.
+
+        Params:
+        + page. Current page.
+        + per_page. Number of results per page.
+        + All parameters supported by Discord Embeds.
+        """
+        em = discord.Embed(**kwargs)
+
+        page = kwargs.get('page', 1)
+        per_page = kwargs.get('per_page', 25)
+        show_usage = kwargs.get('show_usage', False)
+        footer_text = kwargs.get('footer_text', '')
+
+        for deck_id, deck in enumerate(decks):
+            if deck is not None:
+                result_number = per_page * (page - 1) + (deck_id + 1)
+
+                usage_str = ''
+                if deck.usage and show_usage:
+                    usage_str = '(Usage: {})'.format(deck.usage)
+                field_name = "Rank {} {}".format(deck.rank, usage_str)
+                field_value = deck.emoji_repr(self.be, show_levels=True)
+                em.add_field(name=field_name, value=field_value)
+
+        em.set_footer(text=footer_text)
+        return em
 
     @crdatae.command(name="search", pass_context=True, no_pm=True)
     async def crdatae_search(self, ctx, *cards):
-        """Search decks on the Global 200 and output as embed using card emojis
+        """Search decks.
 
         1. Include card(s) to search for
         !crdatae search fb log
@@ -289,13 +315,14 @@ class CRDataEnhanced:
 
         for page, decks_page in enumerate(decks_group):
 
-            em = self.embed_decks(
+            em = self.embed_decks_search(
                 decks_page,
                 page=(page + 1),
                 title="Clash Royale: Global Top 200 Decks",
                 description="Found {} decks.".format(len(decks)),
                 color=color,
-                footer_text="Data provided by http://starfi.re"
+                footer_text="Data provided by http://starfi.re",
+                show_usage=False
             )
 
             await self.bot.say(embed=em)
@@ -303,9 +330,10 @@ class CRDataEnhanced:
             if page < len(decks_group) - 1:
                 show_next = await self.show_next_page(ctx)
                 if not show_next:
+                    await self.bot.say("Search results aborted.")
                     break
 
-    def embed_decks(self, decks, **kwargs):
+    def embed_decks_search(self, decks, **kwargs):
         """Show embed decks.
 
         Params:
