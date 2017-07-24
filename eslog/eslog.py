@@ -245,12 +245,11 @@ class ESLogger:
 
     def param_mention(self, message: Message):
         """Return mentions in message."""
-        mentions = set(message.mentions.copy())
-        names = [m.display_name for m in mentions]
-        ids = [m.id for m in mentions]
+        mentions = []
+        for member in set(message.mentions.copy()):
+            mentions.append(self.param_member(member))
         return {
-            'mention_names': names,
-            'mention_ids': ids
+            'mentions': mentions
         }
 
     def param_attachment(self, message: Message):
@@ -404,6 +403,8 @@ class ESLogger:
         extra.update(self.param_attachment(message))
         extra.update(self.param_mention(message))
         extra.update(self.param_embed(message))
+        extra.update(self.param_emoji(message))
+        extra.update(self.param_mention(message))
         self.log_discord_event('message', extra)
 
     def log_message_delete(self, message: Message):
