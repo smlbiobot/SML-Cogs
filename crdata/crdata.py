@@ -24,29 +24,23 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
+import datetime as dt
+import json
 import os
 import re
-import datetime as dt
 import string
-import asyncio
-import json
+from collections import namedtuple
 from datetime import timedelta
-from collections import Counter
 
-import discord
-from discord import Message
-from discord import Server
+from __main__ import send_cmd_help
 from discord.ext import commands
 from discord.ext.commands import Context
 
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
-
-from cogs.deck import Deck
-from collections import namedtuple
 
 try:
     import aiohttp
@@ -60,11 +54,9 @@ try:
     HOST = 'localhost'
     PORT = 9200
     from elasticsearch import Elasticsearch
-    from elasticsearch_dsl import Search
-    from elasticsearch_dsl.response import Response
-    from elasticsearch_dsl.query import QueryString
-    from elasticsearch_dsl.query import Range
+    from elasticsearch_dsl import DocType, Date, Integer, Text
     from elasticsearch_dsl.connections import connections
+
     connections.create_connection(hosts=[HOST], timeout=20)
     elasticsearch_available = True
 except ImportError:
@@ -154,6 +146,8 @@ class CRData:
         self.settings = dataIO.load_json(SETTINGS_JSON)
         self.clashroyale = dataIO.load_json(CLASHROYALE_JSON)
 
+        self.es = Elasticsearch()
+
         # init card data
         self.cards = []
         self.cards_abbrev = {}
@@ -178,6 +172,7 @@ class CRData:
         """Loop task: update data daily."""
         await self.bot.wait_until_ready()
         await self.update_data()
+        await self.eslog_update_data()
         await asyncio.sleep(DATA_UPDATE_INTERVAL)
         if self is self.bot.get_cog('CRData'):
             self.task = self.bot.loop.create_task(self.loop_task())
@@ -308,18 +303,8 @@ class CRData:
             dataIO.save_json(now_path, data)
 
             if self.elasticsearch_enabled:
-                es = Elasticsearch()
-                now = dt.datetime.utcnow()
-                now_str = now.strftime('%Y.%m.%d')
-                body = data.copy()
-                body['timestamp'] = now
+                self.eslog(data)
 
-                es.index(
-                    index='crdata-lb-{}'.format(now_str),
-                    doc_type='crdata-lb',
-                    body=body,
-                    timestamp=now
-                )
         return data
 
     async def get_now_data(self):
@@ -812,6 +797,89 @@ class CRData:
             if elixir:
                 total += 1
         return sum(elixirs) / total
+
+    async def eslog_update_data(self):
+        """Update data for es logging."""
+        url = self.settings["STARFIRE_URL"]
+        async with aiohttp.ClientSession(
+                auth=aiohttp.BasicAuth(
+                    login=self.settings["STARFIRE_USERNAME"],
+                    password=self.settings["STARFIRE_PASSWORD"])) as session:
+            async with session.get(url) as resp:
+                try:
+                    data = await resp.json()
+                except json.decoder.JSONDecodeError:
+                    data = None
+        if data is not None:
+            if self.elasticsearch_enabled:
+                self.eslog(data)
+
+    def eslog(self, data):
+        """Elasticsearch logging of data"""
+
+        now = dt.datetime.utcnow()
+        now_str = now.strftime('%Y.%m.%d')
+        index_name = 'crdata-{}'.format(now_str)
+
+
+        class PopularCard(DocType):
+            """ESLog Popular Card"""
+            key = Text()
+            usage = Integer()
+            timestamp = Date()
+
+            def save(self, **kwargs):
+                return super(PopularCard, self).save(**kwargs)
+
+        class PopularDeck(DocType):
+            """ESLog Popular Deck"""
+            deck_name = Text()
+            usage = Integer()
+            timestamp = Date()
+            deck_cards = []
+
+            def save(self, **kwargs):
+                return super(PopularDeck, self).save(**kwargs)
+
+        class Leaderboard(DocType):
+            """ESLog Leaderboard"""
+            rank = Integer()
+            deck = []
+            timestamp = Date()
+
+            def save(self, **kwargs):
+                return super(Leaderboard, self).save(**kwargs)
+
+        # leaderboard
+        for rank, deck in enumerate(data["decks"], 1):
+            lb = Leaderboard(
+                rank=rank,
+                deck=deck,
+                timestamp=dt.datetime.utcnow()
+            )
+            lb.save(index=index_name)
+
+        # cards
+        for card in data["popularCards"]:
+            pcard = PopularCard(
+                key=card["key"],
+                usage=card["usage"],
+                timestamp=dt.datetime.utcnow()
+            )
+            pcard.save(index=index_name)
+
+        # decks
+        for deck in data["popularDecks"]:
+            now = dt.datetime.utcnow()
+            now_str = now.strftime('%Y.%m.%d')
+            index_name = 'crdata-{}'.format(now_str)
+            pdeck = PopularDeck(
+                deck_name=deck["key"],
+                deck_cards=deck["key"].split('|'),
+                usage=deck["usage"],
+                timestamp=dt.datetime.utcnow()
+            )
+            pdeck.save(index=index_name)
 
 
 def check_folder():
