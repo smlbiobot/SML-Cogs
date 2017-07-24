@@ -977,7 +977,6 @@ class RACF:
         await self.bot.delete_message(message)
         await self.bot.say(msg)
 
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
     @commands.command(pass_context=True, no_pm=True)
     async def crsettag(self, ctx, tag, member: discord.Member=None):
         """Set CR tags for members.
@@ -988,9 +987,6 @@ class RACF:
         
         If those cogs are not loaded, it will just ignore it.
         """
-        if member is None:
-            member = ctx.message.author
-
         crclan = self.bot.get_cog("CRClan")
         crprofile = self.bot.get_cog("CRProfile")
 
