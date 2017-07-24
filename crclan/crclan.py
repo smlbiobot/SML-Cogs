@@ -89,10 +89,10 @@ class SCTag:
         Remove # if found.
         Convert to uppercase.
         """
-        if tag is not None:
-            if tag.startswith('#'):
-                tag = tag[:1]
-            tag = tag.upper()
+        if tag.startswith('#'):
+            tag = tag[1:]
+        tag = tag.replace('O', '0')
+        tag = tag.upper()
         self._tag = tag
 
     @property
