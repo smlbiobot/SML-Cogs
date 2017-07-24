@@ -136,6 +136,108 @@ class BarChart:
         return out
 
 
+class ClashRoyale:
+    """Clash Royale Data."""
+    instance = None
+
+    class __ClashRoyale:
+        """Singleton."""
+
+        def __init__(self, *args, **kwargs):
+            """Init."""
+            self.data = dataIO.load_json(CLASH_ROYALE_JSON)
+
+    def __init__(self, *args, **kwargs):
+        """Init."""
+        if not ClashRoyale.instance:
+            ClashRoyale.instance = ClashRoyale.__ClashRoyale(*args, **kwargs)
+        else:
+            pass
+
+    def __getattr__(self, name):
+        return getattr(self.instance, name)
+
+    def card_elixir(self, card):
+        """"Elixir of a card."""
+        try:
+            return self.data["Cards"][card]["elixir"]
+        except KeyError:
+            return 0
+
+
+class Card():
+    """Clash Royale Card."""
+
+    def __init__(self, key=None, level=None):
+        """Init.
+
+        Params
+        + name (str). Key in the ClashRoyale.json
+        """
+        self.key = key
+        self.level = level
+
+    @property
+    def elixir(self):
+        """Elixir value."""
+        return ClashRoyale().card_elixir(self.key)
+
+    def emoji(self, be: BotEmoji):
+        """Emoji representation of the card."""
+        if self.key is None:
+            return ''
+        name = self.key.replace('-', '')
+        return be.name(name)
+
+
+class Deck():
+    """Clash Royale Deck.
+
+    Contains 8 cards.
+    """
+
+    def __init__(self, card_keys=None, card_levels=None, rank=0, usage=0):
+        """Init.
+
+        Params
+        + rank (int). Rank on the leaderboard.
+        + cards []. List of card ids (keys in ClashRoyale.json).
+        + card_levels []. List of card levels.
+        """
+        self.rank = rank
+        self.usage = usage
+        self.cards = [Card(key=key) for key in card_keys]
+        if card_levels is not None:
+            kl_zip = zip(card_keys, card_levels)
+            self.cards = [Card(key=k, level=l) for k, l in kl_zip]
+
+    @property
+    def avg_elixir(self):
+        """Average elixir of the deck."""
+        elixirs = [c.elixir for c in self.cards if c.elixir != 0]
+        return sum(elixirs) / len(elixirs)
+
+    @property
+    def avg_elixir_str(self):
+        """Average elixir with format."""
+        return 'Average Elixir: {:.3}'.format(self.avg_elixir)
+
+    def emoji_repr(self, be: BotEmoji, show_levels=False):
+        """Emoji representaion."""
+        out = []
+        for card in self.cards:
+            emoji = card.emoji(be)
+            level = card.level
+            level_str = ''
+            if show_levels and level is not None:
+                level_str = '`{:.<2}`'.format(level)
+            out.append('{}{}'.format(emoji, level_str))
+        return ''.join(out)
+
+    def __repr__(self):
+        return ' '.join([c.key for c in self.cards])
+
+
 class CRData:
     """Clash Royale Global 200 Decks."""
 
