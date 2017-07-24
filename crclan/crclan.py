@@ -53,16 +53,7 @@ DATA_UPDATE_INTERVAL = timedelta(minutes=30).seconds
 
 API_FETCH_TIMEOUT = 5
 
-BOTCOMMANDER_ROLES = ["Bot Commander"]
-
-SETTINGS_DEFAULTS = {
-    "clan_api_url": {},
-    "servers": {},
-}
-SERVER_DEFAULTS = {
-    "clans": {},
-    "players": {}
-}
+BOT_COMMANDER_ROLES = ["Bot Commander"]
 
 CREDITS = 'Selfish + SML'
 
@@ -456,10 +447,6 @@ class CogModel:
         "clan_api_url": {},
         "servers": {},
     }
-    SERVER_DEFAULTS = {
-        "clans": {},
-        "players": {}
-    }
 
     def __init__(self, filepath):
         """Init."""
@@ -477,7 +464,7 @@ class CogModel:
 
         This will wipe all clan data and player data.
         """
-        self.settings["servers"][server.id] = self.SERVER_DEFAULTS
+        self.settings["servers"][server.id] = ServerModel.DEFAULTS
         self.save()
 
     def init_clans(self, server):
@@ -488,7 +475,7 @@ class CogModel:
     def check_server(self, server):
         """Make sure server exists in settings."""
         if server.id not in self.settings["servers"]:
-            self.settings["servers"][server.id] = self.SERVER_DEFAULTS
+            self.settings["servers"][server.id] = ServerModel.DEFAULTS
         self.save()
 
     def get_clans(self, server):
@@ -910,7 +897,7 @@ class CRClan:
         else:
             botcommander_roles = [
                 discord.utils.get(
-                    server.roles, name=r) for r in BOTCOMMANDER_ROLES]
+                    server.roles, name=r) for r in BOT_COMMANDER_ROLES]
             botcommander_roles = set(botcommander_roles)
             author_roles = set(author.roles)
             if len(author_roles.intersection(botcommander_roles)):
@@ -996,9 +983,7 @@ class CRClan:
                 return
 
         color = random_discord_color()
-        # await self.send_info(ctx, data, color=color)
         await self.info_view.send(ctx, data, color=color)
-        # await self.send_roster(ctx, server, data, color=color)
         await self.roster_view.send(ctx, server, data, color=color)
 
         if data_is_cached:
@@ -1084,7 +1069,7 @@ class CRClan:
         await self.roster_view.send(
             ctx, server, clan_data, cache_warning=data_is_cached, color=random_discord_color())
 
-    @commands.has_any_role(*BOTCOMMANDER_ROLES)
+    @commands.has_any_role(*BOT_COMMANDER_ROLES)
     @crclan.command(name="multiroster", pass_context=True, no_pm=True)
     async def crclan_multiroster(self, ctx, *keys):
         """Multiple rosters by list of keys.
@@ -1148,8 +1133,7 @@ class CRClan:
             cr_list = '\n'.join(cr_names_group[i])
             dc_list = '\n'.join(dc_names_group[i])
 
-            em = discord.Embed(title=data.name)
-            em.color = color
+            em = discord.Embed(title=data.name, color=color)
             em.add_field(name="CR", value=cr_list, inline=True)
             em.add_field(name="Discord", value=dc_list, inline=True)
 
@@ -1189,9 +1173,12 @@ class CRClanInfoView:
 
     def embed(self, data: CRClanModel, color=None):
         """Return clan info embed."""
+        if color is None:
+            color = random_discord_color()
         em = discord.Embed(
             title=data.name,
-            description=data.description)
+            description=data.description,
+            color=color)
         em.add_field(name="Clan Trophies", value=data.score)
         em.add_field(name="Type", value=CRClanType(data.type).typename)
         em.add_field(name="Required Trophies", value=data.requiredScore)
@@ -1199,9 +1186,6 @@ class CRClanInfoView:
         em.add_field(name="Members", value=data.member_count_str)
         badge_url = self.model.badge_url + data.badge_url
         em.set_thumbnail(url=badge_url)
-        if color is None:
-            color = random_discord_color()
-        em.color = color
         return em
 
 
@@ -1308,7 +1292,7 @@ def check_folder():
 def check_file():
     """Check files."""
     if not dataIO.is_valid_json(JSON):
-        dataIO.save_json(JSON, SETTINGS_DEFAULTS)
+        dataIO.save_json(JSON, {})
 
 
 def setup(bot):
