@@ -86,7 +86,6 @@ class CRDataEnhanced:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.crdata = self.bot.get_cog('CRData')
         self.be = BotEmoji(bot)
         self.clashroyale = dataIO.load_json(CLASH_ROYALE_JSON)
 
@@ -117,7 +116,13 @@ class CRDataEnhanced:
             await send_cmd_help(ctx)
             return
 
-        found_decks = await self.crdata.search(ctx, *cards)
+        crdata = self.bot.get_cog('CRData')
+
+        if crdata is None:
+            await self.bot.say("The CRData cog does not appear to be loaded.")
+            return
+
+        found_decks = await crdata.search(ctx, *cards)
 
         if found_decks is None:
             await self.bot.say("Found 0 decks.")
@@ -151,14 +156,6 @@ class CRDataEnhanced:
                     cards = [c.replace('-', '') for c in cards]
                     levels = [card["level"] for card in deck]
 
-                    # desc = "**Rank {}: (Usage: {})**".format(rank, usage)
-                    # desc = "**Rank {}: **".format(rank)
-                    # for j, card in enumerate(cards):
-                    #     desc += "{} ".format(self.crdata.id_to_name(card))
-                    #     desc += "({}), ".format(levels[j])
-                    # desc = desc[:-1]
-                    # field_name = desc
-
                     field_name = "Rank {}.".format(rank)
 
                     cards_levels = zip(cards, levels)
@@ -167,9 +164,6 @@ class CRDataEnhanced:
                     field_value = '{}\nAvg Elixir: {:.3f}'.format(cards_str, avg_elixir)
 
                     em.add_field(name=field_name, value=field_value, inline=False)
-
-            # if em_id == (len(found_decks) // per_page):
-            #     em.set_footer(text="Data provided by http://starfi.re")
 
             await self.bot.say(embed=em)
 
