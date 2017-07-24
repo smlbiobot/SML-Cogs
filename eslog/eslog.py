@@ -50,7 +50,6 @@ from discord.ext.commands import Command
 from discord.ext.commands import Context
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
-from elasticsearch_dsl.response import Response
 from elasticsearch_dsl.query import QueryString
 from elasticsearch_dsl.query import Range
 
@@ -130,7 +129,7 @@ class ESLogger:
         """Return server, channel and author from message."""
         return message.server, message.channel, message.author
 
-    def get_server_params(self, server: Server):
+    def param_server(self, server: Server):
         """Return extra fields for server."""
         extra = {
             'id': server.id,
@@ -138,12 +137,12 @@ class ESLogger:
         }
         return extra
 
-    def get_channel_params(self, channel: Channel):
+    def param_channel(self, channel: Channel):
         """Return extra fields for channel."""
         extra = {
             'id': channel.id,
             'name': channel.name,
-            'server': self.get_server_params(channel.server),
+            'server': self.param_server(channel.server),
             'position': channel.position,
             'is_default': channel.is_default,
             'created_at': channel.created_at.isoformat(),
@@ -156,7 +155,7 @@ class ESLogger:
         }
         return extra
 
-    def get_server_channel_params(self, channel: Channel):
+    def param_server_channel(self, channel: Channel):
         """Return digested version of channel params"""
         extra = {
             'id': channel.id,
@@ -167,7 +166,7 @@ class ESLogger:
         }
         return extra
 
-    def get_member_params(self, member: Member):
+    def param_member(self, member: Member):
         """Return data for member."""
         extra = {
             'name': member.display_name,
@@ -179,21 +178,21 @@ class ESLogger:
 
         if isinstance(member, Member):
             extra.update({
-                'status': self.get_extra_status(member.status),
-                'game': self.get_game_params(member.game),
-                'top_role': self.get_role_params(member.top_role),
+                'status': self.param_status(member.status),
+                'game': self.param_game(member.game),
+                'top_role': self.param_role(member.top_role),
                 'joined_at': member.joined_at.isoformat()
             })
 
         if hasattr(member, 'server'):
-            extra['server'] = self.get_server_params(member.server)
+            extra['server'] = self.param_server(member.server)
             # message sometimes reference a user and has no roles info
             if hasattr(member, 'roles'):
-                extra['roles'] = [self.get_role_params(r) for r in member.server.role_hierarchy if r in member.roles]
+                extra['roles'] = [self.param_role(r) for r in member.server.role_hierarchy if r in member.roles]
 
         return extra
 
-    def get_role_params(self, role: Role):
+    def param_role(self, role: Role):
         """Return data for role."""
         if not role:
             return {}
@@ -203,7 +202,7 @@ class ESLogger:
         }
         return extra
 
-    def get_extra_status(self, status: Status):
+    def param_status(self, status: Status):
         """Return data for status."""
         extra = {
             'online': status == Status.online,
@@ -214,7 +213,7 @@ class ESLogger:
         }
         return extra
 
-    def get_game_params(self, game: Game):
+    def param_game(self, game: Game):
         """Return ata for game."""
         if game is None:
             return {}
@@ -225,7 +224,7 @@ class ESLogger:
         }
         return extra
 
-    def get_sca_params(self, message: Message):
+    def param_sca(self, message: Message):
         """Return extra fields from messages."""
         server = message.server
         channel = message.channel
@@ -234,17 +233,17 @@ class ESLogger:
         extra = {}
 
         if author is not None:
-            extra['author'] = self.get_member_params(author)
+            extra['author'] = self.param_member(author)
 
         if channel is not None:
-            extra['channel'] = self.get_channel_params(channel)
+            extra['channel'] = self.param_channel(channel)
 
         if server is not None:
-            extra['server'] = self.get_server_params(server)
+            extra['server'] = self.param_server(server)
 
         return extra
 
-    def get_mentions_extra(self, message: Message):
+    def param_mention(self, message: Message):
         """Return mentions in message."""
         mentions = set(message.mentions.copy())
         names = [m.display_name for m in mentions]
@@ -254,7 +253,7 @@ class ESLogger:
             'mention_ids': ids
         }
 
-    def get_attach_params(self, message: Message):
+    def param_attachment(self, message: Message):
         """Return attachments in message."""
         attach = [{'url': a['url']} for a in message.attachments]
         # attach = []
@@ -262,14 +261,14 @@ class ESLogger:
             'attachments': attach
         }
 
-    def get_embeds_params(self, message: Message):
+    def param_embed(self, message: Message):
         """Return list of embeds as dictionary."""
         embeds = [em for em in message.embeds]
         return {
             'embeds': embeds
         }
 
-    def get_emojis_params(self, message: Message):
+    def param_emoji(self, message: Message):
         """Return list of emojis used in messages."""
         emojis = []
         emojis.append(EMOJI_P.findall(message.content))
@@ -304,6 +303,13 @@ class ESLogger:
         if is_gauge:
             extra['discord_gauge'] = key
 
+        if is_event:
+            doc_type = 'discord_event'
+        elif is_gauge:
+            doc_type = 'discord_gauge'
+        else:
+            doc_type = 'discord'
+
         now = dt.datetime.utcnow()
         now_str = now.strftime('%Y.%m.%d')
 
@@ -311,7 +317,7 @@ class ESLogger:
 
         self.es.index(
             index='discord-{}'.format(now_str),
-            doc_type='discord',
+            doc_type=doc_type,
             body=extra,
             timestamp=now
         )
@@ -330,16 +336,13 @@ class ESLogger:
         emojis = []
         emojis.append(EMOJI_P.findall(message.content))
         emojis.append(UEMOJI_P.findall(message.content))
-        if not self.extra:
-            return
         for emoji in emojis:
-            extra = self.extra.copy()
             event_key = "message.emoji"
             extra = {
                 'discord_event': event_key,
                 'emoji': emoji
             }
-            self.logger.info(self.get_event_key(event_key), extra=extra)
+            self.log_discord_event("message.emoji", extra=extra)
 
     def log_discord_event(self, key=None, extra=None):
         """Log Discord events."""
@@ -352,21 +355,21 @@ class ESLogger:
     def log_channel_create(self, channel: Channel):
         """Log channel creation."""
         extra = {
-            'channel': self.get_channel_params(channel)
+            'channel': self.param_channel(channel)
         }
         self.log_discord_event("channel.create", extra)
 
     def log_channel_delete(self, channel: Channel):
         """Log channel deletion."""
         extra = {
-            'channel': self.get_channel_params(channel)
+            'channel': self.param_channel(channel)
         }
         self.log_discord_event("channel.delete", extra)
 
     def log_member_join(self, member: Member):
         """Log member joining the server."""
         extra = {
-            'member': self.get_member_params(member)
+            'member': self.param_member(member)
         }
         self.log_discord_event("member.join", extra)
 
@@ -374,40 +377,40 @@ class ESLogger:
         """Track member’s updated status."""
         if set(before.roles) != set(after.roles):
             extra = {
-                'member': self.get_member_params(after)
+                'member': self.param_member(after)
             }
             if len(before.roles) > len(after.roles):
                 roles_removed = set(before.roles) - set(after.roles)
                 extra['role_update'] = 'remove'
-                extra['roles_removed'] = [self.get_role_params(r) for r in roles_removed]
+                extra['roles_removed'] = [self.param_role(r) for r in roles_removed]
             else:
                 roles_added = set(after.roles) - set(before.roles)
                 extra['role_update'] = 'add'
-                extra['roles_added'] = [self.get_role_params(r) for r in roles_added]
+                extra['roles_added'] = [self.param_role(r) for r in roles_added]
 
             self.log_discord_event('member.update.roles', extra)
 
     def log_member_remove(self, member: Member):
         """Log member leaving the server."""
         extra = {
-            'member': self.get_member_params(member)
+            'member': self.param_member(member)
         }
         self.log_discord_event("member.remove", extra)
 
     def log_message(self, message: Message):
         """Log message."""
         extra = {'content': message.content}
-        extra.update(self.get_sca_params(message))
-        extra.update(self.get_attach_params(message))
-        extra.update(self.get_mentions_extra(message))
-        extra.update(self.get_embeds_params(message))
+        extra.update(self.param_sca(message))
+        extra.update(self.param_attachment(message))
+        extra.update(self.param_mention(message))
+        extra.update(self.param_embed(message))
         self.log_discord_event('message', extra)
 
     def log_message_delete(self, message: Message):
         """Log deleted message."""
         extra = {'content': message.content}
-        extra.update(self.get_sca_params(message))
-        extra.update(self.get_mentions_extra(message))
+        extra.update(self.param_sca(message))
+        extra.update(self.param_mention(message))
         self.log_discord_event('message.delete', extra)
 
     def log_message_edit(self, before: Message, after: Message):
@@ -416,8 +419,8 @@ class ESLogger:
             'content_before': before.content,
             'content_after': after.content
         }
-        extra.update(self.get_sca_params(after))
-        extra.update(self.get_mentions_extra(after))
+        extra.update(self.param_sca(after))
+        extra.update(self.param_mention(after))
         self.log_discord_event('message.edit', extra)
 
     def log_all_gauges(self):
@@ -444,10 +447,9 @@ class ESLogger:
         })
         servers_data = []
         for server in servers:
-            servers_data.append(self.get_server_params(server))
+            servers_data.append(self.param_server(server))
         extra['servers'] = servers_data
         self.log_discord_gauge('servers', extra=extra)
-        # self.logger.info(self.get_event_key(event_key), extra=extra)
 
     def log_channels(self):
         """Log channels."""
@@ -463,17 +465,17 @@ class ESLogger:
 
     def log_channel(self, channel: Channel):
         """Log one channel."""
-        extra = {'channel': self.get_channel_params(channel)}
+        extra = {'channel': self.param_channel(channel)}
         self.log_discord_gauge('channel', extra=extra)
 
     def log_members(self):
         """Log members."""
         members = list(self.bot.get_all_members())
         unique = set(m.id for m in members)
-        extra = {
-            'member_count': len(members),
-            'unique_member_count': len(unique)
-        }
+        extra = {'member_count': len(members), 'unique_member_count': len(unique)}
+
+        # log all members in single call
+        # extra.update({"members": [self.param_member(m) for m in members]})
         self.log_discord_gauge('all_members', extra=extra)
 
         for member in members:
@@ -481,7 +483,7 @@ class ESLogger:
 
     def log_member(self, member: Member):
         """Log member."""
-        extra = {'member': self.get_member_params(member)}
+        extra = {'member': self.param_member(member)}
         self.log_discord_gauge('member', extra=extra)
 
     def log_voice(self):
@@ -500,7 +502,7 @@ class ESLogger:
         """Log server roles."""
         for server in self.bot.servers:
             extra = {}
-            extra['server'] = self.get_server_params(server)
+            extra['server'] = self.param_server(server)
             extra['roles'] = []
 
             roles = server.role_hierarchy
@@ -509,7 +511,7 @@ class ESLogger:
             for index, role in enumerate(roles):
                 count = sum([1 for m in server.members if role in m.roles])
 
-                role_params = self.get_role_params(role)
+                role_params = self.param_role(role)
                 role_params['count'] = count
                 role_params['hierachy_index'] = index
 
@@ -521,7 +523,7 @@ class ESLogger:
         """Log server channels."""
         for server in self.bot.servers:
             extra = {
-                'server': self.get_server_params(server),
+                'server': self.param_server(server),
                 'channels': {
                     'text': [],
                     'voice': []
@@ -530,7 +532,7 @@ class ESLogger:
             channels = sorted(server.channels, key=lambda x: x.position)
 
             for channel in channels:
-                channel_params = self.get_server_channel_params(channel)
+                channel_params = self.param_server_channel(channel)
                 if channel.type == ChannelType.text:
                     extra['channels']['text'].append(channel_params)
                 elif channel.type == ChannelType.voice:
