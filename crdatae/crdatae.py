@@ -146,7 +146,7 @@ class CRDataEnhanced:
                     deck = data["deck"]
                     rank = ", ".join(data["ranks"])
                     usage = data["count"]
-                    cards = [self.crdata.sfid_to_id(card["key"]) for card in deck]
+                    cards = [crdata.sfid_to_id(card["key"]) for card in deck]
 
                     card_elixirs = [self.card_elixir(c) for c in cards]
                     # Remove from calculation if elixir is 0
