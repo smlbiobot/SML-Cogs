@@ -133,41 +133,98 @@ class CRDataEnhanced:
 
         # embeds
         per_page = 25
-        found_decks_group = grouper(per_page, found_decks)
+        found_decks_group = list(grouper(per_page, found_decks))
         color = random_discord_color()
 
         for em_id, fd in enumerate(found_decks_group):
 
-            em = discord.Embed(title="Clash Royale: Global Top 200 Decks", color=color)
-
-            for data in fd:
-                # print(data)
-                if data is not None:
-                    deck = data["deck"]
-                    rank = ", ".join(data["ranks"])
-                    usage = data["count"]
-                    cards = [crdata.sfid_to_id(card["key"]) for card in deck]
-
-                    card_elixirs = [self.card_elixir(c) for c in cards]
-                    # Remove from calculation if elixir is 0
-                    card_elixirs = [e for e in card_elixirs if e != 0]
-                    avg_elixir = sum(card_elixirs) / len(card_elixirs)
-
-                    cards = [c.replace('-', '') for c in cards]
-                    levels = [card["level"] for card in deck]
-
-                    field_name = "Rank {}.".format(rank)
-
-                    cards_levels = zip(cards, levels)
-                    cards_str = ''.join([
-                        '{}`{:.<2}`'.format(self.be.name(cl[0]), cl[1]) for cl in cards_levels])
-                    field_value = '{}\nAvg Elixir: {:.3f}'.format(cards_str, avg_elixir)
-
-                    em.add_field(name=field_name, value=field_value, inline=False)
+            em = self.embed_decks(
+                fd,
+                page=(em_id + 1),
+                title="Clash Royale: Global Top 200 Decks",
+                description="Found {} decks.".format(len(found_decks)),
+                color=color,
+                footer_text="Data provided by http://starfi.re"
+            )
 
             await self.bot.say(embed=em)
 
-        await self.bot.say("Data provided by <http://starfi.re>")
+            if em_id < len(found_decks_group) - 1:
+                show_next = await self.show_next_page(ctx)
+                if not show_next:
+                    break
+
+    def embed_decks(self, decks, **kwargs):
+        """Show embed decks.
+        
+        Params:
+        + page. Current page.
+        + per_page. Number of results per page.
+        + All parameters supported by Discord Embeds.
+        """
+        em = discord.Embed(**kwargs)
+
+        page = 1
+        per_page = 25
+        show_usage = False
+        footer_text = ''
+        if 'page' in kwargs:
+            page = kwargs['page']
+        if 'per_page' in kwargs:
+            per_page = kwargs['per_page']
+        if 'show_usage' in kwargs:
+            show_usage = kwargs['show_usage']
+        if 'footer_text' in kwargs:
+            footer_text = kwargs['footer_text']
+
+        crdata = self.bot.get_cog('CRData')
+
+        for result_id, data in enumerate(decks):
+            # print(data)
+            result_number = per_page * (page - 1) + (result_id + 1)
+            if data is not None:
+                deck = data["deck"]
+                rank = ", ".join(data["ranks"])
+                usage = data["count"]
+                cards = [crdata.sfid_to_id(card["key"]) for card in deck]
+
+                card_elixirs = [self.card_elixir(c) for c in cards]
+                # Remove from calculation if elixir is 0
+                card_elixirs = [e for e in card_elixirs if e != 0]
+                avg_elixir = sum(card_elixirs) / len(card_elixirs)
+
+                cards = [c.replace('-', '') for c in cards]
+                levels = [card["level"] for card in deck]
+
+                usage_str = ''
+                if usage and show_usage:
+                    usage_str = '(Usage: {})'.format(usage)
+                field_name = "{}: Rank {} {}".format(result_number, rank, usage_str)
+
+                cards_levels = zip(cards, levels)
+                cards_str = ''.join([
+                    '{}`{:.<2}`'.format(self.be.name(cl[0]), cl[1]) for cl in cards_levels])
+                field_value = '{}\nAvg Elixir: {:.3f}'.format(cards_str, avg_elixir)
+                em.add_field(name=field_name, value=field_value, inline=False)
+
+        em.set_footer(text=footer_text)
+        return em
+
+    async def show_next_page(self, ctx):
+        """Results pagination."""
+        timeout = 30
+        await self.bot.say(
+            "Would you like to see more results? (y/n)")
+        answer = await self.bot.wait_for_message(
+            timeout=timeout,
+            author=ctx.message.author)
+        if answer is None:
+            return False
+        elif not len(answer.content):
+            return False
+        elif answer.content[0].lower() != 'y':
+            return False
+        return True
 
     def card_elixir(self, card):
         """Return elixir of a card."""
