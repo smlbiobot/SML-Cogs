@@ -77,23 +77,168 @@ class BotEmoji:
         return ''
 
 
+class ClashRoyale:
+    """Clash Royale Data."""
+    instance = None
+
+    class __ClashRoyale:
+        """Singleton."""
+        def __init__(self, *args, **kwargs):
+            """Init."""
+            self.data = dataIO.load_json(CLASH_ROYALE_JSON)
+
+    def __init__(self, *args, **kwargs):
+        """Init."""
+        if not ClashRoyale.instance:
+            ClashRoyale.instance = ClashRoyale.__ClashRoyale(*args, **kwargs)
+        else:
+            pass
+
+    def __getattr__(self, name):
+        return getattr(self.instance, name)
+
+    def card_elixir(self, card):
+        """"Elixir of a card."""
+        try:
+            return self.data["Cards"][card]["elixir"]
+        except KeyError:
+            return 0
+
+
+class Card():
+    """Clash Royale Card."""
+
+    def __init__(self, key=None, level=None):
+        """Init.
+
+        Params
+        + name (str). Key in the ClashRoyale.json
+        """
+        self.key = key
+        self.level = level
+
+    def elixir(self):
+        """Elixir value."""
+        return ClashRoyale().card_elixir(self.name)
+
+    def emoji(self, be: BotEmoji):
+        """Emoji representation of the card."""
+        if self.key is None:
+            return ''
+        name = self.key.replace('-', '')
+        return be.name(name)
+
+
+class Deck():
+    """Clash Royale Deck.
+    
+    Contains 8 cards.
+    """
+
+    def __init__(self, card_keys=None, card_levels=None, rank=0, usage=0):
+        """Init.
+
+        Params
+        + rank (int). Rank on the leaderboard.
+        + cards []. List of card ids (keys in ClashRoyale.json).
+        + card_levels []. List of card levels.
+        """
+        self.rank = rank
+        self.usage = usage
+        self.cards = [Card(key=key) for key in card_keys]
+        if card_levels is not None:
+            kl_zip = zip(card_keys, card_levels)
+            self.cards = [Card(key=k, level=l) for k, l in kl_zip]
+
+    @property
+    def avg_elixir(self):
+        """Average elixir of the deck."""
+        elixirs = [c.elixir for c in self.cards if c.elixir != 0]
+        return sum(elixirs) / len(elixirs)
+
+    def emoji_repr(self, be: BotEmoji, show_levels=False):
+        """Emoji representaion."""
+        out = []
+        for card in self.cards:
+            emoji = card.emoji(be)
+            level = card.level
+            level_str = ''
+            if show_levels and level is not None:
+                level_str = '`{:.<2}`'.format(level)
+            out.append('{}{}'.format(emoji, level_str))
+        return ''.join(out)
+
+    def __repr__(self):
+        return ' '.join([c.key for c in self.cards])
+
+
 class CRDataEnhanced:
     """Clash Royale Data - Enchanced options.
     
     Requires CRData cog to function.
     """
 
+    error_msg = {
+        "requires_crdata": (
+            "The CRData cog is not installed or loaded. "
+            "This cog cannot function without it."
+        )
+    }
+
     def __init__(self, bot):
         """Init."""
         self.bot = bot
         self.be = BotEmoji(bot)
-        self.clashroyale = dataIO.load_json(CLASH_ROYALE_JSON)
+        self.clashroyale = ClashRoyale().data
 
     @commands.group(pass_context=True, no_pm=True)
     async def crdatae(self, ctx):
-        """Clash Royale Data (Enhanced options)."""
+        """Clash Royale Real-Time Global 200 Leaderboard."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    # @crdatae.command(name="leaderboard", aliases=['lb'], pass_context=True, no_pm=True)
+    # async def crdatae_leaderboard(self, ctx):
+    #     """Leaderboard."""
+    #     crdata = self.bot.get_cog('CRData')
+    #     if crdata is None:
+    #         await self.bot.say(self.error_msg["requires_crdata"])
+    #         return
+    #
+    #     data = crdata.get_last_data()
+    #     decks = data["decks"]
+    #
+    #     for i, deck in enumerate(decks):
+    #         cards = [crdata.sfid_to_id(card["key"]) for card in deck]
+    #         levels = [card["level"] for card in deck]
+    #
+    #         desc = "**Rank {}: **".format(i + 1)
+    #         for j, card in enumerate(cards):
+    #             desc += "{} ".format(crdata.id_to_name(card))
+    #             desc += "({}), ".format(levels[j])
+    #
+    #     # embeds
+    #     per_page = 25
+    #     found_decks_group = list(grouper(per_page, found_decks))
+    #     color = random_discord_color()
+    #
+    #     for em_id, fd in enumerate(found_decks_group):
+    #
+    #         em = self.embed_decks(
+    #             fd,
+    #             page=(em_id + 1),
+    #             title="Clash Royale: Global Top 200 Decks",
+    #             description="Found {} decks.".format(len(found_decks)),
+    #             color=color,
+    #             footer_text="Data provided by http://starfi.re"
+    #         )
+    #
+    #         await self.bot.say(embed=em)
+    #
+    #         if em_id < len(found_decks_group) - 1:
+    #             show_next = await self.show_next_page(ctx)
+    #             if not show_next:
+    #                 break
 
     @crdatae.command(name="search", pass_context=True, no_pm=True)
     async def crdatae_search(self, ctx, *cards):
@@ -119,7 +264,7 @@ class CRDataEnhanced:
         crdata = self.bot.get_cog('CRData')
 
         if crdata is None:
-            await self.bot.say("The CRData cog does not appear to be loaded.")
+            await self.bot.say(self.error_msg["requires_crdata"])
             return
 
         found_decks = await crdata.search(ctx, *cards)
@@ -131,32 +276,38 @@ class CRDataEnhanced:
             await self.bot.say("Found 0 decks.")
             return
 
-        # embeds
+        decks = []
+        for fd in found_decks:
+            card_keys = [crdata.sfid_to_id(card["key"]) for card in fd["deck"]]
+            card_levels = [card["level"] for card in fd["deck"]]
+            deck = Deck(card_keys=card_keys, card_levels=card_levels, rank=fd["ranks"][0], usage=fd["count"])
+            decks.append(deck)
+
         per_page = 25
-        found_decks_group = list(grouper(per_page, found_decks))
+        decks_group = list(grouper(per_page, decks))
         color = random_discord_color()
 
-        for em_id, fd in enumerate(found_decks_group):
+        for page, decks_page in enumerate(decks_group):
 
             em = self.embed_decks(
-                fd,
-                page=(em_id + 1),
+                decks_page,
+                page=(page + 1),
                 title="Clash Royale: Global Top 200 Decks",
-                description="Found {} decks.".format(len(found_decks)),
+                description="Found {} decks.".format(len(decks)),
                 color=color,
                 footer_text="Data provided by http://starfi.re"
             )
 
             await self.bot.say(embed=em)
 
-            if em_id < len(found_decks_group) - 1:
+            if page < len(decks_group) - 1:
                 show_next = await self.show_next_page(ctx)
                 if not show_next:
                     break
 
     def embed_decks(self, decks, **kwargs):
         """Show embed decks.
-        
+
         Params:
         + page. Current page.
         + per_page. Number of results per page.
@@ -169,35 +320,16 @@ class CRDataEnhanced:
         show_usage = kwargs.get('show_usage', False)
         footer_text = kwargs.get('footer_text', '')
 
-        crdata = self.bot.get_cog('CRData')
-
-        for result_id, data in enumerate(decks):
-            # print(data)
-            result_number = per_page * (page - 1) + (result_id + 1)
-            if data is not None:
-                deck = data["deck"]
-                rank = ", ".join(data["ranks"])
-                usage = data["count"]
-                cards = [crdata.sfid_to_id(card["key"]) for card in deck]
-
-                card_elixirs = [self.card_elixir(c) for c in cards]
-                # Remove from calculation if elixir is 0
-                card_elixirs = [e for e in card_elixirs if e != 0]
-                avg_elixir = sum(card_elixirs) / len(card_elixirs)
-
-                cards = [c.replace('-', '') for c in cards]
-                levels = [card["level"] for card in deck]
+        for deck_id, deck in enumerate(decks):
+            if deck is not None:
+                result_number = per_page * (page - 1) + (deck_id + 1)
 
                 usage_str = ''
-                if usage and show_usage:
-                    usage_str = '(Usage: {})'.format(usage)
-                field_name = "{}: Rank {} {}".format(result_number, rank, usage_str)
-
-                cards_levels = zip(cards, levels)
-                cards_str = ''.join([
-                    '{}`{:.<2}`'.format(self.be.name(cl[0]), cl[1]) for cl in cards_levels])
-                field_value = '{}\nAvg Elixir: {:.3f}'.format(cards_str, avg_elixir)
-                em.add_field(name=field_name, value=field_value, inline=False)
+                if deck.usage and show_usage:
+                    usage_str = '(Usage: {})'.format(deck.usage)
+                field_name = "{}: Rank {} {}".format(result_number, deck.rank, usage_str)
+                field_value = deck.emoji_repr(self.be, show_levels=True)
+                em.add_field(name=field_name, value=field_value)
 
         em.set_footer(text=footer_text)
         return em
