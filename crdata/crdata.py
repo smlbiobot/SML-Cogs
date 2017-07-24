@@ -136,6 +136,32 @@ class BarChart:
         return out
 
 
+class BotEmoji:
+    """Emojis available in bot."""
+    def __init__(self, bot):
+        self.bot = bot
+
+    def name(self, name):
+        """Emoji by name."""
+        for server in self.bot.servers:
+            for emoji in server.emojis:
+                if emoji.name == name:
+                    return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
+
+    def key(self, key):
+        """Chest emojis by api key name or key.
+
+        name is used by this cog.
+        key is values returned by the api.
+        Use key only if name is not set
+        """
+        if key in self.map:
+            name = self.map[key]
+            return self.name(name)
+        return ''
+    
+
 class ClashRoyale:
     """Clash Royale Data."""
     instance = None
