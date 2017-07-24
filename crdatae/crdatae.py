@@ -164,18 +164,10 @@ class CRDataEnhanced:
         """
         em = discord.Embed(**kwargs)
 
-        page = 1
-        per_page = 25
-        show_usage = False
-        footer_text = ''
-        if 'page' in kwargs:
-            page = kwargs['page']
-        if 'per_page' in kwargs:
-            per_page = kwargs['per_page']
-        if 'show_usage' in kwargs:
-            show_usage = kwargs['show_usage']
-        if 'footer_text' in kwargs:
-            footer_text = kwargs['footer_text']
+        page = kwargs.get('page', 1)
+        per_page = kwargs.get('per_page', 25)
+        show_usage = kwargs.get('show_usage', False)
+        footer_text = kwargs.get('footer_text', '')
 
         crdata = self.bot.get_cog('CRData')
 
@@ -228,9 +220,12 @@ class CRDataEnhanced:
 
     def card_elixir(self, card):
         """Return elixir of a card."""
-        if card not in self.clashroyale["Cards"].keys():
-            return 0
-        return self.clashroyale["Cards"][card]["elixir"]
+        elixir = 0
+        try:
+            elixir = self.clashroyale["Cards"][card]["elixir"]
+        except KeyError:
+            pass
+        return elixir
 
 
 def setup(bot):
