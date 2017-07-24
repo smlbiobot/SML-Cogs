@@ -894,6 +894,8 @@ class CRClan:
         allowed = False
         if member is None:
             allowed = True
+        elif member.id == author.id:
+            allowed = True
         else:
             botcommander_roles = [
                 discord.utils.get(
