@@ -160,7 +160,7 @@ class BotEmoji:
             name = self.map[key]
             return self.name(name)
         return ''
-    
+
 
 class ClashRoyale:
     """Clash Royale Data."""
