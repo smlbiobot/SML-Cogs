@@ -599,6 +599,7 @@ class ESLogModel:
         )
         parser.add_argument(
             '-s', '--split',
+            default='channel',
             choices=['channel']
         )
         return parser
