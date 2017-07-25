@@ -32,6 +32,7 @@ import os
 import re
 from collections import defaultdict
 from collections import Counter
+from collections import OrderedDict
 from datetime import timedelta
 from random import choice
 
@@ -50,7 +51,7 @@ from discord.ext.commands import Command
 from discord.ext.commands import Context
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search, FacetedSearch, TermsFacet
-from elasticsearch_dsl.query import QueryString
+from elasticsearch_dsl.query import QueryString, Query, Q, Filtered, Match
 from elasticsearch_dsl.query import Range
 from elasticsearch_dsl import Index, DocType, Date, Nested, Boolean, \
     analyzer, InnerObjectWrapper, Completion, Keyword, Text, Integer
@@ -97,7 +98,7 @@ def random_discord_color():
     return discord.Color(value=color)
 
 
-class ServerInnerObject(InnerObjectWrapper):
+class ServerDoc(DocType):
     """Server Inner Object."""
     id = Integer()
     name = Text(fields={'raw': Keyword()})
@@ -146,6 +147,7 @@ class MemberDoc(UserDoc):
     bot = Boolean()
     top_role = Nested(doc_class=RoleInnerObject)
     roles = Nested(doc_class=RoleInnerObject)
+    server = Nested(doc_class=ServerDoc)
 
     class Meta:
         doc_type = 'member'
@@ -193,7 +195,7 @@ class MessageDoc(DocType):
         fields={'raw': Keyword()}
     )
     author = Nested(doc_class=MemberDoc)
-    server = Nested(doc_class=ServerInnerObject)
+    server = Nested(doc_class=ServerDoc)
     channel = Nested(doc_class=ChannelInnerObject)
     mentions = Nested(doc_class=MemberDoc)
     timestamp = Date()
@@ -279,7 +281,7 @@ class MessageAuthorSearch(FacetedSearch):
     }
 
 
-class ESLogger2:
+class ESLogger:
     """Elastic Search Logging v2.
     
     Separated into own class to make migration easier.
@@ -319,7 +321,7 @@ class ESLogger2:
         # parser.add_argument('key')
         parser.add_argument(
             '-t', '--time',
-            default="7d",
+            default="1d",
             help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
         )
         parser.add_argument(
@@ -372,637 +374,6 @@ class ESLogger2:
         for message in s.scan():
             print('-'*40)
             print(message.to_dict())
-
-
-class ESLogger:
-    """Elastic Search Logging module.
-    
-    Handle logging for everything.
-    Most of these methods were orginally inside the Cog class,
-    but it makes navigating the commands difficult.
-    """
-
-    def __init__(self, bot, es: Elasticsearch):
-        """Init."""
-        self.bot = bot
-        self.es = es
-        self.extra = None
-
-        # DMessage.init('discord2', using=self.es)
-
-    def init_extra(self):
-        """Initialize extra settings.
-        
-        This doubles as a flag for when the cog is ready to log to ES.
-        As such it is not initialized in __init__
-        """
-        self.extra = {
-            'log_type': 'discord.logger',
-            'application': 'red',
-            'bot_id': self.bot.user.id,
-            'bot_name': self.bot.user.name
-        }
-
-    def get_message_sca(self, message: Message):
-        """Return server, channel and author from message."""
-        return message.server, message.channel, message.author
-
-    def param_server(self, server: Server):
-        """Return extra fields for server."""
-        extra = {
-            'id': server.id,
-            'name': server.name,
-        }
-        return extra
-
-    def param_channel(self, channel: Channel):
-        """Return extra fields for channel."""
-        extra = {
-            'id': channel.id,
-            'name': channel.name,
-            'server': self.param_server(channel.server),
-            'position': channel.position,
-            'is_default': channel.is_default,
-            'created_at': channel.created_at.isoformat(),
-            'type': {
-                'text': channel.type == ChannelType.text,
-                'voice': channel.type == ChannelType.voice,
-                'private': channel.type == ChannelType.private,
-                'group': channel.type == ChannelType.group
-            }
-        }
-        return extra
-
-    def param_server_channel(self, channel: Channel):
-        """Return digested version of channel params"""
-        extra = {
-            'id': channel.id,
-            'name': channel.name,
-            'position': channel.position,
-            'is_default': channel.is_default,
-            'created_at': channel.created_at.isoformat(),
-        }
-        return extra
-
-    def param_member(self, member: Member):
-        """Return data for member."""
-        extra = {
-            'name': member.display_name,
-            'username': member.name,
-            'display_name': member.display_name,
-            'id': member.id,
-            'bot': member.bot
-        }
-
-        if isinstance(member, Member):
-            extra.update({
-                'status': self.param_status(member.status),
-                'game': self.param_game(member.game),
-                'top_role': self.param_role(member.top_role),
-                'joined_at': member.joined_at.isoformat()
-            })
-
-        if hasattr(member, 'server'):
-            extra['server'] = self.param_server(member.server)
-            # message sometimes reference a user and has no roles info
-            if hasattr(member, 'roles'):
-                extra['roles'] = [self.param_role(r) for r in member.server.role_hierarchy if r in member.roles]
-
-        return extra
-
-    def param_role(self, role: Role):
-        """Return data for role."""
-        if not role:
-            return {}
-        extra = {
-            'name': role.name,
-            'id': role.id
-        }
-        return extra
-
-    def param_status(self, status: Status):
-        """Return data for status."""
-        extra = {
-            'online': status == Status.online,
-            'offline': status == Status.offline,
-            'idle': status == Status.idle,
-            'dnd': status == Status.dnd,
-            'invisible': status == Status.invisible
-        }
-        return extra
-
-    def param_game(self, game: Game):
-        """Return ata for game."""
-        if game is None:
-            return {}
-        extra = {
-            'name': game.name,
-            'url': game.url,
-            'type': game.type
-        }
-        return extra
-
-    def param_sca(self, message: Message):
-        """Return extra fields from messages."""
-        server = message.server
-        channel = message.channel
-        author = message.author
-
-        extra = {}
-
-        if author is not None:
-            extra['author'] = self.param_member(author)
-
-        if channel is not None:
-            extra['channel'] = self.param_channel(channel)
-
-        if server is not None:
-            extra['server'] = self.param_server(server)
-
-        return extra
-
-    def param_mention(self, message: Message):
-        """Return mentions in message."""
-        mentions = []
-        for member in set(message.mentions.copy()):
-            mentions.append(self.param_member(member))
-        return {
-            'mentions': mentions
-        }
-
-    def param_attachment(self, message: Message):
-        """Return attachments in message."""
-        attach = [{'url': a['url']} for a in message.attachments]
-        # attach = []
-        return {
-            'attachments': attach
-        }
-
-    def param_embed(self, message: Message):
-        """Return list of embeds as dictionary."""
-        embeds = [em for em in message.embeds]
-        return {
-            'embeds': embeds
-        }
-
-    def param_emoji(self, message: Message):
-        """Return list of emojis used in messages."""
-        emojis = []
-        emojis.append(EMOJI_P.findall(message.content))
-        emojis.append(UEMOJI_P.findall(message.content))
-        return {
-            'emojis': emojis
-        }
-
-    def log(self, key, extra=None):
-        """Generic logging.
-
-        Used to allow other cogs to log with this cog.
-        """
-        pass
-        # self.logger.info(key, extra=extra)
-
-    def log_discord(self, key=None, is_event=False, is_gauge=False, extra=None):
-        """Log Discord logs"""
-        if key is None:
-            return
-        if self.extra is None:
-            return
-        if extra is None:
-            extra = {}
-        extra.update(self.extra.copy())
-        if is_event:
-            extra['discord_event'] = key
-        if is_gauge:
-            extra['discord_gauge'] = key
-
-        if is_event:
-            doc_type = 'discord_event'
-        elif is_gauge:
-            doc_type = 'discord_gauge'
-        else:
-            doc_type = 'discord'
-
-        now = dt.datetime.utcnow()
-        now_str = now.strftime('%Y.%m.%d')
-
-        extra['timestamp'] = now
-
-        self.es.index(
-            index='discord-{}'.format(now_str),
-            doc_type=doc_type,
-            body=extra,
-            timestamp=now
-        )
-
-    def log_command(self, command, ctx):
-        """Log bot commands."""
-        pass
-        # extra = {
-        #     'name': command.name
-        # }
-        # extra.update(self.get_sca_params(ctx.message))
-        # self.log_discord_event("command", extra)
-
-    def log_emojis(self, message: Message):
-        """Log emoji uses."""
-        emojis = []
-        emojis.append(EMOJI_P.findall(message.content))
-        emojis.append(UEMOJI_P.findall(message.content))
-        for emoji in emojis:
-            event_key = "message.emoji"
-            extra = {
-                'discord_event': event_key,
-                'emoji': emoji
-            }
-            self.log_discord_event("message.emoji", extra=extra)
-
-    def log_discord_event(self, key=None, extra=None):
-        """Log Discord events."""
-        self.log_discord(key=key, is_event=True, extra=extra)
-
-    def log_discord_gauge(self, key=None, extra=None):
-        """Log Discord events."""
-        self.log_discord(key=key, is_gauge=True, extra=extra)
-
-    def log_channel_create(self, channel: Channel):
-        """Log channel creation."""
-        extra = {
-            'channel': self.param_channel(channel)
-        }
-        self.log_discord_event("channel.create", extra)
-
-    def log_channel_delete(self, channel: Channel):
-        """Log channel deletion."""
-        extra = {
-            'channel': self.param_channel(channel)
-        }
-        self.log_discord_event("channel.delete", extra)
-
-    def log_member_join(self, member: Member):
-        """Log member joining the server."""
-        extra = {
-            'member': self.param_member(member)
-        }
-        self.log_discord_event("member.join", extra)
-
-    def log_member_update(self, before: Member, after: Member):
-        """Track member’s updated status."""
-        if set(before.roles) != set(after.roles):
-            extra = {
-                'member': self.param_member(after)
-            }
-            if len(before.roles) > len(after.roles):
-                roles_removed = set(before.roles) - set(after.roles)
-                extra['role_update'] = 'remove'
-                extra['roles_removed'] = [self.param_role(r) for r in roles_removed]
-            else:
-                roles_added = set(after.roles) - set(before.roles)
-                extra['role_update'] = 'add'
-                extra['roles_added'] = [self.param_role(r) for r in roles_added]
-
-            self.log_discord_event('member.update.roles', extra)
-
-    def log_member_remove(self, member: Member):
-        """Log member leaving the server."""
-        extra = {
-            'member': self.param_member(member)
-        }
-        self.log_discord_event("member.remove", extra)
-
-    def log_message(self, message: Message):
-        """Log message."""
-        extra = {'content': message.content}
-        extra.update(self.param_sca(message))
-        extra.update(self.param_attachment(message))
-        extra.update(self.param_mention(message))
-        extra.update(self.param_embed(message))
-        extra.update(self.param_emoji(message))
-        extra.update(self.param_mention(message))
-        self.log_discord_event('message', extra)
-
-    def log_message_delete(self, message: Message):
-        """Log deleted message."""
-        extra = {'content': message.content}
-        extra.update(self.param_sca(message))
-        extra.update(self.param_mention(message))
-        self.log_discord_event('message.delete', extra)
-
-    def log_message_edit(self, before: Message, after: Message):
-        """Log message editing."""
-        extra = {
-            'content_before': before.content,
-            'content_after': after.content
-        }
-        extra.update(self.param_sca(after))
-        extra.update(self.param_mention(after))
-        self.log_discord_event('message.edit', extra)
-
-    def log_all_gauges(self):
-        """Log all gauge values."""
-        self.log_servers()
-        self.log_channels()
-        self.log_members()
-        self.log_voice()
-        self.log_players()
-        self.log_uptime()
-        self.log_server_roles()
-        self.log_server_channels()
-
-    def log_servers(self):
-        """Log servers."""
-        if not self.extra:
-            return
-        event_key = 'servers'
-        extra = self.extra.copy()
-        servers = list(self.bot.servers)
-        extra.update({
-            'discord_gauge': event_key,
-            'server_count': len(servers)
-        })
-        servers_data = []
-        for server in servers:
-            servers_data.append(self.param_server(server))
-        extra['servers'] = servers_data
-        self.log_discord_gauge('servers', extra=extra)
-
-    def log_channels(self):
-        """Log channels."""
-        channels = list(self.bot.get_all_channels())
-        extra = {
-            'channel_count': len(channels)
-        }
-        self.log_discord_gauge('all_channels', extra=extra)
-
-        # individual channels
-        for channel in channels:
-            self.log_channel(channel)
-
-    def log_channel(self, channel: Channel):
-        """Log one channel."""
-        extra = {'channel': self.param_channel(channel)}
-        self.log_discord_gauge('channel', extra=extra)
-
-    def log_members(self):
-        """Log members."""
-        members = list(self.bot.get_all_members())
-        unique = set(m.id for m in members)
-        extra = {'member_count': len(members), 'unique_member_count': len(unique)}
-
-        # log all members in single call
-        # extra.update({"members": [self.param_member(m) for m in members]})
-        self.log_discord_gauge('all_members', extra=extra)
-
-        for member in members:
-            self.log_member(member)
-
-    def log_member(self, member: Member):
-        """Log member."""
-        extra = {'member': self.param_member(member)}
-        self.log_discord_gauge('member', extra=extra)
-
-    def log_voice(self):
-        """Log voice channels."""
-        pass
-
-    def log_players(self):
-        """Log VC players."""
-        pass
-
-    def log_uptime(self):
-        """Log updtime."""
-        pass
-
-    def log_server_roles(self):
-        """Log server roles."""
-        for server in self.bot.servers:
-            extra = {}
-            extra['server'] = self.param_server(server)
-            extra['roles'] = []
-
-            roles = server.role_hierarchy
-
-            # count number of members with a particular role
-            for index, role in enumerate(roles):
-                count = sum([1 for m in server.members if role in m.roles])
-
-                role_params = self.param_role(role)
-                role_params['count'] = count
-                role_params['hierachy_index'] = index
-
-                extra['roles'].append(role_params)
-
-            self.log_discord_gauge('server.roles', extra)
-
-    def log_server_channels(self):
-        """Log server channels."""
-        for server in self.bot.servers:
-            extra = {
-                'server': self.param_server(server),
-                'channels': {
-                    'text': [],
-                    'voice': []
-                }
-            }
-            channels = sorted(server.channels, key=lambda x: x.position)
-
-            for channel in channels:
-                channel_params = self.param_server_channel(channel)
-                if channel.type == ChannelType.text:
-                    extra['channels']['text'].append(channel_params)
-                elif channel.type == ChannelType.voice:
-                    extra['channels']['voice'].append(channel_params)
-
-            self.log_discord_gauge('server.channels', extra)
-
-
-class ESLogModel:
-    """Elastic Search Logging Model.
-    
-    This is the settings file. It is placed in its own class so 
-    settings doesn’t need to be a long chain of dict references,
-    even though it still is under the hood.
-    """
-
-    def __init__(self, file_path, search: Search):
-        """Init."""
-        self.file_path = file_path
-        self.settings = nested_dict()
-        self.settings.update(dataIO.load_json(file_path))
-        self.search = search
-
-    @staticmethod
-    def parser():
-        """Process arguments."""
-        # Process arguments
-        parser = argparse.ArgumentParser(prog='[p]eslog messagecount')
-        # parser.add_argument('key')
-        parser.add_argument(
-            '-t', '--time',
-            default="7d",
-            help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
-        )
-        parser.add_argument(
-            '-c', '--count',
-            type=int,
-            default="10",
-            help='Number of results')
-        parser.add_argument(
-            '-ec', '--excludechannels',
-            nargs='+',
-            help='List of channels to exclude'
-        )
-        parser.add_argument(
-            '-ic', '--includechannels',
-            nargs='+',
-            help='List of channels to exclude'
-        )
-        parser.add_argument(
-            '-eb', '--excludebot',
-            action='store_true'
-        )
-        parser.add_argument(
-            '-er', '--excluderoles',
-            nargs='+',
-            help='List of roles to exclude'
-        )
-        parser.add_argument(
-            '-ir', '--includeroles',
-            nargs='+',
-            help='List of roles to include'
-        )
-        parser.add_argument(
-            '-ebc', '--excludebotcommands',
-            action='store_true'
-        )
-        parser.add_argument(
-            '-s', '--split',
-            default='channel',
-            choices=['channel']
-        )
-        return parser
-
-    def es_query_author(self, parser_arguments, server, member: Member):
-        """Elasticsearch query for author"""
-        p_args = parser_arguments
-
-        time_gte = 'now-{}'.format(p_args.time)
-        r = Range(timestamp={'gte': time_gte, 'lt': 'now'})
-
-        source_list = ['author.id', 'author.roles', 'channel.id', 'channel.name', 'timestamp']
-
-        query_str = (
-            'discord_event:message'
-            ' AND server.name:\"{server_name}\"'
-            ' AND author.id:{author_id}'
-        ).format(server_name=server.name, author_id=member.id)
-        qs = QueryString(query=query_str)
-
-        s = self.search.query(qs).query(r).source(source_list)
-        return s
-
-    def es_query_authors(self, parser_arguments, server):
-        """Construct Elasticsearch query."""
-        p_args = parser_arguments
-
-        time_gte = 'now-{}'.format(p_args.time)
-
-        query_str = (
-            "discord_event:message"
-            " AND server.name:\"{server_name}\""
-        ).format(server_name=server.name)
-
-        if p_args.excludebot:
-            query_str += " AND author.bot:false"
-        if p_args.excludechannels is not None:
-            for channel_name in p_args.excludechannels:
-                query_str += " AND !channel.name:\"{}\"".format(channel_name)
-        if p_args.includechannels is not None:
-            qs = ""
-            for i, channel_name in enumerate(p_args.includechannels):
-                if i > 0:
-                    qs += " OR"
-                qs += " channel.name:\"{}\"".format(channel_name)
-            query_str += " AND ({})".format(qs)
-        if p_args.excluderoles is not None:
-            for role_name in p_args.excluderoles:
-                query_str += " AND !author.roles.name:\"{}\"".format(role_name)
-        if p_args.includeroles is not None:
-            qs = ""
-            for i, role_name in enumerate(p_args.includeroles):
-                if i > 0:
-                    qs += " AND"
-                qs += " author.roles.name:\"{}\"".format(role_name)
-            query_str += " AND ({})".format(qs)
-        if p_args.excludebotcommands:
-            cmd_prefix = ['!', '?', ';', '$']
-            prefix_qs = [' AND !content.keyword:\{}*'.format(p) for p in cmd_prefix]
-            query_str += ' '.join(prefix_qs)
-
-        source_list = ['author.id', 'author.roles', 'channel.id', 'channel.name']
-
-        qs = QueryString(query=query_str)
-        r = Range(timestamp={'gte': time_gte, 'lt': 'now'})
-        s = self.search.query(qs).query(r).source(source_list)
-        return s
-
-    def es_query_channels(self, parser_arguments, server):
-        """Construct Elasticsearch query."""
-        p_args = parser_arguments
-
-        time_gte = 'now-{}'.format(p_args.time)
-
-        query_str = (
-            "discord_event:message"
-            " AND server.name:\"{server_name}\""
-        ).format(server_name=server.name)
-
-        if p_args.excludebot:
-            query_str += " AND author.bot:false"
-        if p_args.excludechannels is not None:
-            for channel_name in p_args.excludechannels:
-                query_str += " AND !channel.name:\"{}\"".format(channel_name)
-        if p_args.includechannels is not None:
-            qs = ""
-            for i, channel_name in enumerate(p_args.includechannels):
-                if i > 0:
-                    qs += " OR"
-                qs += " channel.name:\"{}\"".format(channel_name)
-            query_str += " AND ({})".format(qs)
-        if p_args.excluderoles is not None:
-            for role_name in p_args.excluderoles:
-                query_str += " AND !author.roles.name:\"{}\"".format(role_name)
-        if p_args.includeroles is not None:
-            qs = ""
-            for i, role_name in enumerate(p_args.includeroles):
-                if i > 0:
-                    qs += " AND"
-                qs += " author.roles.name:\"{}\"".format(role_name)
-            query_str += " AND ({})".format(qs)
-        if p_args.excludebotcommands:
-            cmd_prefix = ['!', '?', ';', '$']
-            prefix_qs = [' AND !content.keyword:\{}*'.format(p) for p in cmd_prefix]
-            query_str += ' '.join(prefix_qs)
-
-        qs = QueryString(query=query_str)
-        r = Range(timestamp={'gte': time_gte, 'lt': 'now'})
-
-        s = self.search.query(qs).query(r).source([
-            'channel.created_at',
-            'channel.id',
-            'channel.is_default',
-            'channel.name',
-            'channel.position',
-            'channel.server.id',
-            'channel.server.name',
-            'channel.type.group',
-            'channel.type.private',
-            'channel.type.text',
-            'channel.type.voice',
-            'author.id'
-        ])
-        return s
-
 
 class AuthorHits:
     """
@@ -1113,6 +484,39 @@ class ESLogView:
     """
     def __init__(self, bot):
         self.bot = bot
+
+    def embed_member(self, member=None, message_count=0, active_members=0, rank=0, channels=None, p_args=None):
+        """User view."""
+        em = discord.Embed(
+            title="Member Activity: {}".format(member.display_name),
+            description=self.description(p_args, show_top=False),
+            color=random_discord_color()
+        )
+
+        em.add_field(
+            name="Rank",
+            value="{} / {} (active) / {} (all)".format(
+                rank, active_members, len(member.server.members)
+            )
+        )
+        em.add_field(name="Messages", value=message_count)
+
+        max_count = None
+
+        for channel_id, count in channels.items():
+            if max_count is None:
+                max_count = count
+            channel = member.server.get_channel(channel_id)
+            chart = ESLogView.inline_barchart(count, max_count)
+            em.add_field(
+                name=channel.name,
+                value='{} messages\n{}'.format(count, chart),
+                inline=False)
+
+        return em
+
+
+
 
     async def user_activity(self, server: Server, member: Member, hits, p_args, rank="_"):
         """User actvity"""
@@ -1297,6 +701,70 @@ class ESLogView:
         return embeds
 
 
+class MessageSearch:
+    """Message author.
+    
+    Initialized with a list of all messages.
+    Find the author’s relative rank and other properties.
+    """
+    @staticmethod
+    def time_range(time):
+        """ES Range in time"""
+        time_gte = 'now-{}'.format(time)
+        return Range(timestamp={'gte': time_gte, 'lt': 'now'})
+
+    @staticmethod
+    def author_rank(author, parser_args):
+        """Author’s activity rank on a server."""
+        s = MessageDoc.search() \
+            .query(MessageSearch.time_range(parser_args.time)) \
+            .query(Match(**{'server.id': author.server.id}))
+
+        author_ids = [doc.author.id for doc in s.scan()]
+        counter = Counter(author_ids)
+        for rank, (author_id, count) in enumerate(counter.most_common(), 1):
+            if author_id == author.id:
+                return rank
+        return 0
+
+    @staticmethod
+    def active_members(server, parser_args):
+        """Number of active users during this period."""
+        s = MessageDoc.search() \
+            .query(MessageSearch.time_range(parser_args.time)) \
+            .query(Match(**{'server.id': server.id}))
+        return len(set([doc.author.id for doc in s.scan()]))
+
+    @staticmethod
+    def author_messages_search(author, parser_args):
+        """"All of author’s activity on a server."""
+        s = MessageDoc.search() \
+            .query(MessageSearch.time_range(parser_args.time)) \
+            .query(Match(**{'server.id': author.server.id})) \
+            .query(Match(**{'author.id': author.id}))
+        return s
+
+    @staticmethod
+    def author_messages_count(author, parser_args):
+        """Total of author’s activity on a server."""
+        return MessageSearch.author_messages_search(author, parser_args).count()
+
+    @staticmethod
+    def author_channels(author, parser_args):
+        """Author’s activity by channel on a server.
+        
+        Return as OrderedDict with channel IDs and count.
+        """
+        s = MessageSearch.author_messages_search(author, parser_args)
+
+        channel_ids = [doc.to_dict()["channel"]["id"] for doc in s.scan()]
+        print(Counter(channel_ids))
+        channels = OrderedDict()
+        for channel_id, count in Counter(channel_ids).most_common():
+            channels[channel_id] = count
+
+        return channels
+
 
 class ESLog:
     """Elastic Search Logging.
@@ -1312,7 +780,7 @@ class ESLog:
 
         self.es = Elasticsearch()
         self.search = Search(using=self.es, index="discord-*")
-        self.model = ESLogModel(JSON, self.search)
+        # self.model = ESLogModel(JSON, self.search)
 
         self.extra = {
             'log_type': 'discord.logger',
@@ -1321,11 +789,10 @@ class ESLog:
             'bot_name': self.bot.user.name
         }
 
-        self.eslogger = ESLogger(bot, self.es)
-        self.eslogger2 = ESLogger2()
+        self.eslogger = ESLogger()
 
         # temporarily disable gauges
-        self.task = bot.loop.create_task(self.loop_task())
+        # self.task = bot.loop.create_task(self.loop_task())
 
         self.view = ESLogView(bot)
 
@@ -1336,15 +803,15 @@ class ESLog:
         """
         pass
 
-    async def loop_task(self):
-        """Loop task."""
-        await self.bot.wait_until_ready()
-        self.eslogger.init_extra()
-        # temporarily disable gauges
-        # self.eslogger.log_all_gauges()
-        await asyncio.sleep(INTERVAL)
-        if self is self.bot.get_cog('ESLog'):
-            self.task = self.bot.loop.create_task(self.loop_task())
+    # async def loop_task(self):
+    #     """Loop task."""
+    #     await self.bot.wait_until_ready()
+    #     self.eslogger.init_extra()
+    #     # temporarily disable gauges
+    #     # self.eslogger.log_all_gauges()
+    #     await asyncio.sleep(INTERVAL)
+    #     if self is self.bot.get_cog('ESLog'):
+    #         self.task = self.bot.loop.create_task(self.loop_task())
 
     @commands.group(pass_context=True, no_pm=True)
     async def eslogset(self, ctx):
@@ -1397,21 +864,72 @@ class ESLog:
         await self.search_channel(ctx, server, *args)
 
     @commands.group(pass_context=True, no_pm=True)
-    async def eslog2(self, ctx):
-        """Elastic search logging v2."""
-        if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
-
-    @eslog2.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def eslog_user2(self, ctx, member: discord.Member, *args):
-        """Message statstics of a user."""
-        self.eslogger2.search_author_messages(member)
-
-    @commands.group(pass_context=True, no_pm=True)
     async def eslog(self, ctx):
-        """Elastic Search Logging."""
+        """Elasticsearch Log"""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    @eslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
+    async def eslog_user(self, ctx, member: Member, *args):
+        """Message statistics by user.
+        
+        Params:
+        --time TIME, -t    
+          Time in ES notation. 7d for 7 days, 1h for 1 hour
+          Default: 7d (7 days)
+        --count COUNT, -c   
+          Number of results to show
+          Default: 10
+        --excludechannels EXCLUDECHANNEL [EXCLUDECHANNEL ...], -ec
+          List of channels to exclude
+        --includechannels INCLUDECHANNEL [INCLUDECHANNEL ...], -ic
+          List of channels to include (multiples are interpreted as OR)
+        --excluderoles EXCLUDEROLE [EXCLUDEROLE ...], -er
+          List of roles to exclude
+        --includeroles INCLUDEROLE [INCLUDEROLE ...], -ir
+          List of roles to include (multiples are interpreted as AND)
+        --excludebot, -eb
+          Exclude bot accounts
+        --excludebotcommands, -ebc
+          Exclude bot commands. 
+        --split {none, channel}, -s
+          Split chart
+        
+        Example:
+        [p]eslog user --time 2d --count 20 --include general some-channel
+        Counts number of messages sent by authors within last 2 days in channels #general and #some-channel
+        
+        Note:
+        It might take a few minutes to process for servers which have many users and activity.
+        """
+        parser = ESLogger.parser()
+        try:
+            p_args = parser.parse_args(args)
+        except SystemExit:
+            await send_cmd_help(ctx)
+            return
+
+        author = ctx.message.author
+
+        if member is None:
+            member = author
+
+        await self.bot.type()
+
+        rank = MessageSearch.author_rank(member, p_args)
+        channels = MessageSearch.author_channels(member, p_args)
+        active_members = MessageSearch.active_members(member.server, p_args)
+        message_count = MessageSearch.author_messages_count(member, p_args)
+
+        await self.bot.say(
+            embed=self.view.embed_member(
+                member=member,
+                active_members=active_members,
+                rank=rank,
+                channels=channels,
+                p_args=p_args,
+                message_count=message_count
+            ))
 
     @eslog.command(name="users", aliases=['us'], pass_context=True, no_pm=True)
     async def eslog_users(self, ctx, *args):
@@ -1447,7 +965,9 @@ class ESLog:
         It might take a few minutes to process for servers which have many users and activity.
         """
         server = ctx.message.server
-        await self.search_message_authors(ctx, server, *args)
+
+
+        # await self.search_message_authors(ctx, server, *args)
 
     @eslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
     async def eslog_channel(self, ctx, *args):
@@ -1483,14 +1003,8 @@ class ESLog:
         server = ctx.message.server
         await self.search_channel(ctx, server, *args)
 
-    @eslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def eslog_user(self, ctx, member: Member, *args):
-        """Message statistics for a user."""
-        server = ctx.message.server
-        await self.search_user(ctx, server, member, *args)
-
     async def search_user(self, ctx, server, member: Member, *args):
-        """Perform the server for users.
+        """Perform the search for users.
         
         1. Search against all authors to find relative rank in activity.
         2. Filter just that user to display other stats.
@@ -1583,55 +1097,55 @@ class ESLog:
             await self.bot.say(embed=em)
 
     # Events
-    async def on_channel_create(self, channel: Channel):
-        """Track channel creation."""
-        self.eslogger.log_channel_create(channel)
-
-    async def on_channel_delete(self, channel: Channel):
-        """Track channel deletion."""
-        self.eslogger.log_channel_delete(channel)
-
-    async def on_command(self, command: Command, ctx: Context):
-        """Track command usage."""
-        self.eslogger.log_command(command, ctx)
+    # async def on_channel_create(self, channel: Channel):
+    #     """Track channel creation."""
+    #     self.eslogger.log_channel_create(channel)
+    #
+    # async def on_channel_delete(self, channel: Channel):
+    #     """Track channel deletion."""
+    #     self.eslogger.log_channel_delete(channel)
+    #
+    # async def on_command(self, command: Command, ctx: Context):
+    #     """Track command usage."""
+    #     self.eslogger.log_command(command, ctx)
 
     async def on_message(self, message: Message):
         """Track on message."""
         self.eslogger.log_message(message)
-        self.eslogger2.log_message(message)
+        # self.eslogger2.log_message(message)
         # self.log_emojis(message)
 
     async def on_message_delete(self, message: Message):
         """Track message deletion."""
         self.eslogger.log_message_delete(message)
-        self.eslogger2.log_message_delete(message)
+        # self.eslogger2.log_message_delete(message)
 
-    async def on_message_edit(self, before: Message, after: Message):
-        """Track message editing."""
-        self.eslogger.log_message_edit(before, after)
-
-    async def on_member_join(self, member: Member):
-        """Track members joining server."""
-        self.eslogger.log_member_join(member)
-
-    async def on_member_update(self, before: Member, after: Member):
-        """Called when a Member updates their profile.
-
-        Only track status after.
-        """
-        self.eslogger.log_member_update(before, after)
-
-    async def on_member_remove(self, member: Member):
-        """Track members leaving server."""
-        self.eslogger.log_member_remove(member)
-
-    async def on_ready(self):
-        """Bot ready."""
-        self.eslogger.log_all_gauges()
-
-    async def on_resume(self):
-        """Bot resume."""
-        self.eslogger.log_all_gauges()
+    # async def on_message_edit(self, before: Message, after: Message):
+    #     """Track message editing."""
+    #     self.eslogger.log_message_edit(before, after)
+    #
+    # async def on_member_join(self, member: Member):
+    #     """Track members joining server."""
+    #     self.eslogger.log_member_join(member)
+    #
+    # async def on_member_update(self, before: Member, after: Member):
+    #     """Called when a Member updates their profile.
+    #
+    #     Only track status after.
+    #     """
+    #     self.eslogger.log_member_update(before, after)
+    #
+    # async def on_member_remove(self, member: Member):
+    #     """Track members leaving server."""
+    #     self.eslogger.log_member_remove(member)
+    #
+    # async def on_ready(self):
+    #     """Bot ready."""
+    #     self.eslogger.log_all_gauges()
+    #
+    # async def on_resume(self):
+    #     """Bot resume."""
+    #     self.eslogger.log_all_gauges()
 
 
 def check_folder():
