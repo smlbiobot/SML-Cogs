@@ -49,7 +49,7 @@ from discord.ext import commands
 from discord.ext.commands import Command
 from discord.ext.commands import Context
 from elasticsearch import Elasticsearch
-from elasticsearch_dsl import Search
+from elasticsearch_dsl import Search, FacetedSearch, TermsFacet
 from elasticsearch_dsl.query import QueryString
 from elasticsearch_dsl.query import Range
 from elasticsearch_dsl import Index, DocType, Date, Nested, Boolean, \
@@ -124,38 +124,34 @@ class MemberInnerObject(InnerObjectWrapper):
     roles = Nested(doc_class=RoleInnerObject)
 
 
-class MessageDoc(DocType):
-    """Discord Message."""
+class UserDoc(DocType):
+    """Discord user."""
+    name = Text(fields={'raw': Keyword()})
     id = Integer()
-    content = Text(
-        fields={'raw': Keyword()}
-    )
-    author = Nested(doc_class=MemberInnerObject)
-    server = Nested(doc_class=ServerInnerObject)
-    channel = Nested(doc_class=ChannelInnerObject)
-    mentions = Nested(doc_class=MemberInnerObject)
-    timestamp = Date()
+    discriminator = Integer()
+    bot = Boolean()
+    avatar_url = Text(
+        analyzer=analyzer("simple"),
+        fields={'raw': Keyword()})
 
     class Meta:
-        doc_type = 'message'
+        doc_type = 'user'
+
+
+class MemberDoc(UserDoc):
+    """Discord member."""
+    id = Integer()
+    name = Text(fields={'raw': Keyword()})
+    display_name = Text(fields={'raw': Keyword()})
+    bot = Boolean()
+    top_role = Nested(doc_class=RoleInnerObject)
+    roles = Nested(doc_class=RoleInnerObject)
+
+    class Meta:
+        doc_type = 'member'
 
     @classmethod
-    def log(cls, message, **kwargs):
-        """Log all."""
-        doc = MessageDoc(
-            content=message.content,
-            embeds=message.embeds,
-            attachments=message.attachments,
-            id=message.id,
-            timestamp=dt.datetime.utcnow()
-        )
-        doc.set_server(message.server)
-        doc.set_channel(message.channel)
-        doc.set_author(message.author)
-        doc.set_mentions(message.mentions)
-        doc.save(**kwargs)
-
-    def member_dict(self, member):
+    def member_dict(cls, member):
         """Member dictionary."""
         d = {
             'id': member.id,
@@ -177,9 +173,53 @@ class MessageDoc(DocType):
             })
         return d
 
+
+class MemberJoinDoc(MemberDoc):
+    """Discord member join"""
+
+    class Meta:
+        doc_type = 'member_join'
+
+    @classmethod
+    def log(cls, member, **kwargs):
+        pass
+
+
+class MessageDoc(DocType):
+    """Discord Message."""
+    id = Integer()
+    content = Text(
+        analyzer=analyzer("simple"),
+        fields={'raw': Keyword()}
+    )
+    author = Nested(doc_class=MemberDoc)
+    server = Nested(doc_class=ServerInnerObject)
+    channel = Nested(doc_class=ChannelInnerObject)
+    mentions = Nested(doc_class=MemberDoc)
+    timestamp = Date()
+
+    class Meta:
+        doc_type = 'message'
+
+    @classmethod
+    def log(cls, message, **kwargs):
+        """Log all."""
+        doc = MessageDoc(
+            content=message.content,
+            embeds=message.embeds,
+            attachments=message.attachments,
+            id=message.id,
+            timestamp=dt.datetime.utcnow()
+        )
+        doc.set_server(message.server)
+        doc.set_channel(message.channel)
+        doc.set_author(message.author)
+        doc.set_mentions(message.mentions)
+        doc.save(**kwargs)
+
     def set_author(self, author):
         """Set author."""
-        self.author = self.member_dict(author)
+        self.author = MemberDoc.member_dict(author)
 
     def set_server(self, server):
         """Set server."""
@@ -199,7 +239,7 @@ class MessageDoc(DocType):
 
     def set_mentions(self, mentions):
         """Set mentions."""
-        self.mentions = [self.member_dict(m) for m in mentions]
+        self.mentions = [MemberDoc.member_dict(m) for m in mentions]
 
     def save(self, **kwargs):
         return super(MessageDoc, self).save(**kwargs)
@@ -229,6 +269,14 @@ class MessageDeleteDoc(MessageDoc):
 
     def save(self, **kwargs):
         return super(MessageDeleteDoc, self).save(**kwargs)
+
+
+class MessageAuthorSearch(FacetedSearch):
+    doc_types = [MessageDoc]
+    fields = ['author']
+    facets = {
+        'channel': TermsFacet(field='channel')
+    }
 
 
 class ESLogger2:
@@ -263,14 +311,67 @@ class ESLogger2:
         """Log deleted message."""
         MessageDeleteDoc.log(message, index=self.index_name)
 
+    @staticmethod
+    def parser():
+        """Process arguments."""
+        # Process arguments
+        parser = argparse.ArgumentParser(prog='[p]eslog messagecount')
+        # parser.add_argument('key')
+        parser.add_argument(
+            '-t', '--time',
+            default="7d",
+            help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
+        )
+        parser.add_argument(
+            '-c', '--count',
+            type=int,
+            default="10",
+            help='Number of results')
+        parser.add_argument(
+            '-ec', '--excludechannels',
+            nargs='+',
+            help='List of channels to exclude'
+        )
+        parser.add_argument(
+            '-ic', '--includechannels',
+            nargs='+',
+            help='List of channels to exclude'
+        )
+        parser.add_argument(
+            '-eb', '--excludebot',
+            action='store_true'
+        )
+        parser.add_argument(
+            '-er', '--excluderoles',
+            nargs='+',
+            help='List of roles to exclude'
+        )
+        parser.add_argument(
+            '-ir', '--includeroles',
+            nargs='+',
+            help='List of roles to include'
+        )
+        parser.add_argument(
+            '-ebc', '--excludebotcommands',
+            action='store_true'
+        )
+        parser.add_argument(
+            '-s', '--split',
+            default='channel',
+            choices=['channel']
+        )
+        return parser
+
     def search_author_messages(self, author):
         """Search messages by author."""
         s = MessageDoc.search()
-        # s = s.filter('terms', author={'id': author.id})
-        s = s.query('term', **{'author.id': author.id})
-        results = s.execute()
-        for message in results:
-            print(message.meta.score, message.content)
+        time_gte = 'now-1d'
+
+        s = s.filter('match', **{'author.id': author.id}) \
+            .query(Range(timestamp={'gte': time_gte, 'lt': 'now'}))
+        for message in s.scan():
+            print('-'*40)
+            print(message.to_dict())
 
 
 class ESLogger:
