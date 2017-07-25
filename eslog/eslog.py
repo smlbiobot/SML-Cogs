@@ -104,25 +104,16 @@ class ServerDoc(DocType):
     name = Text(fields={'raw': Keyword()})
 
 
-class ChannelInnerObject(InnerObjectWrapper):
+class ChannelDoc(DocType):
     """Channel Inner Object."""
     id = Integer()
     name = Text(fields={'raw': Keyword()})
 
-class RoleInnerObject(InnerObjectWrapper):
+
+class RoleDoc(DocType):
     """Role Inner Object."""
     id = Integer()
     name = Text(fields={'raw': Keyword()})
-
-
-class MemberInnerObject(InnerObjectWrapper):
-    """Member Inner Object."""
-    id = Integer()
-    name = Text(fields={'raw': Keyword()})
-    display_name = Text(fields={'raw': Keyword()})
-    bot = Boolean()
-    top_role = Nested(doc_class=RoleInnerObject)
-    roles = Nested(doc_class=RoleInnerObject)
 
 
 class UserDoc(DocType):
@@ -145,8 +136,8 @@ class MemberDoc(UserDoc):
     name = Text(fields={'raw': Keyword()})
     display_name = Text(fields={'raw': Keyword()})
     bot = Boolean()
-    top_role = Nested(doc_class=RoleInnerObject)
-    roles = Nested(doc_class=RoleInnerObject)
+    top_role = Nested(doc_class=RoleDoc)
+    roles = Nested(doc_class=RoleDoc)
     server = Nested(doc_class=ServerDoc)
 
     class Meta:
@@ -196,7 +187,7 @@ class MessageDoc(DocType):
     )
     author = Nested(doc_class=MemberDoc)
     server = Nested(doc_class=ServerDoc)
-    channel = Nested(doc_class=ChannelInnerObject)
+    channel = Nested(doc_class=ChannelDoc)
     mentions = Nested(doc_class=MemberDoc)
     timestamp = Date()
 
@@ -286,8 +277,8 @@ class ESLogger:
     
     Separated into own class to make migration easier.
     """
-    def __init__(self):
-        pass
+    def __init__(self, index_name_fmt=None):
+        self.index_name_fmt = index_name_fmt
 
     @property
     def index_name(self):
@@ -297,7 +288,7 @@ class ESLogger:
         """
         now = dt.datetime.utcnow()
         now_str = now.strftime('%Y.%m.%d')
-        index_name = 'discord2-{}'.format(now_str)
+        index_name = self.index_name_fmt.format(now_str)
         return index_name
 
     @property
@@ -485,7 +476,9 @@ class ESLogView:
     def __init__(self, bot):
         self.bot = bot
 
-    def embed_member(self, member=None, message_count=0, active_members=0, rank=0, channels=None, p_args=None):
+    def embed_member(self, member=None,
+                     message_count=0, active_members=0, rank=0, channels=None,
+                     last_seen=None, p_args=None):
         """User view."""
         em = discord.Embed(
             title="Member Activity: {}".format(member.display_name),
@@ -500,6 +493,8 @@ class ESLogView:
             )
         )
         em.add_field(name="Messages", value=message_count)
+        last_seen_str = last_seen.strftime("%Y-%m-%d %H:%M:%S UTC")
+        em.add_field(name="Last seen", value=last_seen_str)
 
         max_count = None
 
@@ -509,8 +504,8 @@ class ESLogView:
             channel = member.server.get_channel(channel_id)
             chart = ESLogView.inline_barchart(count, max_count)
             em.add_field(
-                name=channel.name,
-                value='{} messages\n{}'.format(count, chart),
+                name='{}: {} message'.format(channel.name, count),
+                value=chart,
                 inline=False)
 
         return em
@@ -701,7 +696,7 @@ class ESLogView:
         return embeds
 
 
-class MessageSearch:
+class MessageDocSearch:
     """Message author.
     
     Initialized with a list of all messages.
@@ -714,10 +709,30 @@ class MessageSearch:
         return Range(timestamp={'gte': time_gte, 'lt': 'now'})
 
     @staticmethod
-    def author_rank(author, parser_args):
+    def active_members(server, time):
+        """Number of active users during this period."""
+        s = MessageDoc.search() \
+            .query(MessageDocSearch.time_range(time)) \
+            .query(Match(**{'server.id': server.id}))
+        return len(set([doc.author.id for doc in s.scan()]))
+
+    @staticmethod
+    def author_lastseen(author):
+        """Last known date where author has send a message."""
+        server = author.server
+        s = MessageDoc.search() \
+            .query(Match(**{'server.id': server.id})) \
+            .query(Match(**{'author.id': author.id})) \
+            .sort({'timestamp': {'order': 'desc'}})
+        s = s[0]
+        for hit in s.execute():
+            return hit.timestamp
+
+    @staticmethod
+    def author_rank(author, time):
         """Author’s activity rank on a server."""
         s = MessageDoc.search() \
-            .query(MessageSearch.time_range(parser_args.time)) \
+            .query(MessageDocSearch.time_range(time)) \
             .query(Match(**{'server.id': author.server.id}))
 
         author_ids = [doc.author.id for doc in s.scan()]
@@ -728,42 +743,39 @@ class MessageSearch:
         return 0
 
     @staticmethod
-    def active_members(server, parser_args):
-        """Number of active users during this period."""
-        s = MessageDoc.search() \
-            .query(MessageSearch.time_range(parser_args.time)) \
-            .query(Match(**{'server.id': server.id}))
-        return len(set([doc.author.id for doc in s.scan()]))
-
-    @staticmethod
-    def author_messages_search(author, parser_args):
+    def author_messages_search(author, time):
         """"All of author’s activity on a server."""
         s = MessageDoc.search() \
-            .query(MessageSearch.time_range(parser_args.time)) \
+            .query(MessageDocSearch.time_range(time)) \
             .query(Match(**{'server.id': author.server.id})) \
             .query(Match(**{'author.id': author.id}))
         return s
 
     @staticmethod
-    def author_messages_count(author, parser_args):
+    def author_messages_count(author, time):
         """Total of author’s activity on a server."""
-        return MessageSearch.author_messages_search(author, parser_args).count()
+        return MessageDocSearch.author_messages_search(author, time).count()
 
     @staticmethod
-    def author_channels(author, parser_args):
+    def author_channels(author, time):
         """Author’s activity by channel on a server.
         
         Return as OrderedDict with channel IDs and count.
         """
-        s = MessageSearch.author_messages_search(author, parser_args)
-
+        s = MessageDocSearch.author_messages_search(author, time)
         channel_ids = [doc.to_dict()["channel"]["id"] for doc in s.scan()]
-        print(Counter(channel_ids))
         channels = OrderedDict()
         for channel_id, count in Counter(channel_ids).most_common():
             channels[channel_id] = count
-
         return channels
+
+    @staticmethod
+    def server_messages(server, time):
+        """all of server messages."""
+        s = MessageDoc.search() \
+            .query(MessageDocSearch.time_range(time)) \
+            .query(Match(**{'server.id': server.id}))
+        return s
 
 
 class ESLog:
@@ -789,7 +801,7 @@ class ESLog:
             'bot_name': self.bot.user.name
         }
 
-        self.eslogger = ESLogger()
+        self.eslogger = ESLogger(index_name_fmt='discord-{}')
 
         # temporarily disable gauges
         # self.task = bot.loop.create_task(self.loop_task())
@@ -916,10 +928,12 @@ class ESLog:
 
         await self.bot.type()
 
-        rank = MessageSearch.author_rank(member, p_args)
-        channels = MessageSearch.author_channels(member, p_args)
-        active_members = MessageSearch.active_members(member.server, p_args)
-        message_count = MessageSearch.author_messages_count(member, p_args)
+        time = p_args.time
+        rank = MessageDocSearch.author_rank(member, time)
+        channels = MessageDocSearch.author_channels(member, time)
+        active_members = MessageDocSearch.active_members(member.server, time)
+        message_count = MessageDocSearch.author_messages_count(member, time)
+        last_seen = MessageDocSearch.author_lastseen(member)
 
         await self.bot.say(
             embed=self.view.embed_member(
@@ -928,7 +942,8 @@ class ESLog:
                 rank=rank,
                 channels=channels,
                 p_args=p_args,
-                message_count=message_count
+                message_count=message_count,
+                last_seen=last_seen
             ))
 
     @eslog.command(name="users", aliases=['us'], pass_context=True, no_pm=True)
@@ -964,10 +979,16 @@ class ESLog:
         Note:
         It might take a few minutes to process for servers which have many users and activity.
         """
+        parser = ESLogger.parser()
+        try:
+            p_args = parser.parse_args(args)
+        except SystemExit:
+            await send_cmd_help(ctx)
+            return
+
+        await self.bot.type()
         server = ctx.message.server
-
-
-        # await self.search_message_authors(ctx, server, *args)
+        s = MessageDocSearch.server_messages(server, p_args.time)
 
     @eslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
     async def eslog_channel(self, ctx, *args):
