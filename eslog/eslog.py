@@ -52,13 +52,17 @@ from elasticsearch import Elasticsearch
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import QueryString
 from elasticsearch_dsl.query import Range
+from elasticsearch_dsl import Index, DocType, Date, Nested, Boolean, \
+    analyzer, InnerObjectWrapper, Completion, Keyword, Text, Integer
 
 from cogs.utils.chat_formatting import inline
 from cogs.utils.dataIO import dataIO
 from cogs.utils import checks
 
-HOST = 'localhost'
-PORT = 9200
+# global ES connection
+from elasticsearch_dsl.connections import connections
+connections.create_connection(hosts=['localhost'], timeout=20)
+
 INTERVAL = timedelta(hours=4).seconds
 
 PATH = os.path.join('data', 'eslog')
@@ -71,11 +75,6 @@ UEMOJI_P = re.compile(u'['
                       u'\uD83C-\uDBFF\uDC00-\uDFFF'
                       u'\u2600-\u26FF\u2700-\u27BF]{1,2}',
                       re.UNICODE)
-
-
-# global ES connection
-from elasticsearch_dsl.connections import connections
-connections.create_connection(hosts=[HOST], timeout=20)
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -98,6 +97,178 @@ def random_discord_color():
     return discord.Color(value=color)
 
 
+class ServerInnerObject(InnerObjectWrapper):
+    """Server Inner Object."""
+    id = Integer()
+    name = Text(fields={'raw': Keyword()})
+
+
+class ChannelInnerObject(InnerObjectWrapper):
+    """Channel Inner Object."""
+    id = Integer()
+    name = Text(fields={'raw': Keyword()})
+
+class RoleInnerObject(InnerObjectWrapper):
+    """Role Inner Object."""
+    id = Integer()
+    name = Text(fields={'raw': Keyword()})
+
+
+class MemberInnerObject(InnerObjectWrapper):
+    """Member Inner Object."""
+    id = Integer()
+    name = Text(fields={'raw': Keyword()})
+    display_name = Text(fields={'raw': Keyword()})
+    bot = Boolean()
+    top_role = Nested(doc_class=RoleInnerObject)
+    roles = Nested(doc_class=RoleInnerObject)
+
+
+class MessageDoc(DocType):
+    """Discord Message."""
+    id = Integer()
+    content = Text(
+        fields={'raw': Keyword()}
+    )
+    author = Nested(doc_class=MemberInnerObject)
+    server = Nested(doc_class=ServerInnerObject)
+    channel = Nested(doc_class=ChannelInnerObject)
+    mentions = Nested(doc_class=MemberInnerObject)
+    timestamp = Date()
+
+    class Meta:
+        doc_type = 'message'
+
+    @classmethod
+    def log(cls, message, **kwargs):
+        """Log all."""
+        doc = MessageDoc(
+            content=message.content,
+            embeds=message.embeds,
+            attachments=message.attachments,
+            id=message.id,
+            timestamp=dt.datetime.utcnow()
+        )
+        doc.set_server(message.server)
+        doc.set_channel(message.channel)
+        doc.set_author(message.author)
+        doc.set_mentions(message.mentions)
+        doc.save(**kwargs)
+
+    def member_dict(self, member):
+        """Member dictionary."""
+        return {
+            'id': member.id,
+            'name': member.display_name,
+            'username': member.name,
+            'display_name': member.display_name,
+            'bot': member.bot,
+            'roles': [
+                {'id': r.id, 'name': r.name} for r in member.roles
+            ],
+            'top_role': {
+                'id': member.top_role.id,
+                'name': member.top_role.name
+            },
+            'joined_at': member.joined_at
+        }
+
+    def set_author(self, author):
+        """Set author."""
+        self.author = self.member_dict(author)
+
+    def set_server(self, server):
+        """Set server."""
+        self.server = {
+            'id': server.id,
+            'name': server.name
+        }
+
+    def set_channel(self, channel):
+        """Set channel."""
+        self.channel = {
+            'id': channel.id,
+            'name': channel.name,
+            'is_default': channel.is_default,
+            'position': channel.position
+        }
+
+    def set_mentions(self, mentions):
+        """Set mentions."""
+        self.mentions = [self.member_dict(m) for m in mentions]
+
+    def save(self, **kwargs):
+        return super(MessageDoc, self).save(**kwargs)
+
+
+class MessageDeleteDoc(MessageDoc):
+    """Discord Message Delete."""
+
+    class Meta:
+        doc_type = 'message_delete'
+
+    @classmethod
+    def log(cls, message, **kwargs):
+        """Log all."""
+        doc = MessageDeleteDoc(
+            content=message.content,
+            embeds=message.embeds,
+            attachments=message.attachments,
+            id=message.id,
+            timestamp=dt.datetime.utcnow()
+        )
+        doc.set_server(message.server)
+        doc.set_channel(message.channel)
+        doc.set_author(message.author)
+        doc.set_mentions(message.mentions)
+        doc.save(**kwargs)
+
+    def save(self, **kwargs):
+        return super(MessageDeleteDoc, self).save(**kwargs)
+
+
+class ESLogger2:
+    """Elastic Search Logging v2.
+    
+    Separated into own class to make migration easier.
+    """
+    def __init__(self):
+        pass
+
+    @property
+    def index_name(self):
+        """ES index name.
+        
+        Automatically generated using current time.
+        """
+        now = dt.datetime.utcnow()
+        now_str = now.strftime('%Y.%m.%d')
+        index_name = 'discord2-{}'.format(now_str)
+        return index_name
+
+    @property
+    def now(self):
+        """Current time"""
+        return dt.datetime.utcnow()
+
+    def log_message(self, message: Message):
+        """Log message v2."""
+        MessageDoc.log(message, index=self.index_name)
+
+    def log_message_delete(self, message: Message):
+        """Log deleted message."""
+        MessageDeleteDoc.log(message, index=self.index_name)
+
+    def search_author_messages(self, author):
+        """Search messages by author."""
+        s = MessageDoc.search()
+        # s = s.filter('terms', author={'id': author.id})
+        s = s.query('term', **{'author.id': author.id})
+        results = s.execute()
+        for message in results:
+            print(message.meta.score, message.content)
+
+
 class ESLogger:
     """Elastic Search Logging module.
     
@@ -111,6 +282,8 @@ class ESLogger:
         self.bot = bot
         self.es = es
         self.extra = None
+
+        # DMessage.init('discord2', using=self.es)
 
     def init_extra(self):
         """Initialize extra settings.
@@ -620,7 +793,7 @@ class ESLogModel:
         ).format(server_name=server.name, author_id=member.id)
         qs = QueryString(query=query_str)
 
-        s = self. search.query(qs).query(r).source(source_list)
+        s = self.search.query(qs).query(r).source(source_list)
         return s
 
     def es_query_authors(self, parser_arguments, server):
@@ -668,8 +841,7 @@ class ESLogModel:
         s = self.search.query(qs).query(r).source(source_list)
         return s
 
-    @staticmethod
-    def es_query_channels(parser_arguments, search, server):
+    def es_query_channels(self, parser_arguments, server):
         """Construct Elasticsearch query."""
         p_args = parser_arguments
 
@@ -710,7 +882,7 @@ class ESLogModel:
         qs = QueryString(query=query_str)
         r = Range(timestamp={'gte': time_gte, 'lt': 'now'})
 
-        s = search.query(qs).query(r).source([
+        s = self.search.query(qs).query(r).source([
             'channel.created_at',
             'channel.id',
             'channel.is_default',
@@ -721,7 +893,8 @@ class ESLogModel:
             'channel.type.group',
             'channel.type.private',
             'channel.type.text',
-            'channel.type.voice'
+            'channel.type.voice',
+            'author.id'
         ])
         return s
 
@@ -1020,8 +1193,6 @@ class ESLogView:
 
 
 
-
-
 class ESLog:
     """Elastic Search Logging.
     
@@ -1046,6 +1217,7 @@ class ESLog:
         }
 
         self.eslogger = ESLogger(bot, self.es)
+        self.eslogger2 = ESLogger2()
 
         # temporarily disable gauges
         self.task = bot.loop.create_task(self.loop_task())
@@ -1117,7 +1289,18 @@ class ESLog:
         if server is None:
             await self.bot.say("Cannot find server named {}.".format(server_name))
             return
-        await self.search_eslog_channel(ctx, server, *args)
+        await self.search_channel(ctx, server, *args)
+
+    @commands.group(pass_context=True, no_pm=True)
+    async def eslog2(self, ctx):
+        """Elastic search logging v2."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @eslog2.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
+    async def eslog_user2(self, ctx, member: discord.Member, *args):
+        """Message statstics of a user."""
+        self.eslogger2.search_author_messages(member)
 
     @commands.group(pass_context=True, no_pm=True)
     async def eslog(self, ctx):
@@ -1193,7 +1376,7 @@ class ESLog:
         It might take a few minutes to process for servers which have many users and activity.
         """
         server = ctx.message.server
-        await self.search_eslog_channel(ctx, server, *args)
+        await self.search_channel(ctx, server, *args)
 
     @eslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
     async def eslog_user(self, ctx, member: Member, *args):
@@ -1261,7 +1444,7 @@ class ESLog:
         for em in ESLogView.embeds_user_rank(author_hits, p_args, server):
             await self.bot.say(embed=em)
 
-    async def search_eslog_channel(self, ctx, server, *args):
+    async def search_channel(self, ctx, server, *args):
         """Perform search for channels."""
         parser = ESLogModel.parser()
 
@@ -1274,7 +1457,7 @@ class ESLog:
 
         await self.bot.type()
 
-        s = ESLogModel.es_query_channels(p_args, self.search, server)
+        s = self.model.es_query_channels(p_args, server)
 
         # perform search using scan()
         hit_counts = {}
@@ -1310,11 +1493,13 @@ class ESLog:
     async def on_message(self, message: Message):
         """Track on message."""
         self.eslogger.log_message(message)
+        self.eslogger2.log_message(message)
         # self.log_emojis(message)
 
     async def on_message_delete(self, message: Message):
         """Track message deletion."""
         self.eslogger.log_message_delete(message)
+        self.eslogger2.log_message_delete(message)
 
     async def on_message_edit(self, before: Message, after: Message):
         """Track message editing."""
