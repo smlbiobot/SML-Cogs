@@ -157,21 +157,25 @@ class MessageDoc(DocType):
 
     def member_dict(self, member):
         """Member dictionary."""
-        return {
+        d = {
             'id': member.id,
-            'name': member.display_name,
             'username': member.name,
-            'display_name': member.display_name,
-            'bot': member.bot,
-            'roles': [
-                {'id': r.id, 'name': r.name} for r in member.roles
-            ],
-            'top_role': {
-                'id': member.top_role.id,
-                'name': member.top_role.name
-            },
-            'joined_at': member.joined_at
+            'bot': member.bot
         }
+        if isinstance(member, Member):
+            d.update({
+                'name': member.display_name,
+                'display_name': member.display_name,
+                'roles': [
+                    {'id': r.id, 'name': r.name} for r in member.roles
+                ],
+                'top_role': {
+                    'id': member.top_role.id,
+                    'name': member.top_role.name
+                },
+                'joined_at': member.joined_at
+            })
+        return d
 
     def set_author(self, author):
         """Set author."""
