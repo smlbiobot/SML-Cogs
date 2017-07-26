@@ -32,6 +32,7 @@ import re
 from collections import Counter, OrderedDict, defaultdict
 from datetime import timedelta
 from random import choice
+import pprint
 
 import discord
 import pandas as pd
@@ -41,7 +42,7 @@ from discord import Message
 from discord.ext import commands
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
-    analyzer, Keyword, Text, Integer
+    analyzer, Keyword, Text, Integer, A, Q
 from elasticsearch_dsl import Search, FacetedSearch, TermsFacet
 # global ES connection
 from elasticsearch_dsl.connections import connections
@@ -302,7 +303,7 @@ class ESLogger:
         # parser.add_argument('key')
         parser.add_argument(
             '-t', '--time',
-            default="1d",
+            default="7d",
             help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
         )
         parser.add_argument(
@@ -398,6 +399,84 @@ class ESLogView:
                 inline=False)
 
         return em
+
+    def embed_members(self, server=None, results=None, p_args=None):
+        """Messages by members, with sparkline for activity."""
+        results = sorted(results, key=lambda x: x["timestamp"])
+        most_common_author_ids = Counter([r["doc"].author.id for r in results]).most_common(10)
+
+        # split results in channel ids by count
+        author_channels = nested_dict()
+        for author_id, count in most_common_author_ids:
+            channel_ids = []
+            for result in results:
+                doc = result["doc"]
+                if doc.author.id == author_id:
+                    channel_ids.append(doc.channel.id)
+            author_channels[author_id] = Counter(channel_ids).most_common()
+
+        # split results in the data range time series
+        now = dt.datetime.utcnow()
+        start = results[0]["timestamp"]
+        count = 30
+        freq = (now - start).total_seconds() / count / 60
+        freq = '{}min'.format(int(freq))
+        rng = pd.date_range(start=start, end=now, freq=freq)
+
+        for result in results:
+            for rng_index, rng_timestamp in enumerate(rng):
+                if result["timestamp"] >= rng_timestamp:
+                    result["rng_index"] = rng_index
+                    result["rng_timestamp"] = rng_timestamp
+
+        message_range = []
+        for rng_timestamp in rng:
+            messages = []
+            for result in results:
+                if result["rng_timestamp"] == rng_timestamp:
+                    messages.append(result)
+            message_range.append(messages)
+
+        # embed
+        embed = discord.Embed(
+            title="{}: User activity by messages".format(server.name),
+            description=self.description(p_args),
+            color=random_discord_color()
+        )
+
+        max_count = 0
+        for rank, (author_id, count) in enumerate(most_common_author_ids, 1):
+            max_count = max(count, max_count)
+            # author name
+            author = server.get_member(author_id)
+            if author is None:
+                author_name = 'User {}'.format(author_id)
+            else:
+                author_name = server.get_member(author_id).display_name
+            # chart
+            author_message_count = []
+            sparkline_chart = ''
+            for messages in message_range:
+                author_messages = [msg for msg in messages if msg['doc'].author.id == author_id]
+                author_message_count.append(len(author_messages))
+            for line in sparklines(author_message_count):
+                sparkline_chart += line
+
+            inline_chart = self.inline_barchart(count, max_count)
+            # channels
+            channel_str = ', '.join([
+                '{}: {}'.format(
+                    server.get_channel(
+                        cid), count) for cid, count in author_channels[author_id]])
+
+            # output
+            field_name = '{}. {}: {}'.format(rank, author_name, count)
+            field_value = '{}\n{}'.format(
+                inline(sparkline_chart),
+                channel_str)
+            embed.add_field(name=field_name, value=field_value, inline=False)
+
+        return embed
 
     @staticmethod
     def description(p_args, show_top=True):
@@ -516,6 +595,70 @@ class MessageDocSearch:
             .sort({'timestamp': {'order': 'asc'}})
         return s
 
+    def server_members_heatmap(self, server, parser_args=None):
+        """Members heatmap.
+        
+        Kibana Visualization request:
+        {
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "query_string": {
+                    "query": "_type:message AND server.name:\"Reddit Alpha Clan Family\" AND author.bot:false",
+                    "analyze_wildcard": true
+                  }
+                },
+                {
+                  "range": {
+                    "timestamp": {
+                      "gte": 1501018393274,
+                      "lte": 1501104793274,
+                      "format": "epoch_millis"
+                    }
+                  }
+                }
+              ],
+              "must_not": []
+            }
+          },
+          "size": 0,
+          "_source": {
+            "excludes": []
+          },
+          "aggs": {
+            "3": {
+              "terms": {
+                "field": "author.name.keyword",
+                "size": 20,
+                "order": {
+                  "_count": "desc"
+                }
+              },
+              "aggs": {
+                "2": {
+                  "date_histogram": {
+                    "field": "timestamp",
+                    "interval": "30m",
+                    "time_zone": "Asia/Shanghai",
+                    "min_doc_count": 1
+                  }
+                }
+              }
+            }
+          }
+        }
+        """
+        time = parser_args.time
+        s = self.search \
+            .query(Match(**{'server.id': server.id})) \
+            .query(self.time_range(time)) \
+            .sort({'timestamp': {'order': 'asc'}})
+
+        s.aggs.bucket('author_names', 'terms', field='author.name.keyword') \
+            .bucket('overtime', 'date_histogram', field='timestamp', interval='30m')
+        return s
+
 
 class ESLog:
     """Elastic Search Logging.
@@ -528,42 +671,9 @@ class ESLog:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-
-        self.es = Elasticsearch()
-        self.search = Search(using=self.es, index="discord-*")
         self.message_search = MessageDocSearch(index="discord-*")
-        # self.model = ESLogModel(JSON, self.search)
-
-        # self.extra = {
-        #     'log_type': 'discord.logger',
-        #     'application': 'red',
-        #     'bot_id': self.bot.user.id,
-        #     'bot_name': self.bot.user.name
-        # }
-
         self.eslogger = ESLogger(index_name_fmt='discord-{}')
-
-        # temporarily disable gauges
-        # self.task = bot.loop.create_task(self.loop_task())
-
         self.view = ESLogView(bot)
-
-    def __unload(self):
-        """Unhook logger when unloaded.
-
-        Thanks Kowlin!
-        """
-        pass
-
-    # async def loop_task(self):
-    #     """Loop task."""
-    #     await self.bot.wait_until_ready()
-    #     self.eslogger.init_extra()
-    #     # temporarily disable gauges
-    #     # self.eslogger.log_all_gauges()
-    #     await asyncio.sleep(INTERVAL)
-    #     if self is self.bot.get_cog('ESLog'):
-    #         self.task = self.bot.loop.create_task(self.loop_task())
 
     @commands.group(pass_context=True, no_pm=True)
     async def eslogset(self, ctx):
@@ -588,33 +698,6 @@ class ESLog:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @ownereslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def ownereslog_user(self, ctx, server_name, member: Member, *args):
-        """User activity."""
-        server = discord.utils.get(self.bot.servers, name=server_name)
-        if server is None:
-            await self.bot.say("Cannot find server named {}.".format(server_name))
-            return
-        await self.search_user(ctx, server, member, *args)
-
-    @ownereslog.command(name="users", aliases=['us'], pass_context=True, no_pm=True)
-    async def ownereslog_users(self, ctx, server_name, *args):
-        """Message count by user."""
-        server = discord.utils.get(self.bot.servers, name=server_name)
-        if server is None:
-            await self.bot.say("Cannot find server named {}.".format(server_name))
-            return
-        await self.search_message_authors(ctx, server, *args)
-
-    @ownereslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
-    async def ownereslog_channel(self, ctx, server_name, *args):
-        """Message count by user."""
-        server = discord.utils.get(self.bot.servers, name=server_name)
-        if server is None:
-            await self.bot.say("Cannot find server named {}.".format(server_name))
-            return
-        await self.search_channel(ctx, server, *args)
-
     @commands.group(pass_context=True, no_pm=True)
     async def eslog(self, ctx):
         """Elasticsearch Log"""
@@ -622,7 +705,7 @@ class ESLog:
             await send_cmd_help(ctx)
 
     @eslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def eslog_user(self, ctx, member: Member, *args):
+    async def eslog_user(self, ctx, member: Member=None, *args):
         """Message statistics by user.
         
         Params:
@@ -713,51 +796,7 @@ class ESLog:
         Note:
         It might take a few minutes to process for servers which have many users and activity.
         """
-        parser = argparse.ArgumentParser(prog='[p]eslog users')
-        parser.add_argument(
-            '-t', '--time',
-            default="1d",
-            help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
-        )
-        parser.add_argument(
-            '-c', '--count',
-            type=int,
-            default="10",
-            help='Number of results')
-        parser.add_argument(
-            '-ec', '--excludechannels',
-            nargs='+',
-            help='List of channels to exclude'
-        )
-        parser.add_argument(
-            '-ic', '--includechannels',
-            nargs='+',
-            help='List of channels to exclude'
-        )
-        parser.add_argument(
-            '-eb', '--excludebot',
-            action='store_true'
-        )
-        parser.add_argument(
-            '-er', '--excluderoles',
-            nargs='+',
-            help='List of roles to exclude'
-        )
-        parser.add_argument(
-            '-ir', '--includeroles',
-            nargs='+',
-            help='List of roles to include'
-        )
-        parser.add_argument(
-            '-ebc', '--excludebotcommands',
-            action='store_true'
-        )
-        parser.add_argument(
-            '-s', '--split',
-            default='channel',
-            choices=['channel']
-        )
-
+        parser = ESLogger.parser()
         try:
             p_args = parser.parse_args(args)
         except SystemExit:
@@ -777,95 +816,27 @@ class ESLog:
             "doc": doc
         } for doc in s.scan()]
 
-        results = sorted(results, key=lambda x: x["timestamp"])
-        most_common_author_ids = Counter([r["doc"].author.id for r in results]).most_common(10)
-
-        # split results in channel ids by count
-        author_channels = nested_dict()
-        for author_id, count in most_common_author_ids:
-            channel_ids = []
-            for result in results:
-                doc = result["doc"]
-                if doc.author.id == author_id:
-                    channel_ids.append(doc.channel.id)
-            author_channels[author_id] = Counter(channel_ids).most_common()
-
-        # split results in the data range time series
-
-        now = dt.datetime.utcnow()
-        start = results[0]["timestamp"]
-        count = 30
-        freq = (now - start).total_seconds() / count / 60
-        freq = '{}min'.format(int(freq))
-        rng = pd.date_range(start=start, end=now, freq=freq)
-
-        for result in results:
-            for rng_index, rng_timestamp in enumerate(rng):
-                if result["timestamp"] >= rng_timestamp:
-                    result["rng_index"] = rng_index
-                    result["rng_timestamp"] = rng_timestamp
-
-        message_range = []
-        for rng_timestamp in rng:
-            messages = []
-            for result in results:
-                if result["rng_timestamp"] == rng_timestamp:
-                    messages.append(result)
-            message_range.append(messages)
-
-        def inline_barchart(count, max_count):
-            """Inline bar chart.
-            
-            ▇: values
-            ░: 0
-            """
-            width = 30
-            bar_count = int(width * (count / max_count))
-            chart = '▇' * bar_count if bar_count > 0 else '░'
-            return inline(chart)
-
-        # embed output
         server = ctx.message.server
 
-        embed = discord.Embed(
-            title=server.name,
-            description="User activity by messages",
-            color=random_discord_color()
-        )
-
-        max_count = 0
-        for rank, (author_id, count) in enumerate(most_common_author_ids, 1):
-            max_count = max(count, max_count)
-            # author name
-            author = server.get_member(author_id)
-            if author is None:
-                author_name = 'User {}'.format(author_id)
-            else:
-                author_name = server.get_member(author_id).display_name
-            # chart
-            author_message_count = []
-            sparkline_chart = ''
-            for messages in message_range:
-                author_messages = [msg for msg in messages if msg['doc'].author.id == author_id]
-                author_message_count.append(len(author_messages))
-            for line in sparklines(author_message_count):
-                sparkline_chart += line
-
-            inline_chart = inline_barchart(count, max_count)
-            # channels
-            channel_str = ', '.join([
-                '{}: {}'.format(
-                    server.get_channel(
-                        cid), count) for cid, count in author_channels[author_id]])
-
-            # output
-            field_name = '{}. {}: {}'.format(rank, author_name, count)
-            field_value = '{}\n{}'.format(
-                inline(sparkline_chart),
-                channel_str)
-            embed.add_field(name=field_name, value=field_value, inline=False)
-
+        embed = self.view.embed_members(server, results, p_args)
         await self.bot.say(embed=embed)
+
+    @eslog.command(name="userheatmap", pass_context=True, no_pm=True)
+    async def eslog_userheatmap(self, ctx, *args):
+        """User heat map"""
+        parser = ESLogger.parser()
+        try:
+            p_args = parser.parse_args(args)
+        except SystemExit:
+            await send_cmd_help(ctx)
+            return
+
+        server = ctx.message.server
+        s = self.message_search.server_members_heatmap(server, p_args)
+
+        p = pprint.PrettyPrinter(indent="4")
+        for hit in s.scan():
+            p.pprint(hit.to_dict())
 
     async def on_message(self, message: Message):
         """Track on message."""
