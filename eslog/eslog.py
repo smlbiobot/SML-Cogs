@@ -50,7 +50,7 @@ from elasticsearch_dsl.query import Match, Range
 from sparklines import sparklines
 
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline
+from cogs.utils.chat_formatting import inline, pagify, box
 from cogs.utils.dataIO import dataIO
 
 connections.create_connection(hosts=['localhost'], timeout=20)
@@ -698,6 +698,35 @@ class ESLog:
         """
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    @ownereslog.command(name="users", pass_context=True, no_pm=True)
+    async def ownereslog_users(self, ctx, *args):
+        """Show debug"""
+        parser = ESLogger.parser()
+        try:
+            p_args = parser.parse_args(args)
+        except SystemExit:
+            await send_cmd_help(ctx)
+            return
+
+        await self.bot.type()
+        server = ctx.message.server
+        s = self.message_search.server_messages(server, p_args)
+
+        results = [{
+            "author_id": doc.author.id,
+            "channel_id": doc.channel.id,
+            "timestamp": doc.timestamp,
+            "rng_index": None,
+            "rng_timestamp": None,
+            "doc": doc
+        } for doc in s.scan()]
+
+        p = pprint.PrettyPrinter(indent="4")
+        out = p.pformat(results)
+
+        for page in pagify(out, shorten_by=80):
+            await self.bot.say(box(page, lang='py'))
 
     @commands.group(pass_context=True, no_pm=True)
     async def eslog(self, ctx):
