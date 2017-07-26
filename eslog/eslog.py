@@ -418,7 +418,7 @@ class ESLogView:
 
         # split results in the data range time series
         now = dt.datetime.utcnow()
-        start = results[0]["timestamp"]
+        start = min(now - dt.timedelta(days=1), results[0]["timestamp"])
         count = 30
         freq = (now - start).total_seconds() / count / 60
         freq = '{}min'.format(int(freq))
