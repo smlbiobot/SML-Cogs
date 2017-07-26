@@ -358,6 +358,7 @@ class ESLogger:
             print(message.to_dict())
 
 
+
 class ESLogView:
     """ESLog views.
     
