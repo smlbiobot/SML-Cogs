@@ -29,15 +29,15 @@ import datetime as dt
 import itertools
 import os
 import re
-from collections import Counter, OrderedDict
+from collections import Counter, OrderedDict, defaultdict
 from datetime import timedelta
 from random import choice
 
 import discord
+import pandas as pd
 from __main__ import send_cmd_help
 from discord import Member
 from discord import Message
-from pandasticsearch import Select
 from discord.ext import commands
 from elasticsearch import Elasticsearch
 from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
@@ -298,7 +298,7 @@ class ESLogger:
     def parser():
         """Process arguments."""
         # Process arguments
-        parser = argparse.ArgumentParser(prog='[p]eslog messagecount')
+        parser = argparse.ArgumentParser(prog='[p]eslog uers')
         # parser.add_argument('key')
         parser.add_argument(
             '-t', '--time',
@@ -713,7 +713,51 @@ class ESLog:
         Note:
         It might take a few minutes to process for servers which have many users and activity.
         """
-        parser = ESLogger.parser()
+        parser = argparse.ArgumentParser(prog='[p]eslog users')
+        parser.add_argument(
+            '-t', '--time',
+            default="1d",
+            help="Time span in ES notation. 7d for 7 days, 1h for 1 hour"
+        )
+        parser.add_argument(
+            '-c', '--count',
+            type=int,
+            default="10",
+            help='Number of results')
+        parser.add_argument(
+            '-ec', '--excludechannels',
+            nargs='+',
+            help='List of channels to exclude'
+        )
+        parser.add_argument(
+            '-ic', '--includechannels',
+            nargs='+',
+            help='List of channels to exclude'
+        )
+        parser.add_argument(
+            '-eb', '--excludebot',
+            action='store_true'
+        )
+        parser.add_argument(
+            '-er', '--excluderoles',
+            nargs='+',
+            help='List of roles to exclude'
+        )
+        parser.add_argument(
+            '-ir', '--includeroles',
+            nargs='+',
+            help='List of roles to include'
+        )
+        parser.add_argument(
+            '-ebc', '--excludebotcommands',
+            action='store_true'
+        )
+        parser.add_argument(
+            '-s', '--split',
+            default='channel',
+            choices=['channel']
+        )
+
         try:
             p_args = parser.parse_args(args)
         except SystemExit:
@@ -724,50 +768,104 @@ class ESLog:
         server = ctx.message.server
         s = self.message_search.server_messages(server, p_args)
 
-        """
-        Pandasticsearch
-        """
-        for doc in s.scan():
-            pandas_df = Select.from_dict(doc.to_dict()).to_pandas()
-            print(pandas_df)
+        results = [{
+            "author_id": doc.author.id,
+            "channel_id": doc.channel.id,
+            "timestamp": doc.timestamp,
+            "rng_index": None,
+            "rng_timestamp": None,
+            "doc": doc
+        } for doc in s.scan()]
 
-        """
-        Create a list of counts over time intervals
-        """
-        docs = [doc for doc in s.scan()]
-        docs = sorted(docs, key=lambda doc: doc.timestamp)
+        results = sorted(results, key=lambda x: x["timestamp"])
+        most_common_author_ids = Counter([r["doc"].author.id for r in results]).most_common(10)
 
-        start = docs[0].timestamp
-        steps = 30
+        # split results in channel ids by count
+        author_channels = nested_dict()
+        for author_id, count in most_common_author_ids:
+            channel_ids = []
+            for result in results:
+                doc = result["doc"]
+                if doc.author.id == author_id:
+                    channel_ids.append(doc.channel.id)
+            author_channels[author_id] = Counter(channel_ids).most_common()
+
+        # split results in the data range time series
+
         now = dt.datetime.utcnow()
-        interval = (now - start) / steps
+        start = results[0]["timestamp"]
+        count = 30
+        freq = (now - start).total_seconds() / count / 60
+        freq = '{}min'.format(int(freq))
+        rng = pd.date_range(start=start, end=now, freq=freq)
 
-        timed_docs = OrderedDict()
-        for index in range(steps):
-            timed_docs[index] = []
-        for doc in docs:
-            time_index = (doc.timestamp - start) // interval
-            timed_docs[time_index].append(doc)
+        for result in results:
+            for rng_index, rng_timestamp in enumerate(rng):
+                if result["timestamp"] >= rng_timestamp:
+                    result["rng_index"] = rng_index
+                    result["rng_timestamp"] = rng_timestamp
 
-        author_ids = Counter([doc.author.id for doc in docs]).most_common(10)
+        message_range = []
+        for rng_timestamp in rng:
+            messages = []
+            for result in results:
+                if result["rng_timestamp"] == rng_timestamp:
+                    messages.append(result)
+            message_range.append(messages)
 
-        for author_id, count in author_ids:
-            member = server.get_member(author_id)
-            if member is not None:
-                name = member.display_name
+        def inline_barchart(count, max_count):
+            """Inline bar chart.
+            
+            ▇: values
+            ░: 0
+            """
+            width = 30
+            bar_count = int(width * (count / max_count))
+            chart = '▇' * bar_count if bar_count > 0 else '░'
+            return inline(chart)
+
+        # embed output
+        server = ctx.message.server
+
+        embed = discord.Embed(
+            title=server.name,
+            description="User activity by messages",
+            color=random_discord_color()
+        )
+
+        max_count = 0
+        for rank, (author_id, count) in enumerate(most_common_author_ids, 1):
+            max_count = max(count, max_count)
+            # author name
+            author = server.get_member(author_id)
+            if author is None:
+                author_name = 'User {}'.format(author_id)
             else:
-                name = "User {}".format(author_id)
-            await self.bot.say('{}: {}'.format(name, count))
-            data = []
-            for k, docs in timed_docs.items():
-                count = 0
-                for doc in docs:
-                    if doc.author.id == author_id:
-                        count += 1
-                data.append(count)
+                author_name = server.get_member(author_id).display_name
+            # chart
+            author_message_count = []
+            sparkline_chart = ''
+            for messages in message_range:
+                author_messages = [msg for msg in messages if msg['doc'].author.id == author_id]
+                author_message_count.append(len(author_messages))
+            for line in sparklines(author_message_count):
+                sparkline_chart += line
 
-            for line in sparklines(data):
-                await self.bot.say(inline(line))
+            inline_chart = inline_barchart(count, max_count)
+            # channels
+            channel_str = ', '.join([
+                '{}: {}'.format(
+                    server.get_channel(
+                        cid), count) for cid, count in author_channels[author_id]])
+
+            # output
+            field_name = '{}. {}: {}'.format(rank, author_name, count)
+            field_value = '{}\n{}'.format(
+                inline(sparkline_chart),
+                channel_str)
+            embed.add_field(name=field_name, value=field_value, inline=False)
+
+        await self.bot.say(embed=embed)
 
     async def on_message(self, message: Message):
         """Track on message."""
