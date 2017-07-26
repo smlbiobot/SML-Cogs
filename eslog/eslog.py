@@ -25,44 +25,33 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import argparse
-import asyncio
 import datetime as dt
 import itertools
 import os
 import re
-from collections import defaultdict
-from collections import Counter
-from collections import OrderedDict
+from collections import Counter, OrderedDict
 from datetime import timedelta
 from random import choice
 
 import discord
 from __main__ import send_cmd_help
-import sparklines
-from discord import Channel
-from discord import ChannelType
-from discord import Game
 from discord import Member
 from discord import Message
-from discord import Role
-from discord import Server
-from discord import Status
+from pandasticsearch import Select
 from discord.ext import commands
-from discord.ext.commands import Command
-from discord.ext.commands import Context
 from elasticsearch import Elasticsearch
+from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
+    analyzer, Keyword, Text, Integer
 from elasticsearch_dsl import Search, FacetedSearch, TermsFacet
-from elasticsearch_dsl.query import QueryString, Query, Q, Filtered, Match
-from elasticsearch_dsl.query import Range
-from elasticsearch_dsl import Index, DocType, Date, Nested, Boolean, \
-    analyzer, InnerObjectWrapper, Completion, Keyword, Text, Integer
-
-from cogs.utils.chat_formatting import inline
-from cogs.utils.dataIO import dataIO
-from cogs.utils import checks
-
 # global ES connection
 from elasticsearch_dsl.connections import connections
+from elasticsearch_dsl.query import Match, Range
+from sparklines import sparklines
+
+from cogs.utils import checks
+from cogs.utils.chat_formatting import inline
+from cogs.utils.dataIO import dataIO
+
 connections.create_connection(hosts=['localhost'], timeout=20)
 
 INTERVAL = timedelta(hours=4).seconds
@@ -367,107 +356,6 @@ class ESLogger:
             print('-'*40)
             print(message.to_dict())
 
-class AuthorHits:
-    """
-    Construct results in this format:
-    {
-        "11111": {
-            "author_id": "11111",
-            "count": 100,
-            "channels": {
-                "12345": {
-                    "channel_name": "Channel Name 1",
-                    "count": 100,
-                    "channel_id": "12345"
-                },
-                "23456": {
-                    "channel_name": "Channel Name 2",
-                    "count": 200,
-                    "channel_id": "23456"
-                },       
-            } 
-        }
-    }
-    """
-
-    def __init__(self):
-        self.authors = {}
-
-    def max_author_count(self):
-        """Maximum author count."""
-        return max([ah.counter for k, ah in self.authors.items()])
-
-    def add_hit(self, hit):
-        if hit.author.id not in self.authors:
-            self.authors[hit.author.id] = AuthorHit(hit)
-        self.authors[hit.author.id].add_count()
-        self.authors[hit.author.id].add_channel(hit)
-
-    def sorted_author_list(self):
-        """Sorted author list.
-        Sort author list by author count and return result.
-        
-        """
-        authors = [v for k, v in self.authors.items()]
-        authors = sorted(authors, key=lambda ah: ah.counter, reverse=True)
-        return authors
-
-    def author_count_rank(self, author_id):
-        """Return author rank by count."""
-        authors = self.sorted_author_list()
-        for rank, author_hit in enumerate(authors):
-            if author_id == author_hit.author_id:
-                return rank + 1
-
-
-class AuthorHit:
-    def __init__(self, hit):
-        self.author_id = hit.author.id
-        self.counter = 0
-        self.channels = nested_dict()
-
-    def add_count(self):
-        self.counter += 1
-
-    def add_channel(self, hit):
-        channel_id = hit.channel.id
-        channel_name = hit.channel.name
-        if channel_id not in self.channels:
-            self.channels[channel_id] = {
-                "channel_name": channel_name,
-                "channel_id": channel_id,
-                "count": 1
-            }
-        else:
-            self.channels[channel_id]["count"] += 1
-
-    def sorted_channels(self):
-        """List of channels sorted by count"""
-        channels = [v for k, v in self.channels.items()]
-        channels = sorted(channels, key = lambda c: c["count"], reverse=True)
-        return channels
-
-    def to_dict(self):
-        return {
-            'counter': self.counter,
-            'channels': [{
-                'channel_name': v['channel_name'],
-                'channel_id': v['channel_id'],
-                'count': v['count']
-            } for k, v in self.channels.items()]
-        }
-
-
-class UserActivityModel:
-    """User activitiy model."""
-
-    def __init__(self, *args, **kwargs):
-        """Init.
-        
-        Parameters:
-        """
-        self.__dict__.update(kwargs)
-
 
 class ESLogView:
     """ESLog views.
@@ -511,56 +399,6 @@ class ESLogView:
 
         return em
 
-
-
-
-    async def user_activity(self, server: Server, member: Member, hits, p_args, rank="_"):
-        """User actvity"""
-        await self.bot.type()
-
-        title = "Member Activity: {}".format(member.display_name)
-        description = self.description(p_args, show_top=False)
-        color = random_discord_color()
-
-        em = discord.Embed(title=title, description=description, color=color)
-
-        em.add_field(name="Rank", value='{} / {}'.format(rank, len(server.members)))
-        em.add_field(name="Messages", value='{}'.format(len(hits)))
-
-        # sort hits chronologically
-        hits = sorted(hits, key=lambda hit: hit.timestamp)
-
-        # skip if no results
-        if len(hits):
-            last_hit = hits[-1]
-            if hasattr(last_hit, 'timestamp'):
-                dt_ts = dt.datetime.strptime(hits[-1].timestamp, "%Y-%m-%dT%H:%M:%S.%f")
-                value = dt_ts.strftime("%Y-%m-%d %H:%M:%S UTC")
-                em.add_field(name="Last seen", value=value)
-        else:
-            em.add_field(name="_", value="_")
-
-        channel_ids = []
-        for hit in hits:
-            channel_ids.append(hit.channel.id)
-        channel_id_counter = Counter(channel_ids)
-
-        for channel_id, count in channel_id_counter.most_common(10):
-            channel = server.get_channel(channel_id)
-            em.add_field(name=channel.name, value='{} messages'.format(count))
-
-        await self.bot.say(embed=em)
-
-    @staticmethod
-    def embed_message(hit):
-        """Message events."""
-        em = discord.Embed(title=hit.server.name, description="Message")
-        em.add_field(name="channel.name", value=hit.channel.name)
-        em.add_field(name="author.name", value=hit.author.name)
-        em.add_field(name="content", value=hit.content)
-        em.set_footer(text=hit["@timestamp"])
-        return em
-
     @staticmethod
     def description(p_args, show_top=True):
         """Embed description based on supplied arguments."""
@@ -589,113 +427,6 @@ class ESLogView:
         bar_count = int(width * (count / max_count))
         chart = '▇' * bar_count if bar_count > 0 else '░'
         return inline(chart)
-
-    @staticmethod
-    def channel_count(author_hit: AuthorHit):
-        """Channel count. """
-        channels = author_hit.sorted_channels()
-        chart = ['{}: {}'.format(c["channel_name"], c["count"]) for c in channels]
-        return ', '.join(chart)
-
-    @staticmethod
-    def embeds_user_rank(author_hits: AuthorHits, p_args, server):
-        """User rank display."""
-        title = 'Message count by author'
-        description = ESLogView.description(p_args)
-        color = random_discord_color()
-        footer_text = server.name
-        footer_icon_url = server.icon_url
-        num_results = p_args.count
-
-        em = discord.Embed(title=title, description=description, color=color)
-        sorted_author_list = author_hits.sorted_author_list()
-        sorted_author_list = sorted_author_list[:num_results]
-        for rank, author_hit in enumerate(sorted_author_list, 1):
-            counter = author_hit.counter
-            author_id = author_hit.author_id
-            member = server.get_member(author_id)
-            if member is not None:
-                name = member.display_name
-            else:
-                name = "User ID: {}".format(author_id)
-
-            max_count = author_hits.max_author_count()
-
-            if p_args.split is None:
-                chart = ESLogView.inline_barchart(counter, max_count)
-            elif p_args.split == 'channel':
-                chart = '{}\n{}'.format(
-                    ESLogView.inline_barchart(counter, max_count),
-                    ESLogView.channel_count(author_hit)
-                )
-                # chart = ESLogView.inline_barchart(counter, max_count)
-                # chart = ESLogView.channel_count(author_hit)
-                # chart = ESLogView.inline_barchart(counter, max_count)
-
-            em.add_field(
-                name='{}. {}: {}'.format(rank, name, counter),
-                value=chart,
-                inline=False)
-            rank += 1
-        em.set_footer(text=footer_text, icon_url=footer_icon_url)
-
-        return [em]
-
-    @staticmethod
-    def embeds_channel_rank(hit_counts, p_args, server):
-        """Channel rank display.
-        
-        Available fields:
-        s = search.query(qs).query(r).source([
-            'channel.created_at',
-            'channel.id',
-            'channel.is_default',
-            'channel.name',
-            'channel.position',
-            'channel.server.id',
-            'channel.server.name',
-            'channel.type.group',
-            'channel.type.private',
-            'channel.type.text',
-            'channel.type.voice'
-        ])
-        
-        """
-        embeds = []
-        # group by 25 for embeds
-        hit_counts_group = grouper(25, hit_counts)
-
-        title = 'Message count by channel'
-        description = ESLogView.description(p_args)
-        color = random_discord_color()
-        footer_text = server.name
-        footer_icon_url = server.icon_url
-
-        rank = 1
-        max_count = None
-
-        for hit_counts in hit_counts_group:
-            em = discord.Embed(title=title, description=description, color=color)
-            for hit_count in hit_counts:
-                if hit_count is not None:
-                    count = hit_count["count"]
-                    channel = server.get_channel(hit_count["channel_id"])
-                    if channel is not None:
-                        name = channel.name
-                    else:
-                        name = "Channel ID: {}".format(hit_count["channel_id"])
-                    if max_count is None:
-                        max_count = count
-
-                    em.add_field(
-                        name='{}. {}: {}'.format(rank, name, count),
-                        value=ESLogView.inline_barchart(count, max_count),
-                        inline=False)
-                    rank += 1
-            em.set_footer(text=footer_text, icon_url=footer_icon_url)
-            embeds.append(em)
-        return embeds
-
 
 class MessageDocSearch:
     """Message author.
@@ -772,6 +503,16 @@ class MessageDocSearch:
         s = self.search \
             .query(self.time_range(time)) \
             .query(Match(**{'server.id': server.id})) \
+            .sort({'timestamp': {'order': 'asc'}})
+        return s
+
+    def server_author_messages(self, server, author, parser_args):
+        """An author’s messages on a specific server."""
+        time = parser_args.time
+        s = self.search \
+            .query(Match(**{'server.id': server.id})) \
+            .query(Match(**{'author.id': author.id})) \
+            .query(self.time_range(time)) \
             .sort({'timestamp': {'order': 'asc'}})
         return s
 
@@ -895,16 +636,8 @@ class ESLog:
           List of channels to exclude
         --includechannels INCLUDECHANNEL [INCLUDECHANNEL ...], -ic
           List of channels to include (multiples are interpreted as OR)
-        --excluderoles EXCLUDEROLE [EXCLUDEROLE ...], -er
-          List of roles to exclude
-        --includeroles INCLUDEROLE [INCLUDEROLE ...], -ir
-          List of roles to include (multiples are interpreted as AND)
-        --excludebot, -eb
-          Exclude bot accounts
         --excludebotcommands, -ebc
           Exclude bot commands. 
-        --split {none, channel}, -s
-          Split chart
         
         Example:
         [p]eslog user --time 2d --count 20 --include general some-channel
@@ -992,6 +725,13 @@ class ESLog:
         s = self.message_search.server_messages(server, p_args)
 
         """
+        Pandasticsearch
+        """
+        for doc in s.scan():
+            pandas_df = Select.from_dict(doc.to_dict()).to_pandas()
+            print(pandas_df)
+
+        """
         Create a list of counts over time intervals
         """
         docs = [doc for doc in s.scan()]
@@ -1009,185 +749,33 @@ class ESLog:
             time_index = (doc.timestamp - start) // interval
             timed_docs[time_index].append(doc)
 
-        for k, docs in timed_docs.items():
-            print(k)
-            for doc in docs:
-                print(doc.timestamp)
+        author_ids = Counter([doc.author.id for doc in docs]).most_common(10)
 
-
-
-        #     if start is None:
-        #         start = doc.timestamp
-        #     end = start + td / steps
-        #
-        #     print(doc, start, end, doc.timestamp)
-        #
-        #     count = messages.get(doc.author.id, 1)
-        #     messages[doc.author.id] = count + 1
-        #
-        #     if doc.timestamp > end:
-        #         start = end
-        #         messages_over_time.append(messages)
-        #         messages = {}
-        #
-        # print(messages_over_time)
-
-
-
-
-
-
-
-    @eslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
-    async def eslog_channel(self, ctx, *args):
-        """Message count by channel.
-
-        Params:
-        --time TIME, -t    
-          Time in ES notation. 7d for 7 days, 1h for 1 hour
-          Default: 7d (7 days)
-        --count COUNT, -c   
-          Number of results to show
-          Default: 10
-        --excludechannels EXCLUDECHANNEL [EXCLUDECHANNEL ...], -ec
-          List of channels to exclude
-        --includechannels INCLUDECHANNEL [INCLUDECHANNEL ...], -ic
-          List of channels to include (multiples are interpreted as OR)
-        --excluderoles EXCLUDEROLE [EXCLUDEROLE ...], -er
-          List of roles to exclude
-        --includeroles INCLUDEROLE [INCLUDEROLE ...], -ir
-          List of roles to include (multiples are interpreted as AND)
-        --excludebot, -eb
-          Exclude bot accounts
-        --excludebotcommands, -ebc
-          Exclude bot commands. 
-
-        Example:
-        [p]eslog channel --time 2d --count 20 --include general some-channel
-        Counts number of messages sent by authors within last 2 days in channels #general and #some-channel
-
-        Note:
-        It might take a few minutes to process for servers which have many users and activity.
-        """
-        server = ctx.message.server
-        await self.search_channel(ctx, server, *args)
-
-    async def search_user(self, ctx, server, member: Member, *args):
-        """Perform the search for users.
-        
-        1. Search against all authors to find relative rank in activity.
-        2. Filter just that user to display other stats.
-        """
-        parser = ESLogModel.parser()
-        try:
-            p_args = parser.parse_args(args)
-        except SystemExit:
-            await send_cmd_help(ctx)
-            return
-
-        if member is None:
-            await self.bot.say("Invalid user.")
-            await send_cmd_help(ctx)
-            return
-
-        await self.bot.type()
-
-        # 1. Get author activity rank
-        s = self.model.es_query_authors(p_args, server)
-        author_hits = AuthorHits()
-        for hit in s.scan():
-            author_hits.add_hit(hit)
-
-        rank = author_hits.author_count_rank(member.id)
-
-        # 2. Get author activity
-        s = self.model.es_query_author(p_args, server, member)
-        hits = []
-        for hit in s.scan():
-            hits.append(hit)
-
-        await self.view.user_activity(server, member, hits, p_args, rank=rank)
-
-    async def search_message_authors(self, ctx, server, *args):
-        """Perform the search for authors."""
-        parser = ESLogModel.parser()
-
-        try:
-            p_args = parser.parse_args(args)
-        except SystemExit:
-            # await self.bot.send_message(ctx.message.channel, box(parser.format_help()))
-            await send_cmd_help(ctx)
-            return
-
-        await self.bot.type()
-
-        # s = ESLogModel.es_query_authors(p_args, self.search, server)
-        s = self.model.es_query_authors(p_args, server)
-
-        author_hits = AuthorHits()
-
-        for hit in s.scan():
-            author_hits.add_hit(hit)
-
-        for em in ESLogView.embeds_user_rank(author_hits, p_args, server):
-            await self.bot.say(embed=em)
-
-    async def search_channel(self, ctx, server, *args):
-        """Perform search for channels."""
-        parser = ESLogModel.parser()
-
-        try:
-            p_args = parser.parse_args(args)
-        except SystemExit:
-            # await self.bot.send_message(ctx.message.channel, box(parser.format_help()))
-            await send_cmd_help(ctx)
-            return
-
-        await self.bot.type()
-
-        s = self.model.es_query_channels(p_args, server)
-
-        # perform search using scan()
-        hit_counts = {}
-        for hit in s.scan():
-            if hit.channel.id in hit_counts:
-                hit_counts[hit.channel.id] += 1
+        for author_id, count in author_ids:
+            member = server.get_member(author_id)
+            if member is not None:
+                name = member.display_name
             else:
-                hit_counts[hit.channel.id] = 1
+                name = "User {}".format(author_id)
+            await self.bot.say('{}: {}'.format(name, count))
+            data = []
+            for k, docs in timed_docs.items():
+                count = 0
+                for doc in docs:
+                    if doc.author.id == author_id:
+                        count += 1
+                data.append(count)
 
-        hit_counts = [{"channel_id": k, "count": v} for k, v in hit_counts.items()]
-        hit_counts = sorted(hit_counts, key=lambda hit: hit["count"], reverse=True)
-
-        max_results = p_args.count
-
-        hit_counts = hit_counts[:max_results]
-
-        for em in ESLogView.embeds_channel_rank(hit_counts, p_args, server):
-            await self.bot.say(embed=em)
-
-    # Events
-    # async def on_channel_create(self, channel: Channel):
-    #     """Track channel creation."""
-    #     self.eslogger.log_channel_create(channel)
-    #
-    # async def on_channel_delete(self, channel: Channel):
-    #     """Track channel deletion."""
-    #     self.eslogger.log_channel_delete(channel)
-    #
-    # async def on_command(self, command: Command, ctx: Context):
-    #     """Track command usage."""
-    #     self.eslogger.log_command(command, ctx)
+            for line in sparklines(data):
+                await self.bot.say(inline(line))
 
     async def on_message(self, message: Message):
         """Track on message."""
         self.eslogger.log_message(message)
-        # self.eslogger2.log_message(message)
-        # self.log_emojis(message)
 
     async def on_message_delete(self, message: Message):
         """Track message deletion."""
         self.eslogger.log_message_delete(message)
-        # self.eslogger2.log_message_delete(message)
 
     # async def on_message_edit(self, before: Message, after: Message):
     #     """Track message editing."""

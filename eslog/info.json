@@ -4,7 +4,7 @@
 	"DESCRIPTION": "Directly interface with Elastic Search for logging and searching using official API",
 	"DISABLED": false,
 	"NAME": "ESLog",
-	"REQUIREMENTS": ["elasticsearch", "elasticsearch_dsl"],
+	"REQUIREMENTS": ["elasticsearch", "elasticsearch_dsl", "pandas", "future", "sparklines", "numpy"],
 	"TAGS": ["log", "logging", "elasticsearch"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
 }
