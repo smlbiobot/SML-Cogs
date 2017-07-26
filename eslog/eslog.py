@@ -38,6 +38,7 @@ from random import choice
 
 import discord
 from __main__ import send_cmd_help
+import sparklines
 from discord import Channel
 from discord import ChannelType
 from discord import Game
@@ -702,25 +703,25 @@ class MessageDocSearch:
     Initialized with a list of all messages.
     Find the author’s relative rank and other properties.
     """
-    @staticmethod
-    def time_range(time):
+    def __init__(self, **kwargs):
+        self.search = MessageDoc.search(**kwargs)
+
+    def time_range(self, time):
         """ES Range in time"""
         time_gte = 'now-{}'.format(time)
         return Range(timestamp={'gte': time_gte, 'lt': 'now'})
 
-    @staticmethod
-    def active_members(server, time):
+    def active_members(self, server, time):
         """Number of active users during this period."""
-        s = MessageDoc.search() \
-            .query(MessageDocSearch.time_range(time)) \
+        s = self.search \
+            .query(self.time_range(time)) \
             .query(Match(**{'server.id': server.id}))
         return len(set([doc.author.id for doc in s.scan()]))
 
-    @staticmethod
-    def author_lastseen(author):
+    def author_lastseen(self, author):
         """Last known date where author has send a message."""
         server = author.server
-        s = MessageDoc.search() \
+        s = self.search \
             .query(Match(**{'server.id': server.id})) \
             .query(Match(**{'author.id': author.id})) \
             .sort({'timestamp': {'order': 'desc'}})
@@ -728,11 +729,10 @@ class MessageDocSearch:
         for hit in s.execute():
             return hit.timestamp
 
-    @staticmethod
-    def author_rank(author, time):
+    def author_rank(self, author, time):
         """Author’s activity rank on a server."""
-        s = MessageDoc.search() \
-            .query(MessageDocSearch.time_range(time)) \
+        s = self.search \
+            .query(self.time_range(time)) \
             .query(Match(**{'server.id': author.server.id}))
 
         author_ids = [doc.author.id for doc in s.scan()]
@@ -742,39 +742,37 @@ class MessageDocSearch:
                 return rank
         return 0
 
-    @staticmethod
-    def author_messages_search(author, time):
+    def author_messages_search(self, author, time):
         """"All of author’s activity on a server."""
-        s = MessageDoc.search() \
-            .query(MessageDocSearch.time_range(time)) \
+        s = self.search \
+            .query(self.time_range(time)) \
             .query(Match(**{'server.id': author.server.id})) \
             .query(Match(**{'author.id': author.id}))
         return s
 
-    @staticmethod
-    def author_messages_count(author, time):
+    def author_messages_count(self, author, time):
         """Total of author’s activity on a server."""
-        return MessageDocSearch.author_messages_search(author, time).count()
+        return self.author_messages_search(author, time).count()
 
-    @staticmethod
-    def author_channels(author, time):
+    def author_channels(self, author, time):
         """Author’s activity by channel on a server.
         
         Return as OrderedDict with channel IDs and count.
         """
-        s = MessageDocSearch.author_messages_search(author, time)
+        s = self.author_messages_search(author, time)
         channel_ids = [doc.to_dict()["channel"]["id"] for doc in s.scan()]
         channels = OrderedDict()
         for channel_id, count in Counter(channel_ids).most_common():
             channels[channel_id] = count
         return channels
 
-    @staticmethod
-    def server_messages(server, time):
+    def server_messages(self, server, parser_args):
         """all of server messages."""
-        s = MessageDoc.search() \
-            .query(MessageDocSearch.time_range(time)) \
-            .query(Match(**{'server.id': server.id}))
+        time = parser_args.time
+        s = self.search \
+            .query(self.time_range(time)) \
+            .query(Match(**{'server.id': server.id})) \
+            .sort({'timestamp': {'order': 'asc'}})
         return s
 
 
@@ -792,14 +790,15 @@ class ESLog:
 
         self.es = Elasticsearch()
         self.search = Search(using=self.es, index="discord-*")
+        self.message_search = MessageDocSearch(index="discord-*")
         # self.model = ESLogModel(JSON, self.search)
 
-        self.extra = {
-            'log_type': 'discord.logger',
-            'application': 'red',
-            'bot_id': self.bot.user.id,
-            'bot_name': self.bot.user.name
-        }
+        # self.extra = {
+        #     'log_type': 'discord.logger',
+        #     'application': 'red',
+        #     'bot_id': self.bot.user.id,
+        #     'bot_name': self.bot.user.name
+        # }
 
         self.eslogger = ESLogger(index_name_fmt='discord-{}')
 
@@ -928,12 +927,14 @@ class ESLog:
 
         await self.bot.type()
 
+        mds = self.message_search
+
         time = p_args.time
-        rank = MessageDocSearch.author_rank(member, time)
-        channels = MessageDocSearch.author_channels(member, time)
-        active_members = MessageDocSearch.active_members(member.server, time)
-        message_count = MessageDocSearch.author_messages_count(member, time)
-        last_seen = MessageDocSearch.author_lastseen(member)
+        rank = mds.author_rank(member, time)
+        channels = mds.author_channels(member, time)
+        active_members = mds.active_members(member.server, time)
+        message_count = mds.author_messages_count(member, time)
+        last_seen = mds.author_lastseen(member)
 
         await self.bot.say(
             embed=self.view.embed_member(
@@ -988,7 +989,54 @@ class ESLog:
 
         await self.bot.type()
         server = ctx.message.server
-        s = MessageDocSearch.server_messages(server, p_args.time)
+        s = self.message_search.server_messages(server, p_args)
+
+        """
+        Create a list of counts over time intervals
+        """
+        docs = [doc for doc in s.scan()]
+        docs = sorted(docs, key=lambda doc: doc.timestamp)
+
+        start = docs[0].timestamp
+        steps = 30
+        now = dt.datetime.utcnow()
+        interval = (now - start) / steps
+
+        timed_docs = OrderedDict()
+        for index in range(steps):
+            timed_docs[index] = []
+        for doc in docs:
+            time_index = (doc.timestamp - start) // interval
+            timed_docs[time_index].append(doc)
+
+        for k, docs in timed_docs.items():
+            print(k)
+            for doc in docs:
+                print(doc.timestamp)
+
+
+
+        #     if start is None:
+        #         start = doc.timestamp
+        #     end = start + td / steps
+        #
+        #     print(doc, start, end, doc.timestamp)
+        #
+        #     count = messages.get(doc.author.id, 1)
+        #     messages[doc.author.id] = count + 1
+        #
+        #     if doc.timestamp > end:
+        #         start = end
+        #         messages_over_time.append(messages)
+        #         messages = {}
+        #
+        # print(messages_over_time)
+
+
+
+
+
+
 
     @eslog.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
     async def eslog_channel(self, ctx, *args):
