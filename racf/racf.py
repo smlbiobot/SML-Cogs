@@ -105,6 +105,19 @@ VISITOR_RULES = (
     "you may use this Discord invite: <http://discord.gg/racf> \n"
     "\n"
     "Thanks + enjoy!")
+ELDER_MSG = (
+    "Congratulations on your recent promotion to Elder! \n"
+    "\n"
+    "You have the following responsibilities as elder in the RACF:\n"
+    "+ Accept new members.\n"
+    "+ When accepting new members, you should:\n"
+    ".. + Ask if the person is new to the RACF.\n"
+    ".. + Ask that person to join our Discord server: http://discord.gg/racf\n"
+    ".. + Let them know about the 50/50 kicking policy.\n"
+    "+ Not allowed to kick 50/50.\n"
+    "\n"
+    "Please consult !rules and !roles on the RACF server for more info."
+)
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -994,6 +1007,18 @@ class RACF:
             await ctx.invoke(crclan.crclan_settag, tag, member)
         if crprofile is not None:
             await ctx.invoke(crprofile.crprofile_settag, tag, member)
+
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    @commands.command(pass_context=True, no_pm=True)
+    async def elder(self, ctx, member: discord.Member):
+        """Elder promotion DM + role change."""
+        elder_roles = ["Elder"]
+        await self.changerole(ctx, member, *elder_roles)
+        try:
+            await ctx.invoke(self.dmusers, ELDER_MSG, member)
+        except discord.errors.Forbidden:
+            await self.bot.say(
+                "Unable to send DM to {}. User might have a stricter DM setting.".format(member))
 
 
     async def run_iosfix(self, ctx: Context, *members: discord.Member):
