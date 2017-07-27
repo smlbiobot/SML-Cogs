@@ -597,14 +597,37 @@ class RACF:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions()
-    async def addreaction(self, ctx, message_id, *emojis):
-        """Add reactions to a message by message id."""
+    async def addreaction(self, ctx, *args):
+        """Add reactions to a message by message id.
+        
+        Add reactions to a specific message id
+        [p]addreation 123456 :white_check_mark: :x: :zzz: 
+        
+        Add reactions to the last message in channel
+        [p]addreation :white_check_mark: :x: :zzz: 
+        """
         channel = ctx.message.channel
-        try:
-            message = await self.bot.get_message(channel, message_id)
-        except discord.NotFound:
-            await self.bot.say("Cannot find message with that id.")
+
+        if not len(args):
+            await send_cmd_help(ctx)
             return
+
+        has_message_id = args[0].isdigit()
+
+        emojis = args[1:] if has_message_id else args
+        message_id = args[0] if has_message_id else None
+
+        if has_message_id:
+            try:
+                message = await self.bot.get_message(channel, message_id)
+            except discord.NotFound:
+                await self.bot.say("Cannot find message with that id.")
+                return
+        else:
+            # use the 2nd last message because the last message would be the command
+            messages = [m async for m in self.bot.logs_from(channel, limit=2)]
+            message = messages[1]
+
         for emoji in emojis:
             try:
                 await self.bot.add_reaction(message, emoji)
