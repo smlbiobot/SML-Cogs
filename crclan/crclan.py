@@ -44,6 +44,11 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import inline, box
 from cogs.utils.dataIO import dataIO
 
+from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
+    analyzer, Keyword, Text, Integer
+from elasticsearch_dsl.connections import connections
+connections.create_connection(hosts=['localhost'], timeout=20)
+
 PATH = os.path.join("data", "crclan")
 PATH_CLANS = os.path.join(PATH, "clans")
 JSON = os.path.join(PATH, "settings.json")
@@ -170,33 +175,6 @@ class CRArenaModel:
             ReleaseDate (str)
         """
         self.__dict__.update(kwargs)
-
-
-class CRRole(Enum):
-    """Clash Royale role."""
-
-    MEMBER = 1
-    LEADER = 2
-    ELDER = 3
-    COLEADER = 4
-
-    def __init__(self, role_type):
-        """Init."""
-        self.type = role_type
-
-    @property
-    def rolename(self):
-        """Convert type to name"""
-        roles = {
-            self.MEMBER: "Member",
-            self.LEADER: "Leader",
-            self.ELDER: "Elder",
-            self.COLEADER: "Co-Leader"
-        }
-        for k, v in roles.items():
-            if k == self.type:
-                return v
-        return None
 
 
 class CRClanType(Enum):
@@ -403,6 +381,89 @@ class CRClanMemberModel:
                 if emoji.name == name:
                     return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
+
+
+class CRClanMemberDoc(DocType):
+    """CR Clan Member Document."""
+    arena = Text(fields={'raw': Keyword()})
+    clan_chest_crowns = Integer()
+    current_rank = Integer()
+    donations = Integer()
+    experience_level = Integer()
+    league = Integer()
+    name = Text(fields={'raw': Keyword()})
+    previous_rank = Integer()
+    role = Integer()
+    role_name = Text(fields={'raw': Keyword()})
+    score = Integer()
+    tag = Text(fields={'raw': Keyword()})
+
+    @classmethod
+    def get_dict(cls, data):
+        return CRClanMemberDoc(
+            arena=data.get('arena', None),
+            clan_chest_crowns=data.get('clanChestCrowns', None),
+            current_rank=data.get('currenRank', None),
+            donations=data.get('donations', None),
+            experience_level=data.get('expLevel', None),
+            league=data.get('league', None),
+            name=data.get('name', None),
+            previous_rank=data.get('previousRank', None),
+            role=data.get('role', None),
+            role_name=data.get('roleName', None),
+            score=data.get('score', None),
+            tag=data.get('tag', None)
+        )
+
+
+class CRClanDoc(DocType):
+    """CR Clan Elastic Search Document."""
+    timestamp = Date()
+    badge = Integer()
+    badge_url = Text(fields={'raw': Keyword()})
+    current_rank = Integer()
+    description = Text(
+        analyzer=analyzer("simple"),
+        fields={'raw': Keyword()}
+    )
+    donations = Integer()
+    members = Nested(doc_class=CRClanMemberDoc)
+    name = Text(fields={'raw': Keyword()})
+    number_of_members = Integer()
+    region = Integer()
+    required_score = Integer()
+    score = Integer()
+    tag = Text(fields={'raw': Keyword()})
+    type = Integer()
+    type_name = Text(fields={'raw': Keyword()})
+
+    class Meta:
+        doc_type = 'crclan'
+
+    @classmethod
+    def log(cls, data, **kwargs):
+        """Log all."""
+        doc = CRClanDoc(
+            timestamp=dt.datetime.utcnow(),
+            badge=data.get('badge', None),
+            badge_url=data.get('badge_url', None),
+            current_rank=data.get('currentRank', None),
+            description=data.get('description', None),
+            donations=data.get('donations', None),
+            members=[CRClanMemberDoc.get_dict(m) for m in data.get('members', None)],
+            name=data.get('name', None),
+            number_of_members=data.get('numberOfMembers', None),
+            region=data.get('region', None),
+            required_score=data.get('requiredScore', None),
+            score=data.get('score', None),
+            tag=data.get('tag', None),
+            type=data.get('type', None),
+            type_name=data.get('typeName', None)
+        )
+        doc.save(**kwargs)
+
+    def save(self, **kwargs):
+        return super(CRClanDoc, self).save(**kwargs)
 
 
 class SettingsException(Exception):
@@ -631,6 +692,36 @@ class CogModel:
             return CRClanModel(is_cache, timestamp, **data)
         return None
 
+    async def eslog(self):
+        """Log everything on Elastic Search."""
+        if not self.es_enabled:
+            return False
+
+        dataset = []
+        for server_id in self.settings["servers"]:
+            clans = self.settings["servers"][server_id]["clans"]
+            for tag in clans.keys():
+                tag = SCTag(tag).tag
+                url = "{}{}".format(self.settings["clan_api_url"], tag)
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
+                            data = await resp.json()
+                except json.decoder.JSONDecodeError:
+                    continue
+                except asyncio.TimeoutError:
+                    continue
+                dataset.append(data)
+
+                now = dt.datetime.utcnow()
+                now_str = now.strftime('%Y.%m.%d')
+                index_name_fmt = 'crclan-{}'
+                index_name = index_name_fmt.format(now_str)
+
+                CRClanDoc.log(data, index=index_name)
+
+        return dataset
+
     @staticmethod
     def cached_filepath(tag):
         """Cached clan data file path"""
@@ -684,6 +775,17 @@ class CogModel:
         self.save()
 
     @property
+    def es_enabled(self):
+        """Enable Elastic Search."""
+        return self.settings["elasticsearch_enabled"]
+
+    @es_enabled.setter
+    def es_enabled(self, value):
+        """Set Elastic Search enabled"""
+        self.settings["elasticsearch_enabled"] = value
+        self.save()
+
+    @property
     def badge_url(self):
         """Clan Badge URL."""
         return self.settings["badge_url"]
@@ -710,6 +812,135 @@ class ErrorMessage:
             "Error fetching data from API for clan tag #{}. "
             "Please try again later.").format(tag)
 
+class CRClanInfoView:
+    """Clan info view.
+
+    This shows the clan’s general information 
+    e.g. trophy requirements, trophies, number of members, etc.
+    """
+
+    def __init__(self, bot, model):
+        """Init."""
+        self.bot = bot
+        self.model = model
+
+    async def send(
+            self, ctx, data: CRClanModel,
+            color=None, cache_warning=False, **kwargs):
+        """Send info to destination according to context."""
+        em = self.embed(data, color=color)
+        await self.bot.send_message(ctx.message.channel, embed=em)
+        if cache_warning and data.is_cache:
+            await self.bot.say(data.cache_message)
+
+    def embed(self, data: CRClanModel, color=None):
+        """Return clan info embed."""
+        if color is None:
+            color = random_discord_color()
+        em = discord.Embed(
+            title=data.name,
+            description=data.description,
+            color=color)
+        em.add_field(name="Clan Trophies", value=data.score)
+        em.add_field(name="Type", value=CRClanType(data.type).typename)
+        em.add_field(name="Required Trophies", value=data.requiredScore)
+        em.add_field(name="Clan Tag", value=data.tag)
+        em.add_field(name="Members", value=data.member_count_str)
+        badge_url = self.model.badge_url + data.badge_url
+        em.set_thumbnail(url=badge_url)
+        return em
+
+class CRClanRosterView:
+    """Clan roster view.
+
+    Trying to see if breaking this out in its own class can make
+    processing all those arguments easier to see.
+    """
+
+    def __init__(self, bot, model):
+        """Init."""
+        self.bot = bot
+        self.model = model
+
+    async def display(self, ctx, server, data: CRClanModel, color=None, cache_warning=False):
+        """Intermediate step to sort data if necessary."""
+        await self.send(ctx, server, data, color=color, cache_warning=cache_warning)
+
+    async def send(self, ctx, server, data: CRClanModel, color=None, cache_warning=False):
+        """Send roster to destination according to context.
+
+        Results are split in groups of 25
+        because Discord Embeds allow 25 fields per embed.
+        """
+        members_out = grouper(25, data.members, None)
+
+        for page, members in enumerate(members_out, start=1):
+            kwargs = {
+                'server': server,
+                'members': members,
+                'title': data.name,
+                'footer_text': '{} #{} - Page {}'.format(
+                    data.name, data.tag, page),
+                'footer_icon_url': self.model.badge_url + data.badge_url
+            }
+            em = self.embed(color=color, **kwargs)
+            await self.bot.send_message(ctx.message.channel, embed=em)
+
+        if cache_warning and data.is_cache:
+            await self.bot.say(data.cache_message)
+
+    def embed(
+            self,
+            server=None, title=None, members=None,
+            footer_text=None, footer_icon_url=None,
+            color=None):
+        """Return clan roster as Discord embed.
+
+        This represents a page of a roster.
+        """
+        em = discord.Embed(title=title)
+        em.set_footer(text=footer_text, icon_url=footer_icon_url)
+        for member in members:
+            if member is not None:
+                data = CRClanMemberModel(**member)
+                discord_member = self.model.tag2member(server, data.tag)
+                name = (
+                    "{0.name}, {0.role_name} "
+                    "(Lvl {0.expLevel})").format(data)
+                stats = (
+                    "{0.score:,d}"
+                    " | {0.donations:\u00A0>4} d"
+                    " | {0.clanChestCrowns:\u00A0>3} c"
+                    " | #{0.tag}").format(data)
+                stats = inline(stats)
+                mention = ''
+                if discord_member is not None:
+                    mention = discord_member.mention
+                arena = self.model.trophy2arena(data.score)
+                """ Rank str
+                41 ↓ 31
+                """
+                rank_delta = data.rankdelta
+                rank_delta_str = '.  .'
+                rank_current = '{: <2}'.format(data.currentRank)
+                if data.rankdelta is not None:
+                    if data.rankdelta > 0:
+                        rank_delta_str = "↓ {: >2}".format(rank_delta)
+                    elif data.rankdelta < 0:
+                        rank_delta_str = "↑ {: >2}".format(-rank_delta)
+                value = '`{rank_current} {rank_delta}` {emoji} {arena} {mention}\n{stats} '.format(
+                    rank_current=rank_current,
+                    rank_delta=rank_delta_str,
+                    mention=mention,
+                    emoji=data.league_emoji(self.bot),
+                    arena=arena,
+                    stats=stats)
+                em.add_field(name=name, value=value, inline=False)
+        if color is None:
+            color = random_discord_color()
+        em.color = color
+        return em
+
 
 # noinspection PyUnusedLocal
 class CRClan:
@@ -720,7 +951,6 @@ class CRClan:
         self.bot = bot
         self.task = bot.loop.create_task(self.loop_task())
         self.model = CogModel(JSON)
-        # self.badges = dataIO.load_json(BADGES_JSON)
         self.roster_view = CRClanRosterView(bot, self.model)
         self.info_view = CRClanInfoView(bot, self.model)
 
@@ -731,6 +961,7 @@ class CRClan:
         """Loop task: update data daily."""
         await self.bot.wait_until_ready()
         await self.model.update_data()
+        await self.model.eslog()
         await asyncio.sleep(DATA_UPDATE_INTERVAL)
         if self is self.bot.get_cog('CRClan'):
             self.task = self.bot.loop.create_task(self.loop_task())
@@ -863,6 +1094,26 @@ class CRClan:
                 "{} is not a clan tag you have added".format(tag))
         else:
             await self.bot.say("Added {} for clan #{}.".format(key, tag))
+
+    @crclanset.command(name="elasticsearch", pass_context=True)
+    async def crclanset_elasticsearch(self, ctx, enable: bool):
+        """Enable / disable elasticsearch."""
+        self.model.es_enabled = enable
+        if enable:
+            await self.bot.say("Elastic Search enabled.")
+        else:
+            await self.bot.say("ELastic Search disabled.")
+
+    @crclanset.command(name="eslog", pass_context=True)
+    async def crclanset_eslog(self, ctx):
+        """Save clan data to Elastic Search."""
+        await self.bot.type()
+
+        success = await self.model.eslog()
+        if success:
+            await self.bot.say("Logged everything on Elastic Search.")
+        else:
+            await self.bot.say("ES logging unsuccessful.")
 
     @commands.group(pass_context=True, no_pm=True)
     async def crclan(self, ctx):
@@ -1151,136 +1402,6 @@ class CRClan:
         text = self.model.trophy2arena(trophy)
         await self.bot.say(text)
 
-
-class CRClanInfoView:
-    """Clan info view.
-    
-    This shows the clan’s general information 
-    e.g. trophy requirements, trophies, number of members, etc.
-    """
-
-    def __init__(self, bot, model):
-        """Init."""
-        self.bot = bot
-        self.model = model
-
-    async def send(
-            self, ctx, data: CRClanModel,
-            color=None, cache_warning=False, **kwargs):
-        """Send info to destination according to context."""
-        em = self.embed(data, color=color)
-        await self.bot.send_message(ctx.message.channel, embed=em)
-        if cache_warning and data.is_cache:
-            await self.bot.say(data.cache_message)
-
-    def embed(self, data: CRClanModel, color=None):
-        """Return clan info embed."""
-        if color is None:
-            color = random_discord_color()
-        em = discord.Embed(
-            title=data.name,
-            description=data.description,
-            color=color)
-        em.add_field(name="Clan Trophies", value=data.score)
-        em.add_field(name="Type", value=CRClanType(data.type).typename)
-        em.add_field(name="Required Trophies", value=data.requiredScore)
-        em.add_field(name="Clan Tag", value=data.tag)
-        em.add_field(name="Members", value=data.member_count_str)
-        badge_url = self.model.badge_url + data.badge_url
-        em.set_thumbnail(url=badge_url)
-        return em
-
-
-class CRClanRosterView:
-    """Clan roster view.
-    
-    Trying to see if breaking this out in its own class can make
-    processing all those arguments easier to see.
-    """
-
-    def __init__(self, bot, model):
-        """Init."""
-        self.bot = bot
-        self.model = model
-
-    async def display(self, ctx, server, data: CRClanModel, color=None, cache_warning=False):
-        """Intermediate step to sort data if necessary."""
-        await self.send(ctx, server, data, color=color, cache_warning=cache_warning)
-
-    async def send(self, ctx, server, data: CRClanModel, color=None, cache_warning=False):
-        """Send roster to destination according to context.
-
-        Results are split in groups of 25
-        because Discord Embeds allow 25 fields per embed.
-        """
-        members_out = grouper(25, data.members, None)
-
-        for page, members in enumerate(members_out, start=1):
-            kwargs = {
-                'server': server,
-                'members': members,
-                'title': data.name,
-                'footer_text': '{} #{} - Page {}'.format(
-                    data.name, data.tag, page),
-                'footer_icon_url': self.model.badge_url + data.badge_url
-            }
-            em = self.embed(color=color, **kwargs)
-            await self.bot.send_message(ctx.message.channel, embed=em)
-
-        if cache_warning and data.is_cache:
-            await self.bot.say(data.cache_message)
-
-    def embed(
-            self,
-            server=None, title=None, members=None,
-            footer_text=None, footer_icon_url=None,
-            color=None):
-        """Return clan roster as Discord embed.
-
-        This represents a page of a roster.
-        """
-        em = discord.Embed(title=title)
-        em.set_footer(text=footer_text, icon_url=footer_icon_url)
-        for member in members:
-            if member is not None:
-                data = CRClanMemberModel(**member)
-                discord_member = self.model.tag2member(server, data.tag)
-                name = (
-                    "{0.name}, {0.role_name} "
-                    "(Lvl {0.expLevel})").format(data)
-                stats = (
-                    "{0.score:,d}"
-                    " | {0.donations:\u00A0>4} d"
-                    " | {0.clanChestCrowns:\u00A0>3} c"
-                    " | #{0.tag}").format(data)
-                stats = inline(stats)
-                mention = ''
-                if discord_member is not None:
-                    mention = discord_member.mention
-                arena = self.model.trophy2arena(data.score)
-                """ Rank str
-                41 ↓ 31
-                """
-                rank_delta = data.rankdelta
-                rank_delta_str = '.  .'
-                rank_current = '{: <2}'.format(data.currentRank)
-                if data.rankdelta is not None:
-                    if data.rankdelta > 0:
-                        rank_delta_str = "↓ {: >2}".format(rank_delta)
-                    elif data.rankdelta < 0:
-                        rank_delta_str = "↑ {: >2}".format(-rank_delta)
-                value = '`{rank_current} {rank_delta}` {emoji} {arena} {mention}\n{stats} '.format(
-                    rank_current=rank_current,
-                    rank_delta=rank_delta_str,
-                    mention=mention,
-                    emoji=data.league_emoji(self.bot),
-                    arena=arena,
-                    stats=stats)
-                em.add_field(name=name, value=value, inline=False)
-        if color is None:
-            color = random_discord_color()
-        em.color = color
-        return em
 
 
 def check_folder():
