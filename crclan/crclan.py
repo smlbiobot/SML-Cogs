@@ -420,7 +420,7 @@ class CRClanMemberDoc(DocType):
 
     @classmethod
     def log(cls, data, **kwargs):
-        """Log all."""
+        """Log member."""
         doc = CRClanMemberDoc(
             # arena=data.get('arena', None),
             clan_chest_crowns=data.get('clanChestCrowns', None),
@@ -516,7 +516,7 @@ class APIFetchError(SettingsException):
 
 class ServerModel:
     """Discord server data model.
-    
+
     Sets per-server settings since the bot can be run on multiple servers.
     """
     DEFAULTS = {
@@ -752,10 +752,11 @@ class CogModel:
 
                 CRClanDoc.log(data, index=index_name)
 
-                if 'members' in data:
+                try:
                     for member in data['members']:
                         CRClanMemberDoc.log(member, index=index_name)
-
+                except KeyError:
+                    pass
 
         return dataset
 
@@ -813,12 +814,13 @@ class CogModel:
 
     @property
     def data_update_interval(self):
-        return self.settings.get("data_update_interval", DATA_UPDATE_INTERVAL)
+        interval = self.settings.get("data_update_interval", DATA_UPDATE_INTERVAL)
+        return int(interval)
 
     @data_update_interval.setter
     def data_update_interval(self, value):
         """Set data update interval."""
-        self.settings["data_update_interval"] = value
+        self.settings["data_update_interval"] = int(value)
         self.save()
 
     @property
@@ -862,7 +864,7 @@ class ErrorMessage:
 class CRClanInfoView:
     """Clan info view.
 
-    This shows the clan’s general information 
+    This shows the clan’s general information
     e.g. trophy requirements, trophies, number of members, etc.
     """
 
@@ -1326,10 +1328,10 @@ class CRClan:
 
         To associate a key with a clan tag:
         [p]bsclan addkey
-        
+
         Optional arguments:
         --sort {name,trophies,level,donations,crowns}
-        
+
         Example: Display clan roster associated with key “alpha”, sorted by donations
         [p]bsclan roster alpha --sort donations
         """
