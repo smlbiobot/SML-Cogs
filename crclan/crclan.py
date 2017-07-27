@@ -54,7 +54,7 @@ PATH_CLANS = os.path.join(PATH, "clans")
 JSON = os.path.join(PATH, "settings.json")
 BADGES_JSON = os.path.join(PATH, "badges.json")
 
-DATA_UPDATE_INTERVAL = timedelta(minutes=30).seconds
+DATA_UPDATE_INTERVAL = timedelta(minutes=10).seconds
 
 API_FETCH_TIMEOUT = 5
 
@@ -398,6 +398,9 @@ class CRClanMemberDoc(DocType):
     score = Integer()
     tag = Text(fields={'raw': Keyword()})
 
+    class Meta:
+        doc_type = 'member'
+
     @classmethod
     def get_dict(cls, data):
         return CRClanMemberDoc(
@@ -438,7 +441,7 @@ class CRClanDoc(DocType):
     type_name = Text(fields={'raw': Keyword()})
 
     class Meta:
-        doc_type = 'crclan'
+        doc_type = 'clan'
 
     @classmethod
     def log(cls, data, **kwargs):
@@ -775,6 +778,16 @@ class CogModel:
         self.save()
 
     @property
+    def data_update_interval(self):
+        return self.settings.get("data_update_interval", DATA_UPDATE_INTERVAL)
+
+    @data_update_interval.setter
+    def data_update_interval(self, value):
+        """Set data update interval."""
+        self.settings["data_update_interval"] = value
+        self.save()
+
+    @property
     def es_enabled(self):
         """Enable Elastic Search."""
         return self.settings["elasticsearch_enabled"]
@@ -962,7 +975,7 @@ class CRClan:
         await self.bot.wait_until_ready()
         await self.model.update_data()
         await self.model.eslog()
-        await asyncio.sleep(DATA_UPDATE_INTERVAL)
+        await asyncio.sleep(self.model.data_update_interval)
         if self is self.bot.get_cog('CRClan'):
             self.task = self.bot.loop.create_task(self.loop_task())
 
@@ -1011,6 +1024,15 @@ class CRClan:
         """
         self.model.badge_url = url
         await self.bot.say("Badge URL updated.")
+
+    @crclanset.command(name="dataupdateinterval", pass_context=True)
+    async def crclanset_dataupdateintervall(self, ctx, seconds):
+        """Data update interval
+
+        unit is seconds.
+        """
+        self.model.data_update_interval = seconds
+        await self.bot.say("Data update interval updated.")
 
     @crclanset.command(name="update", pass_context=True)
     async def crclanset_update(self, ctx):
