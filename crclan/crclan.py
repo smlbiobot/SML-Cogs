@@ -418,6 +418,29 @@ class CRClanMemberDoc(DocType):
             tag=data.get('tag', None)
         )
 
+    @classmethod
+    def log(cls, data, **kwargs):
+        """Log all."""
+        doc = CRClanMemberDoc(
+            arena=data.get('arena', None),
+            clan_chest_crowns=data.get('clanChestCrowns', None),
+            current_rank=data.get('currenRank', None),
+            donations=data.get('donations', None),
+            experience_level=data.get('expLevel', None),
+            league=data.get('league', None),
+            name=data.get('name', None),
+            previous_rank=data.get('previousRank', None),
+            role=data.get('role', None),
+            role_name=data.get('roleName', None),
+            score=data.get('score', None),
+            tag=data.get('tag', None)
+        )
+        doc.save(**kwargs)
+
+    def save(self, **kwargs):
+        return super(CRClanMemberDoc, self).save(**kwargs)
+
+
 
 class CRClanDoc(DocType):
     """CR Clan Elastic Search Document."""
@@ -453,7 +476,7 @@ class CRClanDoc(DocType):
             current_rank=data.get('currentRank', None),
             description=data.get('description', None),
             donations=data.get('donations', None),
-            members=[CRClanMemberDoc.get_dict(m) for m in data.get('members', None)],
+            members=[],
             name=data.get('name', None),
             number_of_members=data.get('numberOfMembers', None),
             region=data.get('region', None),
@@ -463,10 +486,16 @@ class CRClanDoc(DocType):
             type=data.get('type', None),
             type_name=data.get('typeName', None)
         )
+        for member in data.get('members', []):
+            doc.add_member(member, **kwargs)
         doc.save(**kwargs)
 
     def save(self, **kwargs):
         return super(CRClanDoc, self).save(**kwargs)
+
+    def add_member(self, member, **kwargs):
+        self.members.append(CRClanMemberDoc.get_dict(member))
+
 
 
 class SettingsException(Exception):
@@ -722,6 +751,11 @@ class CogModel:
                 index_name = index_name_fmt.format(now_str)
 
                 CRClanDoc.log(data, index=index_name)
+
+                if 'members' in data:
+                    for member in data['members']:
+                        CRClanMemberDoc.log(member, index=index_name)
+
 
         return dataset
 
