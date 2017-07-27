@@ -730,33 +730,36 @@ class CogModel:
             return False
 
         dataset = []
+        tags = []
         for server_id in self.settings["servers"]:
             clans = self.settings["servers"][server_id]["clans"]
             for tag in clans.keys():
-                tag = SCTag(tag).tag
-                url = "{}{}".format(self.settings["clan_api_url"], tag)
-                try:
-                    async with aiohttp.ClientSession() as session:
-                        async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
-                            data = await resp.json()
-                except json.decoder.JSONDecodeError:
-                    continue
-                except asyncio.TimeoutError:
-                    continue
-                dataset.append(data)
+                tags.append(SCTag(tag).tag)
 
-                now = dt.datetime.utcnow()
-                now_str = now.strftime('%Y.%m.%d')
-                index_name_fmt = 'crclan-{}'
-                index_name = index_name_fmt.format(now_str)
+        for tag in set(tags):
+            url = "{}{}".format(self.settings["clan_api_url"], tag)
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
+                        data = await resp.json()
+            except json.decoder.JSONDecodeError:
+                continue
+            except asyncio.TimeoutError:
+                continue
+            dataset.append(data)
 
-                CRClanDoc.log(data, index=index_name)
+            now = dt.datetime.utcnow()
+            now_str = now.strftime('%Y.%m.%d')
+            index_name_fmt = 'crclan-{}'
+            index_name = index_name_fmt.format(now_str)
 
-                try:
-                    for member in data['members']:
-                        CRClanMemberDoc.log(member, index=index_name)
-                except KeyError:
-                    pass
+            CRClanDoc.log(data, index=index_name)
+
+            try:
+                for member in data['members']:
+                    CRClanMemberDoc.log(member, index=index_name)
+            except KeyError:
+                pass
 
         return dataset
 
