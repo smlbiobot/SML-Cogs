@@ -404,7 +404,7 @@ class CRClanMemberDoc(DocType):
     @classmethod
     def get_dict(cls, data):
         return CRClanMemberDoc(
-            arena=data.get('arena', None),
+            # arena=data.get('arena', None),
             clan_chest_crowns=data.get('clanChestCrowns', None),
             current_rank=data.get('currenRank', None),
             donations=data.get('donations', None),
@@ -422,7 +422,7 @@ class CRClanMemberDoc(DocType):
     def log(cls, data, **kwargs):
         """Log all."""
         doc = CRClanMemberDoc(
-            arena=data.get('arena', None),
+            # arena=data.get('arena', None),
             clan_chest_crowns=data.get('clanChestCrowns', None),
             current_rank=data.get('currenRank', None),
             donations=data.get('donations', None),
