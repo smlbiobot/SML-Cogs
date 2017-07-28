@@ -299,12 +299,12 @@ class CRClanMemberModel:
         self._discord_member = None
 
     @property
-    def discord_member(self):
+    def discord_member_id(self):
         """Discord user id."""
         return self._discord_member
 
-    @discord_member.setter
-    def discord_member(self, value):
+    @discord_member_id.setter
+    def discord_member_id(self, value):
         """Discord user id."""
         self._discord_member = value
 
@@ -386,60 +386,53 @@ class CRClanMemberModel:
 class CRClanMemberDoc(DocType):
     """CR Clan Member Document."""
     arena = Text(fields={'raw': Keyword()})
+    clan = Nested()
     clan_chest_crowns = Integer()
     current_rank = Integer()
+    discord = Nested()
     donations = Integer()
     experience_level = Integer()
     league = Integer()
     name = Text(fields={'raw': Keyword()})
+    name_with_tag = Text(fields={'raw': Keyword()})
     previous_rank = Integer()
     role = Integer()
     role_name = Text(fields={'raw': Keyword()})
     score = Integer()
     tag = Text(fields={'raw': Keyword()})
+    timestamp = Date()
 
     class Meta:
         doc_type = 'member'
 
     @classmethod
-    def get_dict(cls, data):
-        return CRClanMemberDoc(
-            # arena=data.get('arena', None),
-            clan_chest_crowns=data.get('clanChestCrowns', None),
-            current_rank=data.get('currenRank', None),
-            donations=data.get('donations', None),
-            experience_level=data.get('expLevel', None),
-            league=data.get('league', None),
-            name=data.get('name', None),
-            previous_rank=data.get('previousRank', None),
-            role=data.get('role', None),
-            role_name=data.get('roleName', None),
-            score=data.get('score', None),
-            tag=data.get('tag', None)
-        )
-
-    @classmethod
     def log(cls, data, **kwargs):
         """Log member."""
         doc = CRClanMemberDoc(
-            # arena=data.get('arena', None),
+            clan=data.get('clan', None),
             clan_chest_crowns=data.get('clanChestCrowns', None),
             current_rank=data.get('currenRank', None),
+            discord=data.get('discord', None),
             donations=data.get('donations', None),
+            discord_member_id=data.get('discord_member_id', None),
             experience_level=data.get('expLevel', None),
             league=data.get('league', None),
             name=data.get('name', None),
+            name_with_tag = '{} #{}'.format(
+                data.get('name', ''),
+                data.get('tag', None)
+            ),
             previous_rank=data.get('previousRank', None),
             role=data.get('role', None),
             role_name=data.get('roleName', None),
             score=data.get('score', None),
-            tag=data.get('tag', None)
+            tag=data.get('tag', None),
+            timestamp=dt.datetime.utcnow(),
         )
         doc.save(**kwargs)
 
     def save(self, **kwargs):
         return super(CRClanMemberDoc, self).save(**kwargs)
-
 
 
 class CRClanDoc(DocType):
@@ -470,7 +463,6 @@ class CRClanDoc(DocType):
     def log(cls, data, **kwargs):
         """Log all."""
         doc = CRClanDoc(
-            timestamp=dt.datetime.utcnow(),
             badge=data.get('badge', None),
             badge_url=data.get('badge_url', None),
             current_rank=data.get('currentRank', None),
@@ -478,23 +470,45 @@ class CRClanDoc(DocType):
             donations=data.get('donations', None),
             members=[],
             name=data.get('name', None),
+            name_with_tag='{} #{}'.format(
+                data.get('name', ''),
+                data.get('tag', None)
+            ),
             number_of_members=data.get('numberOfMembers', None),
             region=data.get('region', None),
             required_score=data.get('requiredScore', None),
             score=data.get('score', None),
             tag=data.get('tag', None),
+            timestamp=dt.datetime.utcnow(),
             type=data.get('type', None),
-            type_name=data.get('typeName', None)
+            type_name=data.get('typeName', None),
         )
-        for member in data.get('members', []):
-            doc.add_member(member, **kwargs)
+        for member_data in data.get('members', []):
+            doc.add_member(member_data, **kwargs)
         doc.save(**kwargs)
 
     def save(self, **kwargs):
         return super(CRClanDoc, self).save(**kwargs)
 
-    def add_member(self, member, **kwargs):
-        self.members.append(CRClanMemberDoc.get_dict(member))
+    def add_member(self, data, **kwargs):
+        self.members.append(dict(
+            # arena=data.get('arena', None),
+            clan_chest_crowns=data.get('clanChestCrowns', None),
+            current_rank=data.get('currenRank', None),
+            discord_member_id=data.get('discord_member_id', None),
+            donations=data.get('donations', None),
+            experience_level=data.get('expLevel', None),
+            league=data.get('league', None),
+            name_with_tag='{} #{}'.format(
+                data.get('name', ''),
+                data.get('tag', None)
+            ),
+            previous_rank=data.get('previousRank', None),
+            role=data.get('role', None),
+            role_name=data.get('roleName', None),
+            score=data.get('score', None),
+            tag=data.get('tag', None)
+        ))
 
 
 
@@ -541,11 +555,12 @@ class CogModel:
         "servers": {},
     }
 
-    def __init__(self, filepath):
+    def __init__(self, filepath, bot):
         """Init."""
         self.filepath = filepath
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(filepath))
+        self.bot = bot
 
         # arenas
         arenas = dataIO.load_json(os.path.join(PATH, 'arenas.json'))
@@ -736,30 +751,60 @@ class CogModel:
             for tag in clans.keys():
                 tags.append(SCTag(tag).tag)
 
-        for tag in set(tags):
-            url = "{}{}".format(self.settings["clan_api_url"], tag)
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
-                        data = await resp.json()
-            except json.decoder.JSONDecodeError:
-                continue
-            except asyncio.TimeoutError:
-                continue
-            dataset.append(data)
+            server = self.bot.get_server(server_id)
 
-            now = dt.datetime.utcnow()
-            now_str = now.strftime('%Y.%m.%d')
-            index_name_fmt = 'crclan-{}'
-            index_name = index_name_fmt.format(now_str)
+            for tag in set(tags):
+                url = "{}{}".format(self.settings["clan_api_url"], tag)
+                try:
+                    async with aiohttp.ClientSession() as session:
+                        async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
+                            data = await resp.json()
+                except json.decoder.JSONDecodeError:
+                    continue
+                except asyncio.TimeoutError:
+                    continue
+                dataset.append(data)
 
-            CRClanDoc.log(data, index=index_name)
+                now = dt.datetime.utcnow()
+                now_str = now.strftime('%Y.%m.%d')
+                index_name_fmt = 'crclan-{}'
+                index_name = index_name_fmt.format(now_str)
 
-            try:
-                for member in data['members']:
-                    CRClanMemberDoc.log(member, index=index_name)
-            except KeyError:
-                pass
+                CRClanDoc.log(data, index=index_name)
+
+                try:
+                    for member in data['members']:
+                        discord_member = self.tag2member(server, member["tag"])
+                        discord_member_id = None
+                        discord_member_name = None
+                        discord_member_display_name =None
+                        discord_member_mention = None
+                        if discord_member is not None:
+                            discord_member_id = discord_member.id
+                            discord_member_name = discord_member.name
+                            discord_member_display_name = discord_member.display_name
+                            discord_member_mention = discord_member.mention
+                        member.update({
+                            'clan': {
+                                'name': data["name"],
+                                'tag': data["tag"]
+                            },
+                            'discord': {
+                                'server': {
+                                    'id': server.id,
+                                    'name': server.name
+                                },
+                                'member': {
+                                    'id': discord_member_id,
+                                    'name': discord_member_name,
+                                    'display_name': discord_member_display_name,
+                                    'mention': discord_member_mention
+                                }
+                            }
+                        })
+                        CRClanMemberDoc.log(member, index=index_name)
+                except KeyError:
+                    pass
 
         return dataset
 
@@ -1002,7 +1047,7 @@ class CRClan:
         """Init."""
         self.bot = bot
         self.task = bot.loop.create_task(self.loop_task())
-        self.model = CogModel(JSON)
+        self.model = CogModel(JSON, bot)
         self.roster_view = CRClanRosterView(bot, self.model)
         self.info_view = CRClanInfoView(bot, self.model)
 
@@ -1169,12 +1214,12 @@ class CRClan:
     async def crclanset_eslog(self, ctx):
         """Save clan data to Elastic Search."""
         await self.bot.type()
-
+        channel = ctx.message.channel
         success = await self.model.eslog()
         if success:
-            await self.bot.say("Logged everything on Elastic Search.")
+            await self.bot.send_message(channel, "Logged everything on Elastic Search.")
         else:
-            await self.bot.say("ES logging unsuccessful.")
+            await self.bot.send_message(channel, "ES logging unsuccessful.")
 
     @commands.group(pass_context=True, no_pm=True)
     async def crclan(self, ctx):
