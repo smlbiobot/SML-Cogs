@@ -28,11 +28,11 @@ import argparse
 import datetime as dt
 import itertools
 import os
+import pprint
 import re
 from collections import Counter, OrderedDict, defaultdict
 from datetime import timedelta
 from random import choice
-import pprint
 
 import discord
 import pandas as pd
@@ -40,10 +40,9 @@ from __main__ import send_cmd_help
 from discord import Member
 from discord import Message
 from discord.ext import commands
-from elasticsearch import Elasticsearch
 from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
-    analyzer, Keyword, Text, Integer, A, Q
-from elasticsearch_dsl import Search, FacetedSearch, TermsFacet
+    analyzer, Keyword, Text, Integer
+from elasticsearch_dsl import FacetedSearch, TermsFacet
 # global ES connection
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import Match, Range
