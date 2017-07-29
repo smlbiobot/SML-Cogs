@@ -24,9 +24,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import asyncio
-import aiohttp
 import argparse
+import asyncio
 import datetime as dt
 import itertools
 import json
@@ -36,17 +35,17 @@ from datetime import timedelta
 from enum import Enum
 from random import choice
 
+import aiohttp
 import discord
 from __main__ import send_cmd_help
 from discord.ext import commands
+from elasticsearch_dsl import DocType, Date, Nested, analyzer, Keyword, Text, Integer
+from elasticsearch_dsl.connections import connections
 
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline, box
+from cogs.utils.chat_formatting import inline
 from cogs.utils.dataIO import dataIO
 
-from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
-    analyzer, Keyword, Text, Integer
-from elasticsearch_dsl.connections import connections
 connections.create_connection(hosts=['localhost'], timeout=20)
 
 PATH = os.path.join("data", "crclan")
@@ -418,7 +417,7 @@ class CRClanMemberDoc(DocType):
             experience_level=data.get('expLevel', None),
             league=data.get('league', None),
             name=data.get('name', None),
-            name_with_tag = '{} #{}'.format(
+            name_with_tag='{} #{}'.format(
                 data.get('name', ''),
                 data.get('tag', None)
             ),
@@ -511,7 +510,6 @@ class CRClanDoc(DocType):
         ))
 
 
-
 class SettingsException(Exception):
     pass
 
@@ -543,6 +541,7 @@ class ServerModel:
         if data is None:
             data = self.DEFAULTS
         self.settings = data
+
 
 class CogModel:
     """Cog settings.
@@ -777,7 +776,7 @@ class CogModel:
                         discord_member = self.tag2member(server, member["tag"])
                         discord_member_id = None
                         discord_member_name = None
-                        discord_member_display_name =None
+                        discord_member_display_name = None
                         discord_member_mention = None
                         if discord_member is not None:
                             discord_member_id = discord_member.id
@@ -852,13 +851,7 @@ class CogModel:
     @property
     def clan_api_url(self):
         """Clan API URL."""
-        return self.settings["clan_api_url"]
-
-    @clan_api_url.setter
-    def clan_api_url(self, value):
-        """Set Clan API URL."""
-        self.settings["clan_api_url"] = value
-        self.save()
+        return 'http://cr-api.com/clan/'
 
     @property
     def data_update_interval(self):
@@ -885,13 +878,7 @@ class CogModel:
     @property
     def badge_url(self):
         """Clan Badge URL."""
-        return self.settings["badge_url"]
-
-    @badge_url.setter
-    def badge_url(self, value):
-        """lan Badge URL"""
-        self.settings["badge_url"] = value
-        self.save()
+        return 'http://cr-api.com'
 
 
 class ErrorMessage:
@@ -908,6 +895,7 @@ class ErrorMessage:
         return (
             "Error fetching data from API for clan tag #{}. "
             "Please try again later.").format(tag)
+
 
 class CRClanInfoView:
     """Clan info view.
@@ -943,9 +931,11 @@ class CRClanInfoView:
         em.add_field(name="Required Trophies", value=data.requiredScore)
         em.add_field(name="Clan Tag", value=data.tag)
         em.add_field(name="Members", value=data.member_count_str)
-        badge_url = self.model.badge_url + data.badge_url
+        badge_url = '{}{}'.format(self.model.badge_url, data.badge_url)
+        print(badge_url)
         em.set_thumbnail(url=badge_url)
         return em
+
 
 class CRClanRosterView:
     """Clan roster view.
@@ -1087,27 +1077,27 @@ class CRClan:
         self.model.init_clans(server)
         await self.bot.say("Clan settings initialized.")
 
-    @crclanset.command(name="clanapi", pass_context=True)
-    async def crclanset_clanapi(self, ctx, url):
-        """CR Clan API URL base.
-
-        Format:
-        If path is http://domain.com/path/LQQ
-        Enter http://domain.com/path/
-        """
-        self.model.clan_api_url = url
-        await self.bot.say("Clan API URL updated.")
-
-    @crclanset.command(name="badgeurl", pass_context=True)
-    async def crclanset_badgeurl(self, ctx, url):
-        """badge URL base.
-
-        Format:
-        If path is hhttp://domain.com/path/LQQ
-        Enter http://domain.com/path/
-        """
-        self.model.badge_url = url
-        await self.bot.say("Badge URL updated.")
+    # @crclanset.command(name="clanapi", pass_context=True)
+    # async def crclanset_clanapi(self, ctx, url):
+    #     """CR Clan API URL base.
+    #
+    #     Format:
+    #     If path is http://domain.com/path/LQQ
+    #     Enter http://domain.com/path/
+    #     """
+    #     self.model.clan_api_url = url
+    #     await self.bot.say("Clan API URL updated.")
+    #
+    # @crclanset.command(name="badgeurl", pass_context=True)
+    # async def crclanset_badgeurl(self, ctx, url):
+    #     """badge URL base.
+    #
+    #     Format:
+    #     If path is hhttp://domain.com/path/LQQ
+    #     Enter http://domain.com/path/
+    #     """
+    #     self.model.badge_url = url
+    #     await self.bot.say("Badge URL updated.")
 
     @crclanset.command(name="dataupdateinterval", pass_context=True)
     async def crclanset_dataupdateintervall(self, ctx, seconds):
@@ -1226,6 +1216,11 @@ class CRClan:
         """Clash Royale clan."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    @crclan.command(name="about", pass_context=True, no_pm=True)
+    async def crclan_about(self, ctx):
+        """About this cog."""
+        await self.bot.say("Selfish + SML FTW!")
 
     @crclan.command(name="settag", pass_context=True, no_pm=True)
     async def crclan_settag(
@@ -1507,7 +1502,6 @@ class CRClan:
         """Convert trophies to arenas."""
         text = self.model.trophy2arena(trophy)
         await self.bot.say(text)
-
 
 
 def check_folder():
