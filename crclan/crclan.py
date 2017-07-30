@@ -405,9 +405,9 @@ class CRClanMemberDoc(DocType):
         doc_type = 'member'
 
     @classmethod
-    def log(cls, data, **kwargs):
-        """Log member."""
-        doc = CRClanMemberDoc(
+    def doc(cls, data):
+        """Get doc"""
+        return CRClanMemberDoc(
             clan=data.get('clan', None),
             clan_chest_crowns=data.get('clanChestCrowns', None),
             current_rank=data.get('currenRank', None),
@@ -428,6 +428,11 @@ class CRClanMemberDoc(DocType):
             tag=data.get('tag', None),
             timestamp=dt.datetime.utcnow(),
         )
+
+    @classmethod
+    def log(cls, data, **kwargs):
+        """Log member."""
+        doc = CRClanMemberDoc.doc(data)
         doc.save(**kwargs)
 
     def save(self, **kwargs):
@@ -483,31 +488,16 @@ class CRClanDoc(DocType):
             type_name=data.get('typeName', None),
         )
         for member_data in data.get('members', []):
-            doc.add_member(member_data, **kwargs)
+            doc.add_member(member_data)
         doc.save(**kwargs)
 
     def save(self, **kwargs):
         return super(CRClanDoc, self).save(**kwargs)
 
-    def add_member(self, data, **kwargs):
-        self.members.append(dict(
-            # arena=data.get('arena', None),
-            clan_chest_crowns=data.get('clanChestCrowns', None),
-            current_rank=data.get('currenRank', None),
-            discord_member_id=data.get('discord_member_id', None),
-            donations=data.get('donations', None),
-            experience_level=data.get('expLevel', None),
-            league=data.get('league', None),
-            name_with_tag='{} #{}'.format(
-                data.get('name', ''),
-                data.get('tag', None)
-            ),
-            previous_rank=data.get('previousRank', None),
-            role=data.get('role', None),
-            role_name=data.get('roleName', None),
-            score=data.get('score', None),
-            tag=data.get('tag', None)
-        ))
+    def add_member(self, data):
+        self.members.append(
+            CRClanMemberDoc.doc(data)
+        )
 
 
 class SettingsException(Exception):
