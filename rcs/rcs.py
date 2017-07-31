@@ -38,36 +38,21 @@ class RCS:
         """Init."""
         self.bot = bot
 
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @commands.group(pass_context=True, no_pm=True)
     async def rcs(self, ctx):
         """Reddit Clan System (RCS)."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @rcs.command(pass_context=True, no_pm=True)
-    async def member(self, ctx, member: discord.Member, clan, *roles):
-        """Convert user to member."""
+    async def verify(self, ctx, member: discord.Member, *roles):
+        """Add trusted and any additional roles to user."""
         # add roles
-        racf = self.bot.get_cog("RACF")
-        if roles is None:
-            roles = []
-        else:
-            roles = list(roles)
-        roles.extend(['Trusted', clan, '-Visitor'])
-        await ctx.invoke(racf.changerole, member, *roles)
-        # change nick
-        try:
-            nick = "{} ({})".format(member.display_name, clan)
-            await self.bot.change_nickname(member, nick)
-        except discord.HTTPException:
-            await self.bot.say(
-                "I don’t have permission to change "
-                "{}’s nickname.".format(member.display_name))
-        else:
-            await self.bot.say(
-                "{} changed to {}.".format(
-                    member.mention, nick))
+        mm = self.bot.get_cog("MemberManagement")
+        roles = list(roles)
+        roles.append("Trusted")
+        await ctx.invoke(mm.changerole, member, *roles)
 
 
 def setup(bot):
