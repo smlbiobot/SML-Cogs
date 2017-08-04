@@ -536,7 +536,6 @@ class CogModel:
     """
 
     DEFAULTS = {
-        "clan_api_url": {},
         "servers": {},
     }
 
@@ -694,7 +693,9 @@ class CogModel:
         Return CRClanModel instance
         """
         tag = SCTag(tag).tag
-        url = "{}{}".format(self.settings["clan_api_url"], tag)
+        url = "{}{}".format(self.clan_api_url, tag)
+
+        print(url)
 
         try:
             async with aiohttp.ClientSession() as session:
