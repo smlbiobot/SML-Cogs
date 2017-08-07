@@ -695,8 +695,6 @@ class CogModel:
         tag = SCTag(tag).tag
         url = "{}{}".format(self.clan_api_url, tag)
 
-        print(url)
-
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
@@ -850,7 +848,6 @@ class CRClanInfoView:
         em.add_field(name="Clan Tag", value=data.tag)
         em.add_field(name="Members", value=data.member_count_str)
         badge_url = '{}{}'.format(self.model.badge_url, data.badge_url)
-        print(badge_url)
         em.set_thumbnail(url=badge_url)
         return em
 
