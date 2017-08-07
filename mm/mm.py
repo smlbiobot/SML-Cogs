@@ -79,7 +79,7 @@ class MemberManagement:
     @mmset.group(name="role", pass_context=True, no_pm=True)
     async def mmset_role(self, ctx):
         """Role permissions.
-        
+
         Specify list of roles allowed to run mm.
         This is a per-server setting.
         """
@@ -112,7 +112,7 @@ class MemberManagement:
     @mmset_macro.command(name="add", pass_context=True, no_pm=True)
     async def mmset_macro_add(self, ctx, name, *, args):
         """Add macro.
-        
+
         name: name of the macro
         args: list of arguments to run.
         """
@@ -165,23 +165,23 @@ class MemberManagement:
     @commands.has_any_role(*BOT_COMMANDER_ROLES)
     async def mm(self, ctx, *args):
         """Member management by roles.
-        
+
         !mm [-h] [-x EXCLUDE [EXCLUDE ...]]
              [-o {id,mention,mentiononly}] [-r1] [-e] [-s {join,alpha}]
              [-r {embed,csv,list,none}] [-m MACRO]
              [roles [roles ...]]
-        
+
         Find members with roles: Member, Elder
         !mm Member Elder
-        
+
         Find members with roles: Member, Elder but not: Heist, CoC
         !mm Member Elder -exclude Heist CoC
         !mm Member Elder -x Heist CoC
-        
+
         Output ID
         !mm Alpha Elder --output id
         !mm Alpha Elder -o id
-        
+
         Optional arguments
         --exclude, -x
             Exclude list of roles
@@ -444,16 +444,35 @@ class MemberManagement:
                         "{} does not have permission to edit {}.".format(
                             author.display_name, role.name))
                 else:
-                    if role_in_minus:
-                        await self.bot.remove_roles(member, role)
+                    try:
+                        if role_in_minus:
+                            await self.bot.remove_roles(member, role)
+                        if role_in_plus:
+                            await self.bot.add_roles(member, role)
+                    except discord.Forbidden:
                         await self.bot.say(
-                            "Removed {} from {}".format(
-                                role.name, member.display_name))
-                    if role_in_plus:
-                        await self.bot.add_roles(member, role)
-                        await self.bot.say(
-                            "Added {} for {}".format(
-                                role.name, member.display_name))
+                            "{} does not have permission to edit {}’s roles.".format(
+                            author.display_name, member.display_name))
+                        continue
+                    except discord.HTTPException:
+                        if role_in_minus:
+                            await self.bot.say(
+                                "Failed to remove {}.").format(role.name)
+                            continue
+                        if role_in_plus:
+                            await self.bot.say(
+                                "failed to add {}.").format(role.name)
+                            continue
+                    else:
+                        if role_in_minus:
+                            await self.bot.say(
+                                "Removed {} from {}".format(
+                                    role.name, member.display_name))
+                        if role_in_plus:
+                            await self.bot.say(
+                                "Added {} for {}".format(
+                                    role.name, member.display_name))
+
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOT_COMMANDER_ROLES)
