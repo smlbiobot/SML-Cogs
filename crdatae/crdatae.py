@@ -132,7 +132,7 @@ class Card():
 
 class Deck():
     """Clash Royale Deck.
-    
+
     Contains 8 cards.
     """
 
@@ -180,7 +180,7 @@ class Deck():
 
 class CRDataEnhanced:
     """Clash Royale Data - Enchanced options.
-    
+
     Requires CRData cog to function.
     """
 
@@ -196,6 +196,7 @@ class CRDataEnhanced:
         self.bot = bot
         self.be = BotEmoji(bot)
         self.clashroyale = ClashRoyale().data
+        self.per_page = 10
 
     @commands.group(pass_context=True, no_pm=True)
     async def crdatae(self, ctx):
@@ -221,7 +222,7 @@ class CRDataEnhanced:
             decks.append(Deck(card_keys=cards, card_levels=levels, rank=rank))
 
         # embeds
-        per_page = 25
+        per_page = self.per_page
         decks_group = list(grouper(per_page, decks))
         color = random_discord_color()
 
@@ -254,7 +255,7 @@ class CRDataEnhanced:
         em = discord.Embed(**kwargs)
 
         page = kwargs.get('page', 1)
-        per_page = kwargs.get('per_page', 25)
+        per_page = kwargs.get('per_page', self.per_page)
         show_usage = kwargs.get('show_usage', False)
         footer_text = kwargs.get('footer_text', '')
 
@@ -315,7 +316,7 @@ class CRDataEnhanced:
             deck = Deck(card_keys=card_keys, card_levels=card_levels, rank=fd["ranks"][0], usage=fd["count"])
             decks.append(deck)
 
-        per_page = 25
+        per_page = self.per_page
         decks_group = list(grouper(per_page, decks))
         color = random_discord_color()
 
@@ -350,7 +351,7 @@ class CRDataEnhanced:
         em = discord.Embed(**kwargs)
 
         page = kwargs.get('page', 1)
-        per_page = kwargs.get('per_page', 25)
+        per_page = kwargs.get('per_page', self.per_page)
         show_usage = kwargs.get('show_usage', False)
         footer_text = kwargs.get('footer_text', '')
 
