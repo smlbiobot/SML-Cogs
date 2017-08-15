@@ -1091,6 +1091,9 @@ class RACF:
                             "I am not allowed to remove {} from {}.".format(
                                 role, member))
 
+
+
+
 def setup(bot):
     r = RACF(bot)
     bot.add_cog(r)

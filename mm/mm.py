@@ -507,6 +507,26 @@ class MemberManagement:
             ]
             await self.bot.say('\n'.join(out))
 
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(mention_everyone=True)
+    async def addrole2role(self, ctx: Context, with_role_name, to_add_role_name):
+        """Add a role to users with a specific role."""
+        server = ctx.message.server
+        with_role = discord.utils.get(server.roles, name=with_role_name)
+        to_add_role = discord.utils.get(server.roles, name=to_add_role_name)
+        if with_role is None:
+            await self.bot.say("Cannot find the role **{}** on this server.".format(with_role_name))
+            return
+        if to_add_role is None:
+            await self.bot.say("Cannot find the role **{}** on this server.".format(to_add_role_name))
+            return
+        for member in server.members:
+            if with_role in member.roles:
+                try:
+                    await ctx.invoke(self.changerole, member, to_add_role_name)
+                except:
+                    pass
+
 
 def check_folder():
     """Check folder."""
