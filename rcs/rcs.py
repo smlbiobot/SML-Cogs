@@ -49,13 +49,13 @@ class RCS:
         """Init."""
         self.bot = bot
 
-    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @commands.group(pass_context=True, no_pm=True)
     async def rcs(self, ctx):
         """Reddit Clan System (RCS)."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     @rcs.command(pass_context=True, no_pm=True)
     async def verify(self, ctx, member: discord.Member, *roles):
         """Add trusted and any additional roles to user."""
@@ -65,8 +65,8 @@ class RCS:
         roles.append("Trusted")
         await ctx.invoke(mm.changerole, member, *roles)
 
-    @rcs.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*TOGGLE_ROLES)
+    @rcs.command(pass_context=True, no_pm=True)
     async def togglerole(self, ctx, role_name):
         """Self-toggle role assignments."""
         author = ctx.message.author
