@@ -236,7 +236,6 @@ class CRPlayerModel:
                 epic (int)
                 index (int)
                 cycle [str]
-                fullcycle [str]
             gold (int)
             gems (int)
             wins (int)
@@ -361,12 +360,14 @@ class CRPlayerModel:
     @property
     def chest_magical_index(self):
         """First index of magical chest"""
-        return self.chests["fullcycle"].index("Magic")
+        return 0
+        # return self.chests["fullcycle"].index("Magic")
 
     @property
     def chest_giant_index(self):
         """First index of magical chest"""
-        return self.chests["fullcycle"].index("Giant")
+        return 0
+        # return self.chests["fullcycle"].index("Giant")
 
     @property
     def chests_opened(self):
@@ -380,8 +381,8 @@ class CRPlayerModel:
         key_list = ['super_magical', 'legendary', 'epic']
         chests = [(k, v) for k, v in self.chests.items() if k in key_list]
         # giant magical
-        chests.append(('Giant', self.chest_giant_index))
-        chests.append(('Magic', self.chest_magical_index))
+        # chests.append(('Giant', self.chest_giant_index))
+        # chests.append(('Magic', self.chest_magical_index))
         chests = sorted(chests, key=lambda c: c[1])
 
         cycle = [bot_emoji.key(c) for c in self.chests['cycle']]
@@ -557,10 +558,12 @@ class Settings:
     async def player_data(self, tag):
         """Return CRPlayerModel by tag."""
         tag = SCTag(tag).tag
-        url = "{}{}".format(self.settings["profile_api_url"], tag)
+        url = "{}{}".format(self.profile_api_url, tag)
+
+        headers = {'authorization': self.profile_api_token}
 
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(headers=headers) as session:
                 async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
                     data = await resp.json()
         except json.decoder.JSONDecodeError:
@@ -675,9 +678,20 @@ class Settings:
         self.save()
 
     @property
+    def profile_api_token(self):
+        """Profile API Token."""
+        return self.settings.get("profile_api_token", None)
+
+    @profile_api_token.setter
+    def profile_api_token(self, value):
+        """Set Profile API Token."""
+        self.settings["profile_api_token"] = value
+        self.save()
+
+    @property
     def badge_url(self):
         """Clan Badge URL."""
-        return self.settings["badge_url"]
+        return self.settings.get("badge_url", None)
 
     @badge_url.setter
     def badge_url(self, value):
@@ -751,6 +765,12 @@ class CRProfile:
         """
         self.model.badge_url = url
         await self.bot.say("Badge URL updated.")
+
+    @crprofileset.command(name="apitoken", pass_context=True)
+    async def crprofileset_apiauth(self, ctx, token):
+        """API Authentication token."""
+        self.model.profile_api_token = token
+        await self.bot.say("API token save.")
 
     @crprofileset.command(name="resources", pass_context=True)
     async def crprofileset_resources(self, ctx, enable:bool):
