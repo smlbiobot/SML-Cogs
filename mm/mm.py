@@ -520,12 +520,15 @@ class MemberManagement:
         if to_add_role is None:
             await self.bot.say("Cannot find the role **{}** on this server.".format(to_add_role_name))
             return
-        for member in server.members:
+
+        server_members = server.members.copy()
+        for member in server_members:
             if with_role in member.roles:
-                try:
-                    await ctx.invoke(self.changerole, member, to_add_role_name)
-                except:
-                    pass
+                if to_add_role not in member.roles:
+                    try:
+                        await ctx.invoke(self.changerole, member, to_add_role_name)
+                    except:
+                        pass
 
 
 def check_folder():
