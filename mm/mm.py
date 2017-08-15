@@ -521,7 +521,7 @@ class MemberManagement:
             await self.bot.say("Cannot find the role **{}** on this server.".format(to_add_role_name))
             return
 
-        server_members = server.members.copy()
+        server_members = [member for member in server.members]
         for member in server_members:
             if with_role in member.roles:
                 if to_add_role not in member.roles:
