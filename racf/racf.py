@@ -111,6 +111,20 @@ ELDER_MSG = (
     "You have the following responsibilities as elder in the RACF:\n"
     "+ Accept new members.\n"
     "+ When accepting new members, you should:\n"
+    ".. + Make sure that the person meets trophy requirements."
+    ".. + Ask if the person is new to the RACF.\n"
+    ".. + Ask that person to join our Discord server: http://discord.gg/racf\n"
+    ".. + Let them know about the 50/50 kicking policy.\n"
+    "+ Not allowed to kick 50/50.\n"
+    "\n"
+    "Please consult !rules and !roles on the RACF server for more info."
+)
+ELDER_REFRESH_MSG = (
+    "\n"
+    "You have the following responsibilities as elder in the RACF:\n"
+    "+ Accept new members.\n"
+    "+ When accepting new members, you should:\n"
+    ".. + Make sure that the person meets trophy requirements.\n"
     ".. + Ask if the person is new to the RACF.\n"
     ".. + Ask that person to join our Discord server: http://discord.gg/racf\n"
     ".. + Let them know about the 50/50 kicking policy.\n"
@@ -599,12 +613,12 @@ class RACF:
     @checks.mod_or_permissions()
     async def addreaction(self, ctx, *args):
         """Add reactions to a message by message id.
-        
+
         Add reactions to a specific message id
-        [p]addreation 123456 :white_check_mark: :x: :zzz: 
-        
+        [p]addreation 123456 :white_check_mark: :x: :zzz:
+
         Add reactions to the last message in channel
-        [p]addreation :white_check_mark: :x: :zzz: 
+        [p]addreation :white_check_mark: :x: :zzz:
         """
         channel = ctx.message.channel
 
@@ -1016,11 +1030,11 @@ class RACF:
     @commands.command(pass_context=True, no_pm=True)
     async def crsettag(self, ctx, tag, member: discord.Member=None):
         """Set CR tags for members.
-        
+
         This is the equivalent of running:
         !crclan settag [tag] [member]
         !crprofile settag [tag] [member]
-        
+
         If those cogs are not loaded, it will just ignore it.
         """
         crclan = self.bot.get_cog("CRClan")
@@ -1033,15 +1047,31 @@ class RACF:
 
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     @commands.command(pass_context=True, no_pm=True)
-    async def elder(self, ctx, member: discord.Member):
+    async def elder(self, ctx, *members: discord.Member):
         """Elder promotion DM + role change."""
         elder_roles = ["Elder"]
-        await self.changerole(ctx, member, *elder_roles)
-        try:
-            await ctx.invoke(self.dmusers, ELDER_MSG, member)
-        except discord.errors.Forbidden:
-            await self.bot.say(
-                "Unable to send DM to {}. User might have a stricter DM setting.".format(member))
+        for member in members:
+            await self.changerole(ctx, member, *elder_roles)
+            try:
+                await ctx.invoke(self.dmusers, ELDER_MSG, member)
+            except discord.errors.Forbidden:
+                await self.bot.say(
+                    "Unable to send DM to {}. User might have a stricter DM setting.".format(member))
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True, no_pm=True)
+    async def reelder(self, ctx, msg):
+        """Refresher for elders."""
+        elder_role = "Elder"
+        server = ctx.message.server
+        for member in server.members:
+            member_role_names = [r.name for r in member.roles]
+            if "Elder" in member_role_names:
+                try:
+                    await ctx.invoke(self.dmusers, '{}\n{}'.format(msg, ELDER_REFRESH_MSG), member)
+                except discord.errors.Forbidden:
+                    await self.bot.say(
+                        "Unable to send DM to {}. User might have a stricter DM setting.".format(member))
 
 
     async def run_iosfix(self, ctx: Context, *members: discord.Member):
