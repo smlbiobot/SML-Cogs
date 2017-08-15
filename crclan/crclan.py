@@ -767,7 +767,7 @@ class CogModel:
     @property
     def clan_api_url(self):
         """Clan API URL."""
-        return 'http://cr-api.com/clan/'
+        return 'http://api.cr-api.com/clan/'
 
     @property
     def data_update_interval(self):
