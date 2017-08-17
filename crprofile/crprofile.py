@@ -360,14 +360,14 @@ class CRPlayerModel:
     @property
     def chest_magical_index(self):
         """First index of magical chest"""
-        return 0
-        # return self.chests["fullcycle"].index("Magic")
+        # return 0
+        return self.chests["cycle"].index("Magic")
 
     @property
     def chest_giant_index(self):
         """First index of magical chest"""
-        return 0
-        # return self.chests["fullcycle"].index("Giant")
+        # return 0
+        return self.chests["cycle"].index("Giant")
 
     @property
     def chests_opened(self):
@@ -381,11 +381,11 @@ class CRPlayerModel:
         key_list = ['super_magical', 'legendary', 'epic']
         chests = [(k, v) for k, v in self.chests.items() if k in key_list]
         # giant magical
-        # chests.append(('Giant', self.chest_giant_index))
-        # chests.append(('Magic', self.chest_magical_index))
+        chests.append(('Giant', self.chest_giant_index))
+        chests.append(('Magic', self.chest_magical_index))
         chests = sorted(chests, key=lambda c: c[1])
 
-        cycle = [bot_emoji.key(c) for c in self.chests['cycle']]
+        cycle = [bot_emoji.key(c) for c in self.chests['cycle'][:8]]
         chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1]) for c in chests]
         chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
         return chest_str
