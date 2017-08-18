@@ -895,16 +895,16 @@ class ESLog:
             s = s.filter('range', timestamp={'gte': 'now-{}/m'.format(p_args.time), 'lte': 'now/m'})
         if p_args.includechannels is not None:
             for channel in p_args.includechannels:
-                s = s.filter('match', **{'channel.name': channel})
+                s = s.filter('match', **{'channel.name.keyword': channel})
         if p_args.excludechannels is not None:
             for channel in p_args.excludechannels:
-                s = s.query('bool', must_not=[Q('term', **{'channel.name': channel})])
+                s = s.query('bool', must_not=[Q('match', **{'channel.name.keyword': channel})])
         if p_args.includeroles is not None:
             for role in p_args.includeroles:
-                s = s.filter('match', **{'author.roles.name': role})
+                s = s.filter('match', **{'author.roles.name.keyword': role})
         if p_args.excluderoles is not None:
             for role in p_args.excluderoles:
-                s = s.query('bool', must_not=[Q('term', **{'author.roles.name': role})])
+                s = s.query('bool', must_not=[Q('match', **{'author.roles.name.keyword': role})])
         if p_args.excludebot:
             s = s.filter('match', **{'author.bot': False})
 
