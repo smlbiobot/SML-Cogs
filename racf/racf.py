@@ -639,7 +639,11 @@ class RACF:
                 return
         else:
             # use the 2nd last message because the last message would be the command
-            messages = [m async for m in self.bot.logs_from(channel, limit=2)]
+            messages = []
+            async for m in self.bot.logs_from(channel, limit=2):
+                messages.append(m)
+
+            # messages = [m async for m in self.bot.logs_from(channel, limit=2)]
             message = messages[1]
 
         for emoji in emojis:
