@@ -544,7 +544,7 @@ class RACF:
             await self.bot.say(
                 "I don’t have permission to do this.")
         else:
-            await self.bot.say(f"{member.mention} changed to {nickname}.")
+            await self.bot.say("{} changed to {}.".format(member.mention, nickname))
 
     @commands.command(pass_context=True, no_pm=True)
     async def emojis(self, ctx: Context, embed=False):
