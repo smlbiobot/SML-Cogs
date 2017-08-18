@@ -45,7 +45,7 @@ from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
 from elasticsearch_dsl import FacetedSearch, TermsFacet
 # global ES connection
 from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import Match, Range
+from elasticsearch_dsl.query import Match, Range, Q
 from sparklines import sparklines
 
 from cogs.utils import checks
@@ -401,6 +401,59 @@ class ESLogView:
         return em
 
     def embed_members(self, server=None, results=None, p_args=None):
+        """Results by members"""
+        results = sorted(results, key=lambda x: x["timestamp"])
+
+        count = 10
+        if p_args.count is not None:
+            count = p_args.count
+
+        most_common_author_ids = Counter([r["doc"].author.id for r in results]).most_common(count)
+
+        # split results in channel ids by count
+        author_channels = nested_dict()
+        for author_id, count in most_common_author_ids:
+            channel_ids = []
+            for result in results:
+                doc = result["doc"]
+                if doc.author.id == author_id:
+                    channel_ids.append(doc.channel.id)
+            author_channels[author_id] = Counter(channel_ids).most_common()
+
+        # embed
+        embed = discord.Embed(
+            title="{}: User activity by messages".format(server.name),
+            description=self.description(p_args),
+            color=random_discord_color()
+        )
+
+        max_count = 0
+        for rank, (author_id, count) in enumerate(most_common_author_ids, 1):
+            max_count = max(count, max_count)
+            # author name
+            author = server.get_member(author_id)
+            if author is None:
+                author_name = 'User {}'.format(author_id)
+            else:
+                author_name = server.get_member(author_id).display_name
+
+            inline_chart = self.inline_barchart(count, max_count)
+            # channels
+            channel_str = ', '.join([
+                '{}: {}'.format(
+                    server.get_channel(
+                        cid), count) for cid, count in author_channels[author_id]])
+
+            # output
+            field_name = '{}. {}: {}'.format(rank, author_name, count)
+            field_value = '{}\n{}'.format(
+                inline(inline_chart),
+                channel_str)
+            embed.add_field(name=field_name, value=field_value, inline=False)
+
+        return embed
+
+    def embed_members2(self, server=None, results=None, p_args=None):
         """Messages by members, with sparkline for activity."""
         results = sorted(results, key=lambda x: x["timestamp"])
         most_common_author_ids = Counter([r["doc"].author.id for r in results]).most_common(10)
@@ -834,7 +887,28 @@ class ESLog:
 
         await self.bot.type()
         server = ctx.message.server
-        s = self.message_search.server_messages(server, p_args)
+
+        s =  MessageDoc.search()
+        s = s.filter('match', **{'server.id': server.id})
+
+        if p_args.time is not None:
+            s = s.filter('range', timestamp={'gte': 'now-{}/m'.format(p_args.time), 'lte': 'now/m'})
+        if p_args.includechannels is not None:
+            for channel in p_args.includechannels:
+                s = s.filter('match', **{'channel.name': channel})
+        if p_args.excludechannels is not None:
+            for channel in p_args.excludechannels:
+                s = s.query('bool', must_not=[Q('term', **{'channel.name': channel})])
+        if p_args.includeroles is not None:
+            for role in p_args.includeroles:
+                s = s.filter('match', **{'author.roles.name': role})
+        if p_args.excluderoles is not None:
+            for role in p_args.excluderoles:
+                s = s.query('bool', must_not=[Q('term', **{'author.roles.name': role})])
+        if p_args.excludebot:
+            s = s.filter('match', **{'author.bot': False})
+
+        # s = self.message_search.server_messages(server, p_args)
 
         results = [{
             "author_id": doc.author.id,
