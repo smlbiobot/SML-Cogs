@@ -35,7 +35,6 @@ from datetime import timedelta
 from random import choice
 
 import discord
-import pandas as pd
 from __main__ import send_cmd_help
 from discord import Member
 from discord import Message
@@ -46,7 +45,6 @@ from elasticsearch_dsl import FacetedSearch, TermsFacet
 # global ES connection
 from elasticsearch_dsl.connections import connections
 from elasticsearch_dsl.query import Match, Range, Q
-from sparklines import sparklines
 
 from cogs.utils import checks
 from cogs.utils.chat_formatting import inline, pagify, box
@@ -267,6 +265,7 @@ class ESLogger:
     
     Separated into own class to make migration easier.
     """
+
     def __init__(self, index_name_fmt=None):
         self.index_name_fmt = index_name_fmt
 
@@ -353,9 +352,8 @@ class ESLogger:
         s = s.filter('match', **{'author.id': author.id}) \
             .query(Range(timestamp={'gte': time_gte, 'lt': 'now'}))
         for message in s.scan():
-            print('-'*40)
+            print('-' * 40)
             print(message.to_dict())
-
 
 
 class ESLogView:
@@ -363,6 +361,7 @@ class ESLogView:
     
     A collection of views depending on result types
     """
+
     def __init__(self, bot):
         self.bot = bot
 
@@ -453,84 +452,6 @@ class ESLogView:
 
         return embed
 
-    def embed_members2(self, server=None, results=None, p_args=None):
-        """Messages by members, with sparkline for activity."""
-        results = sorted(results, key=lambda x: x["timestamp"])
-        most_common_author_ids = Counter([r["doc"].author.id for r in results]).most_common(10)
-
-        # split results in channel ids by count
-        author_channels = nested_dict()
-        for author_id, count in most_common_author_ids:
-            channel_ids = []
-            for result in results:
-                doc = result["doc"]
-                if doc.author.id == author_id:
-                    channel_ids.append(doc.channel.id)
-            author_channels[author_id] = Counter(channel_ids).most_common()
-
-        # split results in the data range time series
-        now = dt.datetime.utcnow()
-        start = min(now - dt.timedelta(days=1), results[0]["timestamp"])
-        count = 30
-        freq = (now - start).total_seconds() / count / 60
-        freq = '{}min'.format(int(freq))
-        rng = pd.date_range(start=start, end=now, freq=freq)
-
-        for result in results:
-            for rng_index, rng_timestamp in enumerate(rng):
-                if result["timestamp"] >= rng_timestamp:
-                    result["rng_index"] = rng_index
-                    result["rng_timestamp"] = rng_timestamp
-
-        message_range = []
-        for rng_timestamp in rng:
-            messages = []
-            for result in results:
-                if result["rng_timestamp"] == rng_timestamp:
-                    messages.append(result)
-            message_range.append(messages)
-
-        # embed
-        embed = discord.Embed(
-            title="{}: User activity by messages".format(server.name),
-            description=self.description(p_args),
-            color=random_discord_color()
-        )
-
-        max_count = 0
-        for rank, (author_id, count) in enumerate(most_common_author_ids, 1):
-            max_count = max(count, max_count)
-            # author name
-            author = server.get_member(author_id)
-            if author is None:
-                author_name = 'User {}'.format(author_id)
-            else:
-                author_name = server.get_member(author_id).display_name
-            # chart
-            author_message_count = []
-            sparkline_chart = ''
-            for messages in message_range:
-                author_messages = [msg for msg in messages if msg['doc'].author.id == author_id]
-                author_message_count.append(len(author_messages))
-            for line in sparklines(author_message_count):
-                sparkline_chart += line
-
-            inline_chart = self.inline_barchart(count, max_count)
-            # channels
-            channel_str = ', '.join([
-                '{}: {}'.format(
-                    server.get_channel(
-                        cid), count) for cid, count in author_channels[author_id]])
-
-            # output
-            field_name = '{}. {}: {}'.format(rank, author_name, count)
-            field_value = '{}\n{}'.format(
-                inline(sparkline_chart),
-                channel_str)
-            embed.add_field(name=field_name, value=field_value, inline=False)
-
-        return embed
-
     @staticmethod
     def description(p_args, show_top=True):
         """Embed description based on supplied arguments."""
@@ -560,12 +481,14 @@ class ESLogView:
         chart = '▇' * bar_count if bar_count > 0 else '░'
         return inline(chart)
 
+
 class MessageDocSearch:
     """Message author.
     
     Initialized with a list of all messages.
     Find the author’s relative rank and other properties.
     """
+
     def __init__(self, **kwargs):
         self.search = MessageDoc.search(**kwargs)
 
@@ -787,7 +710,7 @@ class ESLog:
             await send_cmd_help(ctx)
 
     @eslog.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def eslog_user(self, ctx, member: Member=None, *args):
+    async def eslog_user(self, ctx, member: Member = None, *args):
         """Message statistics by user.
         
         Params:
@@ -888,7 +811,7 @@ class ESLog:
         await self.bot.type()
         server = ctx.message.server
 
-        s =  MessageDoc.search()
+        s = MessageDoc.search()
         s = s.filter('match', **{'server.id': server.id})
 
         if p_args.time is not None:
@@ -949,32 +872,32 @@ class ESLog:
         """Track message deletion."""
         self.eslogger.log_message_delete(message)
 
-    # async def on_message_edit(self, before: Message, after: Message):
-    #     """Track message editing."""
-    #     self.eslogger.log_message_edit(before, after)
-    #
-    # async def on_member_join(self, member: Member):
-    #     """Track members joining server."""
-    #     self.eslogger.log_member_join(member)
-    #
-    # async def on_member_update(self, before: Member, after: Member):
-    #     """Called when a Member updates their profile.
-    #
-    #     Only track status after.
-    #     """
-    #     self.eslogger.log_member_update(before, after)
-    #
-    # async def on_member_remove(self, member: Member):
-    #     """Track members leaving server."""
-    #     self.eslogger.log_member_remove(member)
-    #
-    # async def on_ready(self):
-    #     """Bot ready."""
-    #     self.eslogger.log_all_gauges()
-    #
-    # async def on_resume(self):
-    #     """Bot resume."""
-    #     self.eslogger.log_all_gauges()
+        # async def on_message_edit(self, before: Message, after: Message):
+        #     """Track message editing."""
+        #     self.eslogger.log_message_edit(before, after)
+        #
+        # async def on_member_join(self, member: Member):
+        #     """Track members joining server."""
+        #     self.eslogger.log_member_join(member)
+        #
+        # async def on_member_update(self, before: Member, after: Member):
+        #     """Called when a Member updates their profile.
+        #
+        #     Only track status after.
+        #     """
+        #     self.eslogger.log_member_update(before, after)
+        #
+        # async def on_member_remove(self, member: Member):
+        #     """Track members leaving server."""
+        #     self.eslogger.log_member_remove(member)
+        #
+        # async def on_ready(self):
+        #     """Bot ready."""
+        #     self.eslogger.log_all_gauges()
+        #
+        # async def on_resume(self):
+        #     """Bot resume."""
+        #     self.eslogger.log_all_gauges()
 
 
 def check_folder():
