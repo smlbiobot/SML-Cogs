@@ -78,6 +78,7 @@ def random_discord_color():
 
 class BotEmoji:
     """Emojis available in bot."""
+
     def __init__(self, bot):
         self.bot = bot
         self.map = {
@@ -389,6 +390,44 @@ class CRPlayerModel:
         chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1]) for c in chests]
         chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
         return chest_str
+
+    @property
+    def shop_offers_arena(self):
+        """Get epic shop offer."""
+        if hasattr(self, 'shop_offers'):
+            return self.shop_offers.get('arena', -1)
+        return -1
+
+    @property
+    def shop_offers_epic(self):
+        """Get epic shop offer."""
+        if hasattr(self, 'shop_offers'):
+            return self.shop_offers.get('epic', -1)
+        return -1
+
+    @property
+    def shop_offers_legendary(self):
+        """Get epic shop offer."""
+        if hasattr(self, 'shop_offers'):
+            return self.shop_offers.get('legendary', -1)
+        return -1
+
+    def shop_list(self, bot_emoji: BotEmoji):
+        """List of shop offers."""
+        offers = [{
+            'name': 'chestdraft',
+            'index': self.shop_offers_arena
+        }, {
+            'name': 'chestepic',
+            'index': self.shop_offers_epic
+        }, {
+            'name': 'chestlegendary',
+            'index': self.shop_offers_legendary
+        }]
+        offers = [offer for offer in offers if offer['index'] > 0]
+        offers = sorted(offers, key=lambda o: o['index'])
+        out = ['{}{} days'.format(bot_emoji.name(o['name']), o['index']) for o in offers]
+        return ' '.join(out)
 
     @property
     def win_ratio(self):
@@ -710,6 +749,7 @@ class Settings:
         except KeyError:
             return False
 
+
 # noinspection PyUnusedLocal
 class CRProfile:
     """Clash Royale player profile."""
@@ -773,7 +813,7 @@ class CRProfile:
         await self.bot.say("API token save.")
 
     @crprofileset.command(name="resources", pass_context=True)
-    async def crprofileset_resources(self, ctx, enable:bool):
+    async def crprofileset_resources(self, ctx, enable: bool):
         """Show gold/gems in profile."""
         self.model.set_resources(ctx.message.server, enable)
         await self.bot.say(
@@ -980,6 +1020,9 @@ class CRProfile:
 
         # deck
         em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
+
+        # shop offers
+        em.add_field(name="Shop Offers", value=player.shop_list(self.bot_emoji), inline=False)
 
         embeds.append(em)
         return embeds
