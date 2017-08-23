@@ -110,6 +110,30 @@ class ReactionManager:
 
         await self.bot.delete_message(ctx.message)
 
+    @reactionmanager.command(name="remove", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_messages=True)
+    async def rm_remove(self, ctx, number: int):
+        """Remove reactions from last X messages in the channel."""
+        channel = ctx.message.channel
+        author = ctx.message.author
+        server = author.server
+        has_permissions = channel.permissions_for(server.me).manage_messages
+        to_manage = []
+
+        if not has_permissions:
+            await self.bot.say("I’m not allowed to remove reactions.")
+            return
+
+        async for message in self.bot.logs_from(channel, limit=number + 1):
+            to_manage.append(message)
+
+        await self.remove_reactions(to_manage)
+
+    async def remove_reactions(self, messages):
+        """Remove reactions."""
+        for message in messages:
+            await self.bot.clear_reactions(message)
+
 
 
 def check_folder():
