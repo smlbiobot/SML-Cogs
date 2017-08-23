@@ -1,10 +1,10 @@
 {
 	"AUTHOR": "SML",
-	"SHORT": "Challonge API",
-	"DESCRIPTION": "Display Challonge tournaments results updates.",
+	"SHORT": "Clash of Clans",
+	"DESCRIPTION": "Clash of Clans utility cog using the public API.",
 	"DISABLED": false,
-	"NAME": "Challonge",
-	"REQUIREMENTS": ["pychallonge"],
-	"TAGS": ["challonge", "tourney", "tournament", "api"],
+	"NAME": "CRProfile",
+	"REQUIREMENTS": [],
+	"TAGS": ["coc", "clash", "clash of clans", "clashofclans", "api", "supercell"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: http://github.com/smlbiobot/SML-Cogs or my Discord server: http://discord.me/sml"
 }
