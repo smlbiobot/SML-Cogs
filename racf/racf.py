@@ -24,16 +24,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 import itertools
+from random import choice
+
 import discord
+from __main__ import send_cmd_help
 from discord.ext import commands
 from discord.ext.commands import Context
+
 import cogs
-from cogs.utils.chat_formatting import pagify
-from cogs.utils import checks
-from random import choice
-import aiohttp
-from __main__ import send_cmd_help
 from cogs.economy import SetParser
+from cogs.utils import checks
+from cogs.utils.chat_formatting import pagify
 
 RULES_URL = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
 ROLES_URL = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
@@ -190,7 +191,7 @@ class RACF:
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*CHANGECLAN_ROLES)
-    async def changeclan(self, ctx, clan: str=None):
+    async def changeclan(self, ctx, clan: str = None):
         """Update clan role when moved to a new clan.
 
         Example: !changeclan Delta
@@ -200,7 +201,7 @@ class RACF:
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BS_CHANGECLAN_ROLES)
-    async def bschangeclan(self, ctx, clan: str=None):
+    async def bschangeclan(self, ctx, clan: str = None):
         """Update clan role when moved to a new clan.
 
         Example: !bschangeclan BS-Delta
@@ -213,7 +214,7 @@ class RACF:
         clans = [c.lower() for c in BS_CLANS]
         await self.do_changeclan(ctx, clan, clans)
 
-    @commands.command(pass_context=True ,no_pm=True)
+    @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
     async def bselder(self, ctx, member: discord.Member):
         """Add bs-elder role for member.
@@ -226,7 +227,7 @@ class RACF:
             "Added {} for {}".format(
                 role.name, member.display_name))
 
-    async def do_changeclan(self, ctx, clan: str=None, clans=[]):
+    async def do_changeclan(self, ctx, clan: str = None, clans=[]):
         """Perform clan changes."""
         author = ctx.message.author
         server = ctx.message.server
@@ -256,7 +257,7 @@ class RACF:
             ",".join([r.name for r in to_add_roles]),
             author.display_name))
 
-    async def changerole(self, ctx, member: discord.Member=None, *roles: str):
+    async def changerole(self, ctx, member: discord.Member = None, *roles: str):
         """Change roles of a user.
 
         Uses the changerole command in the MM cog.
@@ -271,7 +272,7 @@ class RACF:
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def addrole(
-            self, ctx, member: discord.Member=None, *, role_name: str=None):
+            self, ctx, member: discord.Member = None, *, role_name: str = None):
         """Add role to a user.
 
         Example: !addrole SML Delta
@@ -281,7 +282,7 @@ class RACF:
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def removerole(
-            self, ctx, member: discord.Member=None, *, role_name: str=None):
+            self, ctx, member: discord.Member = None, *, role_name: str = None):
         """Remove role from a user.
 
         Example: !removerole SML Delta
@@ -371,7 +372,7 @@ class RACF:
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def avatar(self, ctx, member: discord.Member=None):
+    async def avatar(self, ctx, member: discord.Member = None):
         """Display avatar of the user."""
         author = ctx.message.author
 
@@ -402,7 +403,7 @@ class RACF:
         for role_name in role_names:
             role_count[role_name] = len(
                 [m for m in server.members
-                    if role_name in [r.name for r in m.roles]])
+                 if role_name in [r.name for r in m.roles]])
 
         colour = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         colour = int(colour, 16)
@@ -495,7 +496,7 @@ class RACF:
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
-    async def dmusers(self, ctx: Context, msg: str=None,
+    async def dmusers(self, ctx: Context, msg: str = None,
                       *members: discord.Member):
         """Send a DM to a list of people.
 
@@ -608,59 +609,6 @@ class RACF:
         """Remove reactions."""
         for message in messages:
             await self.bot.clear_reactions(message)
-
-    @commands.command(pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
-    async def addreaction(self, ctx, *args):
-        """Add reactions to a message by message id.
-
-        Add reactions to a specific message id
-        [p]addreation 123456 :white_check_mark: :x: :zzz:
-
-        Add reactions to the last message in channel
-        [p]addreation :white_check_mark: :x: :zzz:
-        """
-        channel = ctx.message.channel
-
-        if not len(args):
-            await send_cmd_help(ctx)
-            return
-
-        has_message_id = args[0].isdigit()
-
-        emojis = args[1:] if has_message_id else args
-        message_id = args[0] if has_message_id else None
-
-        if has_message_id:
-            try:
-                message = await self.bot.get_message(channel, message_id)
-            except discord.NotFound:
-                await self.bot.say("Cannot find message with that id.")
-                return
-        else:
-            # use the 2nd last message because the last message would be the command
-            messages = []
-            async for m in self.bot.logs_from(channel, limit=2):
-                messages.append(m)
-
-            # messages = [m async for m in self.bot.logs_from(channel, limit=2)]
-            message = messages[1]
-
-        for emoji in emojis:
-            try:
-                await self.bot.add_reaction(message, emoji)
-            except discord.HTTPException:
-                # reaction add failed
-                pass
-            except discord.Forbidden:
-                await self.bot.say(
-                    "I don’t have permission to react to that message.")
-                break
-            except discord.InvalidArgument:
-                await self.bot.say("Invalid arguments for emojis")
-                break
-
-        await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True, no_pm=True)
     async def toggleheist(self, ctx: Context):
@@ -1032,7 +980,7 @@ class RACF:
         await self.bot.say(msg)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def crsettag(self, ctx, tag, member: discord.Member=None):
+    async def crsettag(self, ctx, tag, member: discord.Member = None):
         """Set CR tags for members.
 
         This is the equivalent of running:
@@ -1077,7 +1025,6 @@ class RACF:
                     await self.bot.say(
                         "Unable to send DM to {}. User might have a stricter DM setting.".format(member))
 
-
     async def run_iosfix(self, ctx: Context, *members: discord.Member):
         """Actual fix to allow members without the bot commander to run on themselves."""
         for member in members:
@@ -1094,8 +1041,6 @@ class RACF:
                         await self.bot.say(
                             "I am not allowed to remove {} from {}.".format(
                                 role, member))
-
-
 
 
 def setup(bot):

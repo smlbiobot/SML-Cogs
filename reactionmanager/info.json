@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Reaction Manager",
+	"DESCRIPTION": "Utility for managing reactions, with helpers to list users who have added specific emojis to messages.",
+	"DISABLED": false,
+	"NAME": "ReactionManager",
+	"REQUIREMENTS": [],
+	"TAGS": ["util", "reaction", "poll", "utility"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo."
+}
