@@ -195,8 +195,8 @@ CLAN_PERMISSION = {
         'assign_role': True,
         'member': False
     },
-    '22LR8JJ2': {
-        'tag': '22LR8JJ2',
+    '2Q09VJC8': {
+        'tag': '2Q09VJC8',
         'role': 'Mini2',
         'assign_role': True,
         'member': False
@@ -292,7 +292,13 @@ class RACF:
         if not perm['member']:
             await ctx.invoke(mm.changerole, member, perm['role'])
         else:
-            await ctx.invoke(self.visitor2member, member, perm['role'])
+            channel = discord.utils.get(
+                ctx.message.server.channels, name="family-chat")
+            await ctx.invoke(mm.changerole, member, perm['role'], 'member', 'tourney', 'practice', '-visitor')
+            if channel is not None:
+                await self.bot.say(
+                    "{} Welcome! Main family chat at {} — enjoy!".format(
+                        member.mention, channel.mention))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*CHANGECLAN_ROLES)
