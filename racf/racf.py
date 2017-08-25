@@ -222,7 +222,7 @@ class RACF:
         """Constructor."""
         self.bot = bot
 
-    @commands.group(pass_context=True, no_pm=True)
+    @commands.group(aliases=['r'], pass_context=True, no_pm=True)
     async def racf(self, ctx):
         """RACF commands."""
         if ctx.invoked_subcommand is None:
@@ -255,7 +255,7 @@ class RACF:
             await self.bot.say(
                 "I need the `Embed links` permission to send this.")
 
-    @racf.command(name="verify", pass_context=True, no_pm=True)
+    @racf.command(name="verify", aliases=['v'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def racf_verify(self, ctx, member: discord.Member, tag):
         """Verify members by player tag."""
