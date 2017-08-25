@@ -760,6 +760,11 @@ class CRProfile:
         self.model = Settings(bot, JSON)
         self.bot_emoji = BotEmoji(bot)
 
+    async def player_data(self, tag):
+        """Return CRPlayerModel by tag."""
+        data = await self.model.player_data(tag)
+        return data
+
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
     async def crprofileset(self, ctx):

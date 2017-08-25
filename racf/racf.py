@@ -35,6 +35,7 @@ import cogs
 from cogs.economy import SetParser
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
+import asyncio
 
 RULES_URL = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
 ROLES_URL = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
@@ -133,6 +134,74 @@ ELDER_REFRESH_MSG = (
     "\n"
     "Please consult !rules and !roles on the RACF server for more info."
 )
+CLAN_PERMISSION = {
+    '2CCCP': {
+        'tag': '2CCCP',
+        'role': 'Alpha',
+        'assign_role': True,
+        'member': True
+    },
+    '2U2GGQJ': {
+        'tag': '2U2GGQJ',
+        'role': 'Bravo',
+        'assign_role': True,
+        'member': True
+    },
+    '2QUVVVP': {
+        'tag': '2QUVVVP',
+        'role': 'Charlie',
+        'assign_role': True,
+        'member': True
+    },
+    'Y8GYCGV': {
+        'tag': 'Y8GYCGV',
+        'role': 'Delta',
+        'assign_role': True,
+        'member': True
+    },
+    'LGVV2CG': {
+        'tag': 'LGVV2CG',
+        'role': 'Echo',
+        'assign_role': True,
+        'member': True
+    },
+    'QUYCYV8': {
+        'tag': 'QUYCYV8',
+        'role': 'Foxtrot',
+        'assign_role': True,
+        'member': True
+    },
+    'GUYGVJY': {
+        'tag': 'GUYGVJY',
+        'role': 'Golf',
+        'assign_role': True,
+        'member': True
+    },
+    'UGQ28YU': {
+        'tag': 'UGQ28YU',
+        'role': 'Hotel',
+        'assign_role': True,
+        'member': True
+    },
+    'R8PPJQG': {
+        'tag': 'R8PPJQG',
+        'role': 'eSports',
+        'assign_role': False,
+        'member': True
+    },
+    '22LR8JJ2': {
+        'tag': '22LR8JJ2',
+        'role': 'Mini',
+        'assign_role': True,
+        'member': False
+    },
+    '22LR8JJ2': {
+        'tag': '22LR8JJ2',
+        'role': 'Mini2',
+        'assign_role': True,
+        'member': False
+    },
+}
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -153,41 +222,77 @@ class RACF:
         """Constructor."""
         self.bot = bot
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def racf(self, ctx: Context):
+    @commands.group(pass_context=True, no_pm=True)
+    async def racf(self, ctx):
+        """RACF commands."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @racf.command(name="info", pass_context=True, no_pm=True)
+    async def racf_info(self, ctx: Context):
         """RACF Rules + Roles."""
         server = ctx.message.server
 
         color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
         color = int(color, 16)
 
-        data = discord.Embed(
+        em = discord.Embed(
             color=discord.Color(value=color),
             title="Rules + Roles",
             description="Important information for all members. Please read.")
 
         if server.icon_url:
-            data.set_author(name=server.name, url=server.icon_url)
-            data.set_thumbnail(url=server.icon_url)
+            em.set_author(name=server.name, url=server.icon_url)
+            em.set_thumbnail(url=server.icon_url)
         else:
-            data.set_author(name=server.name)
+            em.set_author(name=server.name)
+
+        em.add_field(name='Documentation', value='http://racfdocs.smlbiobot.com')
 
         try:
-            await self.bot.say(embed=data)
+            await self.bot.say(embed=em)
         except discord.HTTPException:
             await self.bot.say(
                 "I need the `Embed links` permission to send this.")
 
-        out = []
-        out.append("**Rules**")
-        out.append("<{}>".format(RULES_URL))
-        out.append('')
-        out.append("**Roles**")
-        out.append("<{}>".format(ROLES_URL))
-        out.append('')
-        out.append("**Discord invite**")
-        out.append("<{}>".format(DISCORD_URL))
-        await self.bot.say('\n'.join(out))
+    @racf.command(name="verify", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def racf_verify(self, ctx, member: discord.Member, tag):
+        """Verify members by player tag."""
+
+        # - Set their tags
+        await ctx.invoke(self.crsettag, tag, member)
+
+        # - Lookup profile
+        crp = self.bot.get_cog('CRProfile')
+
+        try:
+            player = await crp.player_data(tag)
+        except asyncio.TimeoutError:
+            await self.bot.send_message(
+                ctx.message.channel,
+                "Getting profile info resulted in a timeout. "
+                "API may be down or player tag cannot be found. "
+                "Aborting…")
+            return
+
+        # - Check clan
+        if player.clan_tag not in CLAN_PERMISSION.keys():
+            await self.bot.say("User is not in our clans.")
+            return
+
+        # - Check allow role assignment
+        perm = CLAN_PERMISSION[player.clan_tag]
+        if not perm['assign_role']:
+            await self.bot.say('User belong to a clan that requires roster verifications.')
+            return
+
+        # - Assign role - not members
+        mm = self.bot.get_cog("MemberManagement")
+        if not perm['member']:
+            await ctx.invoke(mm.changerole, member, perm['role'])
+        else:
+            await ctx.invoke(self.visitor2member, member, perm['role'])
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*CHANGECLAN_ROLES)
