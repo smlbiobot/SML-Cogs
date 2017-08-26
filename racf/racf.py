@@ -315,6 +315,15 @@ class RACF:
             await self.bot.say('User belong to a clan that requires roster verifications.')
             return
 
+        # - Change nickname to IGN
+        try:
+            await self.bot.change_nickname(member, player.username)
+        except discord.HTTPException:
+            await self.bot.say(
+                "I don’t have permission to change nick for this user.")
+        else:
+            await self.bot.say("{} changed to {}.".format(member.mention, player.username))
+
         # - Assign role - not members
         mm = self.bot.get_cog("MemberManagement")
         if not perm['member']:
@@ -327,6 +336,8 @@ class RACF:
                 await self.bot.say(
                     "{} Welcome! Main family chat at {} — enjoy!".format(
                         member.mention, channel.mention))
+
+
 
     @racf.command(name="bsverify", aliases=['bv'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
