@@ -23,6 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+import asyncio
 import itertools
 from random import choice
 
@@ -35,7 +36,6 @@ import cogs
 from cogs.economy import SetParser
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
-import asyncio
 
 RULES_URL = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
 ROLES_URL = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
@@ -203,6 +203,34 @@ CLAN_PERMISSION = {
     },
 }
 
+BAND_PERMISSION = {
+    'LQQ': {
+        'tag': 'LQQ',
+        'role': 'BS-Alpha',
+        'assign_role': True,
+        'member': False
+    },
+    '82RQLR': {
+        'tag': '82RQLR',
+        'role': 'BS-Bravo',
+        'assign_role': True,
+        'member': False
+    },
+    '98VLYJ': {
+        'tag': '98VLYJ',
+        'role': 'BS-Charlie',
+        'assign_role': True,
+        'member': False
+    },
+    'Q0YG8V': {
+        'tag': 'Q0YG8V',
+        'role': 'BS-Delta',
+        'assign_role': True,
+        'member': False
+    }
+
+}
+
 
 def grouper(n, iterable, fillvalue=None):
     """Group lists into lists of items.
@@ -258,7 +286,7 @@ class RACF:
     @racf.command(name="verify", aliases=['v'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def racf_verify(self, ctx, member: discord.Member, tag):
-        """Verify members by player tag."""
+        """Verify CR members by player tag."""
 
         # - Set their tags
         await ctx.invoke(self.crsettag, tag, member)
@@ -299,6 +327,44 @@ class RACF:
                 await self.bot.say(
                     "{} Welcome! Main family chat at {} — enjoy!".format(
                         member.mention, channel.mention))
+
+    @racf.command(name="bsverify", aliases=['bv'], pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def racf_bsveify(self, ctx, member: discord.Member, tag):
+        """Verify BS members by player tag."""
+
+        # - Set tags
+        bsdata = self.bot.get_cog("BSData")
+        await ctx.invoke(bsdata.bsdata_settag, tag, member)
+
+        # - Lookup profile
+        try:
+            player = await bsdata.get_player_data(tag)
+        except asyncio.TimeoutError:
+            await self.bot.send_message(
+                ctx.message.channel,
+                "Getting profile info resulted in a timeout. "
+                "API may be down or player tag cannot be found. "
+                "Aborting…")
+            return
+
+
+        # - Check clan
+        band_tag = None
+        try:
+            band_tag = player["band"]["tag"]
+        except KeyError:
+            await self.bot.say("Profile API may be down. Abording…")
+            return
+
+        if band_tag not in BAND_PERMISSION.keys():
+            await self.bot.say("User is not in our clans.")
+            return
+
+        # - Assign roles
+        role = BAND_PERMISSION[band_tag]["role"]
+        await ctx.invoke(self.brawlstars, member, role)
+
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*CHANGECLAN_ROLES)
