@@ -106,7 +106,16 @@ VISITOR_RULES = (
     "If you would like to invite your friends to join this server, "
     "you may use this Discord invite: <http://discord.gg/racf> \n"
     "\n"
+    "Additional help and information: <http://racfdocs.smlbiobot.com> \n"
+    "\n"
     "Thanks + enjoy!")
+MEMBER_MSG = (
+    "Welcome to the **Reddit Alpha Clan Family** (RACF) Discord server. "
+    "Please check out <http://racfdocs.smlbiobot.com> for an overview of our family rules, "
+    "together with help documentation on a plethora of bot commands for you to use and enjoy."
+    "\n\n"
+    "Thanks + enjoy!"
+)
 ELDER_MSG = (
     "Congratulations on your recent promotion to Elder! \n"
     "\n"
@@ -315,6 +324,15 @@ class RACF:
             await self.bot.say('User belong to a clan that requires roster verifications.')
             return
 
+        # - Change nickname to IGN
+        try:
+            await self.bot.change_nickname(member, player.username)
+        except discord.HTTPException:
+            await self.bot.say(
+                "I don’t have permission to change nick for this user.")
+        else:
+            await self.bot.say("{} changed to {}.".format(member.mention, player.username))
+
         # - Assign role - not members
         mm = self.bot.get_cog("MemberManagement")
         if not perm['member']:
@@ -327,6 +345,9 @@ class RACF:
                 await self.bot.say(
                     "{} Welcome! Main family chat at {} — enjoy!".format(
                         member.mention, channel.mention))
+
+        # - Send welcome message + link to documentation
+        await ctx.invoke(self.dmusers, MEMBER_MSG, member)
 
     @racf.command(name="bsverify", aliases=['bv'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
@@ -671,6 +692,8 @@ class RACF:
                 "{} Welcome! Main family chat at {} — enjoy!".format(
                     member.mention, channel.mention))
 
+        await ctx.invoke(self.dmusers, MEMBER_MSG, member)
+
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
     async def dmusers(self, ctx: Context, msg: str = None,
@@ -748,14 +771,6 @@ class RACF:
                     out.append("{} `:{}:`".format(emoji_str, emoji.name))
             for page in pagify("\n".join(out), shorten_by=12):
                 await self.bot.say(page)
-
-    @commands.command(pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
-    async def bankset(
-            self, ctx: Context, user: discord.Member, credits: SetParser):
-        """Work around to allow MODs to set bank."""
-        econ = self.bot.get_cog("Economy")
-        await ctx.invoke(econ._set, user, credits)
 
     @commands.command(pass_context=True, no_pm=True)
     async def toggleheist(self, ctx: Context):
