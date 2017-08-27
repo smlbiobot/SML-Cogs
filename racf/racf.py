@@ -346,8 +346,12 @@ class RACF:
                     "{} Welcome! Main family chat at {} — enjoy!".format(
                         member.mention, channel.mention))
 
+<<<<<<< HEAD
         # - Send welcome message + link to documentation
         await ctx.invoke(self.dmusers, MEMBER_MSG, member)
+=======
+
+>>>>>>> ee7be20b19edcc908b5c272d8ae6cd557b06b377
 
     @racf.command(name="bsverify", aliases=['bv'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
