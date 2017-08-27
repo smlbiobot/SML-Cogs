@@ -1,2 +1,16 @@
 .DS_Store
+.idea
 crtags
+.idea/
+channelfilter/
+crclan/data/sample/
+crprofile/data/players/
+crstats/
+esports/
+google/
+logstash/data/
+punish/
+racfwelcome/
+rbcf/
+reddit/
+timezone/data/
