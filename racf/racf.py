@@ -313,6 +313,15 @@ class RACF:
                 "Aborting…")
             return
 
+        # - Change nickname to IGN
+        try:
+            await self.bot.change_nickname(member, player.username)
+        except discord.HTTPException:
+            await self.bot.say(
+                "I don’t have permission to change nick for this user.")
+        else:
+            await self.bot.say("{} changed to {}.".format(member.mention, player.username))
+
         # - Check clan
         if player.clan_tag not in CLAN_PERMISSION.keys():
             await self.bot.say("User is not in our clans.")
@@ -324,30 +333,25 @@ class RACF:
             await self.bot.say('User belong to a clan that requires roster verifications.')
             return
 
-        # - Change nickname to IGN
-        try:
-            await self.bot.change_nickname(member, player.username)
-        except discord.HTTPException:
-            await self.bot.say(
-                "I don’t have permission to change nick for this user.")
-        else:
-            await self.bot.say("{} changed to {}.".format(member.mention, player.username))
-
         # - Assign role - not members
         mm = self.bot.get_cog("MemberManagement")
         if not perm['member']:
-            await ctx.invoke(mm.changerole, member, perm['role'])
+            await ctx.invoke(mm.changerole, member, perm['role'], 'visitor')
+            channel = discord.utils.get(
+                ctx.message.server.channels, name="visitor")
+            await ctx.invoke(self.dmusers, VISITOR_RULES, member)
         else:
+            await ctx.invoke(mm.changerole, member, perm['role'], 'member', 'tourney', 'practice', '-visitor')
             channel = discord.utils.get(
                 ctx.message.server.channels, name="family-chat")
-            await ctx.invoke(mm.changerole, member, perm['role'], 'member', 'tourney', 'practice', '-visitor')
-            if channel is not None:
-                await self.bot.say(
-                    "{} Welcome! Main family chat at {} — enjoy!".format(
-                        member.mention, channel.mention))
+            await ctx.invoke(self.dmusers, MEMBER_MSG, member)
 
-        # - Send welcome message + link to documentation
-        await ctx.invoke(self.dmusers, MEMBER_MSG, member)
+        if channel is not None:
+            await self.bot.say(
+                "{} Welcome! You may now chat at {} — enjoy!".format(
+                    member.mention, channel.mention))
+
+
 
     @racf.command(name="bsverify", aliases=['bv'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
