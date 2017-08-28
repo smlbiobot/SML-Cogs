@@ -387,7 +387,7 @@ class CRPlayerModel:
         chests = sorted(chests, key=lambda c: c[1])
 
         cycle = [bot_emoji.key(c) for c in self.chests['cycle'][:8]]
-        chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1] + 1) for c in chests]
+        chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1] + 1p) for c in chests]
         chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
         return chest_str
 
