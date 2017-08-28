@@ -338,7 +338,7 @@ class RACF:
         if not perm['member']:
             await ctx.invoke(mm.changerole, member, perm['role'], 'visitor')
             channel = discord.utils.get(
-                ctx.message.server.channels, name="visitor")
+                ctx.message.server.channels, name="visitors")
             await ctx.invoke(self.dmusers, VISITOR_RULES, member)
         else:
             await ctx.invoke(mm.changerole, member, perm['role'], 'member', 'tourney', 'practice', '-visitor')
