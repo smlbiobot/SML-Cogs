@@ -335,7 +335,7 @@ class CRPlayerModel:
 
     def trophy_value(self, emoji):
         """Trophy values.
-        
+
         Current / Highest (PB)
         """
         return '{} / {} PB {}'.format(
@@ -387,7 +387,7 @@ class CRPlayerModel:
         chests = sorted(chests, key=lambda c: c[1])
 
         cycle = [bot_emoji.key(c) for c in self.chests['cycle'][:8]]
-        chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1]) for c in chests]
+        chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1] + 1) for c in chests]
         chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
         return chest_str
 
@@ -415,7 +415,8 @@ class CRPlayerModel:
     def shop_list(self, bot_emoji: BotEmoji):
         """List of shop offers."""
         offers = [{
-            'name': 'chestdraft',
+            # 'name': 'chestdraft',
+            'name': 'shopgoblin',
             'index': self.shop_offers_arena
         }, {
             'name': 'chestepic',
@@ -682,7 +683,7 @@ class Settings:
 
     def emoji(self, name=None, key=None):
         """Chest emojis by api key name or key.
-        
+
         name is used by this cog.
         key is values returned by the api.
         Use key only if name is not set
