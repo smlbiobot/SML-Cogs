@@ -162,7 +162,6 @@ class MemberManagement:
         return parser
 
     @commands.command(pass_context=True)
-    @commands.has_any_role(*BOT_COMMANDER_ROLES)
     async def mm(self, ctx, *args):
         """Member management by roles.
 
@@ -201,6 +200,18 @@ class MemberManagement:
         --everyone
             Include everyone. Useful for finding members without specific roles.
         """
+        server = ctx.message.server
+        role_settings = self.settings[server.id]["roles"]
+
+        user_roles = ctx.message.author.roles
+        can_run = False
+        for role in user_roles:
+            if role.id in role_settings:
+                can_run = True
+
+        if not can_run:
+            return
+
         parser = self.parser()
         try:
             pargs = parser.parse_args(args)
@@ -218,7 +229,7 @@ class MemberManagement:
         option_none = (pargs.result == 'none')
         option_only_role = pargs.onlyrole
 
-        server = ctx.message.server
+
         server_roles_names = [r.name.lower() for r in server.roles]
         plus = set([r.lower() for r in pargs.roles if r.lower() in server_roles_names])
         minus = set()
