@@ -364,6 +364,19 @@ class MemberManagement:
             embeds.append(data)
         return embeds
 
+    def get_server_roles(self, server, *role_names):
+        """Return list of server roles object by name."""
+        if server is None:
+            return []
+        if len(role_names):
+            roles_lower = [r.lower() for r in role_names]
+            roles = [
+                r for r in server.roles if r.name.lower() in roles_lower
+            ]
+        else:
+            roles = server.roles
+        return roles
+
     @commands.command(pass_context=True, no_pm=True)
     async def listroles(self, ctx: Context, *roles):
         """List all the roles on the server."""
@@ -372,13 +385,7 @@ class MemberManagement:
             return
         out = []
         out.append("__List of roles on {}__".format(server.name))
-        roles_to_list = []
-        if len(roles):
-            roles_lower = [r.lower() for r in roles]
-            roles_to_list = [
-                r for r in server.roles if r.name.lower() in roles_lower]
-        else:
-            roles_to_list = server.roles
+        roles_to_list = self.get_server_roles(server, *roles)
 
         out_roles = {}
         for role in roles_to_list:
@@ -392,6 +399,23 @@ class MemberManagement:
                 out.append(
                     "**{}** ({} members)".format(
                         role.name, out_roles[role.id]['count']))
+        for page in pagify("\n".join(out), shorten_by=12):
+            await self.bot.say(page)
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def listrolecolors(self, ctx, *roles):
+        """List role colors on the server."""
+        server = ctx.message.server
+        role_objs = self.get_server_roles(server)
+        out = []
+        for role in server.role_hierarchy:
+            if role in role_objs:
+                rgb = role.color.to_tuple()
+                out.append('**{name}**: {color_rgb}, {color_hex}'.format(
+                    name=role.name,
+                    color_rgb=rgb,
+                    color_hex='#{:02x}{:02x}{:02x}'.format(rgb[0], rgb[1], rgb[2])
+                ))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
 
