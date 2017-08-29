@@ -405,7 +405,28 @@ class MemberManagement:
                         role.name, out_roles[role.id]['count']))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
+            
+     
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def multiaddrole(self, ctx, role, *members: discord.Member):
+        """Add a role to multiple users.
+        !multiaddrole rolename User1 User2 User3
+        """
+        for member in members:
+            await self.changerole(ctx, member, role)
 
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def multiremoverole(self, ctx, role, *members: discord.Member):
+        """Remove a role from multiple users.
+        !multiremoverole rolename User1 User2 User3
+        """
+        role = '-{}'.format(role)
+        for member in members:
+            await self.changerole(ctx, member, role)
+            
+            
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def changerole(self, ctx, member: discord.Member=None, *roles: str):
