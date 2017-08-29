@@ -406,7 +406,7 @@ class MemberManagement:
     async def listrolecolors(self, ctx, *roles):
         """List role colors on the server."""
         server = ctx.message.server
-        role_objs = self.get_server_roles(server)
+        role_objs = self.get_server_roles(server, *roles)
         out = []
         for role in server.role_hierarchy:
             if role in role_objs:
