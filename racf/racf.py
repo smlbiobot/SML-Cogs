@@ -493,27 +493,6 @@ class RACF:
         await self.changerole(ctx, member, role_name)
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def multiaddrole(self, ctx, role, *members: discord.Member):
-        """Add a role to multiple users.
-
-        !multiaddrole rolename User1 User2 User3
-        """
-        for member in members:
-            await self.changerole(ctx, member, role)
-
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def multiremoverole(self, ctx, role, *members: discord.Member):
-        """Remove a role from multiple users.
-
-        !multiremoverole rolename User1 User2 User3
-        """
-        role = '-{}'.format(role)
-        for member in members:
-            await self.changerole(ctx, member, role)
-
-    @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(mention_everyone=True)
     async def mentionusers(self, ctx, role: str, *msg):
         """Mention users by role.

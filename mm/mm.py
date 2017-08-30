@@ -499,7 +499,7 @@ class MemberManagement:
 
 
     @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOT_COMMANDER_ROLES)
+    @checks.mod_or_permissions(manage_roles=True)
     async def searchmember(self, ctx, name=None):
         """Search member on server by name."""
         if name is None:
@@ -532,7 +532,7 @@ class MemberManagement:
             await self.bot.say('\n'.join(out))
 
     @commands.command(pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(mention_everyone=True)
+    @checks.mod_or_permissions(manage_roles=True)
     async def addrole2role(self, ctx: Context, with_role_name, to_add_role_name):
         """Add a role to users with a specific role."""
         server = ctx.message.server
@@ -553,6 +553,27 @@ class MemberManagement:
                         await ctx.invoke(self.changerole, member, to_add_role_name)
                     except:
                         pass
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def multiaddrole(self, ctx, role, *members: discord.Member):
+        """Add a role to multiple users.
+
+        !multiaddrole rolename User1 User2 User3
+        """
+        for member in members:
+            await self.changerole(ctx, member, role)
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def multiremoverole(self, ctx, role, *members: discord.Member):
+        """Remove a role from multiple users.
+
+        !multiremoverole rolename User1 User2 User3
+        """
+        role = '-{}'.format(role)
+        for member in members:
+            await self.changerole(ctx, member, role)
 
 
 def check_folder():
