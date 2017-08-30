@@ -980,10 +980,12 @@ class CRProfile:
         if member is not None:
             mention = member.mention
 
+        url = 'http://cr-api.com/profile/{}'.format(player.tag)
+
         # header
         title = player.clan_name
         description = '#{}\n{}'.format(player.clan_tag, player.clan_role)
-        em = discord.Embed(title=title, description=description, color=color)
+        em = discord.Embed(title=title, description=description, color=color, url=url)
 
         # clan
         author_name = '{} #{}'.format(player.username, player.tag)
@@ -1029,6 +1031,9 @@ class CRProfile:
 
         # shop offers
         em.add_field(name="Shop Offers", value=player.shop_list(self.bot_emoji), inline=False)
+
+        # link to cr-api.com
+        em.set_footer(text=url, icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
 
         embeds.append(em)
         return embeds
