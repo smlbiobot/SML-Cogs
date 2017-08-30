@@ -169,8 +169,8 @@ class ReactionManager:
                 valid_users.append(u)
             users = ', '.join([u.display_name for u in valid_users])
             name = emoji
-            count = reaction.count
-            value = '{}: {}'.format(count, users)
+            count = len(valid_users)
+            value = '{}: {}: {}'.format(emoji, count, users)
 
             out.append(value)
 
