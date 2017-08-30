@@ -77,6 +77,13 @@ def random_discord_color():
     color = int(color, 16)
     return discord.Color(value=color)
 
+def clan_url(clan_tag):
+    """Return clan URL on CR-API."""
+    return 'http://cr-api.com/clan/{}'.format(clan_tag)
+
+cr_api_logo_url = 'https://smlbiobot.github.io/img/cr-api/cr-api-logo.png'
+
+
 
 class SCTag:
     """SuperCell tags."""
@@ -356,6 +363,15 @@ class CRClanMemberModel:
             return None
         else:
             return self.currentRank - self.previousRank
+
+    @property
+    def league(self):
+        """League ID from Arena ID."""
+        arenaID = self.arena["arenaID"]
+        leagueID = arenaID - 11
+        if leagueID > 0:
+            return leagueID
+        return 0
 
     @property
     def league_icon_url(self):
@@ -838,10 +854,12 @@ class CRClanInfoView:
         """Return clan info embed."""
         if color is None:
             color = random_discord_color()
+        url = clan_url(data.tag)
         em = discord.Embed(
             title=data.name,
             description=data.description,
-            color=color)
+            color=color,
+            url=url)
         em.add_field(name="Clan Trophies", value=data.score)
         em.add_field(name="Type", value=CRClanType(data.type).typename)
         em.add_field(name="Required Trophies", value=data.requiredScore)
@@ -849,6 +867,7 @@ class CRClanInfoView:
         em.add_field(name="Members", value=data.member_count_str)
         badge_url = '{}{}'.format(self.model.badge_url, data.badge_url)
         em.set_thumbnail(url=badge_url)
+        em.set_footer(text=url, icon_url=cr_api_logo_url)
         return em
 
 
@@ -883,7 +902,8 @@ class CRClanRosterView:
                 'title': data.name,
                 'footer_text': '{} #{} - Page {}'.format(
                     data.name, data.tag, page),
-                'footer_icon_url': self.model.badge_url + data.badge_url
+                'footer_icon_url': self.model.badge_url + data.badge_url,
+                'clan_data': data
             }
             em = self.embed(color=color, **kwargs)
             await self.bot.send_message(ctx.message.channel, embed=em)
@@ -895,12 +915,12 @@ class CRClanRosterView:
             self,
             server=None, title=None, members=None,
             footer_text=None, footer_icon_url=None,
-            color=None):
+            color=None, clan_data=None):
         """Return clan roster as Discord embed.
 
         This represents a page of a roster.
         """
-        em = discord.Embed(title=title)
+        em = discord.Embed(title=title, url=clan_url(clan_data.tag))
         em.set_footer(text=footer_text, icon_url=footer_icon_url)
         for member in members:
             if member is not None:
