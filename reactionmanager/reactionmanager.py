@@ -32,7 +32,7 @@ from discord.ext import commands
 
 from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify
+from cogs.utils.chat_formatting import pagify, bold, escape_mass_mentions
 from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "reactionmanager")
@@ -136,9 +136,8 @@ class ReactionManager:
 
     @reactionmanager.command(name="get", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_messages=True)
-    async def rm_get(self, ctx, message_id: int):
+    async def rm_get(self, ctx, channel: discord.Channel, message_id, exclude_self=True):
         """Display list of reactions added by users."""
-        channel = ctx.message.channel
         message = await self.bot.get_message(channel, message_id)
 
         if message is None:
@@ -147,9 +146,11 @@ class ReactionManager:
 
         title = message.channel.name
         description = message.content
-        em = discord.Embed(
-            title=title,
-            description=description)
+
+        out = [
+            bold('Channel: {}'.format(title)),
+            escape_mass_mentions(description)
+        ]
 
         for reaction in message.reactions:
             if reaction.custom_emoji:
@@ -161,19 +162,20 @@ class ReactionManager:
                 emoji = reaction.emoji
 
             reaction_users = await self.bot.get_reaction_users(reaction)
-            users = ' '.join([m.mention for m in reaction_users])
+            valid_users = []
+            for u in reaction_users:
+                if exclude_self and u == self.bot.user:
+                    continue
+                valid_users.append(u)
+            users = ', '.join([u.display_name for u in valid_users])
             name = emoji
             count = reaction.count
             value = '{}: {}'.format(count, users)
 
-            em.add_field(name=name, value=value, inline=True)
+            out.append(value)
 
-        em.set_footer(
-            text='ID: {} | Updated: {}'.format(
-                message.id,
-                dt.datetime.utcnow().isoformat()))
-
-        await self.bot.say(embed=em)
+        for page in pagify('\n'.join(out), shorten_by=24):
+            await self.bot.say(page)
 
 
 def check_folder():
