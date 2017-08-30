@@ -562,7 +562,7 @@ class MemberManagement:
         !multiaddrole rolename User1 User2 User3
         """
         for member in members:
-            await self.changerole(ctx, member, role)
+            await ctx.invoke(self.changerole, member, role)
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
@@ -573,7 +573,7 @@ class MemberManagement:
         """
         role = '-{}'.format(role)
         for member in members:
-            await self.changerole(ctx, member, role)
+            await ctx.invoke(self.changerole, member, role)
 
 
 def check_folder():
