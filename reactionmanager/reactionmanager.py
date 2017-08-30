@@ -177,6 +177,9 @@ class ReactionManager:
         for page in pagify('\n'.join(out), shorten_by=24):
             await self.bot.say(page)
 
+        # delete command
+        await self.bot.delete_message(ctx.message)
+
 
 def check_folder():
     """Check folder."""
