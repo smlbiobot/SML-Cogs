@@ -980,18 +980,25 @@ class CRProfile:
         if member is not None:
             mention = member.mention
 
-        url = 'http://cr-api.com/profile/{}'.format(player.tag)
+        profile_url = 'http://cr-api.com/profile/{}'.format(player.tag)
+        clan_url = 'http://cr-api.com/clan/{}'.format(player.clan_tag)
 
         # header
-        title = player.clan_name
-        description = '#{}\n{}'.format(player.clan_tag, player.clan_role)
-        em = discord.Embed(title=title, description=description, color=color, url=url)
-
-        # clan
-        author_name = '{} #{}'.format(player.username, player.tag)
-        em.set_author(name=author_name)
-        # em.set_author(name=author_name, icon_url=player.clan_badge_url)
-        # em.set_thumbnail(url=player.arena_url)
+        title = player.username
+        description = (
+            '[{player_tag}]({profile_url})\n'
+            '**[{clan_name}]({clan_url})**\n'
+            '[{clan_tag}]({clan_url})\n'
+            '{clan_role}'
+        ).format(
+            player_tag=player.tag,
+            profile_url=profile_url,
+            clan_name=player.clan_name,
+            clan_tag=player.clan_tag,
+            clan_url=clan_url,
+            clan_role=player.clan_role
+        )
+        em = discord.Embed(title=title, description=description, color=color, url=profile_url)
         em.set_thumbnail(url=player.clan_badge_url)
         header = {
             'Trophies': player.trophy_value(bem('trophy')),
@@ -1033,7 +1040,9 @@ class CRProfile:
         em.add_field(name="Shop Offers", value=player.shop_list(self.bot_emoji), inline=False)
 
         # link to cr-api.com
-        em.set_footer(text=url, icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
+        em.set_footer(
+            text=profile_url,
+            icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
 
         embeds.append(em)
         return embeds
