@@ -621,22 +621,25 @@ class CRData:
         # sort card in decks
         sorted_decks = []
         for deck in decks:
-            # when data is not clean, "key" may be missin
+            # when data is not clean, "key" may be missing
             # if this is the case, fix it
             clean_deck = []
-            for card in deck.copy():
-                if not "key" in card:
-                    card["key"] = "soon"
-                    card["level"] = 13
-                clean_deck.append(card)
-            deck = clean_deck
 
-            # for unknown reasons deck could sometimes be None in data src
+            # data not clean = deck is None
             if deck is not None:
-                sorted_decks.append(
-                    sorted(
-                        deck.copy(),
-                        key=lambda x: x["key"]))
+                for card in deck.copy():
+                    if not "key" in card:
+                        card["key"] = "soon"
+                        card["level"] = 13
+                    clean_deck.append(card)
+                deck = clean_deck
+
+                # for unknown reasons deck could sometimes be None in data src
+                if deck is not None:
+                    sorted_decks.append(
+                        sorted(
+                            deck.copy(),
+                            key=lambda x: x["key"]))
         decks = sorted_decks
 
         found_decks = []
