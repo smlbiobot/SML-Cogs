@@ -101,7 +101,7 @@ class Magic:
                     self.change_magic_color(server))
 
     @commands.group(pass_context=True)
-    @checks.mod_or_permissions()
+    @checks.admin_or_permissions()
     async def magic(self, ctx: Context):
         """Magic role with ever changing username color."""
         if ctx.invoked_subcommand is None:
