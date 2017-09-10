@@ -35,6 +35,7 @@ from discord.ext.commands import Context
 
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from collections import defaultdict
 
 PATH = os.path.join("data", "magic")
 JSON = os.path.join(PATH, "settings.json")
@@ -47,6 +48,10 @@ SERVER_DEFAULTS = {
     "member_ids": []
 }
 
+def nested_dict():
+    """Recursively nested defaultdict."""
+    return defaultdict(nested_dict)
+
 
 class Magic:
     """Magic username."""
@@ -58,7 +63,8 @@ class Magic:
         self.hue = 0
         self.task = None
         self.magic_role = None
-        self.settings = dataIO.load_json(JSON)
+        self.settings = nested_dict()
+        self.settings.update(dataIO.load_json(JSON))
         self.interval = 0.5
 
     def __unload(self):
