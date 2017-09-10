@@ -164,6 +164,8 @@ class Magic:
 
     async def edit_user_roles(self, server, member: discord.Member, add=False, remove=False):
         """Add or remove Magic role from user."""
+        if "role" not in self.settings[server.id]:
+            self.settings[server.id]["role"] = {}
         role_name = self.settings[server.id]["role"]["name"]
         magic_role = discord.utils.get(server.roles, name=role_name)
         try:
