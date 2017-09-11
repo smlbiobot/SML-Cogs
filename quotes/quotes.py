@@ -118,7 +118,7 @@ class Quotes:
         """Show quotes by name."""
         server = ctx.message.server
         try:
-            q = self.settings[server.id][name]
+            q = self.settings[server.id].get(name, None)
             if q is not None:
                 await self.bot.say(q)
                 return
