@@ -933,7 +933,8 @@ class CRProfile:
 
         if tag is None:
             await self.bot.say(
-                "{} has not set his player tag with the bot yet.".format(member.display_name)
+                "{} has not set player tag with the bot yet. "
+                "Run `!crsettag [tag]` to set your tag.".format(member.display_name)
             )
             return
         await self.display_profile(ctx, tag, resources=resources)
