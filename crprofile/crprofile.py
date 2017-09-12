@@ -354,9 +354,11 @@ class CRPlayerModel:
 
     def rank_str(self, bot_emoji: BotEmoji):
         """Rank in ordinal format."""
-        p = inflect.engine()
-        o = p.ordinal(self.rank)[-2:]
-        return '{:,}{} {}'.format(self.rank, o, bot_emoji.name('rank'))
+        if self.rank != 0:
+            p = inflect.engine()
+            o = p.ordinal(self.rank)[-2:]
+            return '{:,}{} {}'.format(self.rank, o, bot_emoji.name('rank'))
+        return 'Unranked'
 
     @property
     def chest_magical_index(self):
@@ -1021,8 +1023,11 @@ class CRProfile:
             'Wins / Draws / Losses': player.win_draw_losses(bem('battle')),
             'Win Ratio': '{} {}'.format(player.win_ratio, bem('battle')),
             'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
-            'Level': player.level,
-            'Experience': player.xp,
+            'Challenge Cards Won': fmt(player.challenge_cards_won, 'tournament'),
+            'Tourney Cards Won': fmt(player.tourney_cards_won, 'tournament'),
+            'Total Donations': fmt(player.total_donations, 'cards'),
+            'Level': fmt(player.level, 'experience'),
+            'Experience': '{} {}'.format(player.xp, bem('experience')),
             'Cards Found': fmt(player.cards_found, 'cards'),
             'Favorite Card': player.fave_card(self.bot_emoji)
         }
