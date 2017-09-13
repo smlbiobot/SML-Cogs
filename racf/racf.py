@@ -57,7 +57,7 @@ TOGGLE_PERM = {
     "Member": [
         "Heist", "Practice", "Tourney", "Recruit", "CoC",
         "Battle-Bay", "RACF-Tourney", "Brawl-Stars", "vc-crew",
-        "BSPlay", "PvZ"
+        "BSPlay", "PvZ", "Practice-EU"
     ],
     "Visitor": [
         "BSPlay", "Heist", "Recruit"
@@ -807,7 +807,7 @@ class RACF:
         else:
             toggleable_roles = TOGGLE_PERM["Visitor"]
 
-        toggleable_roles = sorted(toggleable_roles)
+        toggleable_roles = sorted(toggleable_roles, key=lambda r: r.lower())
 
         toggleable_roles_lower = [r.lower() for r in toggleable_roles]
 
