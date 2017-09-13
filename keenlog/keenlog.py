@@ -30,26 +30,22 @@ import itertools
 import os
 import pprint
 import re
-from collections import Counter, OrderedDict, defaultdict
+from collections import Counter, defaultdict
 from datetime import timedelta
 from random import choice
 
 import discord
+import keen
 from __main__ import send_cmd_help
 from discord import Member
 from discord import Message
 from discord.ext import commands
-from elasticsearch_dsl import DocType, Date, Nested, Boolean, \
-    analyzer, Keyword, Text, Integer
-from elasticsearch_dsl import FacetedSearch, TermsFacet
 # global ES connection
-from elasticsearch_dsl.connections import connections
-from elasticsearch_dsl.query import Match, Range, Q
+from elasticsearch_dsl.query import Q
 
 from cogs.utils import checks
 from cogs.utils.chat_formatting import inline, pagify, box
 from cogs.utils.dataIO import dataIO
-
 
 INTERVAL = timedelta(hours=4).seconds
 
@@ -87,174 +83,297 @@ def random_discord_color():
 
 class BaseModel:
     """Base model."""
+
     def __init__(self, *args, **kwargs):
         pass
 
+    def save(self, *args, **kwargs):
+        pass
 
-class ServerDoc(BaseModel):
+
+class ServerModel(BaseModel):
     """Server Inner Object."""
-    id = Integer()
-    name = Text(fields={'raw': Keyword()})
 
+    def __init__(self, server):
+        """Init."""
+        self.server = server
 
-class ChannelDoc(BaseModel):
-    """Channel Inner Object."""
-    id = Integer()
-    name = Text(fields={'raw': Keyword()})
-
-
-class RoleDoc(BaseModel):
-    """Role Inner Object."""
-    id = Integer()
-    name = Text(fields={'raw': Keyword()})
-
-
-class UserDoc(BaseModel):
-    """Discord user."""
-    name = Text(fields={'raw': Keyword()})
-    id = Integer()
-    discriminator = Integer()
-    bot = Boolean()
-    avatar_url = Text(
-        analyzer=analyzer("simple"),
-        fields={'raw': Keyword()})
-
-    class Meta:
-        doc_type = 'user'
-
-
-class MemberDoc(BaseModel):
-    """Discord member."""
-    id = Integer()
-    name = Text(fields={'raw': Keyword()})
-    display_name = Text(fields={'raw': Keyword()})
-    bot = Boolean()
-    top_role = Nested(doc_class=RoleDoc)
-    roles = Nested(doc_class=RoleDoc)
-    server = Nested(doc_class=ServerDoc)
-
-    class Meta:
-        doc_type = 'member'
-
-    @classmethod
-    def member_dict(cls, member):
-        """Member dictionary."""
-        d = {
-            'id': member.id,
-            'username': member.name,
-            'bot': member.bot
+    def to_dict(self):
+        """Return as dictionary."""
+        return {
+            "id": self.server.id,
+            "name": self.server.name
         }
-        if isinstance(member, Member):
+
+
+class ChannelModel(BaseModel):
+    """Server Inner Object."""
+
+    def __init__(self, channel):
+        """Init."""
+        self.channel = channel
+
+    def to_dict(self):
+        """Return as dictionary."""
+        return {
+            "id": self.channel.id,
+            "name": self.channel.name,
+            "is_default": self.channel.is_default,
+            "position": self.channel.position
+        }
+
+
+class RoleModel(BaseModel):
+    """Role Inner Object."""
+
+    def __init__(self, role):
+        """Init."""
+        self.role = role
+
+    def to_dict(self):
+        """Return as dictionary."""
+        return {
+            "id": self.role.id,
+            "name": self.role.name,
+            "position": self.role.position,
+            "color": {
+                "rgb": self.role.color.to_tuple(),
+                "value": self.role.color.value
+            },
+            "created_at": self.role.created_at.isoformat()
+        }
+
+class RolesModel(BaseModel):
+    """Roles."""
+    def __init__(self, roles):
+        self.roles = roles
+
+    def to_dict(self):
+        """Return as dictionary."""
+        d = []
+        for role in self.roles:
+            role_dict = RoleModel(role).to_dict()
+            d.append(role_dict)
+        d = sorted(d, key=lambda r: r["position"])
+        return {r["position"]: r for r in d}
+
+
+class UserModel(BaseModel):
+    """Discord user."""
+
+    def __init__(self, user):
+        self.user = user
+
+    def to_dict(self):
+        """Return member as dictionary."""
+        return {
+            "name": self.user.name,
+            "id": self.user.id,
+            "discriminator": self.user.discriminator,
+            "bot": self.user.bot,
+            "avatar_url": self.user.avatar_url,
+            "created_at": self.user.created_at.isoformat()
+        }
+
+
+class MemberModel(BaseModel):
+    """Discord member."""
+
+    def __init__(self, member):
+        self.member = member
+
+    def to_dict(self):
+        """Return member as dictionary."""
+        d = UserModel(self.member).to_dict()
+        if isinstance(self.member, Member):
             d.update({
-                'name': member.display_name,
-                'display_name': member.display_name,
-                'roles': [
-                    {'id': r.id, 'name': r.name} for r in member.roles
-                ],
-                'top_role': {
-                    'id': member.top_role.id,
-                    'name': member.top_role.name
-                },
-                'joined_at': member.joined_at
+                'name': self.member.display_name,
+                'display_name': self.member.display_name,
+                'roles': RolesModel(self.member.roles).to_dict(),
+                'top_role': RoleModel(self.member.top_role).to_dict(),
+                'joined_at': self.member.joined_at.isoformat(),
             })
         return d
 
 
-class MemberJoinDoc(MemberDoc):
-    """Discord member join"""
+class BaseEventModel:
+    """Base event."""
 
-    class Meta:
-        doc_type = 'member_join'
+    def __init__(self):
+        pass
 
-    @classmethod
-    def log(cls, member, **kwargs):
+    @property
+    def event_dict(self):
+        return {}
+
+    def save(self):
+        """Save to keen"""
+        print("please overwrite")
+
+
+class MemberEventModel(BaseEventModel):
+    """Discord member events."""
+
+    def __init__(self, member):
+        """Init."""
+        self.member = member
+
+    @property
+    def event_dict(self):
+        """Keen event."""
+        return {
+            "member": MemberModel(self.member).to_dict()
+        }
+
+    def save(self):
+        """Save to Keen."""
         pass
 
 
-class MessageDoc(BaseModel):
+class MemberJoinEventModel(MemberEventModel):
+    """Discord member joins server."""
+
+    def save(self):
+        """Save to Keen."""
+        keen.add_event("member_join", self.event_dict)
+
+
+class MemberRemoveEventModel(MemberEventModel):
+    """Discord member leaves server."""
+
+    def save(self):
+        """Save to Keen."""
+        keen.add_event("member_remove", self.event_dict)
+
+
+class MemberUpdateEventModel(BaseEventModel):
+    """Discord member joins server."""
+
+    def __init__(self, before, after):
+        """Init."""
+        self.before = before
+        self.after = after
+
+    @property
+    def event_dict(self):
+        """Keen event."""
+        return {
+            "before": MemberModel(self.before).to_dict(),
+            "after": MemberModel(self.after).to_dict()
+        }
+
+    def save(self):
+        """Save to Keen."""
+        keen.add_event("member_update", self.event_dict)
+
+
+class MessageEventModel(BaseEventModel):
     """Discord Message."""
-    id = Integer()
-    content = Text(
-        analyzer=analyzer("simple"),
-        fields={'raw': Keyword()}
-    )
-    author = Nested(doc_class=MemberDoc)
-    server = Nested(doc_class=ServerDoc)
-    channel = Nested(doc_class=ChannelDoc)
-    mentions = Nested(doc_class=MemberDoc)
-    timestamp = Date()
 
-    class Meta:
-        doc_type = 'message'
+    def __init__(self, message):
+        self.message = message
 
-    @classmethod
-    def log(cls, message, **kwargs):
-        """Log all."""
-        doc = MessageDoc(
-            content=message.content,
-            embeds=message.embeds,
-            attachments=message.attachments,
-            id=message.id,
-            timestamp=dt.datetime.utcnow()
-        )
-        doc.set_server(message.server)
-        doc.set_channel(message.channel)
-        doc.set_author(message.author)
-        doc.set_mentions(message.mentions)
-        doc.save(**kwargs)
+    @property
+    def author(self):
+        """Message author."""
+        return MemberModel(self.message.author).to_dict()
 
-    def set_author(self, author):
-        """Set author."""
-        self.author = MemberDoc.member_dict(author)
+    @property
+    def server(self):
+        """Message server."""
+        server = self.message.server
+        if server is not None:
+            return ServerModel(server).to_dict()
+        return None
 
-    def set_server(self, server):
-        """Set server."""
-        self.server = {
-            'id': server.id,
-            'name': server.name
+    @property
+    def channel(self):
+        """Message channel."""
+        channel = self.message.channel
+        if channel is not None:
+            return ChannelModel(channel).to_dict()
+        return None
+
+    @property
+    def mentions(self):
+        """Message mentions."""
+        return [MemberModel(m).to_dict() for m in self.message.mentions]
+
+    @property
+    def event_dict(self):
+        """Keen event dictionary."""
+        return {
+            "author": self.author,
+            "server": self.server,
+            "channel": self.channel,
+            "mentions": self.mentions,
+            "content": self.message.content,
+            "id": self.message.id,
+            "embeds": self.message.embeds,
+            "attachments": self.message.attachments
         }
-
-    def set_channel(self, channel):
-        """Set channel."""
-        self.channel = {
-            'id': channel.id,
-            'name': channel.name,
-            'is_default': channel.is_default,
-            'position': channel.position
-        }
-
-    def set_mentions(self, mentions):
-        """Set mentions."""
-        self.mentions = [MemberDoc.member_dict(m) for m in mentions]
 
     def save(self, **kwargs):
-        return super(MessageDoc, self).save(**kwargs)
+        """Save to Keen."""
+        keen.add_event("message", self.event_dict)
 
 
-class MessageDeleteDoc(MessageDoc):
+class MessageDeleteEventModel(MessageEventModel):
     """Discord Message Delete."""
 
-    class Meta:
-        doc_type = 'message_delete'
-
-    @classmethod
-    def log(cls, message, **kwargs):
-        """Log all."""
-        doc = MessageDeleteDoc(
-            content=message.content,
-            embeds=message.embeds,
-            attachments=message.attachments,
-            id=message.id,
-            timestamp=dt.datetime.utcnow()
-        )
-        doc.set_server(message.server)
-        doc.set_channel(message.channel)
-        doc.set_author(message.author)
-        doc.set_mentions(message.mentions)
-        doc.save(**kwargs)
-
     def save(self, **kwargs):
-        return super(MessageDeleteDoc, self).save(**kwargs)
+        """Save to Keen."""
+        keen.add_event("message_delete", self.event_dict)
+
+
+class MessageEditEventModel(BaseEventModel):
+    """Discord Message Edit."""
+
+    def __init__(self, before, after):
+        self.before = MessageEventModel(before)
+        self.after = MessageEventModel(after)
+
+    @property
+    def event_dict(self):
+        """Keen event dictionary."""
+        return {
+            "before": self.before.event_dict,
+            "after": self.after.event_dict
+        }
+
+    def save(self):
+        """Save Keen event."""
+        keen.add_event("message_edit", self.event_dict)
+
+
+class ServerStatsModel(BaseEventModel):
+    """Discord server stats."""
+
+    def __init__(self, server):
+        self.server = server
+
+    @property
+    def event_dict(self):
+        """Keen event dictionary."""
+        d = {
+            "server": ServerModel(self.server).to_dict(),
+            "roles": {},
+            "channels": {},
+            "member_count": len(self.server.members),
+            "role_count": len(self.server.roles),
+            "channel_count": len(self.server.channels)
+        }
+        for role in self.server.roles:
+            rm = RoleModel(role).to_dict()
+            rm["count"] = sum([1 for member in self.server.members if role in member.roles])
+            d["roles"][role.position] = rm
+        for channel in self.server.channels:
+            d["channels"][channel.position] = ChannelModel(channel).to_dict()
+        return d
+
+    def save(self):
+        """Save keen event."""
+        keen.add_event("server_stats", self.event_dict)
 
 
 class KeenLogger:
@@ -263,32 +382,13 @@ class KeenLogger:
     Separated into own class to make migration easier.
     """
 
-    def __init__(self, index_name_fmt=None):
-        self.index_name_fmt = index_name_fmt
-
-    @property
-    def index_name(self):
-        """ES index name.
-
-        Automatically generated using current time.
-        """
-        now = dt.datetime.utcnow()
-        now_str = now.strftime('%Y.%m.%d')
-        index_name = self.index_name_fmt.format(now_str)
-        return index_name
+    def __init__(self):
+        pass
 
     @property
     def now(self):
         """Current time"""
         return dt.datetime.utcnow()
-
-    def log_message(self, message: Message):
-        """Log message v2."""
-        MessageDoc.log(message, index=self.index_name)
-
-    def log_message_delete(self, message: Message):
-        """Log deleted message."""
-        MessageDeleteDoc.log(message, index=self.index_name)
 
     @staticmethod
     def parser():
@@ -340,17 +440,6 @@ class KeenLogger:
             choices=['channel']
         )
         return parser
-
-    def search_author_messages(self, author):
-        """Search messages by author."""
-        s = MessageDoc.search()
-        time_gte = 'now-1d'
-
-        s = s.filter('match', **{'author.id': author.id}) \
-            .query(Range(timestamp={'gte': time_gte, 'lt': 'now'}))
-        for message in s.scan():
-            print('-' * 40)
-            print(message.to_dict())
 
 
 class KeenLogView:
@@ -479,160 +568,6 @@ class KeenLogView:
         return inline(chart)
 
 
-class MessageSearch:
-    """Message author.
-
-    Initialized with a list of all messages.
-    Find the author’s relative rank and other properties.
-    """
-
-    def __init__(self, **kwargs):
-        self.search = MessageDoc.search(**kwargs)
-
-    def time_range(self, time):
-        """ES Range in time"""
-        time_gte = 'now-{}'.format(time)
-        return Range(timestamp={'gte': time_gte, 'lt': 'now'})
-
-    def active_members(self, server, time):
-        """Number of active users during this period."""
-        s = self.search \
-            .query(self.time_range(time)) \
-            .query(Match(**{'server.id': server.id}))
-        return len(set([doc.author.id for doc in s.scan()]))
-
-    def author_lastseen(self, author):
-        """Last known date where author has send a message."""
-        server = author.server
-        s = self.search \
-            .query(Match(**{'server.id': server.id})) \
-            .query(Match(**{'author.id': author.id})) \
-            .sort({'timestamp': {'order': 'desc'}})
-        s = s[0]
-        for hit in s.execute():
-            return hit.timestamp
-
-    def author_rank(self, author, time):
-        """Author’s activity rank on a server."""
-        s = self.search \
-            .query(self.time_range(time)) \
-            .query(Match(**{'server.id': author.server.id}))
-
-        author_ids = [doc.author.id for doc in s.scan()]
-        counter = Counter(author_ids)
-        for rank, (author_id, count) in enumerate(counter.most_common(), 1):
-            if author_id == author.id:
-                return rank
-        return 0
-
-    def author_messages_search(self, author, time):
-        """"All of author’s activity on a server."""
-        s = self.search \
-            .query(self.time_range(time)) \
-            .query(Match(**{'server.id': author.server.id})) \
-            .query(Match(**{'author.id': author.id}))
-        return s
-
-    def author_messages_count(self, author, time):
-        """Total of author’s activity on a server."""
-        return self.author_messages_search(author, time).count()
-
-    def author_channels(self, author, time):
-        """Author’s activity by channel on a server.
-
-        Return as OrderedDict with channel IDs and count.
-        """
-        s = self.author_messages_search(author, time)
-        channel_ids = [doc.to_dict()["channel"]["id"] for doc in s.scan()]
-        channels = OrderedDict()
-        for channel_id, count in Counter(channel_ids).most_common():
-            channels[channel_id] = count
-        return channels
-
-    def server_messages(self, server, parser_args):
-        """all of server messages."""
-        time = parser_args.time
-        s = self.search \
-            .query(self.time_range(time)) \
-            .query(Match(**{'server.id': server.id})) \
-            .sort({'timestamp': {'order': 'asc'}})
-        return s
-
-    def server_author_messages(self, server, author, parser_args):
-        """An author’s messages on a specific server."""
-        time = parser_args.time
-        s = self.search \
-            .query(Match(**{'server.id': server.id})) \
-            .query(Match(**{'author.id': author.id})) \
-            .query(self.time_range(time)) \
-            .sort({'timestamp': {'order': 'asc'}})
-        return s
-
-    def server_members_heatmap(self, server, parser_args=None):
-        """Members heatmap.
-
-        Kibana Visualization request:
-        {
-          "query": {
-            "bool": {
-              "must": [
-                {
-                  "query_string": {
-                    "query": "_type:message AND server.name:\"Reddit Alpha Clan Family\" AND author.bot:false",
-                    "analyze_wildcard": true
-                  }
-                },
-                {
-                  "range": {
-                    "timestamp": {
-                      "gte": 1501018393274,
-                      "lte": 1501104793274,
-                      "format": "epoch_millis"
-                    }
-                  }
-                }
-              ],
-              "must_not": []
-            }
-          },
-          "size": 0,
-          "_source": {
-            "excludes": []
-          },
-          "aggs": {
-            "3": {
-              "terms": {
-                "field": "author.name.keyword",
-                "size": 20,
-                "order": {
-                  "_count": "desc"
-                }
-              },
-              "aggs": {
-                "2": {
-                  "date_histogram": {
-                    "field": "timestamp",
-                    "interval": "30m",
-                    "time_zone": "Asia/Shanghai",
-                    "min_doc_count": 1
-                  }
-                }
-              }
-            }
-          }
-        }
-        """
-        time = parser_args.time
-        s = self.search \
-            .query(Match(**{'server.id': server.id})) \
-            .query(self.time_range(time)) \
-            .sort({'timestamp': {'order': 'asc'}})
-
-        s.aggs.bucket('author_names', 'terms', field='author.name.keyword') \
-            .bucket('overtime', 'date_histogram', field='timestamp', interval='30m')
-        return s
-
-
 class KeenLog:
     """Keen.IO Logging.
 
@@ -642,9 +577,13 @@ class KeenLog:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.message_search = MessageSearch(index="discord-*")
-        self.eslogger = KeenLogger(index_name_fmt='discord-{}')
+        # TODO: remove KeenLogger
+        self.keenlogger = KeenLogger()
         self.view = KeenLogView(bot)
+        self.settings = nested_dict()
+        self.settings.update(dataIO.load_json(JSON))
+        keen.project_id = self.settings["keen_project_id"]
+        keen.write_key = self.settings["keen_write_key"]
 
     @commands.group(pass_context=True, no_pm=True)
     async def keenlogset(self, ctx):
@@ -652,15 +591,51 @@ class KeenLog:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @checks.serverowner_or_permissions()
+    @keenlogset.command(name="api", pass_context=True)
+    async def keenlogset_api(self, ctx, project_id=None, write_key=None):
+        """API settings.
+        
+        Set API settings according to the console.
+        If no settings are displayed, display settings.
+        """
+        if project_id is None:
+            await self.bot.say(
+                'Keen.IO settings:\n'
+                'Project ID: {project_id}\n'
+                'Write Key: {write_key}'.format(
+                    project_id=self.settings["keen_project_id"],
+                    write_key=self.settings["keen_write_key"]
+                )
+            )
+            return
+        self.settings["keen_project_id"] = project_id
+        self.settings["keen_write_key"] = write_key
+        keen.project_id = self.settings["keen_project_id"]
+        keen.write_key = self.settings["keen_write_key"]
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Keen.IO settings updated.")
+        await self.bot.delete_message(ctx.message)
+
+    @keenlogset.command(name="test", pass_context=True)
+    async def keenlogset_test(self, ctx, a, b):
+        """Test keen"""
+        keen.add_event("test", {
+            "a": a,
+            "b": b
+        })
+
     @keenlogset.command(name="logall", pass_context=True, no_pm=True)
     async def keenlogset_logall(self, ctx):
         """Log all gauges."""
-        self.eslogger.log_all_gauges()
-        await self.bot.say("Logged all gauges.")
+        for server in self.bot.servers:
+            ServerStatsModel(server).save()
+
+        await self.bot.say("Logged all server stats")
 
     @checks.serverowner_or_permissions()
     @commands.group(pass_context=True, no_pm=True)
-    async def ownereslog(self, ctx):
+    async def ownerkeenlog(self, ctx):
         """Bot owner level data access.
 
         Mainly difference is that the bot owner is allowed to see data from another server
@@ -669,7 +644,7 @@ class KeenLog:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @ownereslog.command(name="users", pass_context=True, no_pm=True)
+    @ownerkeenlog.command(name="users", pass_context=True, no_pm=True)
     async def ownerkeenlog_users(self, ctx, *args):
         """Show debug"""
         parser = KeenLogger.parser()
@@ -700,7 +675,7 @@ class KeenLog:
 
     @commands.group(pass_context=True, no_pm=True)
     async def keenlog(self, ctx):
-        """Elasticsearch Log"""
+        """Keen.IO Log"""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
@@ -806,7 +781,7 @@ class KeenLog:
         await self.bot.type()
         server = ctx.message.server
 
-        s = MessageDoc.search()
+        s = MessageEventModel.search()
         s = s.filter('match', **{'server.id': server.id})
 
         if p_args.time is not None:
@@ -861,38 +836,35 @@ class KeenLog:
 
     async def on_message(self, message: Message):
         """Track on message."""
-        self.eslogger.log_message(message)
+        MessageEventModel(message).save()
 
     async def on_message_delete(self, message: Message):
         """Track message deletion."""
-        self.eslogger.log_message_delete(message)
+        MessageDeleteEventModel(message).save()
 
-        # async def on_message_edit(self, before: Message, after: Message):
-        #     """Track message editing."""
-        #     self.eslogger.log_message_edit(before, after)
-        #
-        # async def on_member_join(self, member: Member):
-        #     """Track members joining server."""
-        #     self.eslogger.log_member_join(member)
-        #
-        # async def on_member_update(self, before: Member, after: Member):
-        #     """Called when a Member updates their profile.
-        #
-        #     Only track status after.
-        #     """
-        #     self.eslogger.log_member_update(before, after)
-        #
-        # async def on_member_remove(self, member: Member):
-        #     """Track members leaving server."""
-        #     self.eslogger.log_member_remove(member)
-        #
-        # async def on_ready(self):
-        #     """Bot ready."""
-        #     self.eslogger.log_all_gauges()
-        #
+    async def on_message_edit(self, before: Message, after: Message):
+        """Track message editing."""
+        MessageEditEventModel(before, after).save()
+
+    async def on_member_join(self, member: Member):
+        """Track members joining server."""
+        MemberJoinEventModel(member).save()
+
+    async def on_member_update(self, before: Member, after: Member):
+        """Called when a Member updates their profile."""
+        MemberUpdateEventModel(before, after).save()
+
+    async def on_member_remove(self, member: Member):
+        """Track members leaving server."""
+        MemberRemoveEventModel(member).save()
+
+    # async def on_ready(self):
+    #     """Bot ready."""
+    #     ServerStatsModel(self.bot.server).save()
+
         # async def on_resume(self):
         #     """Bot resume."""
-        #     self.eslogger.log_all_gauges()
+        #     self.keenlogger.log_all_gauges()
 
 
 def check_folder():
