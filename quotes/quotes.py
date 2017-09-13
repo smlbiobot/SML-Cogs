@@ -59,7 +59,7 @@ class Quotes:
             await send_cmd_help(ctx)
 
     @quoteset.command(name="add", aliases=['a'], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
+    @checks.mod_or_permissions(manage_roles=True)
     async def quoteset_add(self, ctx, name, *, quote):
         """Add a quote."""
         server = ctx.message.server
@@ -79,7 +79,7 @@ class Quotes:
         await self.bot.say("Quote saved.")
 
     @quoteset.command(name="edit", aliases=['e'], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
+    @checks.mod_or_permissions(manage_roles=True)
     async def quoteset_edit(self, ctx, name, *, quote):
         """Edit a quote."""
         server = ctx.message.server
@@ -88,7 +88,7 @@ class Quotes:
         await self.bot.say("Quote saved.")
 
     @quoteset.command(name="remove", aliases=['r', 'rm'], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
+    @checks.mod_or_permissions(manage_roles=True)
     async def quoteset_remove(self, ctx, name):
         """Remove a quote."""
         server = ctx.message.server
