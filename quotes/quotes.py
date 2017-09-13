@@ -110,6 +110,8 @@ class Quotes:
             await self.bot.say("No quotes found on this server.")
             return
 
+        qs = sorted(qs)
+
         for page in pagify(', '.join(qs)):
             await self.bot.say(page)
 
