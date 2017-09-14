@@ -318,12 +318,12 @@ class CRClanMemberModel:
 
     @property
     def arena_str(self):
-        """Arena. eg: Master III : League 6"""
+        """Arena. eg: Arena 10: Hog Mountain"""
         arena = self.data.get('arena', None)
         if arena is not None:
             return '{}: {}'.format(
-                arena.get('name', ''),
-                arena.get('arena', '')
+                arena.get('arena', ''),
+                arena.get('name', '')
             )
         return ''
 
@@ -838,7 +838,6 @@ class CRClanRosterView:
                 mention = ''
                 if discord_member is not None:
                     mention = discord_member.mention
-                # arena = self.model.trophy2arena(data.score)
                 arena = data.arena_str
                 """ Rank str
                 41 ↓ 31
