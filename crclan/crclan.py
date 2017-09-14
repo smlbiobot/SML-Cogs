@@ -1351,7 +1351,7 @@ class CRClan:
         dc_names = [m.mention for m in dc_members]
 
         # alphabetical list of members in CR App
-        cr_members = [CRClanMemberModel(**m) for m in data.members]
+        cr_members = [CRClanMemberModel(m) for m in data.members]
         cr_names = [m.name for m in cr_members]
         cr_names = sorted(cr_names, key=lambda x: x.lower())
 
