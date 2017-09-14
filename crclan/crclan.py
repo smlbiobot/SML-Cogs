@@ -212,12 +212,15 @@ class CRClanModel:
     @property
     def member_count(self):
         """Member count."""
-        return self.data.get('numberOfMembers', None)
+        return self.data.get('memberCount', None)
 
     @property
-    def region(self):
+    def region_name(self):
         """Region."""
-        return self.data.get('region', None)
+        region = self.data.get('region', None)
+        if region is not None:
+            return region.get('name', None)
+        return None
 
     @property
     def required_score(self):
@@ -232,12 +235,7 @@ class CRClanModel:
     @property
     def member_count_str(self):
         """Member count in #/50 format."""
-        count = None
-        if hasattr(self, 'numberOfMembers'):
-            count = self.numberOfMembers
-        if count is None:
-            count = 0
-        return '{}/50'.format(count)
+        return '{}/50'.format(self.member_count)
 
     @property
     def tag(self):
@@ -761,10 +759,11 @@ class CRClanInfoView:
             color=color,
             url=url)
         em.add_field(name="Clan Trophies", value=data.score)
-        em.add_field(name="Type", value=CRClanType(data.type).typename)
+        em.add_field(name="Type", value=data.type_name)
         em.add_field(name="Required Trophies", value=data.required_score)
         em.add_field(name="Clan Tag", value=data.tag)
         em.add_field(name="Members", value=data.member_count_str)
+        em.add_field(name="Region", value=data.region_name)
         badge_url = '{}{}'.format(self.model.badge_url, data.badge_url)
         em.set_thumbnail(url=badge_url)
         em.set_footer(text=url, icon_url=cr_api_logo_url)
