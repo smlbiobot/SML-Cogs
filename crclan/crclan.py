@@ -77,12 +77,13 @@ def random_discord_color():
     color = int(color, 16)
     return discord.Color(value=color)
 
+
 def clan_url(clan_tag):
     """Return clan URL on CR-API."""
     return 'http://cr-api.com/clan/{}'.format(clan_tag)
 
-cr_api_logo_url = 'https://smlbiobot.github.io/img/cr-api/cr-api-logo.png'
 
+cr_api_logo_url = 'https://smlbiobot.github.io/img/cr-api/cr-api-logo.png'
 
 
 class SCTag:
@@ -136,49 +137,6 @@ class SCTag:
             ))
 
 
-class CRArenaModel:
-    """Clash Royale arenas."""
-
-    def __init__(self, **kwargs):
-        """Init.
-
-        Keyword Args:
-            Name (str)
-            TID (str)
-            TIDText (str)
-            SubtitleTID (str)
-            SubtitleTIDText (str)
-            Arena (int)
-            ChestArena (str)
-            TvArena (str)
-            IsInUse (bool)
-            TrainingCamp (bool)
-            PVEArena (str)
-            TrophyLimit (int)
-            DemoteTrophyLimit (int)
-            SeasonTrophyReset (str)
-            ChestRewardMultiplier (int)
-            ChestShopPriceMultiplier (int)
-            RequestSize (int)
-            MaxDonationCountCommon (int)
-            MaxDonationCountRare (int)
-            MaxDonationCountEpic (int)
-            IconSWF (str)
-            IconExportName (str)
-            MainMenuIconExportName (str)
-            SmallIconExportName (str)
-            MatchmakingMinTrophyDelta (int)
-            MatchmakingMaxTrophyDelta (int)
-            MatchmakingMaxSeconds (int)
-            PvpLocation (str)
-            TeamVsTeamLocation (str)
-            DailyDonationCapacityLimit (int)
-            BattleRewardGold (str)
-            ReleaseDate (str)
-        """
-        self.__dict__.update(kwargs)
-
-
 class CRClanType(Enum):
     """Clash Royale clan type."""
 
@@ -209,26 +167,6 @@ class CRClanModel:
 
     def __init__(self, data=None, is_cache=False, timestamp=None, loaded=True):
         """Init.
-
-        Expected list of keywords:
-        From API:
-            badge
-            badge_url
-            currentRank
-            description
-            donations
-            members
-            name
-            numberOfMembers
-            region
-            requiredScore
-            score
-            tag
-            type
-            typeName
-        From cog:
-            key
-            role
         """
         # self.__dict__.update(kwargs)
         self.data = data
@@ -344,32 +282,8 @@ class CRClanMemberModel:
 
     def __init__(self, data):
         """Init.
-
-        Expected list of keywords:
-        From API:
-            arena
-            avatarId
-                high
-                low
-                unsigned
-            clanChestCrowns
-            currentRank
-            donations
-            expLevel
-            homeID
-                high
-                low
-                unsigned
-            league
-            name
-            previousRank
-            role
-            roleName
-            score
-            tag
         """
         self.data = data
-        # self.__dict__.update(kwargs)
         self._discord_member = None
 
     @property
@@ -399,8 +313,19 @@ class CRClanMemberModel:
 
     @property
     def arena(self):
-        """Arena"""
+        """Arena object."""
         return self.data.get('arena', None)
+
+    @property
+    def arena_str(self):
+        """Arena. eg: Master III : League 6"""
+        arena = self.data.get('arena', None)
+        if arena is not None:
+            return '{}: {}'.format(
+                arena.get('name', ''),
+                arena.get('arena', '')
+            )
+        return ''
 
     @property
     def role(self):
@@ -431,15 +356,7 @@ class CRClanMemberModel:
     @property
     def role_name(self):
         """Properly formatted role name."""
-        if self.role == 1:
-            return "Member"
-        elif self.role == 2:
-            return "Leader"
-        elif self.role == 3:
-            return "Elder"
-        elif self.role == 4:
-            return "Co-Leader"
-        return ""
+        return self.data.get('roleName', None)
 
     @property
     def previousRank(self):
@@ -510,6 +427,7 @@ class CRClanMemberModel:
                     return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
+
 class SettingsException(Exception):
     pass
 
@@ -559,11 +477,6 @@ class CogModel:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(filepath))
         self.bot = bot
-
-        # arenas
-        arenas = dataIO.load_json(os.path.join(PATH, 'arenas.json'))
-        self.arenas = [CRArenaModel(**a) for a in arenas]
-        self.arenas = sorted(self.arenas, key=lambda x: x.TrophyLimit, reverse=True)
 
     def init_server(self, server):
         """Initialized server settings.
@@ -767,17 +680,6 @@ class CogModel:
             pass
         return None
 
-    def trophy2arena(self, trophy):
-        """Convert trophy to league based on Arenas."""
-        result = None
-        for arena in self.arenas:
-            if trophy >= arena.TrophyLimit:
-                result = arena
-                break
-
-        if result is not None:
-            return '{}: {}'.format(result.TIDText, result.SubtitleTIDText)
-
     @property
     def clan_api_url(self):
         """Clan API URL."""
@@ -936,7 +838,8 @@ class CRClanRosterView:
                 mention = ''
                 if discord_member is not None:
                     mention = discord_member.mention
-                arena = self.model.trophy2arena(data.score)
+                # arena = self.model.trophy2arena(data.score)
+                arena = data.arena_str
                 """ Rank str
                 41 ↓ 31
                 """
@@ -1100,7 +1003,6 @@ class CRClan:
                 "{} is not a clan tag you have added".format(tag))
         else:
             await self.bot.say("Added {} for clan #{}.".format(key, tag))
-
 
     @commands.group(pass_context=True, no_pm=True)
     async def crclan(self, ctx):
@@ -1387,12 +1289,6 @@ class CRClan:
 
         if data_is_cached:
             await self.bot.say(data.cache_message)
-
-    @crclan.command(name="trophy2arena", pass_context=True, no_pm=True)
-    async def crclan_trophy2arena(self, ctx, trophy: int):
-        """Convert trophies to arenas."""
-        text = self.model.trophy2arena(trophy)
-        await self.bot.say(text)
 
 
 def check_folder():
