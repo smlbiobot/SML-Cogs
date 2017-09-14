@@ -207,7 +207,7 @@ class CRClanType(Enum):
 class CRClanModel:
     """Clash Royale Clan data."""
 
-    def __init__(self, is_cache=False, timestamp=None, loaded=True, **kwargs):
+    def __init__(self, data=None, is_cache=False, timestamp=None, loaded=True):
         """Init.
 
         Expected list of keywords:
@@ -230,10 +230,66 @@ class CRClanModel:
             key
             role
         """
-        self.__dict__.update(kwargs)
+        # self.__dict__.update(kwargs)
+        self.data = data
         self.is_cache = is_cache
         self.timestamp = timestamp
         self.loaded = loaded
+
+    @property
+    def badge(self):
+        """Badge."""
+        return self.data.get('badge', None)
+
+    @property
+    def badge_url(self):
+        """Badge URL."""
+        return self.data.get('badge_url', None)
+
+    @property
+    def current_rank(self):
+        """Current rank."""
+        return self.data.get('currentRank', None)
+
+    @property
+    def description(self):
+        """Description."""
+        return self.data.get('description', None)
+
+    @property
+    def donations(self):
+        """Donations."""
+        return self.data.get('donations', None)
+
+    @property
+    def members(self):
+        """Members."""
+        return self.data.get('members', None)
+
+    @property
+    def name(self):
+        """Name."""
+        return self.data.get('name', None)
+
+    @property
+    def member_count(self):
+        """Member count."""
+        return self.data.get('numberOfMembers', None)
+
+    @property
+    def region(self):
+        """Region."""
+        return self.data.get('region', None)
+
+    @property
+    def required_score(self):
+        """Trophy requirement."""
+        return self.data.get('requiredScore', None)
+
+    @property
+    def score(self):
+        """Trophies."""
+        return self.data.get('score', None)
 
     @property
     def member_count_str(self):
@@ -244,6 +300,21 @@ class CRClanModel:
         if count is None:
             count = 0
         return '{}/50'.format(count)
+
+    @property
+    def tag(self):
+        """Tag."""
+        return self.data.get('tag', None)
+
+    @property
+    def type(self):
+        """Type."""
+        return self.data.get('type', None)
+
+    @property
+    def type_name(self):
+        """"Type name."""
+        return self.data.get('typeName', None)
 
     @property
     def valid(self):
@@ -271,7 +342,7 @@ class CRClanModel:
 class CRClanMemberModel:
     """Clash Royale Member data."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, data):
         """Init.
 
         Expected list of keywords:
@@ -297,8 +368,49 @@ class CRClanMemberModel:
             score
             tag
         """
-        self.__dict__.update(kwargs)
+        self.data = data
+        # self.__dict__.update(kwargs)
         self._discord_member = None
+
+    @property
+    def name(self):
+        """Name aka IGN."""
+        return self.data.get('name', None)
+
+    @property
+    def tag(self):
+        """Player tag."""
+        return self.data.get('tag', None)
+
+    @property
+    def score(self):
+        """Player trophies."""
+        return self.data.get('score', None)
+
+    @property
+    def donations(self):
+        """Donations."""
+        return self.data.get('donations', None)
+
+    @property
+    def clan_chest_crowns(self):
+        """Clan chest crowns"""
+        return self.data.get('clanChestCrowns', None)
+
+    @property
+    def arena(self):
+        """Arena"""
+        return self.data.get('arena', None)
+
+    @property
+    def role(self):
+        """Role ID"""
+        return self.data.get('role', None)
+
+    @property
+    def exp_level(self):
+        """Experience level."""
+        return self.data.get('expLevel', None)
 
     @property
     def discord_member_id(self):
@@ -330,9 +442,14 @@ class CRClanMemberModel:
         return ""
 
     @property
+    def previousRank(self):
+        """Previous rank."""
+        return self.data.get('previousRank')
+
+    @property
     def currentRank(self):
         """API has typo."""
-        return self.currenRank
+        return self.data.get('currentRank')
 
     @property
     def rank(self):
@@ -608,7 +725,7 @@ class CogModel:
         is_cache = False
         timestamp = dt.datetime.utcnow()
 
-        return CRClanModel(is_cache, timestamp, **data)
+        return CRClanModel(data=data, is_cache=is_cache, timestamp=timestamp)
 
     def cached_clan_data(self, tag):
         """Load cached clan data. Used when live update failed."""
@@ -617,7 +734,7 @@ class CogModel:
             is_cache = True
             data = dataIO.load_json(filepath)
             timestamp = dt.datetime.fromtimestamp(os.path.getmtime(filepath))
-            return CRClanModel(is_cache, timestamp, **data)
+            return CRClanModel(data=data, is_cache=is_cache, timestamp=timestamp)
         return None
 
     @staticmethod
@@ -743,7 +860,7 @@ class CRClanInfoView:
             url=url)
         em.add_field(name="Clan Trophies", value=data.score)
         em.add_field(name="Type", value=CRClanType(data.type).typename)
-        em.add_field(name="Required Trophies", value=data.requiredScore)
+        em.add_field(name="Required Trophies", value=data.required_score)
         em.add_field(name="Clan Tag", value=data.tag)
         em.add_field(name="Members", value=data.member_count_str)
         badge_url = '{}{}'.format(self.model.badge_url, data.badge_url)
@@ -805,15 +922,15 @@ class CRClanRosterView:
         em.set_footer(text=footer_text, icon_url=footer_icon_url)
         for member in members:
             if member is not None:
-                data = CRClanMemberModel(**member)
+                data = CRClanMemberModel(member)
                 discord_member = self.model.tag2member(server, data.tag)
                 name = (
                     "{0.name}, {0.role_name} "
-                    "(Lvl {0.expLevel})").format(data)
+                    "(Lvl {0.exp_level})").format(data)
                 stats = (
                     "{0.score:,d}"
                     " | {0.donations:\u00A0>4} d"
-                    " | {0.clanChestCrowns:\u00A0>3} c"
+                    " | {0.clan_chest_crowns:\u00A0>3} c"
                     " | #{0.tag}").format(data)
                 stats = inline(stats)
                 mention = ''
