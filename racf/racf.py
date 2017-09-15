@@ -1170,6 +1170,26 @@ class RACF:
                     await self.bot.say(
                         "Unable to send DM to {}. User might have a stricter DM setting.".format(member))
 
+    @commands.command(pass_context=True, no_pm=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def fixme(self, ctx):
+        """Leader fix role permissions."""
+        await self.bot.say("Fix me")
+        author = ctx.message.author
+        for role in author.roles:
+            if role.name in ["Bot Commander", "Leader", "Co-Leader", "Member"]:
+                try:
+                    await self.bot.remove_roles(author, role)
+                    await self.bot.add_roles(author, role)
+                    await self.bot.say(
+                        "Removed and re-added {} to {}.".format(
+                            role, author))
+                except discord.errors.Forbidden:
+                    await self.bot.say(
+                        "I am not allowed to remove {} from {}.".format(
+                            role, author))
+
+
     async def run_iosfix(self, ctx: Context, *members: discord.Member):
         """Actual fix to allow members without the bot commander to run on themselves."""
         for member in members:
