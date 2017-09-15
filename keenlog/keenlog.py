@@ -583,17 +583,18 @@ class KeenLog:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
         keen.project_id = self.settings["keen_project_id"]
+        keen.read_key = self.settings["keen_read_key"]
         keen.write_key = self.settings["keen_write_key"]
 
-    @commands.group(pass_context=True, no_pm=True)
+    @commands.group(pass_context=True)
     async def keenlogset(self, ctx):
         """ES Log settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @checks.serverowner_or_permissions()
+    @checks.is_owner()
     @keenlogset.command(name="api", pass_context=True)
-    async def keenlogset_api(self, ctx, project_id=None, write_key=None):
+    async def keenlogset_api(self, ctx, project_id=None, read_key=None, write_key=None):
         """API settings.
         
         Set API settings according to the console.
@@ -603,16 +604,20 @@ class KeenLog:
             await self.bot.say(
                 'Keen.IO settings:\n'
                 'Project ID: {project_id}\n'
+                'Read Key: {read_key}\n'
                 'Write Key: {write_key}'.format(
                     project_id=self.settings["keen_project_id"],
+                    read_key=self.settings["keen_read_key"],
                     write_key=self.settings["keen_write_key"]
                 )
             )
             return
         self.settings["keen_project_id"] = project_id
         self.settings["keen_write_key"] = write_key
+        self.settings["keen_read_key"] = read_key
         keen.project_id = self.settings["keen_project_id"]
         keen.write_key = self.settings["keen_write_key"]
+        keen.read_key = self.settings["keen_read_key"]
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Keen.IO settings updated.")
         await self.bot.delete_message(ctx.message)
@@ -718,25 +723,72 @@ class KeenLog:
 
         await self.bot.type()
 
-        mds = self.message_search
+        # mds = self.message_search
 
         time = p_args.time
-        rank = mds.author_rank(member, time)
-        channels = mds.author_channels(member, time)
-        active_members = mds.active_members(member.server, time)
-        message_count = mds.author_messages_count(member, time)
-        last_seen = mds.author_lastseen(member)
+        # rank = mds.author_rank(member, time)
+        # channels = mds.author_channels(member, time)
+        # active_members = mds.active_members(member.server, time)
+        # message_count = mds.author_messages_count(member, time)
+        # last_seen = mds.author_lastseen(member)
 
-        await self.bot.say(
-            embed=self.view.embed_member(
-                member=member,
-                active_members=active_members,
-                rank=rank,
-                channels=channels,
-                p_args=p_args,
-                message_count=message_count,
-                last_seen=last_seen
-            ))
+        resp = keen.count(
+            "message",
+            filters=[
+                {
+                    "property_name": "author.id",
+                    "operator": "eq",
+                    "property_value": member.id
+                },
+                {
+                    "property_name": "server.id",
+                    "operator": "eq",
+                    "property_value": ctx.message.server.id
+                }
+            ],
+            timeframe='this_7_days',
+            group_by='channel.id'
+        )
+        resp = sorted(resp, key=lambda r: r["result"], reverse=True)
+
+        # Embed
+        em = discord.Embed(
+            title="Member Activity: {}".format(member.display_name),
+            description=KeenLogView.description(p_args, show_top=False),
+            color=random_discord_color()
+        )
+
+        total_message_count = sum([r["result"] for r in resp])
+
+        # em.add_field(
+        #     name="Rank",
+        #     value="{} / {} (active) / {} (all)".format(
+        #         rank, active_members, len(member.server.members)
+        #     )
+        # )
+        em.add_field(name="Messages", value=total_message_count)
+        # last_seen_str = last_seen.strftime("%Y-%m-%d %H:%M:%S UTC")
+        # em.add_field(name="Last seen", value=last_seen_str)
+
+        max_count = None
+
+        for r in resp[:p_args.count]:
+            count = r["result"]
+            if max_count is None:
+                max_count = count
+            print(r)
+            channel = member.server.get_channel(r["channel.id"])
+            chart = KeenLogView.inline_barchart(count, max_count)
+            if channel is not None:
+                channel_name = channel.name
+            else:
+                channel_name = 'None'
+            em.add_field(
+                name='{}: {} message'.format(channel_name, count),
+                value=chart,
+                inline=False)
+
+        await self.bot.say(embed=em)
 
     @keenlog.command(name="users", aliases=['us'], pass_context=True, no_pm=True)
     async def keenlog_users(self, ctx, *args):
@@ -781,41 +833,81 @@ class KeenLog:
         await self.bot.type()
         server = ctx.message.server
 
-        s = MessageEventModel.search()
-        s = s.filter('match', **{'server.id': server.id})
-
-        if p_args.time is not None:
-            s = s.filter('range', timestamp={'gte': 'now-{}/m'.format(p_args.time), 'lte': 'now/m'})
-        if p_args.includechannels is not None:
-            for channel in p_args.includechannels:
-                s = s.filter('match', **{'channel.name.keyword': channel})
-        if p_args.excludechannels is not None:
-            for channel in p_args.excludechannels:
-                s = s.query('bool', must_not=[Q('match', **{'channel.name.keyword': channel})])
-        if p_args.includeroles is not None:
-            for role in p_args.includeroles:
-                s = s.filter('match', **{'author.roles.name.keyword': role})
-        if p_args.excluderoles is not None:
-            for role in p_args.excluderoles:
-                s = s.query('bool', must_not=[Q('match', **{'author.roles.name.keyword': role})])
-        if p_args.excludebot:
-            s = s.filter('match', **{'author.bot': False})
+        # s = MessageEventModel.search()
+        # s = s.filter('match', **{'server.id': server.id})
+        #
+        # if p_args.time is not None:
+        #     s = s.filter('range', timestamp={'gte': 'now-{}/m'.format(p_args.time), 'lte': 'now/m'})
+        # if p_args.includechannels is not None:
+        #     for channel in p_args.includechannels:
+        #         s = s.filter('match', **{'channel.name.keyword': channel})
+        # if p_args.excludechannels is not None:
+        #     for channel in p_args.excludechannels:
+        #         s = s.query('bool', must_not=[Q('match', **{'channel.name.keyword': channel})])
+        # if p_args.includeroles is not None:
+        #     for role in p_args.includeroles:
+        #         s = s.filter('match', **{'author.roles.name.keyword': role})
+        # if p_args.excluderoles is not None:
+        #     for role in p_args.excluderoles:
+        #         s = s.query('bool', must_not=[Q('match', **{'author.roles.name.keyword': role})])
+        # if p_args.excludebot:
+        #     s = s.filter('match', **{'author.bot': False})
 
         # s = self.message_search.server_messages(server, p_args)
 
-        results = [{
-            "author_id": doc.author.id,
-            "channel_id": doc.channel.id,
-            "timestamp": doc.timestamp,
-            "rng_index": None,
-            "rng_timestamp": None,
-            "doc": doc
-        } for doc in s.scan()]
 
-        server = ctx.message.server
 
-        embed = self.view.embed_members(server, results, p_args)
-        await self.bot.say(embed=embed)
+        resp = keen.count(
+            "message",
+            filters=[
+                {
+                    "property_name": "server.id",
+                    "operator": "eq",
+                    "property_value": server.id
+                }
+            ],
+            timeframe='this_7_days',
+            group_by=['author.id']
+        )
+        resp = sorted(resp, key=lambda r: r["result"], reverse=True)
+        # Embed
+        em = discord.Embed(
+            title="{}: User activity by messages".format(server.name),
+            description=KeenLogView.description(p_args),
+            color=random_discord_color()
+        )
+
+        total_message_count = sum([r["result"] for r in resp])
+
+        # em.add_field(
+        #     name="Rank",
+        #     value="{} / {} (active) / {} (all)".format(
+        #         rank, active_members, len(member.server.members)
+        #     )
+        # )
+        em.add_field(name="Messages", value=total_message_count)
+        # last_seen_str = last_seen.strftime("%Y-%m-%d %H:%M:%S UTC")
+        # em.add_field(name="Last seen", value=last_seen_str)
+
+        max_count = None
+
+        for r in resp[:p_args.count]:
+            count = r["result"]
+            if max_count is None:
+                max_count = count
+            print(r)
+            member = server.get_member(r["author.id"])
+            chart = KeenLogView.inline_barchart(count, max_count)
+            if member is not None:
+                member_name = member.display_name
+            else:
+                member_name = 'User {}'.format(r["author.id"])
+            em.add_field(
+                name='{}: {} message'.format(member_name, count),
+                value=chart,
+                inline=False)
+
+        await self.bot.say(embed=em)
 
     @keenlog.command(name="userheatmap", pass_context=True, no_pm=True)
     async def keenlog_userheatmap(self, ctx, *args):
@@ -858,13 +950,6 @@ class KeenLog:
         """Track members leaving server."""
         MemberRemoveEventModel(member).save()
 
-    # async def on_ready(self):
-    #     """Bot ready."""
-    #     ServerStatsModel(self.bot.server).save()
-
-        # async def on_resume(self):
-        #     """Bot resume."""
-        #     self.keenlogger.log_all_gauges()
 
 
 def check_folder():

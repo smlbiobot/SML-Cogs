@@ -183,7 +183,7 @@ class Trophies:
             our_clans = 'Brawl Stars bands'
 
         description = (
-            "Minimum trophies trophies to join our {}. "
+            "Minimum trophies to join our {}. "
             "Current trophies required."
         ).format(our_clans)
 

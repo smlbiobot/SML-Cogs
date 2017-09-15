@@ -54,7 +54,7 @@ connections.create_connection(hosts=['localhost'], timeout=20)
 
 INTERVAL = timedelta(hours=4).seconds
 
-PATH = os.path.join('data', 'eslog')
+PATH = os.path.join('data', 'keenlog')
 JSON = os.path.join(PATH, 'settings.json')
 
 EMOJI_P = re.compile('\<\:.+?\:\d+\>')
@@ -297,7 +297,7 @@ class ESLogger:
     def parser():
         """Process arguments."""
         # Process arguments
-        parser = argparse.ArgumentParser(prog='[p]eslog uers')
+        parser = argparse.ArgumentParser(prog='[p]keenlog uers')
         # parser.add_argument('key')
         parser.add_argument(
             '-t', '--time',
@@ -728,7 +728,7 @@ class ESLog:
           Exclude bot commands. 
         
         Example:
-        [p]eslog user --time 2d --count 20 --include general some-channel
+        [p]keenlog user --time 2d --count 20 --include general some-channel
         Counts number of messages sent by authors within last 2 days in channels #general and #some-channel
         
         Note:
@@ -795,7 +795,7 @@ class ESLog:
           Split chart
         
         Example:
-        [p]eslog user --time 2d --count 20 --include general some-channel
+        [p]keenlog user --time 2d --count 20 --include general some-channel
         Counts number of messages sent by authors within last 2 days in channels #general and #some-channel
         
         Note:
