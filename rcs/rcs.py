@@ -141,7 +141,7 @@ class RCS:
 
     @checks.mod_or_permissions(manage_roles=True)
     @rcs.command(name="verify", aliases=["v"], pass_context=True, no_pm=True)
-    async def verify(self, ctx, member: discord.Member, tag):
+    async def verify(self, ctx, member: discord.Member, tag, *, options=None):
         """Verify RCS membership using player tag.
         
         1. Check clan information via CR Profile API
@@ -149,7 +149,17 @@ class RCS:
         3. Assign Trused + clan roles.
         4. Rename user to IGN (Role)
         
+        Options:
+        add --notourney as last parameter to not add the Tournaments role
+        
         """
+        # Check options
+        if options is None:
+            options = ''
+        options = options.split(' ')
+
+        include_tourney = '--notourney' not in options
+
         # Check clan info
         if tag.startswith('#'):
             tag = tag[1:]
@@ -166,7 +176,10 @@ class RCS:
         clan_settings = self.settings[server.id]["clans"][player_clan_tag]
 
         # Assign roles
-        await self.changerole(ctx, member, "Trusted", "Tournaments", clan_settings["role_name"])
+        roles = ["Trusted", clan_settings["role_name"]]
+        if include_tourney:
+            roles.append('Tournaments')
+        await self.changerole(ctx, member, *roles)
 
         # Rename member to IGN (role_nick)
         nick = "{ign} ({role_nick})".format(
