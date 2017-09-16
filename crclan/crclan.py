@@ -41,7 +41,7 @@ from __main__ import send_cmd_help
 from discord.ext import commands
 
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline, pagify, escape
+from cogs.utils.chat_formatting import inline, pagify
 from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "crclan")
@@ -1294,8 +1294,12 @@ class CRClan:
             await self.bot.say(data.cache_message)
 
     @crclan.command(name='iaudit', aliases=['ia'], pass_context=True, no_pm=True)
-    async def crclan_iaudit(self, ctx, clankey, clanrole_name):
-        """Interactive audit of clans by clan key and rolename."""
+    async def crclan_iaudit(self, ctx, clankey, clanrole_name, *, options=None):
+        """Interactive audit of clans by clan key and rolename.
+        
+        Options:
+        --removerole   Remove clan role from people who aren’t in clan
+        """
         server = ctx.message.server
 
         clan_tag = self.model.key2tag(server, clankey)
@@ -1303,6 +1307,13 @@ class CRClan:
         if clan_tag is None:
             await self.bot.say("Cannot find clan tag with the clan key. Aborting…")
             return
+
+        # - Check options
+        if options is None:
+            options = ''
+        options = options.split(' ')
+
+        option_remove_role = '--removerole' in options
 
         # - get clan data
         clan_data = await self.model.get_clan_data(server, key=clankey)
@@ -1341,6 +1352,20 @@ class CRClan:
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
 
+        # remove role from members not in clan
+        print(option_remove_role)
+        if option_remove_role:
+            mm = self.bot.get_cog("MemberManagement")
+            for m in dc_members_not_in_clan:
+                try:
+                    await self.bot.remove_roles(m, clanrole)
+                    await self.bot.say("Removed {} from {}".format(clanrole.name, m.display_name))
+                except discord.Forbidden:
+                    await self.bot.say("You do not have permissions to revoke these roles.")
+                    continue
+                except discord.HTTPException:
+                    await self.bot.say("Removing roles failed for unknown reasons.")
+                    continue
 
 
 def check_folder():
