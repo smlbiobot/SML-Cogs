@@ -462,8 +462,7 @@ class MemberManagement:
 
             if role_in_either:
                 # respect role hiearchy
-                rh = server.role_hierarchy
-                if rh.index(role) <= rh.index(author.top_role):
+                if role.position >= author.top_role.position:
                     await self.bot.say(
                         "{} does not have permission to edit {}.".format(
                             author.display_name, role.name))
