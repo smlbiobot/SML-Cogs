@@ -117,7 +117,17 @@ class Quotes:
 
     @commands.command(aliases=['q'], pass_context=True, no_pm=True)
     async def quote(self, ctx, name):
-        """Show quotes by name."""
+        """Show quotes by name.
+        
+        List the list of available quotes by
+        [p]quote list
+        [p]q l
+        """
+        # If name is list, invoke qs list instead
+        if name == 'list' or name == 'l':
+            await ctx.invoke(self.quoteset_list)
+            return
+
         server = ctx.message.server
         try:
             q = self.settings[server.id].get(name, None)
