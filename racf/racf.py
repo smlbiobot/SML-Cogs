@@ -351,7 +351,7 @@ class RACF:
                 await self.bot.say(
                     "I don’t have permission to change nick for this user.")
             else:
-                await self.bot.say("{} changed to {}.".format(member.mention, player.username))
+                await self.bot.say("{} changed to {}.".format(member.mention, ign))
 
         # - Check clan
         player_clan_tag = player.get('clanTag', None)
