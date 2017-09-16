@@ -1353,7 +1353,6 @@ class CRClan:
                 await self.bot.say(page)
 
         # remove role from members not in clan
-        print(option_remove_role)
         if option_remove_role:
             mm = self.bot.get_cog("MemberManagement")
             for m in dc_members_not_in_clan:
