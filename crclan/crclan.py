@@ -41,7 +41,7 @@ from __main__ import send_cmd_help
 from discord.ext import commands
 
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline
+from cogs.utils.chat_formatting import inline, pagify, escape
 from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "crclan")
@@ -205,6 +205,11 @@ class CRClanModel:
         return self.data.get('members', None)
 
     @property
+    def member_tags(self):
+        """List of member tags."""
+        return [m["tag"] for m in self.members]
+
+    @property
     def name(self):
         """Name."""
         return self.data.get('name', None)
@@ -359,12 +364,12 @@ class CRClanMemberModel:
     @property
     def previousRank(self):
         """Previous rank."""
-        return self.data.get('previousRank')
+        return self.data.get('previousRank', 0)
 
     @property
     def currentRank(self):
         """API has typo."""
-        return self.data.get('currentRank')
+        return self.data.get('currentRank', 0)
 
     @property
     def rank(self):
@@ -1287,6 +1292,55 @@ class CRClan:
 
         if data_is_cached:
             await self.bot.say(data.cache_message)
+
+    @crclan.command(name='iaudit', aliases=['ia'], pass_context=True, no_pm=True)
+    async def crclan_iaudit(self, ctx, clankey, clanrole_name):
+        """Interactive audit of clans by clan key and rolename."""
+        server = ctx.message.server
+
+        clan_tag = self.model.key2tag(server, clankey)
+
+        if clan_tag is None:
+            await self.bot.say("Cannot find clan tag with the clan key. Aborting…")
+            return
+
+        # - get clan data
+        clan_data = await self.model.get_clan_data(server, key=clankey)
+
+        # - get list of people with rolename
+        clanrole = discord.utils.get(server.roles, name=clanrole_name)
+        dc_members = self.model.discord_members_by_clankey(server, key=clankey)
+
+        # - assert members have same clan tag as api
+        dc_members_not_in_clan = []
+        dc_members_with_no_player_tag = []
+
+        for dc_member in dc_members:
+            player_tag = self.model.member2tag(server, dc_member)
+
+            if player_tag is None:
+                dc_members_with_no_player_tag.append(dc_member)
+                continue
+
+            if player_tag not in clan_data.member_tags:
+                dc_members_not_in_clan.append(dc_member)
+
+        out = []
+        if len(dc_members_not_in_clan):
+            out.append("List of Discord members not in clan:")
+            for m in dc_members_not_in_clan:
+                out.append("+ {}".format(m.display_name))
+            for page in pagify('\n'.join(out)):
+                await self.bot.say(page)
+
+        out = []
+        if len(dc_members_with_no_player_tag):
+            out.append("List of Discord members with clan role but no CR player tag:")
+            for m in dc_members_with_no_player_tag:
+                out.append("+ {}".format(m.display_name))
+            for page in pagify('\n'.join(out)):
+                await self.bot.say(page)
+
 
 
 def check_folder():
