@@ -165,7 +165,11 @@ class RCS:
             tag = tag[1:]
         tag = tag.upper()
         player = await self.fetch_player_profile(tag)
-        player_clan_tag = player.get("clanTag", None)
+        try:
+            player_clan_tag = player["clan"]["tag"]
+        except KeyError:
+            await self.bot.say("Cannot find clan tag in API. Aborting…")
+            return
 
         server = ctx.message.server
         clans = self.settings[server.id]["clans"]

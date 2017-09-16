@@ -25,17 +25,16 @@ DEALINGS IN THE SOFTWARE.
 """
 import asyncio
 import itertools
-from random import choice
 import json
+from random import choice
 
+import aiohttp
 import discord
 from __main__ import send_cmd_help
 from discord.ext import commands
 from discord.ext.commands import Context
 
 import cogs
-from cogs.economy import SetParser
-import aiohttp
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 
@@ -354,9 +353,14 @@ class RACF:
                 await self.bot.say("{} changed to {}.".format(member.mention, ign))
 
         # - Check clan
-        player_clan_tag = player.get('clanTag', None)
+        try:
+            player_clan_tag = player["clan"]["tag"]
+        except KeyError:
+            await self.bot.say("Cannot find clan tag in API. Aborting…")
+            return
+
         if player_clan_tag not in CLAN_PERMISSION.keys():
-            await self.bot.say("User is not in our clans.")
+            await self.bot.say("User is not in our clans. Aborting…")
             return
 
         # - Check allow role assignment
@@ -383,8 +387,6 @@ class RACF:
                 "{} Welcome! You may now chat at {} — enjoy!".format(
                     member.mention, channel.mention))
 
-
-
     @racf.command(name="bsverify", aliases=['bv'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def racf_bsveify(self, ctx, member: discord.Member, tag):
@@ -405,7 +407,6 @@ class RACF:
                 "Aborting…")
             return
 
-
         # - Check clan
         band_tag = None
         try:
@@ -421,7 +422,6 @@ class RACF:
         # - Assign roles
         role = BAND_PERMISSION[band_tag]["role"]
         await ctx.invoke(self.brawlstars, member, role)
-
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*CHANGECLAN_ROLES)
@@ -1220,7 +1220,6 @@ class RACF:
                     await self.bot.say(
                         "I am not allowed to remove {} from {}.".format(
                             role, author))
-
 
     async def run_iosfix(self, ctx: Context, *members: discord.Member):
         """Actual fix to allow members without the bot commander to run on themselves."""
