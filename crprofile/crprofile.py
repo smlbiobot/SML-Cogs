@@ -77,9 +77,6 @@ def random_discord_color():
     return discord.Color(value=color)
 
 
-
-
-
 class BotEmoji:
     """Emojis available in bot."""
 
@@ -440,10 +437,8 @@ class CRPlayerModel:
     def three_crown_wins(self):
         """Three crown wins."""
         if self.games is not None:
-            return self.games.get("threeCrownWins", 0)
+            return self.stats.get("threeCrownWins", 0)
         return 0
-
-
 
     @property
     def rank(self):
