@@ -34,6 +34,7 @@ from discord.ext.commands import Context
 
 import cogs
 from cogs.economy import SetParser
+import aiohttp
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 
@@ -297,14 +298,33 @@ class RACF:
     async def racf_verify(self, ctx, member: discord.Member, tag):
         """Verify CR members by player tag."""
 
+        # - validate tag
+        if tag.startswith('#'):
+            tag = tag[1:]
+        tag = tag.upper()
+
         # - Set their tags
         await ctx.invoke(self.crsettag, tag, member)
 
         # - Lookup profile
-        crp = self.bot.get_cog('CRProfile')
+        async def fetch_player_profile(tag):
+            """Fetch player profile data."""
+            url = "{}{}".format('http://api.cr-api.com/profile/', tag)
+            print(url)
+
+            try:
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, timeout=30) as resp:
+                        data = await resp.json()
+            except json.decoder.JSONDecodeError:
+                raise
+            except asyncio.TimeoutError:
+                raise
+
+            return data
 
         try:
-            player = await crp.player_data(tag)
+            player = await fetch_player_profile(tag)
         except asyncio.TimeoutError:
             await self.bot.send_message(
                 ctx.message.channel,
@@ -314,21 +334,26 @@ class RACF:
             return
 
         # - Change nickname to IGN
-        try:
-            await self.bot.change_nickname(member, player.username)
-        except discord.HTTPException:
-            await self.bot.say(
-                "I don’t have permission to change nick for this user.")
+        ign = player.get('name', None)
+        if ign is None:
+            await self.bot.say("Cannot find IGN.")
         else:
-            await self.bot.say("{} changed to {}.".format(member.mention, player.username))
+            try:
+                await self.bot.change_nickname(member, ign)
+            except discord.HTTPException:
+                await self.bot.say(
+                    "I don’t have permission to change nick for this user.")
+            else:
+                await self.bot.say("{} changed to {}.".format(member.mention, player.username))
 
         # - Check clan
-        if player.clan_tag not in CLAN_PERMISSION.keys():
+        player_clan_tag = player.get('clanTag', None)
+        if player_clan_tag not in CLAN_PERMISSION.keys():
             await self.bot.say("User is not in our clans.")
             return
 
         # - Check allow role assignment
-        perm = CLAN_PERMISSION[player.clan_tag]
+        perm = CLAN_PERMISSION[player_clan_tag]
         if not perm['assign_role']:
             await self.bot.say('User belong to a clan that requires roster verifications.')
             return
