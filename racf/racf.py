@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 import asyncio
 import itertools
 from random import choice
+import json
 
 import discord
 from __main__ import send_cmd_help
@@ -325,6 +326,12 @@ class RACF:
 
         try:
             player = await fetch_player_profile(tag)
+        except json.decoder.JSONDecodeError:
+            await self.bot.send_message(
+                ctx.message.channel,
+                "Error getting data from API. "
+                "Aborting…")
+            return
         except asyncio.TimeoutError:
             await self.bot.send_message(
                 ctx.message.channel,
