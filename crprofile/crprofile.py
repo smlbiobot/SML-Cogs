@@ -219,22 +219,6 @@ class CRPlayerModel:
     @property
     def xp_str(self):
         """Experience in current / total format."""
-        xp_levels = [
-            "0",
-            "20",
-            "50",
-            "100",
-            "200",
-            "400",
-            "1000",
-            "2000",
-            "5000",
-            "10000",
-            "30000",
-            "40000",
-            "80000",
-            "MAX"
-        ]
         current = 'MAX'
         total = 'MAX'
         if isinstance(self.xp_total, int):
@@ -278,14 +262,6 @@ class CRPlayerModel:
         """Clan badge url."""
         filename = self.clan.get("badgeUrl", None)
         return 'http://api.cr-api.com{}'.format(filename)
-        # if filename is not None:
-        #     filename
-        # badges = dataIO.load_json(BADGES_JSON)
-        # try:
-        #     key = str(self.clan["badge_id"] - 1 + 16000000)
-        #     return 'https://smlbiobot.github.io/img/emblems/{}.png'.format(badges[key])
-        # except KeyError:
-        #     return 'https://smlbiobot.github.io/img/emblems/NoClan.png'
 
     @property
     def stats(self):
@@ -482,7 +458,6 @@ class CRPlayerModel:
     def chest_list(self, bot_emoji: BotEmoji):
         """List of chests."""
         # chests
-        next_chests = [bot_emoji.key(c) for c in self.chests(8)]
         special_chests = [
             ('Magic', self.chest_magical_index),
             ('Giant', self.chest_giant_index),
@@ -502,22 +477,6 @@ class CRPlayerModel:
             out.append('{}'.format(c[1]))
 
         return ''.join(out)
-
-        # chests
-        # special chests
-        # key_list = ['super_magical', 'legendary', 'epic']
-        # chests = [(k, v) for k, v in self.chests.items() if k in key_list]
-        # # giant magical
-        # chests.append(('Giant', self.chest_giant_index))
-        # chests.append(('Magic', self.chest_magical_index))
-        # chests = sorted(chests, key=lambda c: c[1])
-        #
-        # cycle = [bot_emoji.key(c) for c in self.chests]
-        # chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1]) for c in chests]
-        # chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
-        # return '{}{}'.format(
-        #     ''.join(next_chests)
-        # )
 
     def shop_offers(self, name):
         """Shop offers by name.
