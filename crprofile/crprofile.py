@@ -53,7 +53,7 @@ API_FETCH_TIMEOUT = 5
 
 BOTCOMMANDER_ROLES = ["Bot Commander"]
 
-CREDITS = 'Harmiox + SML'
+CREDITS = 'Selfish + SML'
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -280,6 +280,13 @@ class CRPlayerModel:
         return 0
 
     @property
+    def challenge_max_wins(self):
+        """Max challenge wins."""
+        if self.stats is not None:
+            return self.stats.get("challengeMaxWins", 0)
+        return 0
+
+    @property
     def total_donations(self):
         """Total donations."""
         if self.stats is not None:
@@ -339,22 +346,22 @@ class CRPlayerModel:
     def wins(self):
         """Games won."""
         if self.games is not None:
-            return self.games.get("wins", None)
-        return None
+            return self.games.get("wins", 0)
+        return 0
 
     @property
     def losses(self):
         """Games won."""
         if self.games is not None:
-            return self.games.get("losses", None)
+            return self.games.get("losses", 0)
         return None
 
     @property
     def draws(self):
         """Games won."""
         if self.games is not None:
-            return self.games.get("draws", None)
-        return None
+            return self.games.get("draws", 0)
+        return 0
 
     def win_draw_losses(self, emoji):
         """Win / draw / losses."""
@@ -364,6 +371,21 @@ class CRPlayerModel:
             '{:,}'.format(self.losses),
             emoji
         )
+
+    @property
+    def total_games(self):
+        """Total games played."""
+        if self.games is not None:
+            return self.games.get("total", 0)
+        return 0
+
+    @property
+    def win_streak(self):
+        """Win streak."""
+        streak = 0
+        if self.games is not None:
+            streak = self.games.get("currentWinStreak", 0)
+        return max(streak, 0)
 
     @property
     def three_crown_wins(self):
@@ -1109,13 +1131,16 @@ class CRProfile:
         stats = {
             'Wins / Draws / Losses': player.win_draw_losses(bem('battle')),
             'Win Ratio': '{} {}'.format(player.win_ratio, bem('battle')),
+            'Total Games': fmt(player.total_games, 'battle'),
             'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
+            'Win Streak': fmt(player.win_streak, 'crownred'),
+            'Cards Found': fmt(player.cards_found, 'cards'),
             'Challenge Cards Won': fmt(player.challenge_cards_won, 'tournament'),
             'Tourney Cards Won': fmt(player.tourney_cards_won, 'tournament'),
+            'Challenge Max Wins': fmt(player.challenge_max_wins, 'tournament'),
             'Total Donations': fmt(player.total_donations, 'cards'),
             'Level': fmt(player.level, 'experience'),
             'Experience': '{} {}'.format(player.xp_str, bem('experience')),
-            'Cards Found': fmt(player.cards_found, 'cards'),
             'Favorite Card': player.fave_card(self.bot_emoji)
         }
         for k, v in stats.items():
