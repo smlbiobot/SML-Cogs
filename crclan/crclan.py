@@ -692,6 +692,17 @@ class CogModel:
             pass
         return None
 
+    def tag2member(self, server, tag):
+        """Return Discord member by player tag."""
+        try:
+            players = self.settings["servers"][server.id]["players"]
+            for member_id, player_tag in players.items():
+                if player_tag == tag:
+                    return server.get_member(member_id)
+        except KeyError:
+            pass
+        return None
+
     @property
     def clan_api_url(self):
         """Clan API URL."""
@@ -1308,6 +1319,7 @@ class CRClan:
         
         Options:
         --removerole   Remove clan role from people who aren’t in clan
+        --addrole      Add clan role to people who are in clan
         """
         server = ctx.message.server
 
@@ -1323,6 +1335,7 @@ class CRClan:
         options = options.split(' ')
 
         option_remove_role = '--removerole' in options
+        option_add_role = '__addrole' in options
 
         # - get clan data
         clan_data = await self.model.get_clan_data(server, key=clankey)
@@ -1347,7 +1360,7 @@ class CRClan:
 
         out = []
         if len(dc_members_not_in_clan):
-            out.append("List of Discord members not in clan:")
+            out.append("Discord members not in clan:")
             for m in dc_members_not_in_clan:
                 out.append("+ {}".format(m.display_name))
             for page in pagify('\n'.join(out)):
@@ -1355,11 +1368,28 @@ class CRClan:
 
         out = []
         if len(dc_members_with_no_player_tag):
-            out.append("List of Discord members with clan role but no CR player tag:")
+            out.append("Discord members with clan role but no CR player tag:")
             for m in dc_members_with_no_player_tag:
                 out.append("+ {}".format(m.display_name))
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
+
+        # - find members in clan but no discord association
+        dc_members_without_role = []
+        for player_tag in clan_data.member_tags:
+            dc_member = self.model.tag2member(server, player_tag)
+            if dc_member is not None:
+                if clanrole not in dc_member.roles:
+                    dc_members_without_role.append(dc_member)
+
+        out = []
+        if len(dc_members_without_role):
+            out.append("Discord members in clan but without role")
+            for m in dc_members_without_role:
+                out.append("+ {}".format(m.display_name))
+            for page in pagify('\n'.join(out)):
+                await self.bot.say(page)
+
 
         # remove role from members not in clan
         if option_remove_role:
@@ -1368,6 +1398,20 @@ class CRClan:
                 try:
                     await self.bot.remove_roles(m, clanrole)
                     await self.bot.say("Removed {} from {}".format(clanrole.name, m.display_name))
+                except discord.Forbidden:
+                    await self.bot.say("You do not have permissions to revoke these roles.")
+                    continue
+                except discord.HTTPException:
+                    await self.bot.say("Removing roles failed for unknown reasons.")
+                    continue
+
+        # add role to members in clan
+        if option_add_role:
+            mm = self.bot.get_cog("MemberManagement")
+            for m in dc_members_without_role:
+                try:
+                    await self.bot.add_roles(m, clanrole)
+                    await self.bot.say("Added {} to {}".format(clanrole.name, m.display_name))
                 except discord.Forbidden:
                     await self.bot.say("You do not have permissions to revoke these roles.")
                     continue
