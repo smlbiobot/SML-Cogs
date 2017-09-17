@@ -1238,6 +1238,7 @@ class RACF:
                             "I am not allowed to remove {} from {}.".format(
                                 role, member))
 
+    @commands.command(pass_context=True, no_pm=True)
     async def toprole(self, ctx, member: discord.Member=None):
         """Return top role of self (or another member).
         
@@ -1245,7 +1246,7 @@ class RACF:
         """
         if member is None:
             member = ctx.message.author
-        self.bot.say(member.top_role.name)
+        await self.bot.say(member.top_role.name)
 
 
 def setup(bot):
