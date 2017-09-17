@@ -37,11 +37,9 @@ import aiohttp
 import discord
 import inflect
 from __main__ import send_cmd_help
-from discord.ext import commands
-from itertools import cycle
-
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "crprofile")
 PATH_PLAYERS = os.path.join(PATH, "players")
@@ -164,7 +162,6 @@ class SCTag:
                 ', '.join(self.invalid_chars),
                 ', '.join(self.TAG_CHARACTERS)
             ))
-
 
 
 class CRPlayerModel:
@@ -759,19 +756,6 @@ class Settings:
             pass
         return None
 
-    def trophy2arena(self, trophy):
-        """Convert trophy to league based on Arenas."""
-        result = None
-        for arena in self.arenas:
-            if trophy >= arena.TrophyLimit:
-                result = arena
-                break
-
-        if result is not None:
-            return '{}: {}'.format(result.TIDText, result.SubtitleTIDText)
-
-        return ''
-
     def emoji(self, name=None, key=None):
         """Chest emojis by api key name or key.
 
@@ -1140,12 +1124,6 @@ class CRProfile:
 
         embeds.append(em)
         return embeds
-
-    @crprofile.command(name="trophy2arena", aliases=['t2a'], pass_context=True, no_pm=True)
-    async def crprofile_trophy2arena(self, ctx, trophy: int):
-        """Convert trophies to arenas."""
-        text = self.model.trophy2arena(trophy)
-        await self.bot.say(text)
 
 
 def check_folder():
