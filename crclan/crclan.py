@@ -1335,7 +1335,7 @@ class CRClan:
         options = options.split(' ')
 
         option_remove_role = '--removerole' in options
-        option_add_role = '__addrole' in options
+        option_add_role = '--addrole' in options
 
         # - get clan data
         clan_data = await self.model.get_clan_data(server, key=clankey)
