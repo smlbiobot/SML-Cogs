@@ -1238,6 +1238,15 @@ class RACF:
                             "I am not allowed to remove {} from {}.".format(
                                 role, member))
 
+    async def toprole(self, ctx, member: discord.Member=None):
+        """Return top role of self (or another member).
+        
+        Written mostly for debugging Discord’s odd behavior.
+        """
+        if member is None:
+            member = ctx.message.author
+        self.bot.say(member.top_role.name)
+
 
 def setup(bot):
     r = RACF(bot)
