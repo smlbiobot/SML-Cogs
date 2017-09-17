@@ -519,31 +519,32 @@ class CRPlayerModel:
         #     ''.join(next_chests)
         # )
 
+    def shop_offers(self, name):
+        """Shop offers by name.
+        
+        Valid names are: legendary, epic, arena.
+        """
+        offers = self.data.get("shopOffers")
+        return offers.get(name)
+
     @property
     def shop_offers_arena(self):
         """Get epic shop offer."""
-        if hasattr(self, 'shop_offers'):
-            return self.shop_offers.get('arena', -1)
-        return -1
+        return self.shop_offers("arena")
 
     @property
     def shop_offers_epic(self):
         """Get epic shop offer."""
-        if hasattr(self, 'shop_offers'):
-            return self.shop_offers.get('epic', -1)
-        return -1
+        return self.shop_offers("epic")
 
     @property
     def shop_offers_legendary(self):
         """Get epic shop offer."""
-        if hasattr(self, 'shop_offers'):
-            return self.shop_offers.get('legendary', -1)
-        return -1
+        return self.shop_offers("legendary")
 
     def shop_list(self, bot_emoji: BotEmoji):
         """List of shop offers."""
         offers = [{
-            # 'name': 'chestdraft',
             'name': 'shopgoblin',
             'index': self.shop_offers_arena
         }, {
@@ -553,7 +554,7 @@ class CRPlayerModel:
             'name': 'chestlegendary',
             'index': self.shop_offers_legendary
         }]
-        offers = [offer for offer in offers if offer['index'] > 0]
+        offers = [offer for offer in offers if offer['index'] is not None]
         offers = sorted(offers, key=lambda o: o['index'])
         out = ['{}{} days'.format(bot_emoji.name(o['name']), o['index']) for o in offers]
         return ' '.join(out)
@@ -1170,8 +1171,8 @@ class CRProfile:
         # deck
         em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
         #
-        # # shop offers
-        # em.add_field(name="Shop Offers", value=player.shop_list(self.bot_emoji), inline=False)
+        # shop offers
+        em.add_field(name="Shop Offers", value=player.shop_list(self.bot_emoji), inline=False)
 
         # link to cr-api.com
         em.set_footer(
