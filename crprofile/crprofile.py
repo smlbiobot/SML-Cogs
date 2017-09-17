@@ -602,6 +602,20 @@ class CRPlayerModel:
         result = result.replace('-', '')
         return bot_emoji.name(result)
 
+    @property
+    def seasons(self):
+        """Season finishes."""
+        s_list = []
+        for s in self.data.get("previousSeasons"):
+            s_list.append({
+                "number": s.get("seasonNumber", None),
+                "highest": s.get("seasonHighest", None),
+                "ending": s.get("seasonEnding", None),
+                "rank": s.get("seasonEndGlobalRank", None)
+            })
+        s_list = sorted(s_list, key=lambda s: s["number"])
+        return s_list
+
 
 class Settings:
     """Cog settings.
@@ -1107,15 +1121,30 @@ class CRProfile:
         for k, v in stats.items():
             em.add_field(name=k, value=v)
 
-        # # chests
+        # chests
         chest_name = 'Chests ({:,} opened)'.format(player.chests_opened)
         em.add_field(name=chest_name, value=player.chest_list(self.bot_emoji), inline=False)
 
         # deck
         em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
-        #
+
         # shop offers
         em.add_field(name="Shop Offers", value=player.shop_list(self.bot_emoji), inline=False)
+
+        # season finishes
+        def rank_str(rank):
+            if rank is None:
+                return "Unranked"
+            p = inflect.engine()
+            o = p.ordinal(rank)[-2:]
+            return '{:,}{}'.format(rank, o)
+
+        for s in player.seasons:
+            em.add_field(
+                name="Season {}".format(s["number"]),
+                value="{:,}/{:,} ({})".format(s["ending"], s["highest"], rank_str(s["rank"])),
+                inline=True
+            )
 
         # link to cr-api.com
         em.set_footer(
