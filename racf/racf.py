@@ -1209,7 +1209,7 @@ class RACF:
         await self.bot.say("Fix me")
         author = ctx.message.author
         for role in author.roles:
-            if role.name in ["Bot Commander", "Leader", "Co-Leader", "Member"]:
+            if role.name in ["Bot Commander", "Leader", "Co-Leader", "Member", "addrole", "Coleader"]:
                 try:
                     await self.bot.remove_roles(author, role)
                     await self.bot.add_roles(author, role)
