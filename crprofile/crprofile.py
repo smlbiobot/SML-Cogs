@@ -38,6 +38,7 @@ import discord
 import inflect
 from __main__ import send_cmd_help
 from discord.ext import commands
+from itertools import cycle
 
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
@@ -87,9 +88,9 @@ class BotEmoji:
             'Gold': 'chestgold',
             'Giant': 'chestgiant',
             'Magic': 'chestmagical',
-            'super_magical': 'chestsupermagical',
-            'legendary': 'chestlegendary',
-            'epic': 'chestepic'
+            'SuperMagical': 'chestsupermagical',
+            'Legendary': 'chestlegendary',
+            'Epic': 'chestepic'
         }
 
     def name(self, name):
@@ -447,7 +448,6 @@ class CRPlayerModel:
 
     def rank_str(self, bot_emoji: BotEmoji):
         """Rank in ordinal format."""
-        print(self.rank)
         if self.rank is None:
             return "Unranked"
         p = inflect.engine()
@@ -455,37 +455,111 @@ class CRPlayerModel:
         return '{:,}{} {}'.format(self.rank, o, bot_emoji.name('rank'))
 
     @property
+    def chest_cycle(self):
+        """Chest cycle."""
+        return self.data.get("chestCycle", None)
+
+    @property
+    def chest_cycle_position(self):
+        """Chest cycle position."""
+        if self.chest_cycle is not None:
+            return self.chest_cycle.get("position", None)
+        return None
+
+    def chest_by_position(self, pos):
+        """Return chest type based on position."""
+        if pos == self.chest_cycle.get("superMagicalPos"):
+            return "SuperMagical"
+        elif pos == self.chest_cycle.get("legendaryPos"):
+            return "Legendary"
+        elif pos == self.chest_cycle.get("epicPos"):
+            return "Epic"
+        return CHESTS[pos % len(CHESTS)]
+
+    def chests(self, count):
+        """Next n chests."""
+        return [self.chest_by_position(self.chest_cycle_position + i) for i in range(count)]
+
+    @property
+    def chest_super_magical_index(self):
+        """Super magical index."""
+        chest_pos = self.chest_cycle.get("superMagicalPos")
+        return chest_pos - self.chest_cycle_position
+
+    @property
+    def chest_legendary_index(self):
+        """Super magical index."""
+        chest_pos = self.chest_cycle.get("legendaryPos")
+        return chest_pos - self.chest_cycle_position
+
+    @property
+    def chest_epic_index(self):
+        """Super magical index."""
+        chest_pos = self.chest_cycle.get("epicPos")
+        return chest_pos - self.chest_cycle_position
+
+    @property
     def chest_magical_index(self):
         """First index of magical chest"""
-        # return 0
-        return self.chests["cycle"].index("Magic")
+        pos = self.chest_cycle_position
+        start_pos = pos % len(CHESTS)
+        chests = CHESTS[start_pos:]
+        chests.extend(CHESTS)
+        return chests.index('Magic')
 
     @property
     def chest_giant_index(self):
         """First index of magical chest"""
-        # return 0
-        return self.chests["cycle"].index("Giant")
+        pos = self.chest_cycle_position
+        start_pos = pos % len(CHESTS)
+        chests = CHESTS[start_pos:]
+        chests.extend(CHESTS)
+        return chests.index('Giant')
 
     @property
     def chests_opened(self):
         """Number of chests opened."""
-        return self.chests["index"]
+        return self.chest_cycle_position
 
     def chest_list(self, bot_emoji: BotEmoji):
         """List of chests."""
         # chests
-        # special chests
-        key_list = ['super_magical', 'legendary', 'epic']
-        chests = [(k, v) for k, v in self.chests.items() if k in key_list]
-        # giant magical
-        chests.append(('Giant', self.chest_giant_index))
-        chests.append(('Magic', self.chest_magical_index))
-        chests = sorted(chests, key=lambda c: c[1])
+        next_chests = [bot_emoji.key(c) for c in self.chests(8)]
+        special_chests = [
+            ('Magic', self.chest_magical_index),
+            ('Giant', self.chest_giant_index),
+            ('Epic', self.chest_epic_index),
+            ('Legendary', self.chest_legendary_index),
+            ('SuperMagical', self.chest_super_magical_index)
+        ]
+        special_chests = sorted(special_chests, key=lambda c: c[1])
 
-        cycle = [bot_emoji.key(c) for c in self.chests['cycle'][:8]]
-        chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1] + 1) for c in chests]
-        chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
-        return chest_str
+        out = []
+        for c in self.chests(8):
+            out.append(bot_emoji.key(c))
+
+        # special chests
+        for c in special_chests:
+            out.append(bot_emoji.key(c[0]))
+            out.append('{}'.format(c[1]))
+
+        return ''.join(out)
+
+        # chests
+        # special chests
+        # key_list = ['super_magical', 'legendary', 'epic']
+        # chests = [(k, v) for k, v in self.chests.items() if k in key_list]
+        # # giant magical
+        # chests.append(('Giant', self.chest_giant_index))
+        # chests.append(('Magic', self.chest_magical_index))
+        # chests = sorted(chests, key=lambda c: c[1])
+        #
+        # cycle = [bot_emoji.key(c) for c in self.chests]
+        # chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1]) for c in chests]
+        # chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
+        # return '{}{}'.format(
+        #     ''.join(next_chests)
+        # )
 
     @property
     def shop_offers_arena(self):
@@ -719,7 +793,7 @@ class Settings:
         if not os.path.exists(file_path):
             return None
         data = dataIO.load_json(file_path)
-        return CRPlayerModel(is_cache=True, **data)
+        return CRPlayerModel(is_cache=True, data=data)
 
     def cached_player_data_timestamp(self, tag):
         """Return timestamp in days-since format of cached data."""
@@ -1130,9 +1204,17 @@ class CRProfile:
         for k, v in stats.items():
             em.add_field(name=k, value=v)
 
+        print("supermagical", player.chest_super_magical_index)
+        print("legendary", player.chest_legendary_index)
+        print("epic", player.chest_epic_index)
+        print("magical", player.chest_magical_index)
+        print("giant", player.chest_giant_index)
+        print(player.chest_list(self.bot_emoji))
+        # print("chests", player.chests('Magic'))
+
         # # chests
-        # chest_name = 'Chests ({:,} opened)'.format(player.chests_opened)
-        # em.add_field(name=chest_name, value=player.chest_list(self.bot_emoji), inline=False)
+        chest_name = 'Chests ({:,} opened)'.format(player.chests_opened)
+        em.add_field(name=chest_name, value=player.chest_list(self.bot_emoji), inline=False)
         #
         # # deck
         # em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
