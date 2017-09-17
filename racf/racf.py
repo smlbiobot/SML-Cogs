@@ -371,13 +371,24 @@ class RACF:
 
         # - Assign role - not members
         mm = self.bot.get_cog("MemberManagement")
+        author = ctx.message.author
         if not perm['member']:
-            await ctx.invoke(mm.changerole, member, perm['role'], 'visitor')
+            # role_names = [perm['role'], 'Visitor']
+            # try:
+            #     await self._add_roles(member, role_names)
+            # except discord.Forbidden:
+            #     await self.bot.say(
+            #         "{} does not have permission to edit {}’s roles.".format(
+            #             author.display_name, member.display_name))
+            # except discord.HTTPException:
+            #     await self.bot.say("failed to add {}.").format(', '.join(role_names))
+
+            await ctx.invoke(mm.changerole, member, perm['role'], 'Visitor')
             channel = discord.utils.get(
                 ctx.message.server.channels, name="visitors")
             await ctx.invoke(self.dmusers, VISITOR_RULES, member)
         else:
-            await ctx.invoke(mm.changerole, member, perm['role'], 'member', 'tourney', 'practice', '-visitor')
+            await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Rourney', 'Practice', '-Visitor')
             channel = discord.utils.get(
                 ctx.message.server.channels, name="family-chat")
             await ctx.invoke(self.dmusers, MEMBER_MSG, member)
@@ -386,6 +397,28 @@ class RACF:
             await self.bot.say(
                 "{} Welcome! You may now chat at {} — enjoy!".format(
                     member.mention, channel.mention))
+
+    async def _add_roles(self, member, role_names):
+        """Add roles"""
+        server = member.server
+        roles = [discord.utils.get(server.roles, name=role_name) for role_name in role_names]
+        try:
+            await self.bot.add_roles(member, *roles)
+        except discord.Forbidden:
+            raise
+        except discord.HTTPException:
+            raise
+
+    async def _remove_roles(self, member, role_names):
+        """Add roles"""
+        server = member.server
+        roles = [discord.utils.get(server.roles, name=role_name) for role_name in role_names]
+        try:
+            await self.bot.remove_roles(member, *roles)
+        except discord.Forbidden:
+            raise
+        except discord.HTTPException:
+            raise
 
     @racf.command(name="bsverify", aliases=['bv'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
