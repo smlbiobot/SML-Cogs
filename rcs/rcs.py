@@ -60,6 +60,58 @@ def nested_dict():
     return defaultdict(nested_dict)
 
 
+class SCTag:
+    """SuperCell tags."""
+
+    TAG_CHARACTERS = list("0289PYLQGRJCUV")
+
+    def __init__(self, tag: str):
+        """Init.
+
+        Remove # if found.
+        Convert to uppercase.
+        Convert Os to 0s if found.
+        """
+        if tag.startswith('#'):
+            tag = tag[1:]
+        tag = tag.replace('O', '0')
+        tag = tag.upper()
+        self._tag = tag
+
+    @property
+    def tag(self):
+        """Return tag as str."""
+        return self._tag
+
+    @property
+    def valid(self):
+        """Return true if tag is valid."""
+        for c in self.tag:
+            if c not in self.TAG_CHARACTERS:
+                return False
+        return True
+
+    @property
+    def invalid_chars(self):
+        """Return list of invalid characters."""
+        invalids = []
+        for c in self.tag:
+            if c not in self.TAG_CHARACTERS:
+                invalids.append(c)
+        return invalids
+
+    @property
+    def invalid_error_msg(self):
+        """Error message to show if invalid."""
+        return (
+            'The tag you have entered is not valid. \n'
+            'List of invalid characters in your tag: {}\n'
+            'List of valid characters for tags: {}'.format(
+                ', '.join(self.invalid_chars),
+                ', '.join(self.TAG_CHARACTERS)
+            ))
+
+
 class RCS:
     """Reddit Clan System (RCS) utility."""
 
@@ -112,9 +164,12 @@ class RCS:
             return
         if role_nick is None:
             role_nick = role_name
-        if clan_tag.startswith('#'):
-            clan_tag = clan_tag[1:]
-        clan_tag = clan_tag.upper()
+
+        sctag = SCTag(clan_tag)
+        if not sctag.valid:
+            await self.bot.say(sctag.invalid_error_msg)
+
+        clan_tag = sctag.tag
         clan = {
             "tag": clan_tag,
             "role_id": role.id,
@@ -161,9 +216,12 @@ class RCS:
         include_tourney = '--notourney' not in options
 
         # Check clan info
-        if tag.startswith('#'):
-            tag = tag[1:]
-        tag = tag.upper()
+        sctag = SCTag(tag)
+        if not sctag.valid:
+            await self.bot.say(sctag.invalid_error_msg)
+            return
+
+        tag = sctag.tag
         player = await self.fetch_player_profile(tag)
         try:
             player_clan_tag = player["clan"]["tag"]
@@ -205,7 +263,6 @@ class RCS:
     async def fetch_player_profile(self, tag):
         """Fetch player profile data."""
         url = "{}{}".format('http://api.cr-api.com/profile/', tag)
-        print(url)
 
         try:
             async with aiohttp.ClientSession() as session:
