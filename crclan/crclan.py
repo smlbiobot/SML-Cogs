@@ -173,6 +173,7 @@ class CRClanModel:
         self.is_cache = is_cache
         self.timestamp = timestamp
         self.loaded = loaded
+        self._members = None
 
     @property
     def badge(self):
@@ -202,7 +203,15 @@ class CRClanModel:
     @property
     def members(self):
         """Members."""
-        return self.data.get('members', None)
+        if self._members is None:
+            self._members = self.data.get('members', None)
+        return self._members
+
+    @members.setter
+    def members(self, value):
+        """Members set"""
+        self._members = value
+
 
     @property
     def member_tags(self):
@@ -1206,7 +1215,7 @@ class CRClan:
 
         # Sort data
         if p_args.sort == 'trophies':
-            clan_data.members = sorted(clan_data.members, key=lambda member: -member['score'])
+            clan_data.members = sorted(clan_data.members, key=lambda member: -member['trophies'])
         elif p_args.sort == 'name':
             clan_data.members = sorted(clan_data.members, key=lambda member: member['name'].lower())
         elif p_args.sort == 'level':
