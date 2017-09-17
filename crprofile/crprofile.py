@@ -166,48 +166,6 @@ class SCTag:
             ))
 
 
-class CRArenaModel:
-    """Clash Royale arenas."""
-
-    def __init__(self, **kwargs):
-        """Init.
-
-        Keyword Args:
-            Name (str)
-            TID (str)
-            TIDText (str)
-            SubtitleTID (str)
-            SubtitleTIDText (str)
-            Arena (int)
-            ChestArena (str)
-            TvArena (str)
-            IsInUse (bool)
-            TrainingCamp (bool)
-            PVEArena (str)
-            TrophyLimit (int)
-            DemoteTrophyLimit (int)
-            SeasonTrophyReset (str)
-            ChestRewardMultiplier (int)
-            ChestShopPriceMultiplier (int)
-            RequestSize (int)
-            MaxDonationCountCommon (int)
-            MaxDonationCountRare (int)
-            MaxDonationCountEpic (int)
-            IconSWF (str)
-            IconExportName (str)
-            MainMenuIconExportName (str)
-            SmallIconExportName (str)
-            MatchmakingMinTrophyDelta (int)
-            MatchmakingMaxTrophyDelta (int)
-            MatchmakingMaxSeconds (int)
-            PvpLocation (str)
-            TeamVsTeamLocation (str)
-            DailyDonationCapacityLimit (int)
-            BattleRewardGold (str)
-            ReleaseDate (str)
-        """
-        self.__dict__.update(kwargs)
-
 
 class CRPlayerModel:
     """Clash Royale arenas."""
@@ -609,32 +567,39 @@ class CRPlayerModel:
     @property
     def arena(self):
         """League. Can be either Arena or league."""
-        arenas = dataIO.load_json(os.path.join(PATH, 'arenas.json'))
-        arenas = [CRArenaModel(**a) for a in arenas]
-        arenas = sorted(arenas, key=lambda x: x.TrophyLimit, reverse=True)
-
-        result = None
-        for arena in arenas:
-            if self.trophy_current >= arena.TrophyLimit:
-                result = arena
-                break
-
-        return result
+        try:
+            return self.data["arena"]["arena"]
+        except KeyError:
+            return None
 
     @property
     def arena_text(self):
         """Arena text."""
-        return self.arena.TIDText
+        try:
+            return self.data["arena"]["name"]
+        except KeyError:
+            return None
 
     @property
     def arena_subtitle(self):
         """Arena subtitle"""
-        return self.arena.SubtitleTIDText
+        try:
+            return self.data["arena"]["arena"]
+        except KeyError:
+            return None
+
+    @property
+    def arena_id(self):
+        """Arena ID."""
+        try:
+            return self.data["arena"]["arenaID"]
+        except KeyError:
+            return None
 
     @property
     def league(self):
         """League (int)."""
-        league = max(self.arena.Arena - 11, 0)
+        league = max(self.arena_id - 11, 0)
         return league
 
     def fave_card(self, bot_emoji: BotEmoji):
@@ -646,7 +611,7 @@ class CRPlayerModel:
         if self.league > 0:
             name = 'league{}'.format(self.league)
         else:
-            name = 'arena{}'.format(self.arena.Arena)
+            name = 'arena{}'.format(self.arena_id)
         return bot_emoji.name(name)
 
     @property
@@ -660,9 +625,9 @@ class CRPlayerModel:
 
     def deck_list(self, bot_emoji: BotEmoji):
         """Deck with emoji"""
-        cards = [card["name"] for card in self.deck]
+        cards = [card["name"] for card in self.data.get("currentDeck")]
         cards = [self.api_cardname_to_emoji(name, bot_emoji) for name in cards]
-        levels = [card["level"] for card in self.deck]
+        levels = [card["level"] for card in self.data.get("currentDeck")]
         deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
         return ' '.join(deck)
 
@@ -672,7 +637,7 @@ class CRPlayerModel:
         cards = cr["Cards"]
         result = None
         for crid, o in cards.items():
-            if o["api_id"] == name:
+            if o["sfid"] == name:
                 result = crid
                 break
         if result is None:
@@ -703,11 +668,6 @@ class Settings:
         self.filepath = filepath
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(filepath))
-
-        # arenas
-        arenas = dataIO.load_json(os.path.join(PATH, 'arenas.json'))
-        self.arenas = [CRArenaModel(**a) for a in arenas]
-        self.arenas = sorted(self.arenas, key=lambda x: x.TrophyLimit, reverse=True)
 
     def init_server(self, server):
         """Initialized server settings.
@@ -1138,7 +1098,6 @@ class CRProfile:
         server = ctx.message.server
         for em in self.embeds_profile(player_data, server=server, resources=resources):
             await self.bot.say(embed=em)
-            # await self.bot.send_message(ctx.message.channel, embed=em)
 
     def embeds_profile(self, player: CRPlayerModel, server=None, resources=False):
         """Return Discord Embed of player profile."""
@@ -1204,20 +1163,12 @@ class CRProfile:
         for k, v in stats.items():
             em.add_field(name=k, value=v)
 
-        print("supermagical", player.chest_super_magical_index)
-        print("legendary", player.chest_legendary_index)
-        print("epic", player.chest_epic_index)
-        print("magical", player.chest_magical_index)
-        print("giant", player.chest_giant_index)
-        print(player.chest_list(self.bot_emoji))
-        # print("chests", player.chests('Magic'))
-
         # # chests
         chest_name = 'Chests ({:,} opened)'.format(player.chests_opened)
         em.add_field(name=chest_name, value=player.chest_list(self.bot_emoji), inline=False)
-        #
-        # # deck
-        # em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
+
+        # deck
+        em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
         #
         # # shop offers
         # em.add_field(name="Shop Offers", value=player.shop_list(self.bot_emoji), inline=False)
