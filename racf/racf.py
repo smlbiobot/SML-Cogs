@@ -536,26 +536,26 @@ class RACF:
             return
         await ctx.invoke(mm.changerole, member, *roles)
 
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def addrole(
-            self, ctx, member: discord.Member = None, *, role_name: str = None):
-        """Add role to a user.
-
-        Example: !addrole SML Delta
-        """
-        await self.changerole(ctx, member, role_name)
-
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def removerole(
-            self, ctx, member: discord.Member = None, *, role_name: str = None):
-        """Remove role from a user.
-
-        Example: !removerole SML Delta
-        """
-        role_name = '-{}'.format(role_name)
-        await self.changerole(ctx, member, role_name)
+    # @commands.command(pass_context=True, no_pm=True)
+    # @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    # async def addrole(
+    #         self, ctx, member: discord.Member = None, *, role_name: str = None):
+    #     """Add role to a user.
+    #
+    #     Example: !addrole SML Delta
+    #     """
+    #     await self.changerole(ctx, member, role_name)
+    #
+    # @commands.command(pass_context=True, no_pm=True)
+    # @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    # async def removerole(
+    #         self, ctx, member: discord.Member = None, *, role_name: str = None):
+    #     """Remove role from a user.
+    #
+    #     Example: !removerole SML Delta
+    #     """
+    #     role_name = '-{}'.format(role_name)
+    #     await self.changerole(ctx, member, role_name)
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(mention_everyone=True)
