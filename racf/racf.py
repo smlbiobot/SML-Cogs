@@ -856,54 +856,54 @@ class RACF:
                 "Added {} role for {}.".format(
                     RECRUIT_ROLE, author.display_name))
 
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*TOGGLE_ROLES)
-    async def togglerole(self, ctx: Context, role_name):
-        """Self-toggle role assignments."""
-        author = ctx.message.author
-        server = ctx.message.server
-        # toggleable_roles = [r.lower() for r in TOGGLEABLE_ROLES]
-
-        member_role = discord.utils.get(server.roles, name="Member")
-        is_member = member_role in author.roles
-
-        if is_member:
-            toggleable_roles = TOGGLE_PERM["Member"]
-        else:
-            toggleable_roles = TOGGLE_PERM["Visitor"]
-
-        toggleable_roles = sorted(toggleable_roles, key=lambda r: r.lower())
-
-        toggleable_roles_lower = [r.lower() for r in toggleable_roles]
-
-        if role_name.lower() in toggleable_roles_lower:
-            role = [
-                r for r in server.roles
-                if r.name.lower() == role_name.lower()]
-
-            if len(role):
-                role = role[0]
-                if role in author.roles:
-                    await self.bot.remove_roles(author, role)
-                    await self.bot.say(
-                        "Removed {} role from {}.".format(
-                            role.name, author.display_name))
-                else:
-                    await self.bot.add_roles(author, role)
-                    await self.bot.say(
-                        "Added {} role for {}.".format(
-                            role_name, author.display_name))
-            else:
-                await self.bot.say(
-                    "{} is not a valid role on this server.".format(role_name))
-        else:
-            out = []
-            out.append(
-                "{} is not a toggleable role for you.".format(role_name))
-            out.append(
-                "Toggleable roles for you: {}.".format(
-                    ", ".join(toggleable_roles)))
-            await self.bot.say("\n".join(out))
+    # @commands.command(pass_context=True, no_pm=True)
+    # @commands.has_any_role(*TOGGLE_ROLES)
+    # async def togglerole(self, ctx: Context, role_name):
+    #     """Self-toggle role assignments."""
+    #     author = ctx.message.author
+    #     server = ctx.message.server
+    #     # toggleable_roles = [r.lower() for r in TOGGLEABLE_ROLES]
+    #
+    #     member_role = discord.utils.get(server.roles, name="Member")
+    #     is_member = member_role in author.roles
+    #
+    #     if is_member:
+    #         toggleable_roles = TOGGLE_PERM["Member"]
+    #     else:
+    #         toggleable_roles = TOGGLE_PERM["Visitor"]
+    #
+    #     toggleable_roles = sorted(toggleable_roles, key=lambda r: r.lower())
+    #
+    #     toggleable_roles_lower = [r.lower() for r in toggleable_roles]
+    #
+    #     if role_name.lower() in toggleable_roles_lower:
+    #         role = [
+    #             r for r in server.roles
+    #             if r.name.lower() == role_name.lower()]
+    #
+    #         if len(role):
+    #             role = role[0]
+    #             if role in author.roles:
+    #                 await self.bot.remove_roles(author, role)
+    #                 await self.bot.say(
+    #                     "Removed {} role from {}.".format(
+    #                         role.name, author.display_name))
+    #             else:
+    #                 await self.bot.add_roles(author, role)
+    #                 await self.bot.say(
+    #                     "Added {} role for {}.".format(
+    #                         role_name, author.display_name))
+    #         else:
+    #             await self.bot.say(
+    #                 "{} is not a valid role on this server.".format(role_name))
+    #     else:
+    #         out = []
+    #         out.append(
+    #             "{} is not a toggleable role for you.".format(role_name))
+    #         out.append(
+    #             "Toggleable roles for you: {}.".format(
+    #                 ", ".join(toggleable_roles)))
+    #         await self.bot.say("\n".join(out))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
