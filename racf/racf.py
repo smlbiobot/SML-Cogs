@@ -58,7 +58,7 @@ TOGGLE_PERM = {
     "Member": [
         "Heist", "Practice", "Tourney", "Recruit", "CoC",
         "Battle-Bay", "RACF-Tourney", "Brawl-Stars", "vc-crew",
-        "BSPlay", "PvZ", "Practice-EU"
+        "BSPlay", "PvZ", "Practice-EU", "Food"
     ],
     "Visitor": [
         "BSPlay", "Heist", "Recruit"

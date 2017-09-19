@@ -24,16 +24,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-from enum import Enum
+import os
+from random import choice
 
+import aiohttp
+import discord
 from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from random import choice
-import discord
-
-import os
+import json
+import asyncio
 
 PATH = os.path.join("data", "trophies")
 JSON = os.path.join(PATH, "settings.json")
@@ -132,6 +133,39 @@ class Trophies:
     async def trophies_set(self, ctx, clan: str, *, req: str):
         """Set the trophy requirements for clans."""
         await self.run_trophies_set(ctx, ClanType.CR, clan, req)
+
+    @trophies.command(name="check", pass_context=True, no_pm=True)
+    async def trophies_check(self, ctx, tag, member:discord.Member=None):
+        """Grabs trophy info from player and return suitable clans."""
+        url = 'http://api.cr-api.com/profile/' + tag
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, timeout=10) as resp:
+                    data = await resp.json()
+        except json.decoder.JSONDecodeError:
+            await self.bot.say("Failed to decode data from API. Aborting…")
+            return
+        except asyncio.TimeoutError:
+            await self.bot.say("API connection timeout. Aborting…")
+            return
+
+        if "error" in data:
+            await self.bot.say("Failed to fetch player with that tag. Abording…")
+            return
+
+        # - associate player tag with CR database on server.
+        racf = self.bot.get_cog("RACF")
+        if racf is not None and member is not None:
+            ctx.invoke(racf.crsettag, tag, member)
+
+        await self.bot.say(
+            "With a current trophies of {current_trophies}, "
+            "{ign} can join {clans}".format(
+                current_trophies=data.get("trophies", 0),
+                ign=data.get("name", ""),
+                clans="alpha"
+            )
+        )
 
     @commands.group(aliases=["bstr"], pass_context=True, no_pm=True)
     async def bstrophies(self, ctx):
