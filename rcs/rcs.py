@@ -128,33 +128,13 @@ class RCS:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @rcsset.command(name="apiurl", pass_context=True)
-    async def rcsset_profileapi(self, ctx, url):
-        """CR Profile API URL base.
-
-        Format:
-        If path is http://domain.com/path/LQQ
-        Enter http://domain.com/path/
-        """
-        self.settings["profile_api_url"] = url
-        dataIO.save_json(JSON, self.settings)
-        await self.bot.say("Profile API URL saved.")
-        await self.bot.delete_message(ctx.message)
-
-    @rcsset.command(name="apitoken", pass_context=True)
-    async def rcssett_porfileapitoken(self, ctx, token):
-        """API Authentication token."""
-        self.settings["profile_api_token"] = token
-        dataIO.save_json(JSON, self.settings)
-        await self.bot.say("Profile API token saved.")
-        await self.bot.delete_message(ctx.message)
-
     @rcsset.command(name="role", pass_context=True)
+    @checks.mod_or_permissions()
     async def rcsset_clan(self, ctx, clan_tag, role_name, role_nick=None):
         """Associate clan tags to role names.
-        
+
         Internally store roles as role IDs in case role renames.
-        Optionally set role_nick for used in nicknames for special cases 
+        Optionally set role_nick for used in nicknames for special cases
         e.g. RACF Delta uses Ⓐ - Delta instead of the default
         """
         server = ctx.message.server
@@ -198,15 +178,15 @@ class RCS:
     @rcs.command(name="verify", aliases=["v"], pass_context=True, no_pm=True)
     async def verify(self, ctx, member: discord.Member, tag, *, options=None):
         """Verify RCS membership using player tag.
-        
+
         1. Check clan information via CR Profile API
         2. Map clan information to server roles.
         3. Assign Trused + clan roles.
         4. Rename user to IGN (Role)
-        
+
         Options:
         add --notourney as last parameter to not add the Tournaments role
-        
+
         """
         # Check options
         if options is None:
