@@ -191,7 +191,7 @@ class BSBandModel:
         count = self.member_count
         if count is None:
             count = 0
-        return '{}/50'.format(count)
+        return '{}/100'.format(count)
 
     @property
     def badge_url(self):
