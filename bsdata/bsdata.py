@@ -176,6 +176,13 @@ class BSBandModel:
         return self.data.get('description_clean', None)
 
     """
+    Property used for BSPlayerModel
+    """
+    @property
+    def role(self):
+        return self.data.get('role', None)
+
+    """
     Model Properties
     """
     @property
@@ -354,6 +361,7 @@ class BSPlayerModel:
         blist = self.data.get('brawlers', None)
         if blist is None:
             return None
+        self._brawlers = []
         for b in blist:
             b = BSBrawlerModel(data=b)
             self._brawlers.append(b)
@@ -808,7 +816,6 @@ class BSData:
         em = discord.Embed(
             title=player.username,
             description="#{}".format(player.tag))
-        band = BSBandModel(data=player.band)
         em.color = discord.Color(value=self.random_color())
 
         if player.discord_member is not None:
@@ -816,7 +823,7 @@ class BSData:
                 em.description,
                 player.discord_member.mention)
 
-        em.add_field(name=band.name, value=band.role)
+        em.add_field(name=player.band.name, value=player.band.role)
         em.add_field(name="Trophies", value=player.trophies)
         em.add_field(name="Victories", value=player.wins)
         em.add_field(name="Showdown Victories", value=player.survival_wins)
@@ -824,26 +831,25 @@ class BSData:
         em.add_field(name="Brawlers", value=player.brawler_count)
 
         for brawler in player.brawlers:
-            data = BSBrawlerModel(**brawler)
-            emoji = self.brawler_emoji(data.name)
+            emoji = self.brawler_emoji(brawler.name)
             if emoji is None:
                 emoji = ''
-            name = '{} {} ({} UPG)'.format(data.name, emoji, data.level)
-            trophies = '{}/{}'.format(data.trophies, data.highest_trophies)
+            name = '{} {} ({} UPG)'.format(brawler.name, emoji, brawler.level)
+            trophies = '{}/{}'.format(brawler.trophies, brawler.highest_trophies)
             em.add_field(
                 name=name,
                 value=trophies)
 
         text = (
             '{0.name}'
-            ' Trophies: {0.trophies}'
-            ' Requirement: {0.requirement}'
+            ' Trophies: {0.score}'
+            ' Requirement: {0.required_score}'
             ' Tag: {0.tag}'
-            ' Type: {0.type}').format(band)
+            ' Type: {0.type}').format(player.band)
 
         em.set_footer(
             text=text,
-            icon_url=band.badge_url)
+            icon_url=player.band.badge_url)
 
         return em
 
