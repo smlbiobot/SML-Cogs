@@ -776,7 +776,7 @@ class BSData:
         await self.bot.say(embed=self.embed_player(player))
 
     async def get_player_data(self, tag):
-        """Return band data JSON."""
+        """Return player data JSON."""
         url = "{}{}".format(self.settings["player_api_url"], tag)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
@@ -785,6 +785,13 @@ class BSData:
                 except json.decoder.JSONDecodeError:
                     data = None
         return data
+
+    async def get_player_model(self, tag):
+        """Return player data in BSPlayerModel"""
+        data = await self.get_player_data(tag)
+        if data is None:
+            return None
+        return BSPlayerModel(data=data)
 
     def embed_player(self, player: BSPlayerModel):
         """Return player embed."""

@@ -431,7 +431,7 @@ class RACF:
 
         # - Lookup profile
         try:
-            player = await bsdata.get_player_data(tag)
+            player = await bsdata.get_player_model(tag)
         except asyncio.TimeoutError:
             await self.bot.send_message(
                 ctx.message.channel,
@@ -441,11 +441,10 @@ class RACF:
             return
 
         # - Check clan
-        band_tag = None
         try:
-            band_tag = player["band"]["tag"]
+            band_tag = player.band.tag
         except KeyError:
-            await self.bot.say("Profile API may be down. Abording…")
+            await self.bot.say("Profile API may be down. Aborting…")
             return
 
         if band_tag not in BAND_PERMISSION.keys():
