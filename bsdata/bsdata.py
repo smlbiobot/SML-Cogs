@@ -115,50 +115,69 @@ BS_ROLES = {
 }
 
 
-class BSBandData:
+class BSBandModel:
     """Brawl Stars Band data."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, data=None):
         """Init.
-
-        Expected list of keywords:
-        From API:
-            badge_export
-            badge_id
-            description
-            id
-                high
-                low
-                unsigned
-            member_count
-            members
-                avatar
-                avatar_export
-                experience_elvel
-                id
-                    high
-                    low
-                    unsigned
-                name
-                role
-                role_id
-                tag
-                trophies
-            name
-            required_score
-            score
-            tag
-            type
-            type_id
-            unk1
-            unk2
         From cog:
             key
             role
             tag
         """
-        self.__dict__.update(kwargs)
+        self.data = data
+        self.members = []
 
+    """
+    API Properties
+    """
+    @property
+    def name(self):
+        return self.data.get('name', None)
+
+    @property
+    def tag(self):
+        return self.data.get('tag', None)
+
+    @property
+    def badge_id(self):
+        return self.data.get('badge_id', None)
+
+    @property
+    def badge_export(self):
+        return self.data.get('badge_export', None)
+
+    @property
+    def type_id(self):
+        return self.data.get('type_id', None)
+
+    @property
+    def type(self):
+        return self.data.get('type', None)
+
+    @property
+    def member_count(self):
+        return self.data.get('member_count', None)
+
+    @property
+    def score(self):
+        return self.data.get('score', None)
+    
+    @property
+    def required_score(self):
+        return self.data.get('required_score', None)
+    
+    @property
+    def description(self):
+        return self.data.get('description', None)
+    
+    @property
+    def description_clean(self):
+        return self.data.get('description_clean', None)
+
+    """
+    Model Properties
+    """
     @property
     def member_count_str(self):
         """Member count in #/50 format."""
@@ -174,10 +193,10 @@ class BSBandData:
             "http://smlbiobot.github.io/img"
             "/bs-badge/{}.png").format(self.badge_export)
 
-class BSBandMemberData:
+class BSBandMemberModel:
     """Brawl Stars Member data."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, data=None):
         """Init.
 
         Expected list of keywords:
@@ -195,9 +214,41 @@ class BSBandMemberData:
             unk1
             unk2
         """
-        self.__dict__.update(kwargs)
+        self.data = data
         self._discord_member = None
 
+    @property
+    def tag(self):
+        return self.data.get('tag', None)
+
+    @property
+    def name(self):
+        return self.data.get('name', None)
+
+    @property
+    def role_id(self):
+        return self.data.get('role_id', None)
+
+    @property
+    def experience_level(self):
+        return self.data.get('experience_level', None)
+
+    @property
+    def trophies(self):
+        return self.data.get('trophies', None)
+
+    @property
+    def avatar(self):
+        return self.data.get('avatar', None)
+
+    @property
+    def avatar_export(self):
+        return self.data.get('avatar_export', None)
+
+    @property
+    def role(self):
+        return self.data.get('role', None)
+    
     @property
     def discord_member(self):
         """Discord user id."""
@@ -209,10 +260,10 @@ class BSBandMemberData:
         self._discord_member = value
 
 
-class BSBrawlerData:
+class BSBrawlerModel:
     """Brawl Stars Brawler data."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, data=None):
         """Init.
 
         Expected list of keywords:
@@ -225,53 +276,146 @@ class BSBrawlerData:
             type
             value
         """
-        self.__dict__.update(kwargs)
+        self.data = data
+        
+    @property
+    def tid(self):
+        return self.data.get('tid', None)
+    
+    @property
+    def name(self):
+        return self.data.get('name', None)
+    
+    @property
+    def icon_export(self):
+        return self.data.get('icon_export', None)
+    
+    @property
+    def id(self):
+        return self.data.get('id', None)
+    
+    @property
+    def trophies(self):
+        return self.data.get('trophies', None)
+    
+    @property
+    def highest_trophies(self):
+        return self.data.get('highest_trophies', None)
+    
+    @property
+    def level(self):
+        return self.data.get('level', None)
+    
+    @property
+    def rarity(self):
+        return self.data.get('rarity', None)
+    
+    @property
+    def rank(self):
+        return self.data.get('rank', None)
+    
+    @property
+    def rank_export(self):
+        return self.data.get('rank_export', None)
+    
+    @property
+    def required_trophies_for_next_rank(self):
+        return self.data.get('required_trophies_for_next_rank', None)
 
-class BSPlayerData:
+class BSPlayerModel:
     """Brawl Stars player data."""
 
-    def __init__(self, **kwargs):
-        """Init.
-
-        Expected list of keywords:
-        From API:
-            avatar
-            band
-                badge
-                badge_id
-                high
-                low
-                member_count
-                name
-                requirement
-                role
-                role_id
-                tag
-                trophies
-                type
-                type_id
-            brawler_count
-            brawlers[]
-                highest_trophies
-                level
-                name
-                number
-                trophies
-                type
-                value
-            high
-            highest_trophies
-            low
-            survival_wins
-            tag
-            total_experience
-            trophies
-            username
-            wins
-        """
-        self.__dict__.update(kwargs)
+    def __init__(self, data=None):
+        """Init."""
+        self.data = data
         self._discord_member = None
+        self._brawlers = None
+        self._band = None
 
+    """
+    API properties
+    """
+    @property
+    def username(self):
+        return self.data.get('username', None)
+    
+    @property
+    def tag(self):
+        return self.data.get('tag', None)
+    
+    @property
+    def brawler_count(self):
+        return self.data.get('brawler_count', None)
+
+    @property
+    def brawlers(self):
+        if self._brawlers is not None:
+            return self._brawlers
+        blist = self.data.get('brawlers', None)
+        if blist is None:
+            return None
+        for b in blist:
+            b = BSBrawlerModel(data=b)
+            self._brawlers.append(b)
+        return self._brawlers
+
+    @property
+    def value_count(self):
+        return self.data.get('value_count', None)
+
+    @property
+    def wins(self):
+        return self.data.get('wins', None)
+
+    @property
+    def total_experience(self):
+        return self.data.get('total_experience', None)
+
+    @property
+    def trophies(self):
+        return self.data.get('trophies', None)
+
+    @property
+    def highest_trophies(self):
+        return self.data.get('highest_trophies', None)
+
+    @property
+    def account_age_in_days(self):
+        return self.data.get('account_age_in_days', None)
+
+    @property
+    def avatar(self):
+        return self.data.get('avatar', None)
+
+    @property
+    def survival_wins(self):
+        return self.data.get('survival_wins', None)
+
+    @property
+    def avatar_export(self):
+        return self.data.get('avatar_export', None)
+
+    @property
+    def level(self):
+        return self.data.get('level', None)
+
+    @property
+    def current_experience(self):
+        return self.data.get('current_experience', None)
+
+    @property
+    def band(self):
+        if self._band is not None:
+            return self._band
+        b = self.data.get('band', None)
+        if b is None:
+            return None
+        self._band = BSBandModel(data=b)
+        return self._band
+
+    """
+    Cog properties
+    """
     @property
     def discord_member(self):
         """Discord user id."""
@@ -310,7 +454,7 @@ class BSData:
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
-    async def setbsdata(self, ctx):
+    async def bsdataset(self, ctx):
         """Set Brawl Stars Data settings.
 
         Require: Brawl Stars API by Harmiox.
@@ -318,16 +462,16 @@ class BSData:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setbsdata.command(name="init", pass_context=True)
-    async def setbsdata_init(self, ctx: Context):
+    @bsdataset.command(name="init", pass_context=True)
+    async def bsdataset_init(self, ctx: Context):
         """Init BS Band settings."""
         server = ctx.message.server
         self.settings["servers"][server.id] = SERVER_DEFAULTS
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Server settings initialized.")
 
-    @setbsdata.command(name="bandapi", pass_context=True)
-    async def setbsdata_bandapi(self, ctx: Context, url):
+    @bsdataset.command(name="bandapi", pass_context=True)
+    async def bsdataset_bandapi(self, ctx: Context, url):
         """BS Band API URL base.
 
         Format:
@@ -342,8 +486,8 @@ class BSData:
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Band API URL updated.")
 
-    @setbsdata.command(name="playerapi", pass_context=True)
-    async def setbsdata_playerapi(self, ctx: Context, url):
+    @bsdataset.command(name="playerapi", pass_context=True)
+    async def bsdataset_playerapi(self, ctx: Context, url):
         """BS Member API URL base.
 
         Format:
@@ -358,8 +502,8 @@ class BSData:
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Member API URL updated.")
 
-    @setbsdata.command(name="swapplayers", pass_context=True)
-    async def setbsdata_swapplayers(self, ctx):
+    @bsdataset.command(name="swapplayers", pass_context=True)
+    async def bsdataset_swapplayers(self, ctx):
         """LEGACY settings support: swap players dictionary.
 
         From key to value.
@@ -417,8 +561,8 @@ class BSData:
                 pass
         return None
 
-    @setbsdata.command(name="update", pass_context=True)
-    async def setbsdata_update(self, ctx: Context):
+    @bsdataset.command(name="update", pass_context=True)
+    async def bsdataset_update(self, ctx: Context):
         """Update data from api."""
         success = await self.update_data()
         if success:
@@ -435,8 +579,8 @@ class BSData:
         dataIO.save_json(JSON, self.settings)
         return True
 
-    @setbsdata.command(name="add", pass_context=True)
-    async def setbsdata_add(self, ctx: Context, *clantags):
+    @bsdataset.command(name="add", pass_context=True)
+    async def bsdataset_add(self, ctx: Context, *clantags):
         """Add clan tag(s).
 
         [p]setbsband add LQQ 82RQLR 98VLYJ Q0YG8V
@@ -463,8 +607,8 @@ class BSData:
 
         await self.update_data()
 
-    @setbsdata.command(name="remove", pass_context=True)
-    async def setbsdata_remove(self, ctx: Context, *clantags):
+    @bsdataset.command(name="remove", pass_context=True)
+    async def bsdataset_remove(self, ctx: Context, *clantags):
         """Remove clan tag(s).
 
         [p]setbsband remove LQQ 82RQLR 98VLYJ Q0YG8V
@@ -489,8 +633,8 @@ class BSData:
             self.set_bands_settings(server.id, bands)
             await self.bot.say("Removed #{} from bands.".format(clantag))
 
-    @setbsdata.command(name="setkey", pass_context=True)
-    async def setbsdata_setkey(self, ctx, tag, key):
+    @bsdataset.command(name="setkey", pass_context=True)
+    async def bsdataset_setkey(self, ctx, tag, key):
         """Associate band tag with human readable key.
 
         This is used for running other commands to make
@@ -534,7 +678,7 @@ class BSData:
 
     def embed_bsdata_info(self, band):
         """Return band info embed."""
-        data = BSBandData(**band)
+        data = BSBandModel(data=band)
         em = discord.Embed(
             title=data.name,
             description=data.description)
@@ -558,7 +702,7 @@ class BSData:
         bands = self.get_bands_settings(server.id)
         band_result = None
         for k, band in bands.items():
-            data = BSBandData(**band)
+            data = BSBandModel(data=band)
             if hasattr(data, "key"):
                 if data.key == key:
                     band_result = data
@@ -596,7 +740,7 @@ class BSData:
         em = discord.Embed(title=".")
         for member in members:
             if member is not None:
-                data = BSBandMemberData(**member)
+                data = BSBandMemberModel(**member)
                 name = "{}, {}".format(data.name, data.role)
                 mention = ""
                 member = self.tag2member(data.tag)
@@ -643,7 +787,7 @@ class BSData:
                 "Run `!bsdata settag` if you need to update it.".format(tag))
             return
 
-        player = BSPlayerData(**data)
+        player = BSPlayerModel(data=data)
         server = ctx.message.server
         player.discord_member = self.get_discord_member(server, tag)
         await self.bot.say(embed=self.embed_player(player))
@@ -659,12 +803,12 @@ class BSData:
                     data = None
         return data
 
-    def embed_player(self, player: BSPlayerData):
+    def embed_player(self, player: BSPlayerModel):
         """Return player embed."""
         em = discord.Embed(
             title=player.username,
             description="#{}".format(player.tag))
-        band = BSBandData(**player.band)
+        band = BSBandModel(data=player.band)
         em.color = discord.Color(value=self.random_color())
 
         if player.discord_member is not None:
@@ -680,7 +824,7 @@ class BSData:
         em.add_field(name="Brawlers", value=player.brawler_count)
 
         for brawler in player.brawlers:
-            data = BSBrawlerData(**brawler)
+            data = BSBrawlerModel(**brawler)
             emoji = self.brawler_emoji(data.name)
             if emoji is None:
                 emoji = ''
