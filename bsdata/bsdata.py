@@ -205,21 +205,6 @@ class BSBandMemberModel:
 
     def __init__(self, data=None):
         """Init.
-
-        Expected list of keywords:
-        From API:
-            experience_level
-            id
-                high
-                low
-                unsigned
-            name
-            role
-            role_id
-            tag
-            trophies
-            unk1
-            unk2
         """
         self.data = data
         self._discord_member = None
@@ -272,16 +257,6 @@ class BSBrawlerModel:
 
     def __init__(self, data=None):
         """Init.
-
-        Expected list of keywords:
-        From API:
-            highest_trophies
-            level
-            name
-            number
-            trophies
-            type
-            value
         """
         self.data = data
         
