@@ -218,12 +218,12 @@ class Trophies:
         server = ctx.message.server
         clans = RACF_CLANS[clan_type]
 
-        if clan.lower() not in [c.lower() for c in clans]:
+        if clan.lower() not in [c["name"].lower() for c in clans]:
             await self.bot.say("Clan name is not valid.")
             return
 
         for i, c in enumerate(clans):
-            if clan.lower() == c.lower():
+            if clan.lower() == c["name"].lower():
                 self.settings[server.id][
                     "Trophies"][clan_type][i]["value"] = req
                 await self.bot.say(
