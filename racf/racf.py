@@ -107,12 +107,12 @@ VISITOR_RULES = (
     "If you would like to invite your friends to join this server, "
     "you may use this Discord invite: <http://discord.gg/racf> \n"
     "\n"
-    "Additional help and information: <http://racfdocs.smlbiobot.com> \n"
+    "Additional help and information: http://docs.redditalpha.com/ \n"
     "\n"
     "Thanks + enjoy!")
 MEMBER_MSG = (
     "Welcome to the **Reddit Alpha Clan Family** (RACF) Discord server. "
-    "Please check out <http://racfdocs.smlbiobot.com> for an overview of our family rules, "
+    "Please check out http://docs.redditalpha.com/ for an overview of our family rules, "
     "together with help documentation on a plethora of bot commands for you to use and enjoy."
     "\n\n"
     "Thanks + enjoy!"
