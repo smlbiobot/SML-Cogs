@@ -1,7 +1,7 @@
 .DS_Store
 .idea
 crtags
-.idea/
+.vscode
 channelfilter/
 crclan/data/sample/
 crprofile/data/players/

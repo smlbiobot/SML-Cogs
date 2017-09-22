@@ -24,6 +24,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
+import json
 import os
 from random import choice
 
@@ -33,8 +35,6 @@ from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-import json
-import asyncio
 
 PATH = os.path.join("data", "trophies")
 JSON = os.path.join(PATH, "settings.json")
@@ -51,9 +51,22 @@ class ClanType:
 
 RACF_CLANS = {
     ClanType.CR: [
-        'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo',
-        'Foxtrot', 'Golf', 'Hotel', 'eSports'],
-    ClanType.BS: ['Alpha', 'Bravo', 'Charlie', 'Delta']
+        {'name': 'Alpha', 'tag': '2CCCP'},
+        {'name': 'Bravo', 'tag': '2U2GGQJ'},
+        {'name': 'Charlie', 'tag': '2QUVVVP'},
+        {'name': 'Delta', 'tag': 'Y8GYCGV'},
+        {'name': 'Echo', 'tag': 'LGVV2CG'},
+        {'name': 'Foxtrot', 'tag': 'QUYCYV8'},
+        {'name': 'Golf', 'tag': 'GUYGVJY'},
+        {'name': 'Hotel', 'tag': 'UGQ28YU'},
+        {'name': 'eSports', 'tag': 'R8PPJQG'}
+    ],
+    ClanType.BS: [
+        {'name': 'Alpha', 'tag': 'LQQ'},
+        {'name': 'Bravo', 'tag': '82RQLR'},
+        {'name': 'Charlie', 'tag': '98VLYJ'},
+        {'name': 'Delta', 'tag': 'Q0YG8V'}
+    ]
 }
 
 SERVER_DEFAULTS = {
@@ -78,6 +91,20 @@ class Trophies:
         self.bot = bot
         self.settings = dataIO.load_json(JSON)
 
+    @property
+    def racf_clan_names(self):
+        return [c['name'] for c in RACF_CLANS[ClanType.CR]]
+
+    @property
+    def racf_band_names(self):
+        return [c['name'] for c in RACF_CLANS[ClanType.BS]]
+
+    def clan_tag(self, type, name):
+        for clan in RACF_CLANS[type]:
+            if clan['name'] == name:
+                return clan['tag']
+        return ''
+
     @checks.serverowner_or_permissions(manage_server=True)
     @commands.group(pass_context=True, no_pm=True)
     async def settrophies(self, ctx):
@@ -98,12 +125,12 @@ class Trophies:
         server_settings = SERVER_DEFAULTS.copy()
         server_settings["ServerName"] = server.name
         server_settings["ServerID"] = server.id
-        for clan in RACF_CLANS[ClanType.CR]:
+        for clan in self.racf_clan_names:
             server_settings['Trophies'][ClanType.CR].append({
                 'name': clan,
                 'value': 0
             })
-        for clan in RACF_CLANS[ClanType.BS]:
+        for clan in self.racf_band_names:
             server_settings['Trophies'][ClanType.BS].append({
                 'name': clan,
                 'value': 0
@@ -135,7 +162,7 @@ class Trophies:
         await self.run_trophies_set(ctx, ClanType.CR, clan, req)
 
     @trophies.command(name="check", pass_context=True, no_pm=True)
-    async def trophies_check(self, ctx, tag, member:discord.Member=None):
+    async def trophies_check(self, ctx, tag, member: discord.Member = None):
         """Grabs trophy info from player and return suitable clans."""
         url = 'http://api.cr-api.com/profile/' + tag
         try:
@@ -232,11 +259,12 @@ class Trophies:
         for clan in clans:
             name = clan["name"]
             value = clan["value"]
+            tag = self.clan_tag(clan_type, name)
 
             if str(value).isdigit():
                 value = '{:,}'.format(int(value))
 
-            data.add_field(name=str(name), value=value)
+            data.add_field(name='{} #{}'.format(name, tag), value=value)
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
@@ -265,5 +293,3 @@ def setup(bot):
     check_file()
     n = Trophies(bot)
     bot.add_cog(n)
-
-
