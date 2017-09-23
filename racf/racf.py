@@ -250,6 +250,59 @@ def grouper(n, iterable, fillvalue=None):
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
+class SCTag:
+    """SuperCell tags."""
+
+    TAG_CHARACTERS = list("0289PYLQGRJCUV")
+
+    def __init__(self, tag: str):
+        """Init.
+
+        Remove # if found.
+        Convert to uppercase.
+        Convert Os to 0s if found.
+        """
+        if tag.startswith('#'):
+            tag = tag[1:]
+        tag = tag.replace('O', '0')
+        tag = tag.upper()
+        self._tag = tag
+
+    @property
+    def tag(self):
+        """Return tag as str."""
+        return self._tag
+
+    @property
+    def valid(self):
+        """Return true if tag is valid."""
+        for c in self.tag:
+            if c not in self.TAG_CHARACTERS:
+                return False
+        return True
+
+    @property
+    def invalid_chars(self):
+        """Return list of invalid characters."""
+        invalids = []
+        for c in self.tag:
+            if c not in self.TAG_CHARACTERS:
+                invalids.append(c)
+        return invalids
+
+    @property
+    def invalid_error_msg(self):
+        """Error message to show if invalid."""
+        return (
+            'The tag you have entered is not valid. \n'
+            'List of invalid characters in your tag: {}\n'
+            'List of valid characters for tags: {}'.format(
+                ', '.join(self.invalid_chars),
+                ', '.join(self.TAG_CHARACTERS)
+            ))
+
+
+
 class RACF:
     """Display RACF specifc info.
 
@@ -293,15 +346,30 @@ class RACF:
             await self.bot.say(
                 "I need the `Embed links` permission to send this.")
 
+    def player_info(self, player_data):
+        """Short player info without full profile."""
+        return (
+            "Player Tag: {0[tag]}\n"
+            "IGN: {0[name]}\n"
+            "Clan Name: {0[clan][name]}\n"
+            "Clan Tag: {0[clan][tag]}\n"
+            "Clan Role: {0[clan][role]}\n"
+            "Trophies: {0[trophies]} / {0[stats][maxTrophies]} PB".format(
+                player_data
+            )
+        )
+
     @racf.command(name="verify", aliases=['v'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def racf_verify(self, ctx, member: discord.Member, tag):
         """Verify CR members by player tag."""
 
-        # - validate tag
-        if tag.startswith('#'):
-            tag = tag[1:]
-        tag = tag.upper()
+        sctag = SCTag(tag)
+        if not sctag.valid:
+            await self.bot.say(sctag.invalid_error_msg)
+            return
+
+        tag = sctag.tag
 
         # - Set their tags
         await ctx.invoke(self.crsettag, tag, member)
@@ -310,7 +378,6 @@ class RACF:
         async def fetch_player_profile(tag):
             """Fetch player profile data."""
             url = "{}{}".format('http://api.cr-api.com/profile/', tag)
-            print(url)
 
             try:
                 async with aiohttp.ClientSession() as session:
@@ -338,6 +405,16 @@ class RACF:
                 "API may be down or player tag cannot be found. "
                 "Aborting…")
             return
+
+        if "error" in player:
+            await self.bot.send_message(
+                ctx.message.channel,
+                "API reports error in player tag. Verify tag is correct or try again later."
+                "Aborting…")
+            return
+
+        # - Show player info
+        await self.bot.say(self.player_info(player))
 
         # - Change nickname to IGN
         ign = player.get('name', None)
