@@ -229,8 +229,15 @@ class CRPlayerModel:
         return self.data.get("clan", None)
 
     @property
+    def not_in_clan(self):
+        """Not in clan flag."""
+        return self.clan_tag == ''
+
+    @property
     def clan_name(self):
         """Clan name."""
+        if self.not_in_clan:
+            return "No Clan"
         if self.clan is not None:
             return self.clan.get("name", None)
         return None
@@ -245,6 +252,8 @@ class CRPlayerModel:
     @property
     def clan_role(self):
         """Clan role."""
+        if self.not_in_clan:
+            return "N/A"
         if self.clan is not None:
             return self.clan.get("role", None)
         return None
@@ -257,6 +266,8 @@ class CRPlayerModel:
     @property
     def clan_badge_url(self):
         """Clan badge url."""
+        if self.not_in_clan:
+            return "http://smlbiobot.github.io/img/emblems/NoClan.png"
         filename = self.clan.get("badgeUrl", None)
         return 'http://api.cr-api.com{}'.format(filename)
 
@@ -1096,6 +1107,7 @@ class CRProfile:
 
         # header
         title = player.name
+
         description = (
             '[{player_tag}]({profile_url})\n'
             '**[{clan_name}]({clan_url})**\n'
