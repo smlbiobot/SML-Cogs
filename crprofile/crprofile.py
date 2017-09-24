@@ -672,7 +672,7 @@ class CRPlayerModel:
 class Settings:
     """Cog settings.
 
-    Functionally the CRClan cog model.
+    Functionally the CRProfile cog model.
     """
 
     DEFAULTS = {
