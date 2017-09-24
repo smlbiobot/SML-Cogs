@@ -292,6 +292,13 @@ class CRPlayerModel:
         return 0
 
     @property
+    def tourney_cards_per_game(self):
+        """Number of tournament cards won per game played."""
+        if self.tourney_games:
+            return self.tourney_cards_won / self.tourney_games
+        return None
+
+    @property
     def challenge_max_wins(self):
         """Max challenge wins."""
         if self.stats is not None:
@@ -355,6 +362,13 @@ class CRPlayerModel:
         return self.data.get("games", None)
 
     @property
+    def tourney_games(self):
+        """Number of tournament games."""
+        if self.games is not None:
+            return self.games.get("tournamentGames", 0)
+        return 0
+
+    @property
     def wins(self):
         """Games won."""
         if self.games is not None:
@@ -366,7 +380,7 @@ class CRPlayerModel:
         """Games won."""
         if self.games is not None:
             return self.games.get("losses", 0)
-        return None
+        return 0
 
     @property
     def draws(self):
@@ -523,7 +537,7 @@ class CRPlayerModel:
         # special chests
         for c in special_chests:
             out.append(bot_emoji.key(c[0]))
-            out.append('{}'.format(c[1]))
+            out.append('{}'.format(c[1] + 1))
 
         return ''.join(out)
 
@@ -570,8 +584,7 @@ class CRPlayerModel:
     @property
     def win_ratio(self):
         """Win ratio."""
-        return '{0:.3f}%'.format(
-            (self.wins + self.draws * 0.5) / (self.wins + self.draws + self.losses) * 100)
+        return (self.wins + self.draws * 0.5) / (self.wins + self.draws + self.losses)
 
     @property
     def arena(self):
@@ -1161,14 +1174,16 @@ class CRProfile:
 
         stats = {
             'Wins / Draws / Losses': player.win_draw_losses(bem('battle')),
-            'Win Ratio': '{} {}'.format(player.win_ratio, bem('battle')),
+            'Win Percentage': '{:.3%} {}'.format(player.win_ratio, bem('battle')),
             'Total Games': fmt(player.total_games, 'battle'),
             'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
             'Win Streak': fmt(player.win_streak, 'crownred'),
             'Cards Found': fmt(player.cards_found, 'cards'),
             'Challenge Cards Won': fmt(player.challenge_cards_won, 'tournament'),
-            'Tourney Cards Won': fmt(player.tourney_cards_won, 'tournament'),
             'Challenge Max Wins': fmt(player.challenge_max_wins, 'tournament'),
+            'Tourney Cards Won': fmt(player.tourney_cards_won, 'tournament'),
+            'Tourney Games': fmt(player.tourney_games, 'tournament'),
+            'Tourney Cards/Game': '{:.3f}'.format(player.tourney_cards_per_game or 'N/A', 'tournament'),
             'Total Donations': fmt(player.total_donations, 'cards'),
             'Level': fmt(player.level, 'experience'),
             'Experience': '{} {}'.format(player.xp_str, bem('experience')),
