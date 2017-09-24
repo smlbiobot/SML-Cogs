@@ -830,12 +830,12 @@ class Settings:
 
     @property
     def profile_api_url(self):
-        """Clan API URL."""
+        """Profile API URL."""
         return self.settings["profile_api_url"]
 
     @profile_api_url.setter
     def profile_api_url(self, value):
-        """Set Clan API URL."""
+        """Set Profile API URL."""
         self.settings["profile_api_url"] = value
         self.save()
 
@@ -900,21 +900,21 @@ class CRProfile:
 
     @crprofileset.command(name="initserver", pass_context=True)
     async def crprofileset_initserver(self, ctx):
-        """Init CR Clan: server settings."""
+        """Init CR Profile: server settings."""
         server = ctx.message.server
         self.model.init_server(server)
         await self.bot.say("Server settings initialized.")
 
     @crprofileset.command(name="initplayers", pass_context=True)
     async def crprofileset_initplayers(self, ctx):
-        """Init CR Clan: players settings."""
+        """Init CR Profile: players settings."""
         server = ctx.message.server
         self.model.init_players(server)
         await self.bot.say("Clan settings initialized.")
 
     @crprofileset.command(name="profileapi", pass_context=True)
     async def crprofileset_profileapi(self, ctx, url):
-        """CR Clan API URL base.
+        """CR Profile API URL base.
 
         Format:
         If path is http://domain.com/path/LQQ
