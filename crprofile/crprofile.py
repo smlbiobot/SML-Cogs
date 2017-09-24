@@ -1172,6 +1172,11 @@ class CRProfile:
             emoji = bem(emoji_name)
             return '{:,} {}'.format(num, emoji)
 
+        if player.tourney_cards_per_game is None:
+            tourney_cards_per_game = 'N/A'
+        else:
+            tourney_cards_per_game = '{:.3f}'.format(player.tourney_cards_per_game)
+
         stats = {
             'Wins / Draws / Losses': player.win_draw_losses(bem('battle')),
             'Win Percentage': '{:.3%} {}'.format(player.win_ratio, bem('battle')),
@@ -1183,7 +1188,7 @@ class CRProfile:
             'Challenge Max Wins': fmt(player.challenge_max_wins, 'tournament'),
             'Tourney Cards Won': fmt(player.tourney_cards_won, 'tournament'),
             'Tourney Games': fmt(player.tourney_games, 'tournament'),
-            'Tourney Cards/Game': '{:.3f}'.format(player.tourney_cards_per_game or 'N/A', 'tournament'),
+            'Tourney Cards/Game': '{} {}'.format(tourney_cards_per_game, bem('tournament')),
             'Total Donations': fmt(player.total_donations, 'cards'),
             'Level': fmt(player.level, 'experience'),
             'Experience': '{} {}'.format(player.xp_str, bem('experience')),
