@@ -171,6 +171,7 @@ class CRPlayerModel:
         """Init."""
         self.data = data
         self.is_cache = is_cache
+        self.CHESTS = CHESTS
 
     @property
     def tag(self):
@@ -418,6 +419,10 @@ class CRPlayerModel:
         o = p.ordinal(self.rank)[-2:]
         return '{:,}{} {}'.format(self.rank, o, bot_emoji.name('rank'))
 
+    """
+        Chests.
+        """
+
     @property
     def chest_cycle(self):
         """Chest cycle."""
@@ -438,47 +443,60 @@ class CRPlayerModel:
             return "Legendary"
         elif pos == self.chest_cycle.get("epicPos"):
             return "Epic"
-        return CHESTS[pos % len(CHESTS)]
+        return self.CHESTS[pos % len(self.CHESTS)]
 
     def chests(self, count):
         """Next n chests."""
-        return [self.chest_by_position(self.chest_cycle_position + i) for i in range(count)]
+        if self.chest_cycle_position is not None:
+            return [self.chest_by_position(self.chest_cycle_position + i) for i in range(count)]
+        return []
+
+    def chest_index(self, key):
+        """Chest incdex by chest key."""
+        if self.chest_cycle is None:
+            return None
+        if self.chest_cycle_position is None:
+            return None
+        chest_pos = self.chest_cycle.get(key, None)
+        if chest_pos is None:
+            return None
+        return chest_pos - self.chest_cycle_position
 
     @property
     def chest_super_magical_index(self):
         """Super magical index."""
-        chest_pos = self.chest_cycle.get("superMagicalPos")
-        return chest_pos - self.chest_cycle_position
+        return self.chest_index("superMagicalPos")
 
     @property
     def chest_legendary_index(self):
         """Super magical index."""
-        chest_pos = self.chest_cycle.get("legendaryPos")
-        return chest_pos - self.chest_cycle_position
+        return self.chest_index("legendaryPos")
 
     @property
     def chest_epic_index(self):
         """Super magical index."""
-        chest_pos = self.chest_cycle.get("epicPos")
-        return chest_pos - self.chest_cycle_position
+        return self.chest_index("epicPos")
+
+    def chest_first_index(self, key):
+        """First index of chest by key."""
+        if self.CHESTS is not None:
+            pos = self.chest_cycle_position
+            if pos is not None:
+                start_pos = pos % len(self.CHESTS)
+                chests = self.CHESTS[start_pos:]
+                chests.extend(self.CHESTS)
+                return chests.index(key)
+        return None
 
     @property
     def chest_magical_index(self):
         """First index of magical chest"""
-        pos = self.chest_cycle_position
-        start_pos = pos % len(CHESTS)
-        chests = CHESTS[start_pos:]
-        chests.extend(CHESTS)
-        return chests.index('Magic')
+        return self.chest_first_index('Magic')
 
     @property
     def chest_giant_index(self):
-        """First index of magical chest"""
-        pos = self.chest_cycle_position
-        start_pos = pos % len(CHESTS)
-        chests = CHESTS[start_pos:]
-        chests.extend(CHESTS)
-        return chests.index('Giant')
+        """First index of giant chest"""
+        return self.chest_first_index('Giant')
 
     @property
     def chests_opened(self):
@@ -495,6 +513,7 @@ class CRPlayerModel:
             ('Legendary', self.chest_legendary_index),
             ('SuperMagical', self.chest_super_magical_index)
         ]
+        special_chests = [c for c in special_chests if c[1] is not None]
         special_chests = sorted(special_chests, key=lambda c: c[1])
 
         out = []
