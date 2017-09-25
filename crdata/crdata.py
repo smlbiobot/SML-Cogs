@@ -301,7 +301,8 @@ class CRData:
         """Loop task: update data daily."""
         await self.bot.wait_until_ready()
         await self.update_data()
-        await self.eslog_update_data()
+        if elasticsearch_available:
+            await self.eslog_update_data()
         await asyncio.sleep(DATA_UPDATE_INTERVAL)
         if self is self.bot.get_cog('CRData'):
             self.task = self.bot.loop.create_task(self.loop_task())
