@@ -38,11 +38,10 @@ from random import choice
 import aiohttp
 import discord
 from __main__ import send_cmd_help
-from discord.ext import commands
-
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline, pagify
+from cogs.utils.chat_formatting import inline, pagify, box
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "crclan")
 PATH_CLANS = os.path.join(PATH, "clans")
@@ -211,7 +210,6 @@ class CRClanModel:
     def members(self, value):
         """Members set"""
         self._members = value
-
 
     @property
     def member_tags(self):
@@ -473,7 +471,7 @@ class ServerModel:
         self.settings = data
 
 
-class CogModel:
+class ClanManager:
     """Cog settings.
 
     Functionally the CRClan cog model.
@@ -608,7 +606,10 @@ class CogModel:
 
     def server_settings(self, server):
         """Return server settings."""
-        return self.settings["servers"][server.id]
+        try:
+            return self.settings["servers"][server.id]
+        except KeyError:
+            return None
 
     def discord_members_by_clankey(self, server, key=None, sort=True):
         """Return list of Discord members by clan key.
@@ -896,9 +897,9 @@ class CRClan:
         """Init."""
         self.bot = bot
         self.task = bot.loop.create_task(self.loop_task())
-        self.model = CogModel(JSON, bot)
-        self.roster_view = CRClanRosterView(bot, self.model)
-        self.info_view = CRClanInfoView(bot, self.model)
+        self.manager = ClanManager(JSON, bot)
+        self.roster_view = CRClanRosterView(bot, self.manager)
+        self.info_view = CRClanInfoView(bot, self.manager)
 
     def __unload(self):
         self.task.cancel()
@@ -906,8 +907,8 @@ class CRClan:
     async def loop_task(self):
         """Loop task: update data daily."""
         await self.bot.wait_until_ready()
-        await self.model.update_data()
-        await asyncio.sleep(self.model.data_update_interval)
+        await self.manager.update_data()
+        await asyncio.sleep(self.manager.data_update_interval)
         if self is self.bot.get_cog('CRClan'):
             self.task = self.bot.loop.create_task(self.loop_task())
 
@@ -925,14 +926,14 @@ class CRClan:
     async def crclanset_init(self, ctx):
         """Init CR Clan: server settings."""
         server = ctx.message.server
-        self.model.init_server(server)
+        self.manager.init_server(server)
         await self.bot.say("Server settings initialized.")
 
     @crclanset.command(name="initclans", pass_context=True)
     async def crclanset_init(self, ctx):
         """Init CR Clan: clans settings."""
         server = ctx.message.server
-        self.model.init_clans(server)
+        self.manager.init_clans(server)
         await self.bot.say("Clan settings initialized.")
 
     @crclanset.command(name="dataupdateinterval", pass_context=True)
@@ -941,14 +942,14 @@ class CRClan:
 
         unit is seconds.
         """
-        self.model.data_update_interval = seconds
+        self.manager.data_update_interval = seconds
         await self.bot.say("Data update interval updated.")
 
     @crclanset.command(name="update", pass_context=True)
     async def crclanset_update(self, ctx):
         """Update data from api."""
         await self.bot.type()
-        dataset = await self.model.update_data()
+        dataset = await self.manager.update_data()
         for data in dataset:
             if not data.loaded:
                 await self.bot.send_message(ctx.message.channel, "Cannot load data for {}.".format(data.tag))
@@ -974,7 +975,7 @@ class CRClan:
             await self.bot.say(sctag.invalid_error_msg)
             return
 
-        self.model.add_clan(ctx.message.server, sctag.tag, key, role_name)
+        self.manager.add_clan(ctx.message.server, sctag.tag, key, role_name)
 
         await self.bot.say(
             'Added clan #{} with key: {} and role: {}'.format(
@@ -995,7 +996,7 @@ class CRClan:
 
         for clantag in clantags:
             try:
-                self.model.remove_clan(server, clantag)
+                self.manager.remove_clan(server, clantag)
             except ClanTagNotInSettings:
                 await self.bot.say("{} is not in clan settings.".format(clantag))
             else:
@@ -1020,12 +1021,41 @@ class CRClan:
             return
 
         try:
-            self.model.set_clan_key(server, sctag.tag, key)
+            self.manager.set_clan_key(server, sctag.tag, key)
         except ClanTagNotInSettings:
             await self.bot.say(
                 "{} is not a clan tag you have added".format(tag))
         else:
             await self.bot.say("Added {} for clan #{}.".format(key, tag))
+
+    @crclanset.command(name="settings", pass_context=True)
+    async def crclanset_settings(self, ctx):
+        """Display settings for the server."""
+        server = ctx.message.server
+        server_settings = self.manager.server_settings(server)
+        if server_settings is None:
+            await self.bot.say("This server has not settings.")
+            return
+        clans = server_settings.get("clans", None)
+        if clans is None:
+            await self.bot.say("No clans settings found on this server.")
+            return
+        clan_list = [clan for k, clan in clans.items()]
+
+        out = []
+        fmt = '{:<12} ' * 3
+        th = fmt.format("Clan Key", "Role", "Tag")
+        out.append(th)
+        out.append('-' * len(th))
+        for k, clan in clans.items():
+            key = clan.get("key", None) or " "
+            role = clan.get("role_name", None) or " "
+            tag = clan.get("tag", None) or " "
+
+            o = fmt.format(key, role, tag)
+            out.append(o)
+        for page in pagify(box('\n'.join(out))):
+            await self.bot.say(page)
 
     @commands.group(pass_context=True, no_pm=True)
     async def crclan(self, ctx):
@@ -1080,7 +1110,7 @@ class CRClan:
         if member is None:
             member = ctx.message.author
 
-        self.model.set_player(server, member, sctag.tag)
+        self.manager.set_player(server, member, sctag.tag)
 
         await self.bot.say(
             "Associated player tag #{} with Discord Member {}.".format(
@@ -1094,7 +1124,7 @@ class CRClan:
         author = ctx.message.author
         if member is None:
             member = author
-        tag = self.model.member2tag(server, member)
+        tag = self.manager.member2tag(server, member)
         if tag is None:
             await self.bot.say("Cannot find associated player tag.")
             return
@@ -1133,7 +1163,7 @@ class CRClan:
             if key is None:
                 return False
             else:
-                tag = self.model.key2tag(server, key)
+                tag = self.manager.key2tag(server, key)
 
         sctag = SCTag(tag)
         if not sctag.valid:
@@ -1143,11 +1173,11 @@ class CRClan:
         await self.bot.send_typing(ctx.message.channel)
 
         server = ctx.message.server
-        data = await self.model.get_clan_data(server, tag=sctag.tag)
+        data = await self.manager.get_clan_data(server, tag=sctag.tag)
         data_is_cached = False
         if not data:
             data_is_cached = True
-            data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            data = self.manager.cached_clan_data(self.manager.key2tag(server, key))
             if data is None:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
@@ -1170,11 +1200,11 @@ class CRClan:
         server = ctx.message.server
         await self.bot.send_typing(ctx.message.channel)
 
-        clan_data = await self.model.get_clan_data(server, key=key)
+        clan_data = await self.manager.get_clan_data(server, key=key)
         data_is_cached = False
         if not clan_data:
             data_is_cached = True
-            clan_data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            clan_data = self.manager.cached_clan_data(self.manager.key2tag(server, key))
             if clan_data is None:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
@@ -1215,11 +1245,11 @@ class CRClan:
         # Load data
         server = ctx.message.server
         await self.bot.send_typing(ctx.message.channel)
-        clan_data = await self.model.get_clan_data(server, key=key)
+        clan_data = await self.manager.get_clan_data(server, key=key)
         data_is_cached = False
         if not clan_data:
             data_is_cached = True
-            clan_data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            clan_data = self.manager.cached_clan_data(self.manager.key2tag(server, key))
             if clan_data is None:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
@@ -1260,11 +1290,11 @@ class CRClan:
 
         await self.bot.type()
 
-        data = await self.model.get_clan_data(server, key=key)
+        data = await self.manager.get_clan_data(server, key=key)
         data_is_cached = False
         if not data:
             data_is_cached = True
-            data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            data = self.manager.cached_clan_data(self.manager.key2tag(server, key))
             if data is None:
                 await self.bot.send_message(
                     ctx.message.channel,
@@ -1272,7 +1302,7 @@ class CRClan:
                 return
 
         # alphabetical list of discord members with associated role
-        dc_members = self.model.discord_members_by_clankey(server, key=key)
+        dc_members = self.manager.discord_members_by_clankey(server, key=key)
         dc_names = [m.mention for m in dc_members]
 
         # alphabetical list of members in CR App
@@ -1323,7 +1353,7 @@ class CRClan:
         """
         server = ctx.message.server
 
-        clan_tag = self.model.key2tag(server, clankey)
+        clan_tag = self.manager.key2tag(server, clankey)
 
         if clan_tag is None:
             await self.bot.say("Cannot find clan tag with the clan key. Aborting…")
@@ -1338,18 +1368,18 @@ class CRClan:
         option_add_role = '--addrole' in options
 
         # - get clan data
-        clan_data = await self.model.get_clan_data(server, key=clankey)
+        clan_data = await self.manager.get_clan_data(server, key=clankey)
 
         # - get list of people with rolename
         clanrole = discord.utils.get(server.roles, name=clanrole_name)
-        dc_members = self.model.discord_members_by_clankey(server, key=clankey)
+        dc_members = self.manager.discord_members_by_clankey(server, key=clankey)
 
         # - assert members have same clan tag as api
         dc_members_not_in_clan = []
         dc_members_with_no_player_tag = []
 
         for dc_member in dc_members:
-            player_tag = self.model.member2tag(server, dc_member)
+            player_tag = self.manager.member2tag(server, dc_member)
 
             if player_tag is None:
                 dc_members_with_no_player_tag.append(dc_member)
@@ -1377,7 +1407,7 @@ class CRClan:
         # - find members in clan but no discord association
         dc_members_without_role = []
         for player_tag in clan_data.member_tags:
-            dc_member = self.model.tag2member(server, player_tag)
+            dc_member = self.manager.tag2member(server, player_tag)
             if dc_member is not None:
                 if clanrole not in dc_member.roles:
                     dc_members_without_role.append(dc_member)
@@ -1389,7 +1419,6 @@ class CRClan:
                 out.append("+ {}".format(m.display_name))
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
-
 
         # remove role from members not in clan
         if option_remove_role:
