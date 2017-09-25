@@ -274,7 +274,8 @@ class CRData:
         self.settings = dataIO.load_json(SETTINGS_JSON)
         self.clashroyale = dataIO.load_json(CLASHROYALE_JSON)
 
-        self.es = Elasticsearch()
+        if elasticsearch_available:
+            self.es = Elasticsearch()
 
         # init card data
         self.cards = []
