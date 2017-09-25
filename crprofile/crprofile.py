@@ -29,7 +29,7 @@ import datetime as dt
 import itertools
 import json
 import os
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from datetime import timedelta
 from random import choice
 
@@ -1177,23 +1177,23 @@ class CRProfile:
         else:
             tourney_cards_per_game = '{:.3f}'.format(player.tourney_cards_per_game)
 
-        stats = {
-            'Wins / Draws / Losses': player.win_draw_losses(bem('battle')),
-            'Win Percentage': '{:.3%} {}'.format(player.win_ratio, bem('battle')),
-            'Total Games': fmt(player.total_games, 'battle'),
-            'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
-            'Win Streak': fmt(player.win_streak, 'crownred'),
-            'Cards Found': fmt(player.cards_found, 'cards'),
-            'Challenge Cards Won': fmt(player.challenge_cards_won, 'tournament'),
-            'Challenge Max Wins': fmt(player.challenge_max_wins, 'tournament'),
-            'Tourney Cards Won': fmt(player.tourney_cards_won, 'tournament'),
-            'Tourney Games': fmt(player.tourney_games, 'tournament'),
-            'Tourney Cards/Game': '{} {}'.format(tourney_cards_per_game, bem('tournament')),
-            'Total Donations': fmt(player.total_donations, 'cards'),
-            'Level': fmt(player.level, 'experience'),
-            'Experience': '{} {}'.format(player.xp_str, bem('experience')),
-            'Favorite Card': player.fave_card(self.bot_emoji)
-        }
+        stats = OrderedDict([
+            ('Wins / Draws / Losses', player.win_draw_losses(bem('battle'))),
+            ('Win Percentage', '{:.3%} {}'.format(player.win_ratio, bem('battle'))),
+            ('Total Games', fmt(player.total_games, 'battle')),
+            ('Three-Crown Wins', fmt(player.three_crown_wins, 'crownblue')),
+            ('Win Streak', fmt(player.win_streak, 'crownred')),
+            ('Cards Found', fmt(player.cards_found, 'cards')),
+            ('Challenge Cards Won', fmt(player.challenge_cards_won, 'tournament')),
+            ('Challenge Max Wins', fmt(player.challenge_max_wins, 'tournament')),
+            ('Tourney Cards Won', fmt(player.tourney_cards_won, 'tournament')),
+            ('Tourney Games', fmt(player.tourney_games, 'tournament')),
+            ('Tourney Cards/Game', '{} {}'.format(tourney_cards_per_game, bem('tournament'))),
+            ('Total Donations', fmt(player.total_donations, 'cards')),
+            ('Level', fmt(player.level, 'experience')),
+            ('Experience', '{} {}'.format(player.xp_str, bem('experience'))),
+            ('Favorite Card', player.fave_card(self.bot_emoji))
+        ])
         for k, v in stats.items():
             em.add_field(name=k, value=v)
 
