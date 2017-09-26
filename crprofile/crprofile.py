@@ -627,7 +627,7 @@ class CRPlayerModel:
     def fave_card(self, bot_emoji: BotEmoji):
         """Favorite card in emoji and name."""
         emoji = self.api_cardname_to_emoji(self.favorite_card, bot_emoji)
-        return '{} {}'.format(self.favorite_card, emoji)
+        return '{} {}'.format(self.favorite_card.replace('_', ' ').title(), emoji)
 
     def arena_emoji(self, bot_emoji: BotEmoji):
         if self.league > 0:
