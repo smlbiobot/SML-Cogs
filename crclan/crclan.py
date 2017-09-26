@@ -182,7 +182,10 @@ class CRClanModel:
     @property
     def badge_url(self):
         """Badge URL."""
-        return self.data.get('badge_url', None)
+        try:
+            return self.data['badge']['url']
+        except KeyError:
+            return ''
 
     @property
     def current_rank(self):
@@ -740,9 +743,9 @@ class ClanManager:
         self.save()
 
     @property
-    def badge_url(self):
+    def badge_url_base(self):
         """Clan Badge URL."""
-        return 'http://cr-api.com'
+        return 'http://api.cr-api.com'
 
 
 class ErrorMessage:
@@ -798,9 +801,10 @@ class CRClanInfoView:
         em.add_field(name="Clan Tag", value=data.tag)
         em.add_field(name="Members", value=data.member_count_str)
         em.add_field(name="Region", value=data.region_name)
-        badge_url = '{}{}'.format(self.model.badge_url, data.badge_url)
+        badge_url = '{}{}'.format(self.model.badge_url_base, data.badge_url)
         em.set_thumbnail(url=badge_url)
         em.set_footer(text=url, icon_url=cr_api_logo_url)
+        print(badge_url)
         return em
 
 
@@ -835,7 +839,7 @@ class CRClanRosterView:
                 'title': data.name,
                 'footer_text': '{} #{} - Page {}'.format(
                     data.name, data.tag, page),
-                'footer_icon_url': self.model.badge_url + data.badge_url,
+                'footer_icon_url': self.model.badge_url_base + data.badge_url,
                 'clan_data': data
             }
             em = self.embed(color=color, **kwargs)
