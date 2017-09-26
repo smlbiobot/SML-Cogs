@@ -750,6 +750,16 @@ class Settings:
         self.settings["servers"][server.id]["players"] = players
         self.save()
 
+    def rm_player_tag(self, server, member):
+        """Remove player tag from settings."""
+        self.check_server(server)
+        try:
+            self.settings["servers"][server.id]["players"].pop(member.id, None)
+        except KeyError:
+            pass
+        self.save()
+
+
     def tag2member(self, server, tag):
         """Return Discord member from player tag."""
         try:
@@ -927,10 +937,7 @@ class CRProfile:
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
     async def crprofileset(self, ctx):
-        """Clash Royale clan management API.
-
-        Requires: Clash Royale API access by Selfish.
-        """
+        """Clash Royale profile API."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
@@ -950,12 +957,8 @@ class CRProfile:
 
     @crprofileset.command(name="profileapi", pass_context=True)
     async def crprofileset_profileapi(self, ctx, url):
-        """CR Profile API URL base.
-
-        Format:
-        If path is http://domain.com/path/LQQ
-        Enter http://domain.com/path/
-        """
+        """CR Profile API URL base."""
+        # TODO Depreciated as cr-api.com Profile API is now public.
         self.model.profile_api_url = url
         await self.bot.say("Profile API URL updated.")
 
@@ -973,16 +976,27 @@ class CRProfile:
     @crprofileset.command(name="apitoken", pass_context=True)
     async def crprofileset_apiauth(self, ctx, token):
         """API Authentication token."""
+        # TODO Depreciated as cr-api.com Profile API is now public.
+        # TODO Keeping this as token might be implemented later.
         self.model.profile_api_token = token
         await self.bot.say("API token save.")
 
     @crprofileset.command(name="resources", pass_context=True)
     async def crprofileset_resources(self, ctx, enable: bool):
         """Show gold/gems in profile."""
+        # TODO Depreciated as field determined to be “creepy”
         self.model.set_resources(ctx.message.server, enable)
         await self.bot.say(
             "CR profiles {} show resources.".format('will' if enable else 'will not')
         )
+
+    @crprofileset.command(name="rmplayertag", pass_context=True)
+    async def crprofileset_rmplayertag(self, ctx, member:discord.Member):
+        """Remove player tag of a user."""
+        server = ctx.message.server
+        self.model.rm_player_tag(server, member)
+        await self.bot.say("Removed player tag for {}".format(member))
+
 
     @commands.group(pass_context=True, no_pm=True)
     async def crprofile(self, ctx):
@@ -1089,9 +1103,18 @@ class CRProfile:
 
         if tag is None:
             await self.bot.say(
-                "{} has not set player tag with the bot yet. "
-                "Run `!crsettag [tag]` to set your tag.".format(member.display_name)
+                "{} has not set player tag with the bot yet. ".format(member.display_name)
             )
+            # Tailor support message depending on cogs installed
+            racf_cog = self.bot.get_cog("RACF")
+            if racf_cog is None:
+                await self.bot.say(
+                    "Pleaes run `[p]crprofile settag` to set your player tag."
+                )
+            else:
+                await self.bot.say(
+                    "Please run `!crsettag` to set your player tag."
+                )
             return
         await self.display_profile(ctx, tag, resources=resources)
 
