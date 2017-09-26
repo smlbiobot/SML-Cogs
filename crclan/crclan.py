@@ -575,6 +575,14 @@ class ClanManager:
                 return tag
         return None
 
+    def key2role(self, server, key):
+        """Convert clan key to clan role."""
+        clans = self.get_clans(server)
+        for tag, clan in clans.items():
+            if clan["key"].lower() == key.lower():
+                return clan["role_name"]
+        return None
+
     def tag2member(self, server, tag):
         """Return Discord member from player tag."""
         try:
@@ -1344,7 +1352,7 @@ class CRClan:
             await self.bot.say(data.cache_message)
 
     @crclan.command(name='iaudit', aliases=['ia'], pass_context=True, no_pm=True)
-    async def crclan_iaudit(self, ctx, clankey, clanrole_name, *, options=None):
+    async def crclan_iaudit(self, ctx, clankey, *, options=None):
         """Interactive audit of clans by clan key and rolename.
         
         Options:
@@ -1354,6 +1362,7 @@ class CRClan:
         server = ctx.message.server
 
         clan_tag = self.manager.key2tag(server, clankey)
+        clanrole_name = self.manager.key2role(server, clankey)
 
         if clan_tag is None:
             await self.bot.say("Cannot find clan tag with the clan key. Aborting…")
