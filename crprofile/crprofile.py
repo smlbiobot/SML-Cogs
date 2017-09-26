@@ -269,8 +269,12 @@ class CRPlayerModel:
         """Clan badge url."""
         if self.not_in_clan:
             return "http://smlbiobot.github.io/img/emblems/NoClan.png"
-        filename = self.clan.get("badgeUrl", None)
-        return 'http://api.cr-api.com{}'.format(filename)
+        try:
+            url = self.clan['badge']['url']
+            return 'http://api.cr-api.com' + url
+        except KeyError:
+            pass
+        return ''
 
     @property
     def stats(self):
@@ -885,12 +889,12 @@ class Settings:
     @property
     def badge_url(self):
         """Clan Badge URL."""
-        return self.settings.get("badge_url", None)
+        return self.settings.get("badge_url_base", None)
 
     @badge_url.setter
     def badge_url(self, value):
         """lan Badge URL"""
-        self.settings["badge_url"] = value
+        self.settings["badge_url_base"] = value
         self.save()
 
     def set_resources(self, server, value):
