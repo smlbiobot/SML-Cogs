@@ -711,7 +711,7 @@ class BSData:
                 "Required Trophies: {}").format(
                     band_result.tag, band_result.required_score)
             em.color = discord.Color(value=color)
-            # em.set_thumbnail(url=band_result.badge_url)
+            # em.set_thumbnail(url=band_result.badge_url_base)
             em.set_footer(
                 text="Page {}".format(page),
                 icon_url=band_result.badge_url)

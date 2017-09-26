@@ -804,7 +804,6 @@ class CRClanInfoView:
         badge_url = '{}{}'.format(self.model.badge_url_base, data.badge_url)
         em.set_thumbnail(url=badge_url)
         em.set_footer(text=url, icon_url=cr_api_logo_url)
-        print(badge_url)
         return em
 
 
