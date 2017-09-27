@@ -1474,7 +1474,6 @@ class CRClan:
             dc_elder_members = [m for m in dc_members if elder_role in m.roles]
             clan_elders = [m for m in clan_model.members if m["roleName"] == "Elder"]
             clan_elders_tags = [m["tag"] for m in clan_elders]
-            print(clan_elders_tags)
             for dc_member in dc_elder_members:
                 dc_member_tag = self.manager.member2tag(server, dc_member)
                 if dc_member_tag not in clan_elders_tags:
