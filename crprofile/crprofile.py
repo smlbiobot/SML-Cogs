@@ -49,7 +49,7 @@ CHESTS = dataIO.load_json(os.path.join('data', 'crprofile', 'chests.json'))
 
 DATA_UPDATE_INTERVAL = timedelta(minutes=30).seconds
 
-API_FETCH_TIMEOUT = 5
+API_FETCH_TIMEOUT = 10
 
 BOTCOMMANDER_ROLES = ["Bot Commander"]
 
