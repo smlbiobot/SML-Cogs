@@ -85,6 +85,42 @@ def clan_url(clan_tag):
 cr_api_logo_url = 'https://smlbiobot.github.io/img/cr-api/cr-api-logo.png'
 
 
+class SettingsException(Exception):
+    pass
+
+
+class ClanTagNotInSettings(SettingsException):
+    pass
+
+
+class ClanKeyNotInSettings(SettingsException):
+    pass
+
+
+class APIFetchError(SettingsException):
+    pass
+
+
+class RoleNotFound(SettingsException):
+    pass
+
+
+class ErrorMessage:
+    """Error Messages"""
+
+    @staticmethod
+    def key_error(key):
+        return (
+            "Error fetching data from API for clan key {}. "
+            "Please try again later.").format(key)
+
+    @staticmethod
+    def tag_error(tag):
+        return (
+            "Error fetching data from API for clan tag #{}. "
+            "Please try again later.").format(tag)
+
+
 class SCTag:
     """SuperCell tags."""
 
@@ -441,22 +477,6 @@ class CRClanMemberModel:
         return ''
 
 
-class SettingsException(Exception):
-    pass
-
-
-class ClanTagNotInSettings(SettingsException):
-    pass
-
-
-class ClanKeyNotInSettings(SettingsException):
-    pass
-
-
-class APIFetchError(SettingsException):
-    pass
-
-
 class ServerModel:
     """Discord server data model.
 
@@ -569,6 +589,26 @@ class ClanManager:
         players[member.id] = tag
         self.settings["servers"][server.id]["players"] = players
         self.save()
+
+    def set_elder_role(self, server, role_name):
+        """Set associated elder role on a server."""
+        self.check_server(server)
+        role = discord.utils.get(server.roles, name=role_name)
+        if role is None:
+            raise RoleNotFound
+        try:
+            self.settings["servers"][server.id]["elder_role_id"] = role.id
+        except KeyError:
+            raise
+        self.save()
+
+    def get_elder_role(self, server):
+        """Return elder role on a server."""
+        try:
+            role_id = self.settings["servers"][server.id]["elder_role_id"]
+            return discord.utils.get(server.roles, id=role_id)
+        except KeyError:
+            return None
 
     def key2tag(self, server, key):
         """Convert clan key to clan tag."""
@@ -746,22 +786,6 @@ class ClanManager:
     def badge_url_base(self):
         """Clan Badge URL."""
         return 'http://api.cr-api.com'
-
-
-class ErrorMessage:
-    """Error Messages"""
-
-    @staticmethod
-    def key_error(key):
-        return (
-            "Error fetching data from API for clan key {}. "
-            "Please try again later.").format(key)
-
-    @staticmethod
-    def tag_error(tag):
-        return (
-            "Error fetching data from API for clan tag #{}. "
-            "Please try again later.").format(tag)
 
 
 class CRClanInfoView:
@@ -1038,6 +1062,17 @@ class CRClan:
                 "{} is not a clan tag you have added".format(tag))
         else:
             await self.bot.say("Added {} for clan #{}.".format(key, tag))
+
+    @crclanset.command(name="elderrole", pass_context=True)
+    async def crclanset_elderrole(self, ctx, elder_role):
+        """Set elder’s role on server."""
+        server = ctx.message.server
+        try:
+            self.manager.set_elder_role(server, elder_role)
+        except RoleNotFound:
+            await self.bot.say("Cannot find that role on the server.")
+        else:
+            await self.bot.say("Settings saved.")
 
     @crclanset.command(name="settings", pass_context=True)
     async def crclanset_settings(self, ctx):
@@ -1380,7 +1415,7 @@ class CRClan:
         option_add_role = '--addrole' in options
 
         # - get clan data
-        clan_data = await self.manager.get_clan_data(server, key=clankey)
+        clan_model = await self.manager.get_clan_data(server, key=clankey)
 
         # - get list of people with rolename
         clanrole = discord.utils.get(server.roles, name=clanrole_name)
@@ -1397,12 +1432,12 @@ class CRClan:
                 dc_members_with_no_player_tag.append(dc_member)
                 continue
 
-            if player_tag not in clan_data.member_tags:
+            if player_tag not in clan_model.member_tags:
                 dc_members_not_in_clan.append(dc_member)
 
         out = []
         if len(dc_members_not_in_clan):
-            out.append("Discord members not in clan:")
+            out.append("Discord members with {} role but not in the clan:".format(clanrole.name))
             for m in dc_members_not_in_clan:
                 out.append("+ {}".format(m.display_name))
             for page in pagify('\n'.join(out)):
@@ -1410,7 +1445,7 @@ class CRClan:
 
         out = []
         if len(dc_members_with_no_player_tag):
-            out.append("Discord members with clan role but no CR player tag:")
+            out.append("Discord members with {} role but no associated player tags:".format(clanrole.name))
             for m in dc_members_with_no_player_tag:
                 out.append("+ {}".format(m.display_name))
             for page in pagify('\n'.join(out)):
@@ -1418,7 +1453,7 @@ class CRClan:
 
         # - find members in clan but no discord association
         dc_members_without_role = []
-        for player_tag in clan_data.member_tags:
+        for player_tag in clan_model.member_tags:
             dc_member = self.manager.tag2member(server, player_tag)
             if dc_member is not None:
                 if clanrole not in dc_member.roles:
@@ -1426,8 +1461,28 @@ class CRClan:
 
         out = []
         if len(dc_members_without_role):
-            out.append("Discord members in clan but without role")
+            out.append("Discord members in the clan but does not have the {} role:".format(clanrole.name))
             for m in dc_members_without_role:
+                out.append("+ {}".format(m.display_name))
+            for page in pagify('\n'.join(out)):
+                await self.bot.say(page)
+
+        # - Discord members with elder role but not promoted in clan
+        elder_role = self.manager.get_elder_role(server)
+        members_not_promoted_in_clan = []
+        if elder_role is not None:
+            dc_elder_members = [m for m in dc_members if elder_role in m.roles]
+            clan_elders = [m for m in clan_model.members if m["roleName"] == "Elder"]
+            clan_elders_tags = [m["tag"] for m in clan_elders]
+            print(clan_elders_tags)
+            for dc_member in dc_elder_members:
+                dc_member_tag = self.manager.member2tag(server, dc_member)
+                if dc_member_tag not in clan_elders_tags:
+                    members_not_promoted_in_clan.append(dc_member)
+        if len(members_not_promoted_in_clan):
+            out = []
+            out.append("List of members with the Elder role but not yet promoted in clan:")
+            for m in members_not_promoted_in_clan:
                 out.append("+ {}".format(m.display_name))
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
