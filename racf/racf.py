@@ -354,7 +354,7 @@ class RACF:
             "Clan Name: {0[clan][name]}\n"
             "Clan Tag: {0[clan][tag]}\n"
             "Clan Role: {0[clan][role]}\n"
-            "Trophies: {0[trophies]} / {0[stats][maxTrophies]} PB".format(
+            "Trophies: {0[trophies]:,} / {0[stats][maxTrophies]:,} PB".format(
                 player_data
             )
         )
@@ -518,6 +518,31 @@ class RACF:
         if band_tag not in BAND_PERMISSION.keys():
             await self.bot.say("User is not in our clans.")
             return
+
+        # - Output info
+        await self.bot.say(
+            "Player Tag: {0.tag}\n"
+            "IGN: {0.username}\n"
+            "Clan Name: {0.band.name}\n"
+            "Clan Tag: {0.band.tag}\n"
+            "Clan Role: {0.band.role}\n"
+            "Trophies: {0.trophies:,} / {0.highest_trophies:,} PB".format(
+                player
+            )
+        )
+
+        # - Change nickname to IGN
+        ign = player.username
+        if ign is None:
+            await self.bot.say("Cannot find IGN.")
+        else:
+            try:
+                await self.bot.change_nickname(member, ign)
+            except discord.HTTPException:
+                await self.bot.say(
+                    "I don’t have permission to change nick for this user.")
+            else:
+                await self.bot.say("{} changed to {}.".format(member.mention, ign))
 
         # - Assign roles
         role = BAND_PERMISSION[band_tag]["role"]
