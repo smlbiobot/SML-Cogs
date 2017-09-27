@@ -50,7 +50,7 @@ BADGES_JSON = os.path.join(PATH, "badges.json")
 
 DATA_UPDATE_INTERVAL = timedelta(minutes=10).seconds
 
-API_FETCH_TIMEOUT = 5
+API_FETCH_TIMEOUT = 15
 
 BOT_COMMANDER_ROLES = ["Bot Commander"]
 
