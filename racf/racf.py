@@ -906,24 +906,6 @@ class RACF:
                     HEIST_ROLE, author.display_name))
 
     @commands.command(pass_context=True, no_pm=True)
-    async def togglerecruit(self, ctx: Context):
-        """Self-toggle heist role."""
-        author = ctx.message.author
-        server = ctx.message.server
-        role = discord.utils.get(
-            server.roles, name=RECRUIT_ROLE)
-        if role in author.roles:
-            await self.bot.remove_roles(author, role)
-            await self.bot.say(
-                "Removed {} role from {}.".format(
-                    RECRUIT_ROLE, author.display_name))
-        else:
-            await self.bot.add_roles(author, role)
-            await self.bot.say(
-                "Added {} role for {}.".format(
-                    RECRUIT_ROLE, author.display_name))
-
-    @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
     async def teamadd(self, ctx, member: discord.Member, role):
         """Add competitive team member roles."""
@@ -1012,37 +994,6 @@ class RACF:
             await self.changerole(ctx, member, *member_clan)
         else:
             await self.bot.say("Member has no clan roles to remove.")
-
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOTCOMMANDER_ROLE)
-    async def recruit(self, ctx, member: discord.Member):
-        """Assign member with recruit roles and give them info.
-
-        Command detects origin:
-        If command is invoked from default channel, add Visitor role.
-        If command in invoked from other channels, only add Recruit role.
-        """
-        recruit_roles = ["Recruit"]
-        add_visitor_role = False
-        if ctx.message.channel.is_default:
-            recruit_roles.append("Visitor")
-            add_visitor_role = True
-        await self.changerole(ctx, member, *recruit_roles)
-        channel = discord.utils.get(
-            ctx.message.server.channels, name="esports-recruiting")
-        if channel is not None:
-            await self.bot.say(
-                "{} Please see pinned messages "
-                "in {} for eSports information.".format(
-                    member.mention, channel.mention))
-        if add_visitor_role:
-            visitor_channel = discord.utils.get(
-                ctx.message.server.channels, name="visitors")
-            if visitor_channel is not None:
-                await self.bot.say(
-                    "{} You can now chat in {} — enjoy!".format(
-                        member.mention, visitor_channel.mention))
-            await ctx.invoke(self.visitorrules, member)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
