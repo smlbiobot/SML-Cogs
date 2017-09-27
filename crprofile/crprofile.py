@@ -232,7 +232,7 @@ class CRPlayerModel:
     @property
     def not_in_clan(self):
         """Not in clan flag."""
-        return self.clan_tag == ''
+        return self.clan is None
 
     @property
     def clan_name(self):
