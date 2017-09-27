@@ -58,8 +58,7 @@ RACF_CLANS = {
         {'name': 'Echo', 'tag': 'LGVV2CG'},
         {'name': 'Foxtrot', 'tag': 'QUYCYV8'},
         {'name': 'Golf', 'tag': 'GUYGVJY'},
-        {'name': 'Hotel', 'tag': 'UGQ28YU'},
-        {'name': 'eSports', 'tag': 'R8PPJQG'}
+        {'name': 'Hotel', 'tag': 'UGQ28YU'}
     ],
     ClanType.BS: [
         {'name': 'Alpha', 'tag': 'LQQ'},
@@ -255,16 +254,18 @@ class Trophies:
         )
 
         clans = self.settings[server.id]["Trophies"][clan_type]
+        names = [c['name'] for c in RACF_CLANS[clan_type]]
 
         for clan in clans:
             name = clan["name"]
-            value = clan["value"]
-            tag = self.clan_tag(clan_type, name)
+            if name in names:
+                value = clan["value"]
+                tag = self.clan_tag(clan_type, name)
 
-            if str(value).isdigit():
-                value = '{:,}'.format(int(value))
+                if str(value).isdigit():
+                    value = '{:,}'.format(int(value))
 
-            data.add_field(name='{} #{}'.format(name, tag), value=value)
+                data.add_field(name='{} #{}'.format(name, tag), value=value)
 
         if server.icon_url:
             data.set_author(name=server.name, url=server.icon_url)
