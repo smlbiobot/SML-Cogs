@@ -538,6 +538,10 @@ class ClanManager:
         """CR Players settings by server."""
         return self.settings["servers"][server.id]["players"]
 
+    def get_player_tags(self, server):
+        """All player tags known to the server."""
+        return [player_tag for member_id, player_tag in self.get_players(server).items()]
+
     def save(self):
         """Save data to disk."""
         dataIO.save_json(self.filepath, self.settings)
@@ -1422,6 +1426,9 @@ class CRClan:
         dc_members = self.manager.discord_members_by_clankey(server, key=clankey)
 
         # - assert members have same clan tag as api
+
+
+
         dc_members_not_in_clan = []
         dc_members_with_no_player_tag = []
 
@@ -1435,6 +1442,7 @@ class CRClan:
             if player_tag not in clan_model.member_tags:
                 dc_members_not_in_clan.append(dc_member)
 
+        # - Discord Members with clan tag but not in clan
         out = []
         if len(dc_members_not_in_clan):
             out.append("Discord members with {} role but not in the clan:".format(clanrole.name))
@@ -1443,6 +1451,7 @@ class CRClan:
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
 
+        # - Discord Members without associated player tags
         out = []
         if len(dc_members_with_no_player_tag):
             out.append("Discord members with {} role but no associated player tags:".format(clanrole.name))
@@ -1451,7 +1460,7 @@ class CRClan:
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
 
-        # - find members in clan but no discord association
+        # - Dicsord members in clan but no clan role
         dc_members_without_role = []
         for player_tag in clan_model.member_tags:
             dc_member = self.manager.tag2member(server, player_tag)
@@ -1486,6 +1495,20 @@ class CRClan:
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
 
+        # - Clan members who have no player tag assigned
+        server_player_tags = self.manager.get_player_tags(server)
+        clan_members_not_registered_on_dc = []
+        for m in clan_model.members:
+            if m["tag"] not in server_player_tags:
+                clan_members_not_registered_on_dc.append(m)
+        if len(clan_members_not_registered_on_dc):
+            out = []
+            out.append("List of IGNs who have not set their player tags on Discord:")
+            for m in clan_members_not_registered_on_dc:
+                out.append("+ {}".format(m["name"]))
+            for page in pagify('\n'.join(out)):
+                await self.bot.say(page)
+
         # remove role from members not in clan
         if option_remove_role:
             mm = self.bot.get_cog("MemberManagement")
@@ -1513,6 +1536,8 @@ class CRClan:
                 except discord.HTTPException:
                     await self.bot.say("Removing roles failed for unknown reasons.")
                     continue
+
+        await self.bot.say("…End of audit.")
 
 
 def check_folder():
