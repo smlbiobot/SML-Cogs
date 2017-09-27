@@ -52,7 +52,7 @@ HEIST_ROLE = "Heist"
 RECRUIT_ROLE = "Recruit"
 TOGGLE_ROLES = ["Member", "Visitor"]
 TOGGLEABLE_ROLES = [
-    "Heist", "Practice", "Tourney", "Recruit", "CoC",
+    "Heist", "Practice", "Tourney", "CoC",
     "Battle-Bay", "RACF-Tourney", "Brawl-Stars", "vc-crew"]
 TOGGLE_PERM = {
     "Member": [
@@ -61,7 +61,7 @@ TOGGLE_PERM = {
         "BSPlay", "PvZ", "Practice-EU", "Food"
     ],
     "Visitor": [
-        "BSPlay", "Heist", "Recruit"
+        "BSPlay", "Heist"
     ]
 }
 MEMBER_DEFAULT_ROLES = ["Member", "Tourney", "Practice"]
