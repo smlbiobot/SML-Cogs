@@ -178,7 +178,7 @@ class ReactionManager:
             await self.bot.say(page)
 
         # delete command
-        await self.bot.delete_message(ctx.message)
+        # await self.bot.delete_message(ctx.message)
 
 
 def check_folder():
