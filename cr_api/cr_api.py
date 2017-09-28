@@ -816,7 +816,7 @@ class CRClanModel:
 
 class Settings:
     """CR API Settings."""
-    timeout = 15
+    timeout = 30
 
 
 class ClashRoyaleAPI:
@@ -860,6 +860,7 @@ class ClashRoyaleAPI:
         :param url: URL
         :return: Response in JSON
         """
+        print(url)
         try:
             with async_timeout.timeout(Settings.timeout):
                 async with session.get(url) as response:
@@ -889,7 +890,7 @@ class ClashRoyaleAPI:
         
         http://api.cr-api.com/clan/2CCCP 
         """
-        url = 'http://api.cr-api.com/profile/{}'.format(SCTag(tag).tag)
+        url = 'http://api.cr-api.com/clan/{}'.format(SCTag(tag).tag)
         async with aiohttp.ClientSession() as session:
             data = await self.fetch(session, url)
         return data
@@ -898,6 +899,19 @@ class ClashRoyaleAPI:
         """Clan as CRClanModel."""
         data = await self.clan_json(tag)
         return CRClanModel(data=data)
+
+    async def clans_json(self, tags):
+        """Clans as JSON."""
+        sctags = [SCTag(t).tag for t in tags]
+        url = 'http://api.cr-api.com/clan/{}'.format(','.join(sctags))
+        async with aiohttp.ClientSession() as session:
+            data = await self.fetch(session, url)
+        return data
+
+    async def clans_model(self, tags):
+        """Clans as a list of CRClanModel."""
+        data = await self.clans_json(tags)
+        return [CRClanModel(c) for c in data]
 
 
 def check_folder():
