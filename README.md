@@ -32,9 +32,12 @@ There are no extensive documentation on these cogs. However, usage for many of t
 
 * **crclan**: Clash Royale clan using [cr-api](https://github.com/cr-api/cr-api) API
 * **crdata**: Clash Royale Global 200 leaderboard (requires Starfi.re login)
+    * [User docs](http://docs.redditalpha.com/#/visitor/crdata)
 * **crdatae**: Clash Royale Global 200 leaderboard using emojis (requires SF Auth)
+    * [User docs](http://docs.redditalpha.com/#/visitor/crdata)
 * **crprofile**: Clash Royale profile using [cr-api](https://github.com/cr-api/cr-api) API
-* **deck**: Clash Royale deck builder
+    * [User docs](http://docs.redditalpha.com/#/visitor/crprofile)
+* **[deck](https://github.com/smlbiobot/SML-Cogs/wiki/Deck)**: Clash Royale deck builder
 
 
 # RACF cogs
