@@ -880,12 +880,19 @@ class BSData:
                 em.description,
                 player.discord_member.mention)
 
+        def fmt(value, type):
+            """Format value by type."""
+            if value is None:
+                return ''
+            if type == int:
+                return '{:,}'.format(value)
+
         em.add_field(name=player.band.name, value=player.band.role)
-        em.add_field(name="Trophies", value=player.trophies)
-        em.add_field(name="Victories", value=player.wins)
-        em.add_field(name="Showdown Victories", value=player.survival_wins)
-        em.add_field(name="Highest Trophies", value=player.highest_trophies)
-        em.add_field(name="Brawlers", value=player.brawler_count)
+        em.add_field(name="Trophies", value=fmt(player.trophies, int))
+        em.add_field(name="Victories", value=fmt(player.wins, int))
+        em.add_field(name="Showdown Victories", value=fmt(player.survival_wins, int))
+        em.add_field(name="Highest Trophies", value=fmt(player.highest_trophies, int))
+        em.add_field(name="Brawlers", value=fmt(player.brawler_count, int))
 
         for brawler in player.brawlers:
             emoji = self.brawler_emoji(brawler.name)
