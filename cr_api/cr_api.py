@@ -877,13 +877,27 @@ class ClashRoyaleAPI:
         url = 'http://api.cr-api.com/profile/{}'.format(SCTag(tag).tag)
         async with aiohttp.ClientSession() as session:
             data = await self.fetch(session, url)
-
         return data
 
     async def profile_model(self, tag):
         """Get player profile as CRPlayerModel."""
         data = await self.profile_json(tag)
         return CRPlayerModel(data=data)
+
+    async def clan_json(self, tag):
+        """Clan as JSON.
+        
+        http://api.cr-api.com/clan/2CCCP 
+        """
+        url = 'http://api.cr-api.com/profile/{}'.format(SCTag(tag).tag)
+        async with aiohttp.ClientSession() as session:
+            data = await self.fetch(session, url)
+        return data
+
+    async def clan_model(self, tag):
+        """Clan as CRClanModel."""
+        data = await self.clan_json(tag)
+        return CRClanModel(data=data)
 
 
 def check_folder():
