@@ -1400,6 +1400,7 @@ class CRClan:
         Options:
         --removerole   Remove clan role from people who aren’t in clan
         --addrole      Add clan role to people who are in clan
+        --exec         Run both add and remove role options
         """
         server = ctx.message.server
 
@@ -1417,6 +1418,11 @@ class CRClan:
 
         option_remove_role = '--removerole' in options
         option_add_role = '--addrole' in options
+        option_exec = '--exec' in options
+
+        if option_exec:
+            option_add_role = True
+            option_remove_role = True
 
         # - get clan data
         clan_model = await self.manager.get_clan_data(server, key=clankey)
@@ -1426,8 +1432,6 @@ class CRClan:
         dc_members = self.manager.discord_members_by_clankey(server, key=clankey)
 
         # - assert members have same clan tag as api
-
-
 
         dc_members_not_in_clan = []
         dc_members_with_no_player_tag = []
