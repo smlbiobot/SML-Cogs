@@ -1489,8 +1489,9 @@ class CRClan:
             clan_elders_tags = [m["tag"] for m in clan_elders]
             for dc_member in dc_elder_members:
                 dc_member_tag = self.manager.member2tag(server, dc_member)
-                if dc_member_tag not in clan_elders_tags:
-                    members_not_promoted_in_clan.append(dc_member)
+                if dc_member_tag in clan_model.member_tags:
+                    if dc_member_tag not in clan_elders_tags:
+                        members_not_promoted_in_clan.append(dc_member)
         if len(members_not_promoted_in_clan):
             out = []
             out.append("List of members with the Elder role but not yet promoted in clan:")
