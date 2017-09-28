@@ -167,10 +167,10 @@ class ReactionManager:
                 if exclude_self and u == self.bot.user:
                     continue
                 valid_users.append(u)
-            users = ', '.join([u.display_name for u in valid_users])
-            name = emoji
+                valid_users = sorted(valid_users, key=lambda u: u.display_name.lower())
+            users_str = ', '.join([u.display_name for u in valid_users])
             count = len(valid_users)
-            value = '{}: {}: {}'.format(emoji, count, users)
+            value = '{}: {}: {}'.format(emoji, count, users_str)
 
             out.append(value)
 
