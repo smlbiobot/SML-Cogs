@@ -833,7 +833,7 @@ class ClashRoyaleAPI:
             
         def foo(self):
             api = self.bot.get_cog('ClashRoyaleAPI')
-            profile = api.profile('C0G20PR2')
+            profile = api.profile_model('C0G20PR2')
     """
 
     def __init__(self, bot):
