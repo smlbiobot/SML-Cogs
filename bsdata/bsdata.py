@@ -200,6 +200,10 @@ class BSBandModel:
             "http://smlbiobot.github.io/img"
             "/bs-badge/{}.png").format(self.badge_export)
 
+
+
+
+
 class BSBandMemberModel:
     """Brawl Stars Member data."""
 
@@ -307,6 +311,77 @@ class BSBrawlerModel:
 class BSPlayerModel:
     """Brawl Stars player data."""
 
+    class BSPlayerBandModel:
+        """Band model inside player.
+        
+        This is different than the BSBandModel because API uses different field name
+        and has different data structure."""
+
+        def __init__(self, data=None):
+            """Init.
+            From cog:
+                key
+                role
+                tag
+            """
+            self.data = data
+            self.members = []
+
+        """
+        API Properties
+        """
+
+        @property
+        def name(self):
+            return self.data.get('name', None)
+
+        @property
+        def tag(self):
+            return self.data.get('tag', None)
+
+        @property
+        def badge_id(self):
+            return self.data.get('badge_id', None)
+
+        @property
+        def badge_export(self):
+            return self.data.get('badge_export', None)
+
+        @property
+        def type_id(self):
+            return self.data.get('type_id', None)
+
+        @property
+        def type(self):
+            return self.data.get('type', None)
+
+        @property
+        def member_count(self):
+            return self.data.get('member_count', None)
+
+        @property
+        def score(self):
+            return self.data.get('trophies', None)
+
+        @property
+        def required_score(self):
+            return self.data.get('required_trophies_to_join', None)
+
+        @property
+        def role(self):
+            return self.data.get('role', None)
+
+        """
+        Model Properties
+        """
+
+        @property
+        def badge_url(self):
+            """Return band emblem URL."""
+            return (
+                "http://smlbiobot.github.io/img"
+                "/bs-badge/{}.png").format(self.badge_export)
+
     def __init__(self, data=None):
         """Init."""
         self.data = data
@@ -393,7 +468,7 @@ class BSPlayerModel:
         b = self.data.get('band', None)
         if b is None:
             return None
-        self._band = BSBandModel(data=b)
+        self._band = BSPlayerModel.BSPlayerBandModel(data=b)
         return self._band
 
     """
@@ -661,17 +736,17 @@ class BSData:
 
     def embed_bsdata_info(self, band):
         """Return band info embed."""
-        data = BSBandModel(data=band)
+        band_model = BSBandModel(data=band)
         em = discord.Embed(
-            title=data.name,
-            description=data.description)
-        em.add_field(name="Band Trophies", value=data.score)
-        em.add_field(name="Type", value=data.type)
-        em.add_field(name="Required Trophies", value=data.required_score)
-        em.add_field(name="Band Tag", value=data.tag)
+            title=band_model.name,
+            description=band_model.description)
+        em.add_field(name="Band Trophies", value='{:,}'.format(band_model.score))
+        em.add_field(name="Type", value=band_model.type)
+        em.add_field(name="Required Trophies", value='{:,}'.format(band_model.required_score))
+        em.add_field(name="Band Tag", value=band_model.tag)
         em.add_field(
-            name="Members", value=data.member_count_str)
-        em.set_thumbnail(url=data.badge_url)
+            name="Members", value=band_model.member_count_str)
+        em.set_thumbnail(url=band_model.badge_url)
         # em.set_author(name=data.name)
         return em
 
