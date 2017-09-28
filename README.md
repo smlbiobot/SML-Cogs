@@ -30,10 +30,10 @@ There are no extensive documentation on these cogs. However, usage for many of t
 
 # Clash Royale Cogs
 
-* **crclan**: Clash Royale clan using /cr-api/cr-api
+* **crclan**: Clash Royale clan using [cr-api](/cr-api/cr-api) API
 * **crdata**: Clash Royale Global 200 leaderboard (requires Starfi.re login)
 * **crdatae**: Clash Royale Global 200 leaderboard using emojis (requires SF Auth)
-* **crprofile**: Clash Royale profile using /cr-api/cr-api
+* **crprofile**: Clash Royale profile using [cr-api](/cr-api/cr-api) API
 * **deck**: Clash Royale deck builder
 
 
