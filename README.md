@@ -6,7 +6,7 @@ If you would like to see most of these in action, you can join the RACF Discord 
 
 You are welcome to log any issues in the Issues tab, or try to find me on either the RACF Discord server or my own Discord server at [http://discord.me/sml](http://discord.me/sml)
 
-There are no extensive documentation on these cogs. However, usage for many of these commands can be found on the documentation site for the RACF server, since these cogs were mostly written for it: http://racfdocs.smlbiobot.com
+There are no extensive documentation on these cogs. However, usage for many of these commands can be found on the documentation site for the RACF server, since these cogs were mostly written for it: http://docs.redditalpha.com
 # General Cogs
 
 * **archive**: Archive channel messages from one channel to another.
