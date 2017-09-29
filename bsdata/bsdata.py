@@ -24,24 +24,20 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import os
 import asyncio
 import itertools
-import datetime as dt
-from random import choice
 import json
-from urllib.parse import urlunparse
+import os
 from datetime import timedelta
 from enum import Enum
+from random import choice
 
 import discord
-from discord.ext import commands
-from discord.ext.commands import Context
-
 from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
+from discord.ext.commands import Context
 
 try:
     import aiohttp
@@ -98,6 +94,37 @@ def grouper(n, iterable, fillvalue=None):
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
+class BotEmoji:
+    """Emojis available in bot."""
+
+    def __init__(self, bot, map=None):
+        """Init.
+
+        map: a dictionary mapping a key to to an emoji name.
+        """
+        self.bot = bot
+        self.map = map
+
+    def name(self, name):
+        """Emoji by name."""
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == name:
+                return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
+
+    def key(self, key):
+        """Chest emojis by api key name or key.
+
+        name is used by this cog.
+        key is values returned by the api.
+        Use key only if name is not set
+        """
+        if key in self.map:
+            name = self.map[key]
+            return self.name(name)
+        return ''
+
+
 class BSRole(Enum):
     """Brawl Stars role."""
 
@@ -113,41 +140,6 @@ BS_ROLES = {
     BSRole.ELDER: "Elder",
     BSRole.COLEADER: "Co-Leader"
 }
-
-class BotEmoji:
-    """Emojis available in bot."""
-
-    def __init__(self, bot, map=None):
-        """Init.
-        
-        map: a dictionary mapping a key to to an emoji name.
-        """
-        self.bot = bot
-        self.map = map
-
-    def name(self, name):
-        """Emoji by name."""
-        for emoji in self.bot.get_all_emojis():
-            if emoji.name == name:
-                return '<:{}:{}>'.format(emoji.name, emoji.id)
-
-        # for server in self.bot.servers:
-        #     for emoji in server.emojis:
-        #         if emoji.name == name:
-        #             return '<:{}:{}>'.format(emoji.name, emoji.id)
-        return ''
-
-    def key(self, key):
-        """Chest emojis by api key name or key.
-
-        name is used by this cog.
-        key is values returned by the api.
-        Use key only if name is not set
-        """
-        if key in self.map:
-            name = self.map[key]
-            return self.name(name)
-        return ''
 
 
 class BSBandModel:
@@ -166,6 +158,7 @@ class BSBandModel:
     """
     API Properties
     """
+
     @property
     def name(self):
         return self.data.get('name', None)
@@ -197,15 +190,15 @@ class BSBandModel:
     @property
     def score(self):
         return self.data.get('score', None)
-    
+
     @property
     def required_score(self):
         return self.data.get('required_score', None)
-    
+
     @property
     def description(self):
         return self.data.get('description', None)
-    
+
     @property
     def description_clean(self):
         return self.data.get('description_clean', None)
@@ -213,6 +206,7 @@ class BSBandModel:
     """
     Property used for BSPlayerModel
     """
+
     @property
     def role(self):
         return self.data.get('role', None)
@@ -220,6 +214,7 @@ class BSBandModel:
     """
     Model Properties
     """
+
     @property
     def member_count_str(self):
         """Member count in #/50 format."""
@@ -234,9 +229,6 @@ class BSBandModel:
         return (
             "http://smlbiobot.github.io/img"
             "/bs-badge/{}.png").format(self.badge_export)
-
-
-
 
 
 class BSBandMemberModel:
@@ -279,7 +271,7 @@ class BSBandMemberModel:
     @property
     def role(self):
         return self.data.get('role', None)
-    
+
     @property
     def discord_member(self):
         """Discord user id."""
@@ -298,50 +290,51 @@ class BSBrawlerModel:
         """Init.
         """
         self.data = data
-        
+
     @property
     def tid(self):
         return self.data.get('tid', None)
-    
+
     @property
     def name(self):
         return self.data.get('name', None)
-    
+
     @property
     def icon_export(self):
         return self.data.get('icon_export', None)
-    
+
     @property
     def id(self):
         return self.data.get('id', None)
-    
+
     @property
     def trophies(self):
         return self.data.get('trophies', None)
-    
+
     @property
     def highest_trophies(self):
         return self.data.get('highest_trophies', None)
-    
+
     @property
     def level(self):
         return self.data.get('level', None)
-    
+
     @property
     def rarity(self):
         return self.data.get('rarity', None)
-    
+
     @property
     def rank(self):
         return self.data.get('rank', None)
-    
+
     @property
     def rank_export(self):
         return self.data.get('rank_export', None)
-    
+
     @property
     def required_trophies_for_next_rank(self):
         return self.data.get('required_trophies_for_next_rank', None)
+
 
 class BSPlayerModel:
     """Brawl Stars player data."""
@@ -427,14 +420,15 @@ class BSPlayerModel:
     """
     API properties
     """
+
     @property
     def username(self):
         return self.data.get('username', None)
-    
+
     @property
     def tag(self):
         return self.data.get('tag', None)
-    
+
     @property
     def brawler_count(self):
         return self.data.get('brawler_count', None)
@@ -509,6 +503,7 @@ class BSPlayerModel:
     """
     Cog properties
     """
+
     @property
     def discord_member(self):
         """Discord user id."""
@@ -518,6 +513,7 @@ class BSPlayerModel:
     def discord_member(self, value):
         """Discord user id."""
         self._discord_member = value
+
 
 class BSData:
     """Brawl Stars Clan management."""
@@ -820,7 +816,7 @@ class BSData:
             em.description = (
                 "Tag: {} | "
                 "Required Trophies: {}").format(
-                    band_result.tag, band_result.required_score)
+                band_result.tag, band_result.required_score)
             em.color = discord.Color(value=color)
             # em.set_thumbnail(url=band_result.badge_url_base)
             em.set_footer(
@@ -849,7 +845,7 @@ class BSData:
         return em
 
     @bsdata.command(name="profile", pass_context=True, no_pm=True)
-    async def bsdata_profile(self, ctx, member: discord.Member=None):
+    async def bsdata_profile(self, ctx, member: discord.Member = None):
         """Return player profile by Discord member name or id."""
         server = ctx.message.server
         players = self.settings["servers"][server.id]["players"]
@@ -939,10 +935,14 @@ class BSData:
                 name=name,
                 value=trophies)
 
+        em.set_thumbnail(
+            url='https://smlbiobot.github.io/bs-emoji-servers/avatars/{}.png'.format(
+                player.avatar_export))
+
         text = (
             '{0.name}'
-            ' Trophies: {0.score}'
-            ' Requirement: {0.required_score}'
+            ' Trophies: {0.score:,}'
+            ' Requirement: {0.required_score:,}'
             ' Tag: {0.tag}'
             ' Type: {0.type}').format(player.band)
 
@@ -980,7 +980,7 @@ class BSData:
 
     @bsdata.command(name="settag", pass_context=True, no_pm=True)
     async def bsdata_settag(
-            self, ctx, playertag=None, member: discord.Member=None):
+            self, ctx, playertag=None, member: discord.Member = None):
         """Set playertag to discord member.
 
         Setting tag for yourself:
@@ -1042,7 +1042,6 @@ class BSData:
         return None
 
 
-
 def check_folder():
     """Check folder."""
     if not os.path.exists(PATH):
@@ -1061,5 +1060,3 @@ def setup(bot):
     check_file()
     n = BSData(bot)
     bot.add_cog(n)
-
-
