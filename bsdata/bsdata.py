@@ -114,6 +114,41 @@ BS_ROLES = {
     BSRole.COLEADER: "Co-Leader"
 }
 
+class BotEmoji:
+    """Emojis available in bot."""
+
+    def __init__(self, bot, map=None):
+        """Init.
+        
+        map: a dictionary mapping a key to to an emoji name.
+        """
+        self.bot = bot
+        self.map = map
+
+    def name(self, name):
+        """Emoji by name."""
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == name:
+                return '<:{}:{}>'.format(emoji.name, emoji.id)
+
+        # for server in self.bot.servers:
+        #     for emoji in server.emojis:
+        #         if emoji.name == name:
+        #             return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
+
+    def key(self, key):
+        """Chest emojis by api key name or key.
+
+        name is used by this cog.
+        key is values returned by the api.
+        Use key only if name is not set
+        """
+        if key in self.map:
+            name = self.map[key]
+            return self.name(name)
+        return ''
+
 
 class BSBandModel:
     """Brawl Stars Band data."""
@@ -492,6 +527,7 @@ class BSData:
         self.bot = bot
         self.task = bot.loop.create_task(self.loop_task())
         self.settings = dataIO.load_json(JSON)
+        self.bot_emoji = BotEmoji(bot)
 
     def __unload(self):
         self.task.cancel()
@@ -895,9 +931,8 @@ class BSData:
         em.add_field(name="Brawlers", value=fmt(player.brawler_count, int))
 
         for brawler in player.brawlers:
-            emoji = self.brawler_emoji(brawler.name)
-            if emoji is None:
-                emoji = ''
+            icon_export = brawler.icon_export
+            emoji = self.brawler_emoji(icon_export)
             name = '{} {} ({} UPG)'.format(brawler.name, emoji, brawler.level)
             trophies = '{}/{}'.format(brawler.trophies, brawler.highest_trophies)
             em.add_field(
