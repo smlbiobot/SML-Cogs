@@ -93,6 +93,13 @@ def grouper(n, iterable, fillvalue=None):
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
+def random_discord_color():
+    """Return random color as an integer."""
+    color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+    color = int(color, 16)
+    return discord.Color(value=color)
+
+
 class BotEmoji:
     """Emojis available in bot."""
 
@@ -501,6 +508,84 @@ class BSPlayerModel:
         self._discord_member = value
 
 
+class BSDataServerSettings:
+    """Brawl Stars Data server settings."""
+    def __init__(self, server):
+        self.server = server
+
+class BSDataSettings:
+    """Brawl Stars Data Settings."""
+    def __init__(self, bot):
+        """Init."""
+        self.bot = bot
+        self.settings = dataIO.load_json(JSON)
+
+    def save(self):
+        """Save settings to file."""
+        dataIO.save_json(JSON, self.settings)
+
+    def init_server(self, server):
+        """Initialize server settings."""
+        self.settings["servers"][server.id] = SERVER_DEFAULTS
+        self.save()
+
+    def check_server_settings(self, server):
+        """Add server to settings if one does not exist."""
+        if server.id not in self.settings["servers"]:
+            self.settings["servers"][server.id] = SERVER_DEFAULTS
+        self.save()
+
+    @property
+    def servers(self):
+        return self.settings["servers"]
+
+    def server_settings(self, server):
+        self.check_server_settings(server)
+        return self.settings["servers"][server.id]
+
+    @property
+    def player_api_url(self):
+        return self.settings["player_api_url"]
+
+    @player_api_url.setter
+    def player_api_url(self, value):
+        self.settings["player_api_url"] = value
+        self.save()
+
+    @property
+    def band_api_url(self):
+        return self.settings["band_api_url"]
+
+    @band_api_url.setter
+    def band_api_url(self, value):
+        self.settings["band_api_url"] = value
+        self.save()
+
+    def get_bands_settings(self, server):
+        """Return bands in settings."""
+        return self.server_settings(server)["bands"]
+
+    def set_bands_settings(self, server, data):
+        """Set bands data in settings."""
+        self.server_settings(server)["bands"] = data
+        self.save()
+        return True
+
+    def get_players(self, server):
+        """Return players on a server."""
+        return self.server_settings(server)["players"]
+
+    def get_server(self, server):
+        return self.server_settings(server)
+
+    def add_player(self, server, player_tag, member_id):
+        """Add or edit a player."""
+        if "players" not in self.settings["servers"][server.id]:
+            self.settings["servers"][server.id]["players"] = {}
+        self.settings["servers"][server.id]["players"][member_id] = player_tag
+        self.save()
+
+
 class BSData:
     """Brawl Stars Clan management."""
 
@@ -508,7 +593,8 @@ class BSData:
         """Init."""
         self.bot = bot
         self.task = bot.loop.create_task(self.loop_task())
-        self.settings = dataIO.load_json(JSON)
+        self.settings = BSDataSettings(bot)
+        # self.settings = dataIO.load_json(JSON)
         self.bot_emoji = BotEmoji(bot)
 
     def __unload(self):
@@ -522,11 +608,11 @@ class BSData:
         if self is self.bot.get_cog('BSBand'):
             self.task = self.bot.loop.create_task(self.loop_task())
 
-    def check_server_settings(self, server_id):
-        """Add server to settings if one does not exist."""
-        if server_id not in self.settings["servers"]:
-            self.settings["servers"][server_id] = SERVER_DEFAULTS
-        dataIO.save_json(JSON, self.settings)
+    # def check_server_settings(self, server_id):
+    #     """Add server to settings if one does not exist."""
+    #     if server_id not in self.settings.servers:
+    #         self.settings["servers"][server_id] = SERVER_DEFAULTS
+    #     dataIO.save_json(JSON, self.settings)
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
@@ -539,27 +625,21 @@ class BSData:
             await send_cmd_help(ctx)
 
     @bsdataset.command(name="init", pass_context=True)
-    async def bsdataset_init(self, ctx: Context):
+    async def bsdataset_init(self, ctx):
         """Init BS Band settings."""
         server = ctx.message.server
-        self.settings["servers"][server.id] = SERVER_DEFAULTS
-        dataIO.save_json(JSON, self.settings)
+        self.settings.init_server(server)
         await self.bot.say("Server settings initialized.")
 
     @bsdataset.command(name="bandapi", pass_context=True)
-    async def bsdataset_bandapi(self, ctx: Context, url):
+    async def bsdataset_bandapi(self, ctx, url):
         """BS Band API URL base.
 
         Format:
         If path is hhttp://domain.com/path/LQQ
         Enter http://domain.com/path/
         """
-        self.settings["band_api_url"] = url
-
-        server = ctx.message.server
-        self.check_server_settings(server.id)
-
-        dataIO.save_json(JSON, self.settings)
+        self.settings.band_api_url = url
         await self.bot.say("Band API URL updated.")
 
     @bsdataset.command(name="playerapi", pass_context=True)
@@ -570,34 +650,12 @@ class BSData:
         If path is hhttp://domain.com/path/LQQ
         Enter http://domain.com/path/
         """
-        self.settings["player_api_url"] = url
-
-        server = ctx.message.server
-        self.check_server_settings(server.id)
-
-        dataIO.save_json(JSON, self.settings)
+        self.settings.player_api_url = url
         await self.bot.say("Member API URL updated.")
-
-    @bsdataset.command(name="swapplayers", pass_context=True)
-    async def bsdataset_swapplayers(self, ctx):
-        """LEGACY settings support: swap players dictionary.
-
-        From key to value.
-        Originally:
-        PlayerTag: MemberID
-        Now:
-        MmeberID: PlayerTag
-        """
-        for server_id in self.settings["servers"]:
-            players = self.settings["servers"][server_id]["players"]
-            updated_players = {v: k for k, v in players.items()}
-            self.settings["servers"][server_id]["players"] = updated_players
-        dataIO.save_json(JSON, self.settings)
-        await self.bot.say("Players settings updated.")
 
     async def get_band_data(self, tag):
         """Return band data JSON."""
-        url = "{}{}".format(self.settings["band_api_url"], tag)
+        url = "{}{}".format(self.settings.band_api_url, tag)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 try:
@@ -608,8 +666,9 @@ class BSData:
 
     async def update_data(self, band_tag=None):
         """Perform data update from api."""
-        for server_id in self.settings["servers"]:
-            bands = self.get_bands_settings(server_id)
+        for server_id in self.settings.servers:
+            server = self.bot.get_server(server_id)
+            bands = self.settings.get_bands_settings(server)
 
             for tag, band in bands.items():
                 do_update = False
@@ -622,14 +681,14 @@ class BSData:
                     data = await self.get_band_data(tag)
                     bands[tag].update(data)
 
-            self.set_bands_settings(server_id, bands)
+            self.settings.set_bands_settings(server, bands)
         return True
 
     def tag2member(self, tag=None):
         """Return Discord member from player tag."""
         for server in self.bot.servers:
             try:
-                players = self.settings["servers"][server.id]["players"]
+                players = self.settings.get_players(server)
                 for member_id, v in players.items():
                     if v == tag:
                         return server.get_member(member_id)
@@ -644,16 +703,15 @@ class BSData:
         if success:
             await self.bot.say("Data updated")
 
-    def get_bands_settings(self, server_id):
-        """Return bands in settings."""
-        self.check_server_settings(server_id)
-        return self.settings["servers"][server_id]["bands"]
-
-    def set_bands_settings(self, server_id, data):
-        """Set bands data in settings."""
-        self.settings["servers"][server_id]["bands"] = data
-        dataIO.save_json(JSON, self.settings)
-        return True
+    # def get_bands_settings(self, server):
+    #     """Return bands in settings."""
+    #     return self.settings.get_bands_settings(server)
+    #
+    # def set_bands_settings(self, server_id, data):
+    #     """Set bands data in settings."""
+    #     self.settings["servers"][server_id]["bands"] = data
+    #     dataIO.save_json(JSON, self.settings)
+    #     return True
 
     @bsdataset.command(name="add", pass_context=True)
     async def bsdataset_add(self, ctx: Context, *clantags):
@@ -667,17 +725,17 @@ class BSData:
             return
 
         server = ctx.message.server
-        self.check_server_settings(server.id)
+        # self.check_server_settings(server.id)
 
         for clantag in clantags:
             if clantag.startswith('#'):
                 clantag = clantag[1:]
 
-            bands = self.get_bands_settings(server.id)
+            bands = self.settings.get_bands_settings(server)
             if clantag not in bands:
                 bands[clantag] = BAND_DEFAULTS
 
-            self.set_bands_settings(server.id, bands)
+            self.settings.set_bands_settings(server, bands)
 
             await self.bot.say("added Band with clan tag: #{}".format(clantag))
 
@@ -695,7 +753,7 @@ class BSData:
             return
 
         server = ctx.message.server
-        bands = self.get_bands_settings(server.id)
+        bands = self.settings.get_bands_settings(server)
 
         for clantag in clantags:
             if clantag.startswith('#'):
@@ -706,7 +764,7 @@ class BSData:
                 await self.bot.say("{} not in clan settings.".format(clantag))
                 return
 
-            self.set_bands_settings(server.id, bands)
+            self.settings.set_bands_settings(server, bands)
             await self.bot.say("Removed #{} from bands.".format(clantag))
 
     @bsdataset.command(name="setkey", pass_context=True)
@@ -718,14 +776,14 @@ class BSData:
         band tag every time.
         """
         server = ctx.message.server
-        bands = self.get_bands_settings(server.id)
+        bands = self.settings.get_bands_settings(server)
 
         if tag not in bands:
             await self.bot.say(
                 "{} is not a band tag you have added".format(tag))
             return
         bands[tag]["key"] = key
-        self.set_bands_settings(server.id, bands)
+        self.settings.set_bands_settings(server, bands)
         await self.bot.say("Added {} for band #{}.".format(key, tag))
 
     @commands.group(pass_context=True, no_pm=True)
@@ -738,7 +796,7 @@ class BSData:
     async def bsdata_info(self, ctx: Context):
         """Information."""
         server = ctx.message.server
-        bands = self.get_bands_settings(server.id)
+        bands = self.settings.get_bands_settings(server)
         for k, band in bands.items():
             # update band data if it was never fetched
             if band["name"] is None:
@@ -775,7 +833,7 @@ class BSData:
         Key of each band is set from [p]bsband addkey
         """
         server = ctx.message.server
-        bands = self.get_bands_settings(server.id)
+        bands = self.settings.get_bands_settings(server)
         band_result = None
         for k, band in bands.items():
             data = BSBandModel(data=band)
@@ -794,7 +852,7 @@ class BSData:
         # if fields are displayed inline,
         # 24 can fit both 2 and 3-column layout
         members_out = grouper(24, members, None)
-        color = self.random_color()
+        color = random_discord_color()
         page = 1
         for members in members_out:
             em = self.embed_bsdata_roster(members)
@@ -803,11 +861,11 @@ class BSData:
                 "Tag: {} | "
                 "Required Trophies: {}").format(
                 band_result.tag, band_result.required_score)
-            em.color = discord.Color(value=color)
+            em.color = color
             # em.set_thumbnail(url=band_result.badge_url_base)
             em.set_footer(
                 text="Page {}".format(page),
-                icon_url=band_result.badge_url)
+                icon_url=band_result.badge_url, )
             await self.bot.say(embed=em)
             page = page + 1
 
@@ -834,7 +892,7 @@ class BSData:
     async def bsdata_profile(self, ctx, member: discord.Member = None):
         """Return player profile by Discord member name or id."""
         server = ctx.message.server
-        players = self.settings["servers"][server.id]["players"]
+        players = self.settings.get_players(server)
 
         if member is None:
             member = ctx.message.author
@@ -867,12 +925,12 @@ class BSData:
         server = ctx.message.server
         player.discord_member = self.get_discord_member(server, tag)
 
-        for em in self.player_embeds(player, color=discord.Color(value=self.random_color())):
+        for em in self.player_embeds(player, color=random_discord_color()):
             await self.bot.say(embed=em)
 
     async def get_player_data(self, tag):
         """Return player data JSON."""
-        url = "{}{}".format(self.settings["player_api_url"], tag)
+        url = "{}{}".format(self.settings.player_api_url, tag)
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 try:
@@ -913,7 +971,8 @@ class BSData:
         em.add_field(name="Level: XP",
                      value='{0.level}: {0.current_experience:,} / {0.required_experience:,}'.format(player))
         em.add_field(name="Trophies {}".format(self.bot_emoji.name('trophy_bs')), value=fmt(player.trophies, int))
-        em.add_field(name="Highest Trophies {}".format(self.bot_emoji.name('trophy_bs')), value=fmt(player.highest_trophies, int))
+        em.add_field(name="Highest Trophies {}".format(self.bot_emoji.name('trophy_bs')),
+                     value=fmt(player.highest_trophies, int))
         em.add_field(name="Victories", value=fmt(player.wins, int))
         em.add_field(name="Showdown Victories", value=fmt(player.survival_wins, int))
 
@@ -931,7 +990,7 @@ class BSData:
 
         for brawler in player.brawlers:
             icon_export = brawler.icon_export
-            emoji = self.brawler_emoji(icon_export)
+            emoji = self.bot_emoji.name(icon_export)
             name = '{emoji} {name}'.format(
                 name=brawler.name,
                 emoji=emoji,
@@ -964,7 +1023,7 @@ class BSData:
         """Return Discord member if tag is associated."""
         member_id = None
         try:
-            players = self.settings["servers"][server.id]["players"]
+            players = self.settings.get_players(server)
             for k, v in players.items():
                 if v == player_tag:
                     member_id = k
@@ -974,17 +1033,18 @@ class BSData:
             return None
         return server.get_member(member_id)
 
-    def set_player_settings(self, server_id, playertag, member_id):
+    def set_player_settings(self, server, playertag, member_id):
         """Set player tag to member id.
 
         Remove previously stored playertags associated with member_id.
         """
-        if "players" not in self.settings["servers"][server_id]:
-            self.settings["servers"][server_id]["players"] = {}
-        players = self.settings["servers"][server_id]["players"]
-        players[member_id] = playertag
-        self.settings["servers"][server_id]["players"] = players
-        dataIO.save_json(JSON, self.settings)
+        self.settings.add_player(server, playertag, member_id)
+        # if "players" not in self.settings["servers"][server_id]:
+        #     self.settings["servers"][server_id]["players"] = {}
+        # players = self.settings["servers"][server_id]["players"]
+        # players[member_id] = playertag
+        # self.settings["servers"][server_id]["players"] = players
+        # dataIO.save_json(JSON, self.settings)
 
     @bsdata.command(name="settag", pass_context=True, no_pm=True)
     async def bsdata_settag(
@@ -1025,30 +1085,16 @@ class BSData:
         if member is None:
             member = ctx.message.author
 
-        self.set_player_settings(server.id, playertag, member.id)
+        self.set_player_settings(server, playertag, member.id)
 
         await self.bot.say("Associated player tag with Discord Member.")
 
-    @staticmethod
-    def random_color():
-        """Return random color as an integer."""
-        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-        color = int(color, 16)
-        return color
+    @bsdata.command(name="events", pass_context=True)
+    async def bsdata_events(self, ctx):
+        """Return events."""
 
-    def brawler_emoji(self, name):
-        """Emoji of the brawler.
-
-        Find emoji against all known servers
-        to look for match
-        <:emoji_name:emoji_id>
-        """
-        for server in self.bot.servers:
-            for emoji in server.emojis:
-                if emoji.name == name:
-                    return '<:{}:{}>'.format(emoji.name, emoji.id)
-        return None
-
+    def event_embeds(self, event_models, color=None):
+        pass
 
 def check_folder():
     """Check folder."""
