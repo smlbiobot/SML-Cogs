@@ -89,7 +89,7 @@ class RoleHistory:
 
                 if user == member:
                     await self.bot.say("Found Member.")
-                    # await ctx.invoke(General.userinfo, user=member)
+                    await ctx.invoke(General.userinfo, user=member)
                     out = []
 
                     hist = sorted(member_value["History"].items())
