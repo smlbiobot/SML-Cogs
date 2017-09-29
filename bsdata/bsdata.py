@@ -29,7 +29,6 @@ import itertools
 import json
 import os
 from datetime import timedelta
-from enum import Enum
 from random import choice
 
 import discord
@@ -123,23 +122,6 @@ class BotEmoji:
             name = self.map[key]
             return self.name(name)
         return ''
-
-
-class BSRole(Enum):
-    """Brawl Stars role."""
-
-    MEMBER = 1
-    LEADER = 2
-    ELDER = 3
-    COLEADER = 4
-
-
-BS_ROLES = {
-    BSRole.MEMBER: "Member",
-    BSRole.LEADER: "Leader",
-    BSRole.ELDER: "Elder",
-    BSRole.COLEADER: "Co-Leader"
-}
 
 
 class BSBandModel:
@@ -489,6 +471,10 @@ class BSPlayerModel:
     @property
     def current_experience(self):
         return self.data.get('current_experience', None)
+
+    @property
+    def required_experience(self):
+        return self.data.get('required_experience', None)
 
     @property
     def band(self):
@@ -920,6 +906,8 @@ class BSData:
                 return '{:,}'.format(value)
 
         em.add_field(name=player.band.name, value=player.band.role)
+        em.add_field(name="Level: XP",
+                     value='{0.level}: {0.current_experience:,} / {0.required_experience:,}'.format(player))
         em.add_field(name="Trophies", value=fmt(player.trophies, int))
         em.add_field(name="Victories", value=fmt(player.wins, int))
         em.add_field(name="Showdown Victories", value=fmt(player.survival_wins, int))
