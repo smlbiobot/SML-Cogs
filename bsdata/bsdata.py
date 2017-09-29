@@ -866,7 +866,9 @@ class BSData:
         player = BSPlayerModel(data=data)
         server = ctx.message.server
         player.discord_member = self.get_discord_member(server, tag)
-        await self.bot.say(embed=self.embed_player(player))
+
+        for em in self.player_embeds(player, color=discord.Color(value=self.random_color())):
+            await self.bot.say(embed=em)
 
     async def get_player_data(self, tag):
         """Return player data JSON."""
@@ -886,12 +888,14 @@ class BSData:
             return None
         return BSPlayerModel(data=data)
 
-    def embed_player(self, player: BSPlayerModel):
+    def player_embeds(self, player: BSPlayerModel, color=None):
         """Return player embed."""
+        embeds = []
+
         em = discord.Embed(
             title=player.username,
-            description="#{}".format(player.tag))
-        em.color = discord.Color(value=self.random_color())
+            description="#{}".format(player.tag),
+            color=color)
 
         if player.discord_member is not None:
             em.description = '{} {}'.format(
@@ -908,24 +912,39 @@ class BSData:
         em.add_field(name=player.band.name, value=player.band.role)
         em.add_field(name="Level: XP",
                      value='{0.level}: {0.current_experience:,} / {0.required_experience:,}'.format(player))
-        em.add_field(name="Trophies", value=fmt(player.trophies, int))
+        em.add_field(name="Trophies {}".format(self.bot_emoji.name('trophy_bs')), value=fmt(player.trophies, int))
+        em.add_field(name="Highest Trophies {}".format(self.bot_emoji.name('trophy_bs')), value=fmt(player.highest_trophies, int))
         em.add_field(name="Victories", value=fmt(player.wins, int))
         em.add_field(name="Showdown Victories", value=fmt(player.survival_wins, int))
-        em.add_field(name="Highest Trophies", value=fmt(player.highest_trophies, int))
-        em.add_field(name="Brawlers", value=fmt(player.brawler_count, int))
-
-        for brawler in player.brawlers:
-            icon_export = brawler.icon_export
-            emoji = self.brawler_emoji(icon_export)
-            name = '{} {} ({} UPG)'.format(brawler.name, emoji, brawler.level)
-            trophies = '{}/{}'.format(brawler.trophies, brawler.highest_trophies)
-            em.add_field(
-                name=name,
-                value=trophies)
 
         em.set_thumbnail(
             url='https://smlbiobot.github.io/bs-emoji-servers/avatars/{}.png'.format(
                 player.avatar_export))
+
+        embeds.append(em)
+
+        # - Brawlers
+        em = discord.Embed(
+            title='Brawlers',
+            descripton=fmt(player.brawler_count, int),
+            color=color)
+
+        for brawler in player.brawlers:
+            icon_export = brawler.icon_export
+            emoji = self.brawler_emoji(icon_export)
+            name = '{emoji} {name}'.format(
+                name=brawler.name,
+                emoji=emoji,
+                level=brawler.level,
+                level_emoji=self.bot_emoji.name('lvl'))
+            value = '{trophies} / {pb} ({level} upg)'.format(
+                trophies=brawler.trophies,
+                pb=brawler.highest_trophies,
+                level=brawler.level,
+                level_emoji=self.bot_emoji.name('lvl'))
+            em.add_field(
+                name=name,
+                value=value)
 
         text = (
             '{0.name}'
@@ -938,7 +957,8 @@ class BSData:
             text=text,
             icon_url=player.band.badge_url)
 
-        return em
+        embeds.append(em)
+        return embeds
 
     def get_discord_member(self, server, player_tag):
         """Return Discord member if tag is associated."""
