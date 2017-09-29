@@ -25,9 +25,11 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import asyncio
+import async_timeout
 import itertools
 import json
 import os
+import datetime as dt
 from datetime import timedelta
 from random import choice
 
@@ -98,6 +100,30 @@ def random_discord_color():
     color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
     color = int(color, 16)
     return discord.Color(value=color)
+
+def format_timedelta(td):
+    """Timedelta in 4 hr 2 min 3 sec"""
+    l = str(td).split(':')
+    return '{0[0]} hr {0[1]} min {0[2]} sec'.format(l)
+
+
+async def fetch(url, timeout=10):
+    """Fetch URL.
+
+    :param session: aiohttp.ClientSession
+    :param url: URL
+    :return: Response in JSON
+    """
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, timeout=timeout) as resp:
+                data = await resp.json()
+                return data
+    except asyncio.TimeoutError:
+        return None
+    except aiohttp.ClientResponseError:
+        return None
+    return None
 
 
 class BotEmoji:
@@ -507,6 +533,99 @@ class BSPlayerModel:
         """Discord user id."""
         self._discord_member = value
 
+class BSEventModel:
+    """Brawl Stars event model."""
+    def __init__(self, data=None):
+        self.data = data
+
+    @property
+    def time(self):
+        return self.data.get('time', None)
+
+    @property
+    def time_starts_in(self):
+        if self.time is None:
+            return 0
+        return self.time.get('starts_in', 0)
+
+    @property
+    def time_ends_in(self):
+        if self.time is None:
+            return 0
+        return self.time.get('ends_in', 0)
+
+    @property
+    def coins(self):
+        return self.data.get('coins', None)
+
+    @property
+    def coins_free(self):
+        if self.coins is None:
+            return 0
+        return self.coins.get('free', 0)
+
+    @property
+    def coins_first_win(self):
+        if self.coins is None:
+            return 0
+        return self.coins.get('first_win', 0)
+
+    @property
+    def coins_max(self):
+        if self.coins is None:
+            return 0
+        return self.coins.get('max', 0)
+
+    @property
+    def number(self):
+        return self.data.get('number', None)
+
+    @property
+    def xp_multiplier(self):
+        return self.data.get('xp_multiplier', None)
+
+    @property
+    def index(self):
+        return self.data.get('index', None)
+
+    @property
+    def location(self):
+        return self.data.get('location', None)
+
+    @property
+    def type(self):
+        return self.data.get('type', None)
+
+    @property
+    def mode(self):
+        return self.data.get('mode', None)
+
+    @property
+    def mode_name(self):
+        if self.mode is None:
+            return ''
+        return self.mode.get('name', '')
+
+    @property
+    def mode_color(self):
+        if self.mode is None:
+            return ''
+        return self.mode.get('color', '')
+
+    @property
+    def mode_description(self):
+        if self.mode is None:
+            return ''
+        return self.mode.get('description', '')
+
+    @property
+    def info(self):
+        return self.data.get('info', None)
+
+    @property
+    def map_url(self):
+        return self.data.get('map', None)
+
 
 class BSDataServerSettings:
     """Brawl Stars Data server settings."""
@@ -561,6 +680,15 @@ class BSDataSettings:
         self.settings["band_api_url"] = value
         self.save()
 
+    @property
+    def event_api_url(self):
+        return self.settings["event_api_url"]
+
+    @event_api_url.setter
+    def event_api_url(self, value):
+        self.settings["event_api_url"] = value
+        self.save()
+
     def get_bands_settings(self, server):
         """Return bands in settings."""
         return self.server_settings(server)["bands"]
@@ -592,27 +720,8 @@ class BSData:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.task = bot.loop.create_task(self.loop_task())
         self.settings = BSDataSettings(bot)
-        # self.settings = dataIO.load_json(JSON)
         self.bot_emoji = BotEmoji(bot)
-
-    def __unload(self):
-        self.task.cancel()
-
-    async def loop_task(self):
-        """Loop task: update data daily."""
-        await self.bot.wait_until_ready()
-        await self.update_data()
-        await asyncio.sleep(DATA_UPDATE_INTERVAL)
-        if self is self.bot.get_cog('BSBand'):
-            self.task = self.bot.loop.create_task(self.loop_task())
-
-    # def check_server_settings(self, server_id):
-    #     """Add server to settings if one does not exist."""
-    #     if server_id not in self.settings.servers:
-    #         self.settings["servers"][server_id] = SERVER_DEFAULTS
-    #     dataIO.save_json(JSON, self.settings)
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
@@ -651,7 +760,18 @@ class BSData:
         Enter http://domain.com/path/
         """
         self.settings.player_api_url = url
-        await self.bot.say("Member API URL updated.")
+        await self.bot.say("Player API URL updated.")
+
+    @bsdataset.command(name="eventapi", pass_context=True)
+    async def bsdataset_playerapi(self, ctx: Context, url):
+        """BS Event API URL base.
+
+        Format:
+        If path is http://domain.com/path/
+        Enter http://domain.com/path/
+        """
+        self.settings.event_api_url = url
+        await self.bot.say("Event API URL updated.")
 
     async def get_band_data(self, tag):
         """Return band data JSON."""
@@ -664,26 +784,6 @@ class BSData:
                     data = None
         return data
 
-    async def update_data(self, band_tag=None):
-        """Perform data update from api."""
-        for server_id in self.settings.servers:
-            server = self.bot.get_server(server_id)
-            bands = self.settings.get_bands_settings(server)
-
-            for tag, band in bands.items():
-                do_update = False
-                if band_tag is None:
-                    do_update = True
-                elif band_tag == tag:
-                    do_update = True
-                if do_update:
-                    # async with self.get_band_data(tag) as data:
-                    data = await self.get_band_data(tag)
-                    bands[tag].update(data)
-
-            self.settings.set_bands_settings(server, bands)
-        return True
-
     def tag2member(self, tag=None):
         """Return Discord member from player tag."""
         for server in self.bot.servers:
@@ -695,23 +795,6 @@ class BSData:
             except KeyError:
                 pass
         return None
-
-    @bsdataset.command(name="update", pass_context=True)
-    async def bsdataset_update(self, ctx: Context):
-        """Update data from api."""
-        success = await self.update_data()
-        if success:
-            await self.bot.say("Data updated")
-
-    # def get_bands_settings(self, server):
-    #     """Return bands in settings."""
-    #     return self.settings.get_bands_settings(server)
-    #
-    # def set_bands_settings(self, server_id, data):
-    #     """Set bands data in settings."""
-    #     self.settings["servers"][server_id]["bands"] = data
-    #     dataIO.save_json(JSON, self.settings)
-    #     return True
 
     @bsdataset.command(name="add", pass_context=True)
     async def bsdataset_add(self, ctx: Context, *clantags):
@@ -1090,11 +1173,60 @@ class BSData:
         await self.bot.say("Associated player tag with Discord Member.")
 
     @bsdata.command(name="events", pass_context=True)
-    async def bsdata_events(self, ctx):
-        """Return events."""
+    async def bsdata_events(self, ctx, type="now"):
+        """Return events.
+        
+        [p]bsdata events 
+        [p]bsdata events now
+        [p]bsdata events later
+        """
+        await self.bot.type()
+        url = self.settings.event_api_url
+        data = await fetch(url)
+        if data is None:
+            await self.bot.say("Error fetching events from API.")
+            return
+        event_data = data[type]
+        for e in event_data:
+            await self.bot.type()
+            event_model = BSEventModel(data=e)
+            await self.bot.say(
+                embed=self.event_embed(event_model))
 
-    def event_embeds(self, event_models, color=None):
-        pass
+    def event_embed(self, event_model, color=None):
+        """BS event embed."""
+        e = event_model
+
+        if color is None:
+            color = discord.Color(value=int(e.mode_color[1:], 16))
+
+        em = discord.Embed(
+            title=e.mode_name,
+            description=e.mode_description,
+            color=color,
+            url=e.map_url
+        )
+        em.add_field(name="Location", value=e.location)
+        em.add_field(name="Type", value=e.type)
+        if e.time_starts_in == 0:
+            starts_in_value = 'Started'
+        else:
+            starts_in_value = format_timedelta(dt.timedelta(seconds=e.time_starts_in))
+        em.add_field(
+            name="Starts in {}".format(self.bot_emoji.name("timer")),
+            value=starts_in_value)
+        em.add_field(
+            name="Ends in {}".format(self.bot_emoji.name("timer")),
+            value=format_timedelta(dt.timedelta(seconds=e.time_ends_in)))
+        em.add_field(
+            name="Coins {}".format(self.bot_emoji.name("coin")),
+            value=(
+                "{0.coins_free} Free | "
+                "{0.coins_first_win} First Win | "
+                "{0.coins_max} Max".format(e))
+            )
+        em.set_thumbnail(url=e.map_url)
+        return em
 
 def check_folder():
     """Check folder."""
