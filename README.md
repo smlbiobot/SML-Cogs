@@ -10,6 +10,21 @@ You are welcome to log any issues in the Issues tab, or try to find me on either
 
 There are no extensive documentation on these cogs. However, usage for many of these commands can be found on the documentation site for the RACF server, since these cogs were mostly written for it: http://docs.redditalpha.com
 
+# Table of Contents
+
+* [SML\-Cogs](#sml-cogs)
+  * [Installation](#installation)
+    * [1\. Add the repo](#1-add-the-repo)
+    * [2\. Add the cog you want to installed](#2-add-the-cog-you-want-to-installed)
+  * [Cogs](#cogs)
+    * [General Cogs](#general-cogs)
+    * [Brawl Stars Cogs](#brawl-stars-cogs)
+    * [Clash Royale Cogs](#clash-royale-cogs)
+    * [RACF cogs](#racf-cogs)
+    * [RCS cogs](#rcs-cogs)
+    * [No longer maintained](#no-longer-maintained)
+  * [Notes](#notes)
+
 ## Installation
 
 To install a cog on your bot instance:
@@ -26,7 +41,9 @@ To install a cog on your bot instance:
 
 `[p]cog install SML-Cogs deck`
 
-## General Cogs
+## Cogs
+
+### General Cogs
 
 * **archive**: Archive channel messages from one channel to another.
 * **banned**: quick list for banned players
@@ -43,11 +60,11 @@ To install a cog on your bot instance:
 * **togglerole**: Allow users to self-assigned roles based on role permission.
 * **userdata**: Free-form user data store.
 
-## Brawl Stars Cogs
+### Brawl Stars Cogs
 
 * **bsdata**: Brawl Stars profile and clan using brawlstars.io API
 
-## Clash Royale Cogs
+### Clash Royale Cogs
 
 * **crclan**: Clash Royale clan using [cr-api](https://github.com/cr-api/cr-api) API
 * **crdata**: Clash Royale Global 200 leaderboard (requires Starfi.re login)
@@ -59,9 +76,9 @@ To install a cog on your bot instance:
 * **[deck](https://github.com/smlbiobot/SML-Cogs/wiki/Deck)**: Clash Royale deck builder
 
 
-## RACF cogs
+### RACF cogs
 
-These cogs were written specifically for the RACF Discord server and will be useless for other servers.
+These cogs were written specifically for the RACF (Reddit Alpha Clan Family) Discord server and will be useless for other servers.
 
 * **farmers**: display clan chest farmers historic data
 * **feddback**: Send feedbacks to leaders
@@ -69,7 +86,7 @@ These cogs were written specifically for the RACF Discord server and will be use
 * **trophies**: display clan trophy requirements
 * **vcutil**: Automatically enter VC specific text chat based on VC participation
 
-## RCS cogs
+### RCS cogs
 
 These are developed specifically for the RCS (Reddit Clan System) server.
 
@@ -77,7 +94,7 @@ These are developed specifically for the RCS (Reddit Clan System) server.
 * **rcsapplication**: Retrieve RCS application responses
 * **recruit**: add and edit recruitment messages for clans.
 
-## No longer maintained
+### No longer maintained
 
 Some of these might still work, but they are no longer maintained.
 
@@ -89,6 +106,10 @@ Some of these might still work, but they are no longer maintained.
 * **draftroyale**: Clash Royale drafting bot (active development)
 * **ga**: Hacking Google Analytics as free data storage for Discord logging
 
+## Notes
 
+The top-level scripts `./enable-cog` and `./disable-cog` were written to help with local cog development and are not needed for the end users. They were made so that cogs can maintain the folder structures expected by the Red bot while making it possible to “install” into the Red folder without using the `cog install` command.
+
+In the production environment, however, you should always install the cogs as specified in the [Installation](#installation) section above.
 
 
