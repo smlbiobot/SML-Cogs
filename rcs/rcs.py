@@ -36,6 +36,7 @@ import asyncio
 
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from cogs.utils.chat_formatting import pagify, box
 
 BOTCOMMANDER_ROLES = ['Bot Commander']
 
@@ -127,6 +128,32 @@ class RCS:
         """RCS Settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
+
+    @rcsset.command(name="settings", pass_context=True)
+    @checks.mod_or_permissions()
+    async def rcsset_settings(self, ctx):
+        """Shows settings."""
+        server = ctx.message.server
+        try:
+            clans = self.settings[server.id]["clans"].values()
+            print(clans)
+            clans = sorted(clans, key=lambda c: c["role_name"])
+            fmt = '{:<16} {:<16} {:<16}'
+            out = [
+                fmt.format('Role', 'Nick', 'Tag'),
+                '-' * 50
+            ]
+            for clan in clans:
+                out.append(
+                    fmt.format(
+                        clan["role_name"],
+                        clan["role_nick"],
+                        clan["tag"]
+                    ))
+            for page in pagify(box('\n'.join(out)), shorten_by=24):
+                await self.bot.say(page)
+        except KeyError:
+            await self.bot.say("No server settings found.")
 
     @rcsset.command(name="role", pass_context=True)
     @checks.mod_or_permissions()
