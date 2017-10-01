@@ -1133,7 +1133,7 @@ class CRProfile:
             player_data = self.model.cached_player_data(tag)
 
         if player_data is None:
-            await self.bot.say("Unable to load from API.")
+            await self.bot.send_message(ctx.message.channel, "Unable to load from API.")
             return
         if player_data.is_cache:
             await self.bot.send_message(
