@@ -85,6 +85,8 @@ class ToggleRole:
         if not self.verify_role(server, toggleable_role):
             await self.bot.say("{} is not a valid role on this server.".format(toggleable_role))
             return
+        if actor_role not in self.settings[server.id]:
+            self.settings[server.id][actor_role] = {}
         self.settings[server.id][actor_role][toggleable_role] = True
         dataIO.save_json(SETTINGS_JSON, self.settings)
         await ctx.invoke(self.toggleroleset_list)
