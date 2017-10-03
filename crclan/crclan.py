@@ -30,7 +30,7 @@ import datetime as dt
 import itertools
 import json
 import os
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from datetime import timedelta
 from enum import Enum
 from random import choice
@@ -614,6 +614,26 @@ class ClanManager:
         except KeyError:
             return None
 
+    def set_member_role(self, server, role_name):
+        """Set associated elder role on a server."""
+        self.check_server(server)
+        role = discord.utils.get(server.roles, name=role_name)
+        if role is None:
+            raise RoleNotFound
+        try:
+            self.settings["servers"][server.id]["member_role_id"] = role.id
+        except KeyError:
+            raise
+        self.save()
+
+    def get_member_role(self, server):
+        """Return elder role on a server."""
+        try:
+            role_id = self.settings["servers"][server.id]["member_role_id"]
+            return discord.utils.get(server.roles, id=role_id)
+        except KeyError:
+            return None
+
     def key2tag(self, server, key):
         """Convert clan key to clan tag."""
         clans = self.get_clans(server)
@@ -627,6 +647,18 @@ class ClanManager:
         clans = self.get_clans(server)
         for tag, clan in clans.items():
             if clan["key"].lower() == key.lower():
+                return clan["role_name"]
+        return None
+
+    def clantag_to_discord_role(self, server, tag):
+        """Convert clan tag to clan role."""
+        return discord.utils.get(server.roles, name=self.clantag_to_discord_role_name(server, tag))
+
+    def clantag_to_discord_role_name(self, server, tag):
+        """Convert clan tag to discord role name."""
+        clans = self.get_clans(server)
+        for clan_tag, clan in clans.items():
+            if clan["tag"] == SCTag(tag).tag:
                 return clan["role_name"]
         return None
 
@@ -1068,11 +1100,22 @@ class CRClan:
             await self.bot.say("Added {} for clan #{}.".format(key, tag))
 
     @crclanset.command(name="elderrole", pass_context=True)
-    async def crclanset_elderrole(self, ctx, elder_role):
+    async def crclanset_elderrole(self, ctx, role_name):
         """Set elder’s role on server."""
         server = ctx.message.server
         try:
-            self.manager.set_elder_role(server, elder_role)
+            self.manager.set_elder_role(server, role_name)
+        except RoleNotFound:
+            await self.bot.say("Cannot find that role on the server.")
+        else:
+            await self.bot.say("Settings saved.")
+
+    @crclanset.command(name="memberrole", pass_context=True)
+    async def crclanset_memberrole(self, ctx, role_name):
+        """Set elder’s role on server."""
+        server = ctx.message.server
+        try:
+            self.manager.set_member_role(server, role_name)
         except RoleNotFound:
             await self.bot.say("Cannot find that role on the server.")
         else:
@@ -1090,13 +1133,16 @@ class CRClan:
         if clans is None:
             await self.bot.say("No clans settings found on this server.")
             return
+        clans = OrderedDict(clans)
+        clans = OrderedDict(sorted(clans.items(), key=lambda item:item[1]['key']))
         clan_list = [clan for k, clan in clans.items()]
 
-        out = []
+        divider = '-'* 40
+        out = ['CRClan Settings', divider]
         fmt = '{:<12} ' * 3
         th = fmt.format("Clan Key", "Role", "Tag")
         out.append(th)
-        out.append('-' * len(th))
+        out.append(divider)
         for k, clan in clans.items():
             key = clan.get("key", None) or " "
             role = clan.get("role_name", None) or " "
@@ -1104,6 +1150,9 @@ class CRClan:
 
             o = fmt.format(key, role, tag)
             out.append(o)
+        out.append(divider)
+        out.append('Elder role: {}'.format(self.manager.get_elder_role(server)))
+        out.append('Member role: {}'.format(self.manager.get_member_role(server)))
         for page in pagify(box('\n'.join(out))):
             await self.bot.say(page)
 
@@ -1516,33 +1565,91 @@ class CRClan:
 
         # remove role from members not in clan
         if option_remove_role:
-            mm = self.bot.get_cog("MemberManagement")
             for m in dc_members_not_in_clan:
-                try:
-                    await self.bot.remove_roles(m, clanrole)
-                    await self.bot.say("Removed {} from {}".format(clanrole.name, m.display_name))
-                except discord.Forbidden:
-                    await self.bot.say("You do not have permissions to revoke these roles.")
-                    continue
-                except discord.HTTPException:
-                    await self.bot.say("Removing roles failed for unknown reasons.")
-                    continue
+                await self.remove_role(ctx, m, clanrole)
 
         # add role to members in clan
         if option_add_role:
-            mm = self.bot.get_cog("MemberManagement")
             for m in dc_members_without_role:
-                try:
-                    await self.bot.add_roles(m, clanrole)
-                    await self.bot.say("Added {} to {}".format(clanrole.name, m.display_name))
-                except discord.Forbidden:
-                    await self.bot.say("You do not have permissions to revoke these roles.")
-                    continue
-                except discord.HTTPException:
-                    await self.bot.say("Removing roles failed for unknown reasons.")
-                    continue
+                await self.add_role(ctx, m, clanrole)
 
         await self.bot.say("…End of audit.")
+
+    async def add_role(self, ctx, member:discord.Member, role:discord.Role):
+        """Add role."""
+        try:
+            await self.bot.add_roles(member, role)
+            await self.bot.say("Added {} to {}".format(role.name, member.display_name))
+        except discord.Forbidden:
+            await self.bot.say("You do not have permissions to revoke these roles.")
+            return
+        except discord.HTTPException:
+            await self.bot.say("Removing roles failed for unknown reasons.")
+            return
+
+    async def remove_role(self, ctx, member:discord.Member, role:discord.Role):
+        """Remove role."""
+        try:
+            await self.bot.remove_roles(member, role)
+            await self.bot.say("Removed {} from {}".format(role.name, member.display_name))
+        except discord.Forbidden:
+            await self.bot.say("You do not have permissions to revoke these roles.")
+            return
+        except discord.HTTPException:
+            await self.bot.say("Removing roles failed for unknown reasons.")
+            return
+
+    @crclan.command(name='auditfam', aliases=['af'], pass_context=True, no_pm=True)
+    async def crclan_auditfam(self, ctx, *, options=None):
+        """Audit the entire family.
+        
+        Family clans are determined by what is saved in clans
+        [p]crclanset settings
+
+        Options:
+        --removerole   Remove clan role from people who aren’t in clan
+        --addrole      Add clan role to people who are in clan
+        --exec         Run both add and remove role options
+        """
+        api = self.bot.get_cog("ClashRoyaleAPI")
+        server = ctx.message.server
+
+        await self.bot.type()
+
+        family_tags = self.manager.get_clans(server).keys()
+        await self.bot.say("Family tags: {}".format(",".join(family_tags)))
+        clan_models = await api.clans_model(family_tags)
+
+        # - add role to models
+        for c in clan_models:
+            await self.bot.type()
+            role = self.manager.clantag_to_discord_role(server, c.tag)
+            if role is None:
+                role = 'No found role.'
+            c.role = role
+
+        # - all player models from clan_models
+        # member_models = [m for m in c.members for c in clan_models]
+        member_models = []
+        for c in clan_models:
+            for m in c.members:
+                member_models.append(m)
+        await self.bot.say("Total members: {}".format(len(member_models)))
+
+        members_without_discord = []
+        # - Audit clan roles
+        for c in clan_models:
+            clan_role = c.role
+            for m in c.members:
+                discord_user = self.manager.tag2member(server, m.tag)
+                if discord_user is None:
+                    members_without_discord.append(m)
+                    continue
+                else:
+                    if clan_role not in discord_user.roles:
+                        await self.bot.say("{} does not have {} but is in clan.".format(
+                            discord_user, clan_role
+                        ))
 
 
 def check_folder():

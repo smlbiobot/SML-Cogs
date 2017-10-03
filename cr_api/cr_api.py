@@ -699,7 +699,8 @@ class CRClanModel:
         self.is_cache = is_cache
         self.timestamp = timestamp
         self.loaded = loaded
-        self._members = None
+        self._members = []
+        self._discord_role = None
 
     @property
     def badge(self):
@@ -732,7 +733,7 @@ class CRClanModel:
     @property
     def members(self):
         """Members."""
-        if self._members is None:
+        if len(self._members) == 0:
             members = self.data.get('members', None)
             for m in members:
                 self._members.append(CRClanMemberModel(data=m))
@@ -812,6 +813,19 @@ class CRClanModel:
             "Real-time data in CR may be different. \n"
             "Displaying data from {}.".format(passed_str)
         )
+
+    """
+    Cog helper properties
+    """
+    @property
+    def discord_role(self):
+        """Discord role object."""
+        return self._discord_role
+
+    @discord_role.setter
+    def discord_role(self, value):
+        """Discord role object."""
+        self._discord_role = value
 
 
 class Settings:
