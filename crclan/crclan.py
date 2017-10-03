@@ -1030,14 +1030,17 @@ class CRClan:
                 await self.bot.send_message(ctx.message.channel, "Data for {} updated".format(data.name))
 
     @crclanset.command(name="add", pass_context=True)
-    async def crclanset_add(self, ctx, tag, key=None, role_name=None):
+    async def crclanset_add(self, ctx, tag, key=None, role_name=None, unique=True):
         """Add clan tag(s).
 
         [p]crclanset add 2CCCP alpha
 
         tag: clan tag without the # sign
         key: human readable key for easier calls for data
-        role: server role assignment
+        role_name: server role assignment
+        unique: default True. Used to determine if a member can only be in one clan.
+            For example, in some clan families, people’s main account must be in one single clan,
+            but they may have additional accounts in mini accounts.
 
         """
         sctag = SCTag(tag)
@@ -1613,6 +1616,7 @@ class CRClan:
         """
         api = self.bot.get_cog("ClashRoyaleAPI")
         server = ctx.message.server
+        option_exec = '--exec' in options
 
         await self.bot.type()
 
