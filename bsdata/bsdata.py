@@ -25,11 +25,10 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import asyncio
-import async_timeout
+import datetime as dt
 import itertools
 import json
 import os
-import datetime as dt
 from datetime import timedelta
 from random import choice
 
@@ -101,13 +100,14 @@ def random_discord_color():
     color = int(color, 16)
     return discord.Color(value=color)
 
+
 def format_timedelta(td):
     """Timedelta in 4 hr 2 min 3 sec"""
     l = str(td).split(':')
     return '{0[0]} hr {0[1]} min {0[2]} sec'.format(l)
 
 
-async def fetch(url, timeout=10):
+async def fetch(url, timeout=10, headers=None):
     """Fetch URL.
 
     :param session: aiohttp.ClientSession
@@ -115,7 +115,7 @@ async def fetch(url, timeout=10):
     :return: Response in JSON
     """
     try:
-        async with aiohttp.ClientSession() as session:
+        async with aiohttp.ClientSession(headers=headers) as session:
             async with session.get(url, timeout=timeout) as resp:
                 data = await resp.json()
                 return data
@@ -533,8 +533,10 @@ class BSPlayerModel:
         """Discord user id."""
         self._discord_member = value
 
+
 class BSEventModel:
     """Brawl Stars event model."""
+
     def __init__(self, data=None):
         self.data = data
 
@@ -629,11 +631,14 @@ class BSEventModel:
 
 class BSDataServerSettings:
     """Brawl Stars Data server settings."""
+
     def __init__(self, server):
         self.server = server
 
+
 class BSDataSettings:
     """Brawl Stars Data Settings."""
+
     def __init__(self, bot):
         """Init."""
         self.bot = bot
@@ -689,6 +694,15 @@ class BSDataSettings:
         self.settings["event_api_url"] = value
         self.save()
 
+    @property
+    def api_auth(self):
+        return self.settings["api_auth"]
+
+    @api_auth.setter
+    def api_auth(self, value):
+        self.settings["api_auth"] = value
+        self.save()
+
     def get_bands_settings(self, server):
         """Return bands in settings."""
         return self.server_settings(server)["bands"]
@@ -740,6 +754,12 @@ class BSData:
         self.settings.init_server(server)
         await self.bot.say("Server settings initialized.")
 
+    @bsdataset.command(name="auth", pass_context=True)
+    async def bsdataset_auth(self, ctx, token):
+        """Authorization (token)."""
+        self.settings.api_auth = token
+        await self.bot.say("Authorization (token) updated.")
+
     @bsdataset.command(name="bandapi", pass_context=True)
     async def bsdataset_bandapi(self, ctx, url):
         """BS Band API URL base.
@@ -776,12 +796,7 @@ class BSData:
     async def get_band_data(self, tag):
         """Return band data JSON."""
         url = "{}{}".format(self.settings.band_api_url, tag)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                try:
-                    data = await resp.json()
-                except json.decoder.JSONDecodeError:
-                    data = None
+        data = await fetch(url, headers={"Authorization": self.settings.api_auth})
         return data
 
     def tag2member(self, tag=None):
@@ -1014,12 +1029,7 @@ class BSData:
     async def get_player_data(self, tag):
         """Return player data JSON."""
         url = "{}{}".format(self.settings.player_api_url, tag)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                try:
-                    data = await resp.json()
-                except json.decoder.JSONDecodeError:
-                    data = None
+        data = await fetch(url, headers={"Authorization": self.settings.api_auth})
         return data
 
     async def get_player_model(self, tag):
@@ -1182,7 +1192,7 @@ class BSData:
         """
         await self.bot.type()
         url = self.settings.event_api_url
-        data = await fetch(url)
+        data = await fetch(url, headers={"Authorization": self.settings.api_auth})
         if data is None:
             await self.bot.say("Error fetching events from API.")
             return
@@ -1224,9 +1234,10 @@ class BSData:
                 "{0.coins_free} Free | "
                 "{0.coins_first_win} First Win | "
                 "{0.coins_max} Max".format(e))
-            )
+        )
         em.set_thumbnail(url=e.map_url)
         return em
+
 
 def check_folder():
     """Check folder."""
