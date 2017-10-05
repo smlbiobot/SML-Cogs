@@ -923,10 +923,17 @@ class ClashRoyaleAPI:
         return data
 
     async def clans_model(self, tags):
-        """Clans as a list of CRClanModel."""
+        """Clans as a list of CRClanModel.
+        
+        TOOD: Legacy remove.
+        """
         data = await self.clans_json(tags)
         return [CRClanModel(c) for c in data]
 
+    async def clan_models(self, tags):
+        """Clans as a list of CRClanModel."""
+        data = await self.clans_json(tags)
+        return [CRClanModel(c) for c in data]
 
 def check_folder():
     """Check folder."""
