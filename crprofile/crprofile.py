@@ -393,11 +393,10 @@ class CRPlayerModel:
             return self.games.get("draws", 0)
         return 0
 
-    def win_draw_losses(self, emoji):
-        """Win / draw / losses."""
-        return '{} / {} / {} {}'.format(
+    def win_losses(self, emoji):
+        """Win / losses."""
+        return '{} / {} {}'.format(
             '{:,}'.format(self.wins),
-            '{:,}'.format(self.draws),
             '{:,}'.format(self.losses),
             emoji
         )
@@ -587,8 +586,12 @@ class CRPlayerModel:
 
     @property
     def win_ratio(self):
-        """Win ratio."""
-        return (self.wins + self.draws * 0.5) / (self.wins + self.draws + self.losses)
+        """Win ratio.
+
+        Draws reported by API includes 2v2, so we remove those data
+        """
+        # return (self.wins + self.draws * 0.5) / (self.wins + self.draws + self.losses)
+        return self.wins / (self.wins + self.losses)
 
     @property
     def arena(self):
@@ -1205,9 +1208,9 @@ class CRProfile:
             tourney_cards_per_game = '{:.3f}'.format(player.tourney_cards_per_game)
 
         stats = OrderedDict([
-            ('Wins / Draws / Losses', player.win_draw_losses(bem('battle'))),
-            ('Win Percentage', '{:.3%} {}'.format(player.win_ratio, bem('battle'))),
-            ('Total Games', fmt(player.total_games, 'battle')),
+            ('Wins / Losses (Ladder 1v1)', player.win_losses(bem('battle'))),
+            ('Ladder Win Percentage', '{:.3%} {}'.format(player.win_ratio, bem('battle'))),
+            ('Total Games (1v1 + 2v2)', fmt(player.total_games, 'battle')),
             ('Three-Crown Wins', fmt(player.three_crown_wins, 'crownblue')),
             ('Win Streak', fmt(player.win_streak, 'crownred')),
             ('Cards Found', fmt(player.cards_found, 'cards')),
