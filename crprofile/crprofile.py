@@ -538,8 +538,14 @@ class CRPlayerModel:
 
         # special chests
         for c in special_chests:
-            out.append(bot_emoji.key(c[0]))
-            out.append('{}'.format(c[1] + 1))
+            # don’t append if index is replaced by a special cycle
+            add_chest = True
+            if c[0] in ('Magic', 'Giant'):
+                if c[1] in [self.chest_epic_index, self.chest_legendary_index, self.chest_super_magical_index]:
+                    add_chest = False
+            if add_chest:
+                out.append(bot_emoji.key(c[0]))
+                out.append('{}'.format(c[1] + 1))
 
         return ''.join(out)
 
