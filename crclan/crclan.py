@@ -1622,7 +1622,7 @@ class CRClan:
 
         family_tags = self.manager.get_clans(server).keys()
         await self.bot.say("Family tags: {}".format(",".join(family_tags)))
-        clan_models = await api.clans_model(family_tags)
+        clan_models = await api.clan_models(family_tags)
 
         # - add role to models
         for c in clan_models:
