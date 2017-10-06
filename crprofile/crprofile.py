@@ -93,10 +93,9 @@ class BotEmoji:
 
     def name(self, name):
         """Emoji by name."""
-        for server in self.bot.servers:
-            for emoji in server.emojis:
-                if emoji.name == name:
-                    return '<:{}:{}>'.format(emoji.name, emoji.id)
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == name:
+                return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
     def key(self, key):
@@ -437,8 +436,8 @@ class CRPlayerModel:
         return '{:,}{} {}'.format(self.rank, o, bot_emoji.name('rank'))
 
     """
-        Chests.
-        """
+    Chests.
+    """
 
     @property
     def chest_cycle(self):
