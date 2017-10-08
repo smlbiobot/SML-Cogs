@@ -4,7 +4,7 @@
 	"DESCRIPTION": "Reddit Alpha Clan Family’s Clash Royale auditing cog using cr-api.com as data source",
 	"DISABLED": false,
 	"NAME": "RACFAudit",
-	"REQUIREMENTS": ["pyyaml", "tabulate"],
+	"REQUIREMENTS": ["pyyaml", "tabulate", "unidecode"],
 	"TAGS": [],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
 }
