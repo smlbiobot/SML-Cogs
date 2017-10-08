@@ -28,6 +28,7 @@ import os
 import argparse
 from collections import defaultdict
 import unidecode
+import re
 
 import discord
 import yaml
@@ -297,8 +298,9 @@ class RACFAudit:
         member_models = await self.family_member_models(server)
         for member_model in member_models:
             if pargs.name is not None:
-                unaccented_string = unidecode.unidecode(member_model.name)
-                if pargs.name[0].lower() in unaccented_string.lower():
+                s = unidecode.unidecode(member_model.name)
+                s = ''.join(re.findall(r'\w', s))
+                if pargs.name[0].lower() in s.lower():
                     results.append(member_model)
             if pargs.tag is not None:
                 if pargs.tag[0].lower() in member_model.tag.lower():
