@@ -24,17 +24,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import os
 import argparse
-from collections import defaultdict
-import unidecode
+import os
 import re
+from collections import defaultdict
 
 import discord
+import unidecode
 import yaml
 from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify, box, bold
+from cogs.utils.chat_formatting import pagify, box
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from tabulate import tabulate
@@ -51,6 +51,12 @@ def nested_dict():
 def server_role(server, role_name):
     """Return discord role object by name."""
     return discord.utils.get(server.roles, name=role_name)
+
+
+def member_has_role(server, member, role_name):
+    """Return True if member has specific role."""
+    role = discord.utils.get(server.roles, name=role_name)
+    return role in member.roles
 
 
 class RACFClan:
@@ -87,8 +93,10 @@ class DiscordUser:
         self.user = user
         self.tag = tag
 
+
 class DiscordUsers:
     """List of Discord users."""
+
     def __init__(self, crclan_cog, server):
         """Init."""
         self.crclan_cog = crclan_cog
@@ -119,6 +127,72 @@ class DiscordUsers:
             if u.tag == tag:
                 return u.user
         return None
+
+    def tag_to_member_id(self, tag):
+        """Return Discord member from tag."""
+        for u in self.user_list:
+            if u.tag == tag:
+                return u.user
+        return None
+
+
+class MemberAudit:
+    """Member audit object associates API model with discord model."""
+
+    def __init__(self, member_model, server, clans):
+        self.member_model = member_model
+        self.server = server
+        self.clans = clans
+
+    @property
+    def discord_member(self):
+        return self.member_model.discord_member
+
+    @property
+    def has_discord(self):
+        return self.discord_member is not None
+
+    @property
+    def api_clan_name(self):
+        return self.member_model.clan_name
+
+    @property
+    def api_is_member(self):
+        return self.member_model.role_is_member
+
+    @property
+    def api_is_elder(self):
+        return self.member_model.role_is_elder
+
+    @property
+    def api_is_coleader(self):
+        return self.member_model.role_is_coleader
+
+    @property
+    def api_is_leader(self):
+        return self.member_model.role_is_leader
+
+    @property
+    def discord_role_member(self):
+        return member_has_role(self.server, self.discord_member, "Member")
+
+    @property
+    def discord_role_elder(self):
+        return member_has_role(self.server, self.discord_member, "Elder")
+
+    @property
+    def discord_role_coleader(self):
+        return member_has_role(self.server, self.discord_member, "Co-Leader")
+
+    @property
+    def discord_role_leader(self):
+        return member_has_role(self.server, self.discord_member, "Leader")
+
+    @property
+    def discord_clan_roles(self):
+        if self.discord_member is None:
+            return []
+        return [c.role for c in self.clans if c.role in self.discord_member.roles]
 
 
 class RACFAudit:
@@ -196,6 +270,13 @@ class RACFAudit:
     def clan_roles(self, server):
         """Clan roles."""
         return [clan.role for clan in self.clans(server)]
+
+    def clan_name_to_role(self, server, clan_name):
+        """Return Discord Role object by clan name."""
+        for clan in self.clans(server):
+            if clan.name == clan_name:
+                return clan.role
+        return None
 
     def check_cogs(self):
         """Check required cogs are loaded."""
@@ -322,7 +403,6 @@ class RACFAudit:
         else:
             await self.bot.say("No results found.")
 
-
     @racfaudit.command(name="run", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_run(self, ctx, *, options=''):
@@ -347,56 +427,54 @@ class RACFAudit:
         # Show settings
         await ctx.invoke(self.racfaudit_config)
 
-        # Load clan models from API
-        clan_models = await self.api.clan_models([clan.tag for clan in clans])
-        for clan_model in clan_models:
-            for clan in clans:
-                if clan.tag == clan_model.tag:
-                    clan.model = clan_model
-
         # Create list of all discord users with associated tags
         discord_users = DiscordUsers(crclan_cog=self.crclan, server=server)
+
+        # Member models from API
+        member_models = await self.family_member_models(server)
+
+        # associate Discord user to member
+        for member_model in member_models:
+            member_model.discord_member = discord_users.tag_to_member(member_model.tag)
 
         if option_debug:
             for du in discord_users.user_list:
                 print(du.tag, du.user)
 
         """
-        Clan processing.
+        Member processing.
         
-        Go through each clan, and:
-        1. Make sure users have correct clan tags.
         """
-        clan_roles = self.clan_roles(server)
-        await self.bot.say("Debugging")
-        for clan in clans:
-            await self.bot.type()
-            await self.bot.say(bold(clan.model.name))
-            out = []
-            for member_model in clan.model.members:
-                discord_user = discord_users.tag_to_member(member_model.tag)
-                if discord_user is None:
-                    out.append(":x: IGN: {} is not registered on Discord".format(member_model.name))
-                else:
-                    # check all roles
-                    user_clan_roles = [r for r in discord_user.roles if r in clan_roles]
+        out = []
+        for i, member_model in enumerate(member_models):
+            if i % 20 == 0:
+                await self.bot.type()
+            ma = MemberAudit(member_model, server, clans)
+            m_out = []
+            if ma.has_discord:
+                if not ma.api_is_elder and ma.discord_role_elder:
+                    m_out.append(":warning: Has Elder role but not promoted in clan.")
+                if not ma.api_is_coleader and ma.discord_role_coleader:
+                    m_out.append(":warning: Has Co-Leader role but not promoted in clan.")
+                clan_role = self.clan_name_to_role(server, member_model.clan_name)
+                if clan_role is not None:
+                    if clan_role not in ma.discord_clan_roles:
+                        m_out.append(":warning: Does not have {}".format(clan_role.name))
+            else:
+                m_out.append(':x: No Discord')
 
-
-                    # member_model.role_name
-                    out.append(
-                        ":white_check_mark: "
-                        "IGN: {ign} | "
-                        "Discord: {d_name} | "
-                        "Roles: {roles}".format(
-                            ign=member_model.name,
-                            d_name=discord_user.display_name,
-                            roles=', '.join([r.name for r in user_clan_roles])
-                        )
+            if len(m_out):
+                out.append(
+                    "**{ign}** {clan}\n{status}".format(
+                        ign=member_model.name,
+                        clan=member_model.clan_name,
+                        status='\n'.join(m_out)
                     )
-            for page in pagify('\n'.join(out)):
-                await self.bot.say(page)
+                )
 
-
+        for page in pagify('\n'.join(out)):
+            await self.bot.type()
+            await self.bot.say(page)
 
 
 def check_folder():

@@ -544,6 +544,7 @@ class CRClanMemberModel:
         """Init.
         """
         self.data = data
+        self._discord_member_id = None
         self._discord_member = None
         self._clan_name = None
         self._clan_tag = None
@@ -600,25 +601,59 @@ class CRClanMemberModel:
         return self.data.get('expLevel', None)
 
     @property
+    def discord_member(self):
+        """Discord user objedt."""
+        return self._discord_member
+
+    @discord_member.setter
+    def discord_member(self, value):
+        """Discord user  object."""
+        self._discord_member = value
+
+    @property
     def discord_member_id(self):
         """Discord user id."""
-        return self._discord_member
+        return self._discord_member_id
 
     @discord_member_id.setter
     def discord_member_id(self, value):
         """Discord user id."""
-        self._discord_member = value
+        self._discord_member_id = value
 
     @property
     def mention(self):
         """Discord mention."""
-        # return self.discord_member.mention
-        return ""
+        return self.discord_member.mention
 
     @property
     def role_name(self):
         """Properly formatted role name."""
         return self.data.get('roleName', None)
+
+    def role_is(self, role_name):
+        """Return True if member has role"""
+        return self.role_name == role_name
+
+
+    @property
+    def role_is_member(self):
+        """Return True if member is Member."""
+        return self.role_is('Member')
+
+    @property
+    def role_is_elder(self):
+        """Return True if member is elder."""
+        return self.role_is('Elder')
+
+    @property
+    def role_is_coleader(self):
+        """Return True if member is co-leader."""
+        return self.role_is('Co-Leader')
+
+    @property
+    def role_is_leader(self):
+        """Return True if member is leader."""
+        return self.role_is('Leader')
 
     @property
     def previousRank(self):
