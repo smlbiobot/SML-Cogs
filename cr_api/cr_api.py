@@ -545,6 +545,8 @@ class CRClanMemberModel:
         """
         self.data = data
         self._discord_member = None
+        self._clan_name = None
+        self._clan_tag = None
 
     @property
     def name(self):
@@ -687,6 +689,22 @@ class CRClanMemberModel:
                     return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
+    @property
+    def clan_name(self):
+        return self._clan_name
+
+    @clan_name.setter
+    def clan_name(self, value):
+        self._clan_name = value
+
+    @property
+    def clan_tag(self):
+        return self._clan_tag
+
+    @clan_tag.setter
+    def clan_tag(self, value):
+        self._clan_tag = value
+
 
 class CRClanModel:
     """Clash Royale Clan data."""
@@ -736,7 +754,10 @@ class CRClanModel:
         if len(self._members) == 0:
             members = self.data.get('members', None)
             for m in members:
-                self._members.append(CRClanMemberModel(data=m))
+                member_model = CRClanMemberModel(data=m)
+                member_model.clan_name = self.name
+                member_model.clan_tag = self.tag
+                self._members.append(member_model)
         return self._members
 
     @property
@@ -817,6 +838,7 @@ class CRClanModel:
     """
     Cog helper properties
     """
+
     @property
     def discord_role(self):
         """Discord role object."""
@@ -934,6 +956,7 @@ class ClashRoyaleAPI:
         """Clans as a list of CRClanModel."""
         data = await self.clans_json(tags)
         return [CRClanModel(c) for c in data]
+
 
 def check_folder():
     """Check folder."""
