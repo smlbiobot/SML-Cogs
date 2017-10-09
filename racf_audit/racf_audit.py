@@ -27,14 +27,14 @@ DEALINGS IN THE SOFTWARE.
 import argparse
 import os
 import re
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 
 import discord
 import unidecode
 import yaml
 from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify, box
+from cogs.utils.chat_formatting import pagify, box, bold
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from tabulate import tabulate
@@ -445,22 +445,39 @@ class RACFAudit:
         Member processing.
         
         """
+        clan_defaults = {
+            "elder_promotion_req": [],
+            "coleader_promotion_req": [],
+            "no_discord": [],
+            "no_clan_role": []
+        }
+        clans_out = OrderedDict([(c.name, clan_defaults) for c in clans])
+
+        def update_clan(clan_name, field, member_model):
+            clans_out[clan_name][field].append(member_model)
+
         out = []
         for i, member_model in enumerate(member_models):
             if i % 20 == 0:
                 await self.bot.type()
+
             ma = MemberAudit(member_model, server, clans)
+            clan_name = member_model.clan_name
             m_out = []
             if ma.has_discord:
                 if not ma.api_is_elder and ma.discord_role_elder:
+                    update_clan(clan_name, "elder_promotion_req", member_model)
                     m_out.append(":warning: Has Elder role but not promoted in clan.")
                 if not ma.api_is_coleader and ma.discord_role_coleader:
+                    update_clan(clan_name, "coleader_promotion_req", member_model)
                     m_out.append(":warning: Has Co-Leader role but not promoted in clan.")
                 clan_role = self.clan_name_to_role(server, member_model.clan_name)
                 if clan_role is not None:
                     if clan_role not in ma.discord_clan_roles:
+                        update_clan(clan_name, "no_clan_role", member_model)
                         m_out.append(":warning: Does not have {}".format(clan_role.name))
             else:
+                update_clan(clan_name, "no_discord", member_model)
                 m_out.append(':x: No Discord')
 
             if len(m_out):
@@ -472,9 +489,30 @@ class RACFAudit:
                     )
                 )
 
+        # line based output
         for page in pagify('\n'.join(out)):
             await self.bot.type()
             await self.bot.say(page)
+
+        # clan based output
+        out = []
+        print(clans_out)
+        for clan_name, clan_dict in clans_out.items():
+            out.append("**{}**".format(clan_name))
+            if len(clan_dict["elder_promotion_req"]):
+                out.append("Elders that need to be promoted:")
+                out.append(", ".join([m.name for m in clan_dict["elder_promotion_req"]]))
+            if len(clan_dict["no_discord"]):
+                out.append("No Discord:")
+                out.append(", ".join([m.name for m in clan_dict["no_discord"]]))
+            if len(clan_dict["no_clan_role"]):
+                out.append("No clan role on Discord:")
+                out.append(", ".join([m.name for m in clan_dict["no_clan_role"]]))
+
+        for page in pagify('\n'.join(out), shorten_by=24):
+            await self.bot.type()
+            if len(page):
+                await self.bot.say(page)
 
 
 def check_folder():
