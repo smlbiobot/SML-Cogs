@@ -129,13 +129,13 @@ async def fetch(url, timeout=10, headers=None):
 class BotEmoji:
     """Emojis available in bot."""
 
-    def __init__(self, bot, map=None):
+    def __init__(self, bot, mapping=None):
         """Init.
 
         map: a dictionary mapping a key to to an emoji name.
         """
         self.bot = bot
-        self.map = map
+        self.mapping = mapping
 
     def name(self, name):
         """Emoji by name."""
@@ -144,6 +144,13 @@ class BotEmoji:
                 return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
+    def named(self, name):
+        """Emoji object by name"""
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == name:
+                return emoji
+        return None
+
     def key(self, key):
         """Chest emojis by api key name or key.
 
@@ -151,10 +158,16 @@ class BotEmoji:
         key is values returned by the api.
         Use key only if name is not set
         """
-        if key in self.map:
-            name = self.map[key]
+        if key in self.mapping:
+            name = self.mapping[key]
             return self.name(name)
         return ''
+
+    def key_to_name(self, key):
+        """Return emoji name by key."""
+        if key in self.mapping:
+            return self.mapping[key]
+        return None
 
 
 class BSBandModel:
@@ -735,7 +748,17 @@ class BSData:
         """Init."""
         self.bot = bot
         self.settings = BSDataSettings(bot)
-        self.bot_emoji = BotEmoji(bot)
+        self.bot_emoji = BotEmoji(
+            bot,
+            mapping={
+                "Smash & Grab": "icon_smashgrab",
+                "Heist": "icon_heist",
+                "Bounty": "icon_bounty",
+                "Showdown": "icon_showdown",
+                "Brawl Ball": "icon_brawlball"
+            }
+        )
+        self.sessions = {}
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
@@ -1190,6 +1213,10 @@ class BSData:
         [p]bsdata events now
         [p]bsdata events later
         """
+        author = ctx.message.author
+        server = ctx.message.server
+        channel = ctx.message.channel
+
         await self.bot.type()
         url = self.settings.event_api_url
         data = await fetch(url, headers={"Authorization": self.settings.api_auth})
@@ -1197,11 +1224,23 @@ class BSData:
             await self.bot.say("Error fetching events from API.")
             return
         event_data = data[type]
-        for e in event_data:
-            await self.bot.type()
-            event_model = BSEventModel(data=e)
-            await self.bot.say(
-                embed=self.event_embed(event_model))
+
+        event_models = (BSEventModel(data=e) for e in event_data)
+
+        await self.bot.type()
+
+        message = None
+        for i, e in enumerate(event_models):
+            if i == 0:
+                message = await self.bot.say(embed=self.event_embed(e))
+            emoji = self.bot_emoji.named('number{}'.format(i+1))
+            await self.bot.add_reaction(message, emoji)
+
+        self.sessions[author.id] = {
+            "data": event_data,
+            "message_id": message.id,
+            "channel_id": channel.id
+        }
 
     def event_embed(self, event_model, color=None):
         """BS event embed."""
@@ -1237,6 +1276,38 @@ class BSData:
         )
         em.set_thumbnail(url=e.map_url)
         return em
+
+    async def on_reaction_add(self, reaction, user):
+        """Event: on_reaction_add."""
+        await self.handle_reaction(reaction, user)
+
+    async def on_reaction_remove(self, reaction, user):
+        """Event: on_reaction_remove."""
+        await self.handle_reaction(reaction, user)
+
+    async def handle_reaction(self, reaction, user):
+        """Handle reactions.
+
+        + Check to see if reaction is added in active sessions.
+        + Change embeds based on reaction name.
+        """
+        if user == self.bot.user:
+            return
+        if user.id not in self.sessions:
+            return
+        if self.sessions[user.id]["message_id"] != reaction.message.id:
+            return
+
+        # emoji names: number1, number2, etc.
+        index = int(reaction.emoji.name[-1]) - 1
+
+        session = self.sessions[user.id]
+        channel = self.bot.get_channel(session["channel_id"])
+        message = await self.bot.get_message(channel, session["message_id"])
+        data = session["data"]
+        event_model = BSEventModel(data=data[index])
+
+        await self.bot.edit_message(message, embed=self.event_embed(event_model))
 
 
 def check_folder():
