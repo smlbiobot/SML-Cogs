@@ -164,10 +164,16 @@ class SCTag:
 
 
 class CRPlayerModel:
-    """Clash Royale arenas."""
+    """Clash Royale player model."""
 
     def __init__(self, is_cache=False, data=None):
-        """Init."""
+        """Init.
+
+        Params:
+        data: dict from JSON
+        is_cache: True is data is cached (flag)
+        CHESTS: chest cycle from apk
+        """
         self.data = data
         self.is_cache = is_cache
         self.CHESTS = CHESTS
@@ -324,8 +330,7 @@ class CRPlayerModel:
 
     @property
     def favorite_card(self):
-        """Favorite card"""
-        """Cards found."""
+        """Favorite card."""
         if self.stats is not None:
             return self.stats.get("favoriteCard", "soon")
         return "soon"
