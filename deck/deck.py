@@ -36,7 +36,10 @@ from PIL import ImageFont
 import io
 import string
 from cogs.utils.chat_formatting import pagify
+import requests #for card id
 
+cardinfo_url = 'https://raw.githubusercontent.com/smlbiobot/cr-api-data/master/dst/cards.json'
+deckurl = 'https://link.clashroyale.com/deck/en?deck='
 settings_path = os.path.join("data", "deck", "settings.json")
 crdata_path = os.path.join("data", "deck", "clashroyale.json")
 max_deck_per_user = 5
@@ -61,6 +64,10 @@ class Deck:
         self.crdata_path = crdata_path
 
         self.settings = dataIO.load_json(self.file_path)
+        self.cardinfo = requests.get(cardinfo_url).json()
+        self.name_to_id = {}
+        for card in self.cardinfo:
+            self.name_to_id[card['key']] = card['decklink']
         self.crdata = dataIO.load_json(self.crdata_path)
 
         # init card data
@@ -93,6 +100,18 @@ class Deck:
         # pagination tracking
         self.track_pagination = None
 
+    def copylink(self, cards): 
+        """converts list of cards into ids,
+        compiles list of ids into url
+        """
+        print(self.cards_abbrev)
+        print(self.cards)
+        cards = list(map(lambda x: self.cards_abbrev[x], cards))
+        cardids = list(map(lambda x: self.name_to_id[x], cards))
+        url = deckurl + ';'.join(cardids)
+        return url
+
+
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
         """Clash Royale deck builder.
@@ -106,7 +125,6 @@ class Deck:
         Full help
         !deck help
         """
-
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
@@ -225,7 +243,7 @@ class Deck:
         for k, deck in decks.items():
             await self.upload_deck_image(
                 ctx, deck["Deck"], deck["DeckName"], member,
-                description="**{}**. {}".format(deck_id, deck["DeckName"]))
+                description="**{}**. {}\nCopy Deck{}".format(deck_id, deck["DeckName"], self.copylink(deck["Deck"])))
             deck_id += 1
 
         if not len(decks):
@@ -373,7 +391,7 @@ class Deck:
             for i, deck in enumerate(decks.values()):
                 if i == deck_id:
                     await self.deck_upload(ctx, deck["Deck"],
-                                           deck["DeckName"], member)
+                            deck["DeckName"], member)
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
     async def deck_cards(self, ctx):
@@ -590,7 +608,7 @@ class Deck:
             f.seek(0)
             message = await ctx.bot.send_file(
                 ctx.message.channel, f,
-                filename=filename, content=description)
+                filename=filename, content="{}\nCopy deck: {}".format(description, self.copylink(deck)))
 
         return message
 
