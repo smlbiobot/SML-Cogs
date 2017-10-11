@@ -36,7 +36,10 @@ from PIL import ImageFont
 import io
 import string
 from cogs.utils.chat_formatting import pagify
+import requests #for card id
 
+cardinfo_url = 'https://raw.githubusercontent.com/smlbiobot/cr-api-data/master/dst/cards.json'
+deckurl = 'https://link.clashroyale.com/deck/en?deck='
 settings_path = os.path.join("data", "deck", "settings.json")
 crdata_path = os.path.join("data", "deck", "clashroyale.json")
 max_deck_per_user = 5
@@ -61,6 +64,10 @@ class Deck:
         self.crdata_path = crdata_path
 
         self.settings = dataIO.load_json(self.file_path)
+        self.cardinfo = requests.get(cardinfo_url).json()
+        self.name_to_id = {}
+        for card in self.cardinfo:
+            self.name_to_id[card['key']] = card['decklink']
         self.crdata = dataIO.load_json(self.crdata_path)
 
         # init card data
@@ -93,6 +100,20 @@ class Deck:
         # pagination tracking
         self.track_pagination = None
 
+    def copylink(self, cards): 
+        """converts list of cards into ids,
+        compiles list of ids into url
+        compiles link into embed
+        """
+        print(self.cards_abbrev)
+        print(self.cards)
+        cards = list(map(lambda x: self.cards_abbrev[x], cards))
+        cardids = list(map(lambda x: self.name_to_id[x], cards))
+        url = deckurl + ';'.join(cardids)
+
+        em = discord.Embed(title="Copy Deck", url=url)
+        return em
+
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
         """Clash Royale deck builder.
@@ -106,7 +127,6 @@ class Deck:
         Full help
         !deck help
         """
-
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
@@ -143,7 +163,8 @@ class Deck:
         elif len(set(member_deck)) < len(member_deck):
             await self.bot.say("Please enter 8 unique cards.")
         else:
-            await self.deck_upload(ctx, member_deck, deck_name, author)
+            await self.deck_upload(ctx, member_deck, deck_name, author, 
+                    embed=self.copylink(member_deck))
 
     @deck.command(name="add", pass_context=True, no_pm=True)
     async def deck_add(self, ctx,
@@ -226,6 +247,7 @@ class Deck:
             await self.upload_deck_image(
                 ctx, deck["Deck"], deck["DeckName"], member,
                 description="**{}**. {}".format(deck_id, deck["DeckName"]))
+            await self.bot.say(embed=self.copylink(deck["Deck"]))
             deck_id += 1
 
         if not len(decks):
@@ -373,7 +395,7 @@ class Deck:
             for i, deck in enumerate(decks.values()):
                 if i == deck_id:
                     await self.deck_upload(ctx, deck["Deck"],
-                                           deck["DeckName"], member)
+                            deck["DeckName"], member, embed=self.copylink(deck["Deck"]))
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
     async def deck_cards(self, ctx):
@@ -532,7 +554,7 @@ class Deck:
         await self.bot.say(
             "Please visit {} for an illustrated guide.".format(HELP_URL))
 
-    async def deck_upload(self, ctx, member_deck, deck_name:str, member=None):
+    async def deck_upload(self, ctx, member_deck, deck_name:str, member=None, embed=None):
         """Upload deck to Discord."""
         author = ctx.message.author
         server = ctx.message.server
@@ -568,6 +590,8 @@ class Deck:
 
         if deck_is_valid:
             await self.upload_deck_image(ctx, member_deck, deck_name, member)
+        if embed is not None:
+            await self.bot.say(embed=embed)
 
         self.deck_is_valid = deck_is_valid
 
