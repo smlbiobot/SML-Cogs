@@ -98,7 +98,6 @@ class Deck:
 
         self._cards_json = None
 
-    @property
     async def cards_json(self):
         url = 'https://smlbiobot.github.io/cr-api-data/dst/cards.json'
         if self._cards_json is None:
@@ -393,11 +392,11 @@ class Deck:
                     em = await self.decklink_embed(deck["Deck"])
                     await self.bot.say(embed=em)
 
-    async def decklink_embed(self, cards):
+    async def decklink_embed(self, deck_cards):
         """Decklink embed."""
-        cards_json = await self.cards_json
+        cards_json = await self.cards_json()
         ids = []
-        for card in cards:
+        for card in deck_cards:
             for card_json in cards_json:
                 if card_json['key'] == card:
                     ids.append(card_json['decklink'])
