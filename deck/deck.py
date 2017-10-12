@@ -24,18 +24,21 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import discord
-from discord.ext import commands
-from .utils.dataIO import dataIO
-from __main__ import send_cmd_help
-import os
 import datetime
+import io
+import os
+import string
+
+import aiohttp
+import discord
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-import io
-import string
+from __main__ import send_cmd_help
 from cogs.utils.chat_formatting import pagify
+from discord.ext import commands
+
+from .utils.dataIO import dataIO
 
 settings_path = os.path.join("data", "deck", "settings.json")
 crdata_path = os.path.join("data", "deck", "clashroyale.json")
@@ -93,6 +96,17 @@ class Deck:
         # pagination tracking
         self.track_pagination = None
 
+        self._cards_json = None
+
+    @property
+    async def cards_json(self):
+        url = 'https://smlbiobot.github.io/cr-api-data/dst/cards.json'
+        if self._cards_json is None:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as response:
+                    self._cards_json = await response.json()
+        return self._cards_json
+
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
         """Clash Royale deck builder.
@@ -113,16 +127,16 @@ class Deck:
     async def deck_get_helper(self, ctx,
                               card1=None, card2=None, card3=None, card4=None,
                               card5=None, card6=None, card7=None, card8=None,
-                              deck_name=None, author:discord.Member=None):
+                              deck_name=None, author: discord.Member = None):
         """Abstract command to run deck_get for other modules."""
         await ctx.invoke(self.deck_get, card1, card2, card3, card4, card5,
-                            card6, card7, card8, deck_name, author)
+                         card6, card7, card8, deck_name, author)
 
     @deck.command(name="get", pass_context=True, no_pm=True)
     async def deck_get(self, ctx,
                        card1=None, card2=None, card3=None, card4=None,
                        card5=None, card6=None, card7=None, card8=None,
-                       deck_name=None, author:discord.Member=None):
+                       deck_name=None, author: discord.Member = None):
         """Display a deck with cards.
 
         Enter 8 cards followed by a name.
@@ -204,7 +218,7 @@ class Deck:
                 self.save_settings()
 
     @deck.command(name="list", pass_context=True, no_pm=True)
-    async def deck_list(self, ctx, member:discord.Member=None):
+    async def deck_list(self, ctx, member: discord.Member = None):
         """List the decks of a user."""
         author = ctx.message.author
         server = ctx.message.server
@@ -236,7 +250,7 @@ class Deck:
                 await self.bot.say("{} hasn’t added any decks yet.".format(member.name))
 
     @deck.command(name="longlist", pass_context=True, no_pm=True)
-    async def deck_longlist(self, ctx, member:discord.Member=None):
+    async def deck_longlist(self, ctx, member: discord.Member = None):
         """List the decks of a user."""
         author = ctx.message.author
         server = ctx.message.server
@@ -272,6 +286,7 @@ class Deck:
                 if deck_id < len(decks):
                     def pagination_check(m):
                         return m.content.lower() == 'y'
+
                     await self.bot.say(
                         'Would you like to see the next results? (y/n)')
                     answer = await self.bot.wait_for_message(
@@ -283,7 +298,7 @@ class Deck:
                         return
 
     @deck.command(name="pagelist", pass_context=True, no_pm=True)
-    async def deck_pagelist(self, ctx, member: discord.Member=None):
+    async def deck_pagelist(self, ctx, member: discord.Member = None):
         """List decks of a user with pagination."""
         author = ctx.message.author
         server = ctx.message.server
@@ -306,8 +321,8 @@ class Deck:
 
     async def deck_pagelist_menu(
             self, ctx, decks, member: discord.Member,
-            message: discord.Message=None,
-            page=0, timeout: int=30):
+            message: discord.Message = None,
+            page=0, timeout: int = 30):
         """Menu control logic for this taken from
         https://github.com/Lunar-Dust/Dusty-Cogs/blob/master/menu/menu.py
         """
@@ -316,7 +331,7 @@ class Deck:
         deck = decks[page]
         description = "**{}**. {}".format(page + 1, deck["DeckName"])
         if not message:
-            message =\
+            message = \
                 await self.upload_deck_image(
                     ctx, deck["Deck"], deck["DeckName"], member, description)
             await self.bot.add_reaction(message, "⬅")
@@ -353,8 +368,8 @@ class Deck:
                 pass
 
     @deck.command(name="show", pass_context=True, no_pm=True)
-    async def deck_show(self, ctx, deck_id=None, member:discord.Member=None):
-        """Show the deck of a user by id."""
+    async def deck_show(self, ctx, deck_id=None, member: discord.Member = None):
+        """Show the deck of a user by id. With link to copy."""
         author = ctx.message.author
         server = ctx.message.server
         if not member:
@@ -374,6 +389,21 @@ class Deck:
                 if i == deck_id:
                     await self.deck_upload(ctx, deck["Deck"],
                                            deck["DeckName"], member)
+                    # generate link
+                    em = await self.decklink_embed(deck["Deck"])
+                    await self.bot.say(embed=em)
+
+    async def decklink_embed(self, cards):
+        """Decklink embed."""
+        cards_json = await self.cards_json
+        ids = []
+        for card in cards:
+            for card_json in cards_json:
+                if card_json['key'] == card:
+                    ids.append(card_json['decklink'])
+        url = 'http://link.clashroyale.com/deck/en?deck=' + ';'.join(ids)
+        em = discord.Embed(title='Copy deck to Clash Royale', url=url)
+        return em
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
     async def deck_cards(self, ctx):
@@ -465,8 +495,6 @@ class Deck:
                                 await self.bot.say("Search results aborted.")
                                 return
 
-
-
     @deck.command(name="rename", pass_context=True, no_pm=True)
     async def deck_rename(self, ctx, deck_id, new_name):
         """Rename a deck based on deck id.
@@ -532,7 +560,7 @@ class Deck:
         await self.bot.say(
             "Please visit {} for an illustrated guide.".format(HELP_URL))
 
-    async def deck_upload(self, ctx, member_deck, deck_name:str, member=None):
+    async def deck_upload(self, ctx, member_deck, deck_name: str, member=None):
         """Upload deck to Discord."""
         author = ctx.message.author
         server = ctx.message.server
@@ -734,6 +762,7 @@ def check_folder():
             print("Creating {} folder".format(f))
             os.makedirs(f)
 
+
 def check_file():
     """Verify data is valid."""
     settings = {
@@ -743,6 +772,7 @@ def check_file():
     if not dataIO.is_valid_json(f):
         print("Creating default deck settings.json...")
         dataIO.save_json(f, settings)
+
 
 def setup(bot):
     """Add cog to Red."""
