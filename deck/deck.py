@@ -53,6 +53,18 @@ numbs = {
     "exit": "❌"
 }
 
+class BotEmoji:
+    """Emojis available in bot."""
+
+    def __init__(self, bot):
+        self.bot = bot
+
+    def name(self, name):
+        """Emoji by name."""
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == name:
+                return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
 
 class Deck:
     """Clash Royale Deck Builder."""
@@ -405,7 +417,8 @@ class Deck:
                 if card_json['key'] == card:
                     ids.append(card_json['decklink'])
         url = 'http://link.clashroyale.com/deck/en?deck=' + ';'.join(ids)
-        em = discord.Embed(title='Copy deck to Clash Royale', url=url)
+        emoji = BotEmoji(self.bot).name('copydeck')
+        em = discord.Embed(title=emoji + ' Copy deck to Clash Royale', url=url)
         return em
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
