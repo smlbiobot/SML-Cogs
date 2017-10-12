@@ -418,7 +418,7 @@ class Deck:
                     ids.append(card_json['decklink'])
         url = 'http://link.clashroyale.com/deck/en?deck=' + ';'.join(ids)
         emoji = BotEmoji(self.bot).name('copydeck')
-        em = discord.Embed(title=emoji + ' Copy deck to Clash Royale', url=url)
+        em = discord.Embed(title='Copy deck to Clash Royale ' + emoji, url=url)
         return em
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
