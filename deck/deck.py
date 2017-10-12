@@ -157,6 +157,9 @@ class Deck:
             await self.bot.say("Please enter 8 unique cards.")
         else:
             await self.deck_upload(ctx, member_deck, deck_name, author)
+            # generate link
+            em = await self.decklink_embed(member_deck)
+            await self.bot.say(embed=em)
 
     @deck.command(name="add", pass_context=True, no_pm=True)
     async def deck_add(self, ctx,
@@ -394,6 +397,7 @@ class Deck:
 
     async def decklink_embed(self, deck_cards):
         """Decklink embed."""
+        deck_cards = self.normalize_deck_data(deck_cards)
         cards_json = await self.cards_json()
         ids = []
         for card in deck_cards:
