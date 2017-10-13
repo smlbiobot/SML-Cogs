@@ -38,7 +38,8 @@ from __main__ import send_cmd_help
 from cogs.utils.chat_formatting import pagify
 from discord.ext import commands
 
-from .utils.dataIO import dataIO
+from cogs.utils.dataIO import dataIO
+from cogs.utils import checks
 
 settings_path = os.path.join("data", "deck", "settings.json")
 crdata_path = os.path.join("data", "deck", "clashroyale.json")
@@ -117,6 +118,42 @@ class Deck:
                 async with session.get(url) as response:
                     self._cards_json = await response.json()
         return self._cards_json
+
+    @commands.group(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
+    async def deckset(self, ctx):
+        """Settings."""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @deckset.command(name="decklink", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
+    async def deckset_decklink(self, ctx, use=None):
+        """How to display decklinks.
+
+        Possible values are:
+        - embed (default): use embeds with link
+        - link: use URL with text
+        - none
+        """
+        if use is None:
+            await send_cmd_help(ctx)
+            return
+        server = ctx.message.server
+        self.settings["Servers"][server.id]["decklink"] = use
+        self.save_settings()
+        await self.bot.say("Settings saved.")
+
+    def decklink_settings(self, server):
+        """embed, link, none. Default: embed"""
+        default = 'embed'
+        server_settings = self.settings["Servers"].get(server.id)
+        if server_settings is None:
+            return default
+        decklink = server_settings.get("decklink")
+        if decklink is None:
+            return default
+        return decklink
 
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
@@ -205,15 +242,6 @@ class Deck:
             decks = self.settings["Servers"][server.id]["Members"][author.id]["Decks"]
 
             if self.deck_is_valid:
-
-                # creates sets with decks.values
-                # decks_sets = [set(d) for d in decks.values()]
-
-                # if  set(member_deck) in decks_sets:
-                #     # existing deck
-                #     await self.bot.say("Deck exists already")
-                # else:
-                # new deck
                 await self.bot.say("Deck added.")
                 deck_key = str(datetime.datetime.utcnow())
                 decks[deck_key] = {
@@ -404,11 +432,22 @@ class Deck:
                     await self.deck_upload(ctx, deck["Deck"],
                                            deck["DeckName"], member)
                     # generate link
-                    em = await self.decklink_embed(deck["Deck"])
-                    await self.bot.say(embed=em)
+                    decklink_setting = self.decklink_settings(server)
+                    if decklink_setting == 'embed':
+                        em = await self.decklink_embed(deck["Deck"])
+                        await self.bot.say(embed=em)
+                    elif decklink_setting == 'link':
+                        url = await self.decklink_url(deck["Deck"])
+                        await self.bot.say('<{}>'.format(url))
 
     async def decklink_embed(self, deck_cards):
         """Decklink embed."""
+        url = await self.decklink_url(deck_cards)
+        em = discord.Embed(title='Copy deck to Clash Royale', url=url)
+        return em
+
+    async def decklink_url(self, deck_cards):
+        """Decklink URL."""
         deck_cards = self.normalize_deck_data(deck_cards)
         cards_json = await self.cards_json()
         ids = []
@@ -417,9 +456,7 @@ class Deck:
                 if card_json['key'] == card:
                     ids.append(card_json['decklink'])
         url = 'https://link.clashroyale.com/deck/en?deck=' + ';'.join(ids)
-        emoji = BotEmoji(self.bot).name('copydeck')
-        em = discord.Embed(title='Copy deck to Clash Royale ' + emoji, url=url)
-        return em
+        return url
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
     async def deck_cards(self, ctx):
