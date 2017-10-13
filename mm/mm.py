@@ -25,18 +25,19 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import argparse
+import itertools
 import os
 from collections import defaultdict
-import discord
-from discord.ext import commands
-from discord.ext.commands import Context
 from random import choice
-import itertools
+
+import discord
+from __main__ import send_cmd_help
+from cogs.utils import checks
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
-from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
-from __main__ import send_cmd_help
+from discord.ext import commands
+from discord.ext.commands import Context
 
 BOT_COMMANDER_ROLES = ["Bot Commander", "High-Elder"]
 PATH = os.path.join("data", "mm")
@@ -118,7 +119,6 @@ class MemberManagement:
         """
         server = ctx.message.server
         role_settings = self.settings[server.id]["macro"]
-
 
     def parser(self):
         """Process MM arguments."""
@@ -421,7 +421,7 @@ class MemberManagement:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
-    async def changerole(self, ctx, member: discord.Member=None, *roles: str):
+    async def changerole(self, ctx, member: discord.Member = None, *roles: str):
         """Change roles of a user.
 
         Example: !changerole SML +Delta "-Foxtrot Lead" "+Delta Lead"
@@ -475,7 +475,7 @@ class MemberManagement:
                     except discord.Forbidden:
                         await self.bot.say(
                             "{} does not have permission to edit {}’s roles.".format(
-                            author.display_name, member.display_name))
+                                author.display_name, member.display_name))
                         continue
                     except discord.HTTPException:
                         if role_in_minus:
@@ -495,7 +495,6 @@ class MemberManagement:
                             await self.bot.say(
                                 "Added {} for {}".format(
                                     role.name, member.display_name))
-
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
@@ -583,18 +582,29 @@ class MemberManagement:
         if not member:
             member = author
 
-        permitted_channels = []
-        for channel in [c for c in server.channels if c.type == discord.ChannelType.text]:
-            if 'read_messages' in perms:
-                if channel.permissions_for(member).read_messages:
-                    permitted_channels.append(channel)
+        text_channels = [c for c in server.channels if c.type == discord.ChannelType.text]
+        text_channels = sorted(text_channels, key=lambda c: c.position)
+        voice_channels = [c for c in server.channels if c.type == discord.ChannelType.voice]
 
-        permitted_channels = sorted(permitted_channels, key=lambda c: c.position)
-        await self.bot.say("{} is allowed to read:".format(member.display_name))
-        await self.bot.say('\n'.join([c.mention for c in permitted_channels]))
+        def permitted_channels(member, perm):
+            channels = [c for c in text_channels if getattr(c.permissions_for(member), perm)]
+            return sorted(channels, key=lambda c: c.position)
 
+        read_channels = permitted_channels(member, "read_messages")
+        write_channels = permitted_channels(member, "send_messages")
 
+        out = []
+        for c in text_channels:
+            perms = []
+            if c.permissions_for(member).read_messages:
+                perms.append('read')
+            if c.permissions_for(member).send_messages:
+                perms.append('write')
+            if len(perms):
+                out.append("{channel} {perms}".format(channel=c.mention, perms=', '.join(perms)))
 
+        for page in pagify('\n'.join(out)):
+            await self.bot.say(page)
 
 
 def check_folder():
