@@ -24,17 +24,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
-import itertools
 import os
 from collections import defaultdict
-from random import choice
 
 import discord
 from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 
@@ -68,8 +63,11 @@ class SMLDebug:
         """Test Discord Embed Links."""
         em = discord.Embed(title="Google", url="http://google.com", description="Google Home.")
         await self.bot.say(embed=em)
-        em = discord.Embed(title="Copy deck to Clash Royale", url="https://link.clashroyale.com/deck/en?deck=26000028;26000043;26000000;26000039;26000038;26000030;28000008;27000007", description="Clash Royale deck import.")
+        em = discord.Embed(title="Copy deck to Clash Royale",
+                           url="https://link.clashroyale.com/deck/en?deck=26000028;26000043;26000000;26000039;26000038;26000030;28000008;27000007",
+                           description="Clash Royale deck import.")
         await self.bot.say(embed=em)
+
 
 def check_folder():
     """Check folder."""
