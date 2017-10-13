@@ -575,7 +575,7 @@ class MemberManagement:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
-    async def channelperm(self, ctx, member: discord.Member, perms=['read_messages']):
+    async def channelperm(self, ctx, member: discord.Member):
         """Return channels viewable by member."""
         author = ctx.message.author
         server = ctx.message.server
@@ -585,23 +585,22 @@ class MemberManagement:
         text_channels = [c for c in server.channels if c.type == discord.ChannelType.text]
         text_channels = sorted(text_channels, key=lambda c: c.position)
         voice_channels = [c for c in server.channels if c.type == discord.ChannelType.voice]
-
-        def permitted_channels(member, perm):
-            channels = [c for c in text_channels if getattr(c.permissions_for(member), perm)]
-            return sorted(channels, key=lambda c: c.position)
-
-        read_channels = permitted_channels(member, "read_messages")
-        write_channels = permitted_channels(member, "send_messages")
+        voice_channels = sorted(voice_channels, key=lambda c: c.position)
 
         out = []
         for c in text_channels:
-            perms = []
-            if c.permissions_for(member).read_messages:
-                perms.append('read')
-            if c.permissions_for(member).send_messages:
-                perms.append('write')
+            channel_perm = c.permissions_for(member)
+            tests = ['read_messages', 'send_messages']
+            perms = [t for t in tests if getattr(channel_perm, t)]
             if len(perms):
                 out.append("{channel} {perms}".format(channel=c.mention, perms=', '.join(perms)))
+
+        for c in voice_channels:
+            channel_perm = c.permissions_for(member)
+            tests = ['connect']
+            perms = [t for t in tests if getattr(channel_perm, t)]
+            if len(perms):
+                out.append("{channel}: {perms}".format(channel=c.name, perms=', '.join(perms)))
 
         for page in pagify('\n'.join(out)):
             await self.bot.say(page)
