@@ -574,6 +574,28 @@ class MemberManagement:
         for member in members:
             await ctx.invoke(self.changerole, member, role)
 
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def channelperm(self, ctx, member: discord.Member, perms=['read_messages']):
+        """Return channels viewable by member."""
+        author = ctx.message.author
+        server = ctx.message.server
+        if not member:
+            member = author
+
+        permitted_channels = []
+        for channel in server.channels:
+            if 'read_messages' in perms:
+                if channel.permissions_for(member).read_messages:
+                    permitted_channels.append(channel)
+
+        permitted_channels = sorted(permitted_channels, key=lambda c: c.position)
+        await self.bot.say("{} is allowed to read:".format(member.display_name))
+        await self.bot.say('\n'.join(['+ ' + c.name for c in permitted_channels]))
+
+
+
+
 
 def check_folder():
     """Check folder."""
