@@ -40,6 +40,7 @@ from discord.ext import commands
 
 from cogs.utils.dataIO import dataIO
 from cogs.utils import checks
+from concurrent.futures import ThreadPoolExecutor
 
 settings_path = os.path.join("data", "deck", "settings.json")
 crdata_path = os.path.join("data", "deck", "clashroyale.json")
@@ -110,6 +111,9 @@ class Deck:
         self.track_pagination = None
 
         self._cards_json = None
+
+        # Used for Pillow blocking code
+        self.threadex = ThreadPoolExecutor(max_workers=2)
 
     async def cards_json(self):
         url = 'https://smlbiobot.github.io/cr-api-data/dst/cards.json'
@@ -655,13 +659,16 @@ class Deck:
     async def upload_deck_image(self, ctx, deck, deck_name, author, description=""):
         """Upload deck image to the server."""
 
-        deck_image = self.get_deck_image(deck, deck_name, author)
+        deck_image = await self.bot.loop.run_in_executor(
+            self.threadex,
+            self.get_deck_image,
+            deck, deck_name, author
+        )
+
+        # deck_image = self.get_deck_image(deck, deck_name, author)
 
         # construct a filename using first three letters of each card
         filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
-
-        # Take out hyphnens and capitlize the name of each card
-        # card_names = [string.capwords(c.replace('-', ' ')) for c in deck]
 
         # description = "Deck: {}".format(', '.join(card_names))
         message = None
