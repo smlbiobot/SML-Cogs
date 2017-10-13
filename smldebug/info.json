@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "SML Debug",
+	"DESCRIPTION": "Debugging Discord for odd behaviors. Not intended for use by other people.",
+	"DISABLED": false,
+	"NAME": "SMLDebug",
+	"REQUIREMENTS": [],
+	"TAGS": ["debug"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
