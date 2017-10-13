@@ -584,14 +584,14 @@ class MemberManagement:
             member = author
 
         permitted_channels = []
-        for channel in server.channels:
+        for channel in [c for c in server.channels if c.type == discord.ChannelType.text]:
             if 'read_messages' in perms:
                 if channel.permissions_for(member).read_messages:
                     permitted_channels.append(channel)
 
         permitted_channels = sorted(permitted_channels, key=lambda c: c.position)
         await self.bot.say("{} is allowed to read:".format(member.display_name))
-        await self.bot.say('\n'.join(['+ ' + c.name for c in permitted_channels]))
+        await self.bot.say('\n'.join([c.mention for c in permitted_channels]))
 
 
 
