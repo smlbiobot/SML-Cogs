@@ -1,0 +1,3 @@
+- [Home](/)
+- [Installation](/installation)
+- [Cogs](/cogs)
