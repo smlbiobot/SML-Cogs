@@ -224,7 +224,7 @@ class Deck:
             await self.bot.say("Cannot find a URL.")
             return
         url = m.group()
-        await self.bot.say(url)
+        # await self.bot.say(url)
         cards = re.findall('2\d{7}', url)
         cards_json = await self.cards_json()
 
