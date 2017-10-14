@@ -216,25 +216,39 @@ class Deck:
             em = await self.decklink_embed(member_deck)
             await self.bot.say(embed=em)
 
-    @deck.command(name="import", aliases=['i'], pass_context=True, no_pm=True)
-    async def deck_import(self, ctx, *, url):
-        """Add a deck using the decklink."""
+    async def decklink_to_cards(self, url):
+        """Convert decklink to cards."""
         m = re.search('(http|ftp|https)://link.clashroyale.com/deck/en\?deck=[\d\;]+', url)
         if not m:
-            await self.bot.say("Cannot find a URL.")
-            return
+            return None
         url = m.group()
-        # await self.bot.say(url)
         cards = re.findall('2\d{7}', url)
         cards_json = await self.cards_json()
-
         card_keys = []
         for card in cards:
             for card_json in cards_json:
                 if card_json['decklink'] == card:
                     card_keys.append(card_json["key"])
+        return card_keys
 
+    @deck.command(name="import", aliases=['i'], pass_context=True, no_pm=True)
+    async def deck_import(self, ctx, *, url):
+        """Add a deck using the decklink."""
+        card_keys = await self.decklink_to_cards(url)
+        if card_keys is None:
+            await self.bot.say("Cannot find a URL.")
+            return
         await ctx.invoke(self.deck_add, *card_keys)
+        await self.bot.delete_message(ctx.message)
+
+    @deck.command(name="getlink", aliases=['gl'], pass_context=True, no_pm=True)
+    async def deck_import(self, ctx, *, url):
+        """Get a deck using the decklink."""
+        card_keys = await self.decklink_to_cards(url)
+        if card_keys is None:
+            await self.bot.say("Cannot find a URL.")
+            return
+        await ctx.invoke(self.deck_get, *card_keys)
         await self.bot.delete_message(ctx.message)
 
     @deck.command(name="add", pass_context=True, no_pm=True)
