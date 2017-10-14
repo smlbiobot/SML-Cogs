@@ -195,7 +195,8 @@ class Deck:
 
         Enter 8 cards followed by a name.
 
-        Example: !deck get bbd mm loon bt is fs gs lh "Lava Loon"
+        Example:
+        !deck get barrel gg is it knight princess rocket log "Log Bait"
 
         For the full list of acceptable card names, type !deck cards
         """
@@ -258,7 +259,8 @@ class Deck:
                        deck_name=None):
         """Add a deck to a personal decklist.
 
-        Example: !deck add bbd mm loon bt is fs gs lh "Lava Loon"
+        Example:
+        !deck add 3M knight log pump miner ig is skeletons "3M Cycle"
 
         For the full list of acceptable card names, type !deck cards
         """
@@ -323,6 +325,7 @@ class Deck:
             await self.upload_deck_image(
                 ctx, deck["Deck"], deck["DeckName"], member,
                 description="**{}**. {}".format(deck_id, deck["DeckName"]))
+            await self.decklink(ctx, deck["Deck"])
             deck_id += 1
 
         if not len(decks):
@@ -473,13 +476,18 @@ class Deck:
                     await self.deck_upload(ctx, deck["Deck"],
                                            deck["DeckName"], member)
                     # generate link
-                    decklink_setting = self.decklink_settings(server)
-                    if decklink_setting == 'embed':
-                        em = await self.decklink_embed(deck["Deck"])
-                        await self.bot.say(embed=em)
-                    elif decklink_setting == 'link':
-                        url = await self.decklink_url(deck["Deck"])
-                        await self.bot.say('<{}>'.format(url))
+                    await self.decklink(ctx, deck["Deck"])
+
+    async def decklink(self, ctx, deck_cards):
+        """Show deck link depending on settings."""
+        server = ctx.message.server
+        decklink_setting = self.decklink_settings(server)
+        if decklink_setting == 'embed':
+            em = await self.decklink_embed(deck_cards)
+            await self.bot.say(embed=em)
+        elif decklink_setting == 'link':
+            url = await self.decklink_url(deck_cards)
+            await self.bot.say('<{}>'.format(url))
 
     async def decklink_embed(self, deck_cards):
         """Decklink embed."""
