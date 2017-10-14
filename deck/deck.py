@@ -27,7 +27,9 @@ DEALINGS IN THE SOFTWARE.
 import datetime
 import io
 import os
+import re
 import string
+from concurrent.futures import ThreadPoolExecutor
 
 import aiohttp
 import discord
@@ -35,12 +37,10 @@ from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
 from __main__ import send_cmd_help
-from cogs.utils.chat_formatting import pagify
-from discord.ext import commands
-
-from cogs.utils.dataIO import dataIO
 from cogs.utils import checks
-from concurrent.futures import ThreadPoolExecutor
+from cogs.utils.chat_formatting import pagify
+from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 settings_path = os.path.join("data", "deck", "settings.json")
 crdata_path = os.path.join("data", "deck", "clashroyale.json")
@@ -55,6 +55,7 @@ numbs = {
     "exit": "❌"
 }
 
+
 class BotEmoji:
     """Emojis available in bot."""
 
@@ -67,6 +68,7 @@ class BotEmoji:
             if emoji.name == name:
                 return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
+
 
 class Deck:
     """Clash Royale Deck Builder."""
@@ -213,6 +215,27 @@ class Deck:
             # generate link
             em = await self.decklink_embed(member_deck)
             await self.bot.say(embed=em)
+
+    @deck.command(name="import", aliases=['i'], pass_context=True, no_pm=True)
+    async def deck_import(self, ctx, *, url):
+        """Add a deck using the decklink."""
+        m = re.search('(http|ftp|https)://link.clashroyale.com/deck/en\?deck=[\d\;]+', url)
+        if not m:
+            await self.bot.say("Cannot find a URL.")
+            return
+        url = m.group()
+        await self.bot.say(url)
+        cards = re.findall('2\d{7}', url)
+        cards_json = await self.cards_json()
+
+        card_keys = []
+        for card in cards:
+            for card_json in cards_json:
+                if card_json['decklink'] == card:
+                    card_keys.append(card_json["key"])
+
+        await ctx.invoke(self.deck_add, *card_keys)
+        await self.bot.delete_message(ctx.message)
 
     @deck.command(name="add", pass_context=True, no_pm=True)
     async def deck_add(self, ctx,
