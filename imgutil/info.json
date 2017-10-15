@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Image Utility",
+	"DESCRIPTION": "Image utility for rotating images, etc.",
+	"DISABLED": false,
+	"NAME": "ImgUtil",
+	"REQUIREMENTS": [],
+	"TAGS": [],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
