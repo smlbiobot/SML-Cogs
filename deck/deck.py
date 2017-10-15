@@ -243,7 +243,7 @@ class Deck:
         await self.bot.delete_message(ctx.message)
 
     @deck.command(name="getlink", aliases=['gl'], pass_context=True, no_pm=True)
-    async def deck_import(self, ctx, *, url):
+    async def deck_getlink(self, ctx, *, url):
         """Get a deck using the decklink."""
         card_keys = await self.decklink_to_cards(url)
         if card_keys is None:
