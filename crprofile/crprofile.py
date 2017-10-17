@@ -664,8 +664,8 @@ class CRPlayerModel:
 
     def deck_list(self, bot_emoji: BotEmoji):
         """Deck with emoji"""
-        cards = [card["name"] for card in self.data.get("currentDeck")]
-        cards = [self.api_cardname_to_emoji(name, bot_emoji) for name in cards]
+        cards = [card["key"] for card in self.data.get("currentDeck")]
+        cards = [bot_emoji.name(key.replace('-', '')) for key in cards]
         levels = [card["level"] for card in self.data.get("currentDeck")]
         deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
         return ' '.join(deck)
