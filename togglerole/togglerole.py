@@ -111,6 +111,8 @@ class ToggleRole:
 
     def verify_role(self, server, role_name):
         """Verify the role exist on the server"""
+        if role_name == '_everyone':
+            return True
         role = discord.utils.get(server.roles, name=role_name)
         return role is not None
 
@@ -137,29 +139,38 @@ class ToggleRole:
         o = []
         user_role_names = [r.name for r in user.roles]
         for actor_role, toggle_roles in self.settings[server.id].items():
+            if actor_role == '_everyone':
+                o.extend(toggle_roles.keys())
             if actor_role in user_role_names:
                 o.extend(toggle_roles.keys())
         o = list(set(o))
         o = sorted(o, key=lambda x: x.lower())
         return o
 
+    def toggleable_role_list(self, server, member:discord.Member):
+        """List of toggleable roles for member."""
+        toggleable_roles = self.toggleable_roles(server, member)
+        if len(toggleable_roles):
+            toggleable_roles_str = ', '.join(toggleable_roles)
+        else:
+            toggleable_roles_str = 'None'
+        return (
+            "List of roles toggleable for you are: {}".format(
+                toggleable_roles_str)
+        )
+
     @commands.command(pass_context=True, no_pm=True)
-    async def togglerole(self, ctx, role):
+    async def togglerole(self, ctx, role=None):
         """Toggle a role."""
         author = ctx.message.author
         server = ctx.message.server
+        if role is None:
+            await self.bot.say(self.toggleable_role_list(server, author))
+            return
         toggleable_roles = self.toggleable_roles(server, author)
         if role.lower() not in [r.lower() for r in toggleable_roles]:
-            if len(toggleable_roles):
-                toggleable_roles_str = ', '.join(toggleable_roles)
-            else:
-                toggleable_roles_str = 'None'
-            await self.bot.say(
-                "{} is not a toggleable role for you.\n"
-                "List of roles toggleable for you are: {}".format(
-                    role,
-                    toggleable_roles_str)
-            )
+            await self.bot.say("{} is not a toggleable role for you.".format(role))
+            await self.bot.say(self.toggleable_role_list(server, author))
             return
         for r in server.roles:
             if r.name.lower() == role.lower():
