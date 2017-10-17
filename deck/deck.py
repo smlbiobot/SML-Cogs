@@ -515,7 +515,8 @@ class Deck:
         deck_cards = self.normalize_deck_data(deck_cards)
         ids = []
         for card in deck_cards:
-            ids.append(await self.card_key_to_decklink(card))
+            if card is not None:
+                ids.append(await self.card_key_to_decklink(card))
         url = 'https://link.clashroyale.com/deck/en?deck=' + ';'.join(ids)
         return url
 
