@@ -118,7 +118,7 @@ class Deck:
         self.threadex = ThreadPoolExecutor(max_workers=2)
 
     async def cards_json(self):
-        url = 'https://smlbiobot.github.io/cr-api-data/dst/cards.json'
+        url = 'https://cr-api.github.io/cr-api-data/dst/cards.json'
         if self._cards_json is None:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as response:
@@ -217,19 +217,34 @@ class Deck:
             em = await self.decklink_embed(member_deck)
             await self.bot.say(embed=em)
 
+    async def card_decklink_to_key(self, decklink):
+        """Decklink id to card."""
+        cards_json = await self.cards_json()
+        for k, card_json in cards_json.items():
+            if card_json["decklink"] == decklink:
+                return card_json["key"]
+        return None
+
+    async def card_key_to_decklink(self, key):
+        """Card key to decklink id."""
+        cards_json = await self.cards_json()
+        for k, card_json in cards_json.items():
+            if card_json["key"] == key:
+                return card_json["decklink"]
+        return None
+
     async def decklink_to_cards(self, url):
         """Convert decklink to cards."""
         m = re.search('(http|ftp|https)://link.clashroyale.com/deck/en\?deck=[\d\;]+', url)
         if not m:
             return None
         url = m.group()
-        cards = re.findall('2\d{7}', url)
-        cards_json = await self.cards_json()
+        decklinks = re.findall('2\d{7}', url)
         card_keys = []
-        for card in cards:
-            for card_json in cards_json:
-                if card_json['decklink'] == card:
-                    card_keys.append(card_json["key"])
+        for decklink in decklinks:
+            card_key = await self.card_decklink_to_key(decklink)
+            if card_key is not None:
+                card_keys.append(card_key)
         return card_keys
 
     @deck.command(name="import", aliases=['i'], pass_context=True, no_pm=True)
@@ -498,12 +513,9 @@ class Deck:
     async def decklink_url(self, deck_cards):
         """Decklink URL."""
         deck_cards = self.normalize_deck_data(deck_cards)
-        cards_json = await self.cards_json()
         ids = []
         for card in deck_cards:
-            for card_json in cards_json:
-                if card_json['key'] == card:
-                    ids.append(card_json['decklink'])
+            ids.append(await self.card_key_to_decklink(card))
         url = 'https://link.clashroyale.com/deck/en?deck=' + ';'.join(ids)
         return url
 
