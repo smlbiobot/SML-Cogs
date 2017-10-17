@@ -24,24 +24,16 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
-import itertools
+import io
 import os
 from collections import defaultdict
-from random import choice
 from urllib.parse import urlparse
 
-import discord
-from __main__ import send_cmd_help
-from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
-from cogs.utils.dataIO import dataIO
-from discord.ext import commands
-from discord.ext.commands import Context
 import aiohttp
 from PIL import Image
-import io
+from __main__ import send_cmd_help
+from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "imgutil")
 JSON = os.path.join(PATH, "settings.json")
@@ -87,6 +79,7 @@ class ImgUtil:
                     message = await ctx.bot.send_file(
                         ctx.message.channel, f,
                         filename=filename, content="Rotated image:")
+
 
 def check_folder():
     """Check folder."""
