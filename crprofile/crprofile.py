@@ -166,7 +166,7 @@ class SCTag:
 class CRPlayerModel:
     """Clash Royale player model."""
 
-    def __init__(self, is_cache=False, data=None):
+    def __init__(self, is_cache=False, data=None, error=False):
         """Init.
 
         Params:
@@ -177,6 +177,7 @@ class CRPlayerModel:
         self.data = data
         self.is_cache = is_cache
         self.CHESTS = CHESTS
+        self.error = error
 
     @property
     def tag(self):
@@ -791,24 +792,26 @@ class Settings:
     async def player_data(self, tag):
         """Return CRPlayerModel by tag."""
         tag = SCTag(tag).tag
-        # url = "{}{}".format(self.profile_api_url, tag)
         url = 'http://api.cr-api.com/profile/{}'.format(tag)
 
-        # headers = {'authorization': self.profile_api_token}
+        error = False
+        data = None
 
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
-                    data = await resp.json()
+                    if resp.status != 200:
+                        error = True
+                    else:
+                        data = await resp.json()
+                        file_path = self.cached_filepath(tag)
+                        dataIO.save_json(file_path, data)
         except json.decoder.JSONDecodeError:
             raise
         except asyncio.TimeoutError:
             raise
 
-        file_path = self.cached_filepath(tag)
-        dataIO.save_json(file_path, data)
-
-        return CRPlayerModel(data=data)
+        return CRPlayerModel(data=data, error=error)
 
     def cached_player_data(self, tag):
         """Return cached data by tag."""
