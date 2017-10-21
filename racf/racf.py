@@ -466,7 +466,7 @@ class RACF:
                         member.mention, channel.mention))
 
         else:
-            ctx.invoke(self.visitor, member)
+            await ctx.invoke(self.visitor, member)
 
 
 
