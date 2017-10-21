@@ -439,35 +439,37 @@ class RACF:
             await self.bot.say("Cannot find clan tag in API. Aborting…")
             return
 
-        if player_clan_tag not in CLAN_PERMISSION.keys():
-            await self.bot.say("User is not in our clans. Aborting…")
-            return
+        if player_clan_tag in CLAN_PERMISSION.keys():
+            # - Check allow role assignment
+            perm = CLAN_PERMISSION[player_clan_tag]
+            if not perm['assign_role']:
+                await self.bot.say('User belong to a clan that requires roster verifications.')
+                return
 
-        # - Check allow role assignment
-        perm = CLAN_PERMISSION[player_clan_tag]
-        if not perm['assign_role']:
-            await self.bot.say('User belong to a clan that requires roster verifications.')
-            return
+            # - Assign role - not members
+            mm = self.bot.get_cog("MemberManagement")
+            if not perm['member']:
 
-        # - Assign role - not members
-        mm = self.bot.get_cog("MemberManagement")
-        author = ctx.message.author
-        if not perm['member']:
+                await ctx.invoke(mm.changerole, member, perm['role'], 'Visitor')
+                channel = discord.utils.get(
+                    ctx.message.server.channels, name="visitors")
+                await ctx.invoke(self.dmusers, VISITOR_RULES, member)
+            else:
+                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', 'Practice', '-Visitor')
+                channel = discord.utils.get(
+                    ctx.message.server.channels, name="family-chat")
+                await ctx.invoke(self.dmusers, MEMBER_MSG, member)
 
-            await ctx.invoke(mm.changerole, member, perm['role'], 'Visitor')
-            channel = discord.utils.get(
-                ctx.message.server.channels, name="visitors")
-            await ctx.invoke(self.dmusers, VISITOR_RULES, member)
+            if channel is not None:
+                await self.bot.say(
+                    "{} Welcome! You may now chat at {} — enjoy!".format(
+                        member.mention, channel.mention))
+
         else:
-            await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', 'Practice', '-Visitor')
-            channel = discord.utils.get(
-                ctx.message.server.channels, name="family-chat")
-            await ctx.invoke(self.dmusers, MEMBER_MSG, member)
+            ctx.invoke(self.visitor, member)
 
-        if channel is not None:
-            await self.bot.say(
-                "{} Welcome! You may now chat at {} — enjoy!".format(
-                    member.mention, channel.mention))
+
+
 
     async def _add_roles(self, member, role_names):
         """Add roles"""
