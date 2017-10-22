@@ -351,6 +351,14 @@ class RACF:
 
     def player_info(self, player_data):
         """Short player info without full profile."""
+        data = player_data
+        clan = player_data.get("clan", None)
+        if clan is None:
+            data["clan"] = {
+                "name": "No Clan",
+                "tag": "N/A",
+                "role": "N/A"
+            }
         return (
             "Player Tag: {0[tag]}\n"
             "IGN: {0[name]}\n"
@@ -358,7 +366,7 @@ class RACF:
             "Clan Tag: {0[clan][tag]}\n"
             "Clan Role: {0[clan][role]}\n"
             "Trophies: {0[trophies]:,} / {0[stats][maxTrophies]:,} PB".format(
-                player_data
+                data
             )
         )
 
@@ -434,7 +442,9 @@ class RACF:
 
         # - Check clan
         try:
-            player_clan_tag = player["clan"]["tag"]
+            player_clan = player.get("clan", None)
+            if player_clan is not None:
+                player_clan_tag = player_clan.get("tag", None)
         except KeyError:
             await self.bot.say("Cannot find clan tag in API. Aborting…")
             return
