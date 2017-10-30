@@ -900,6 +900,10 @@ class CRData:
         for elixir in elixirs:
             if elixir:
                 total += 1
+
+        if total == 0:
+            return 0
+
         return sum(elixirs) / total
 
     async def eslog_update_data(self):
