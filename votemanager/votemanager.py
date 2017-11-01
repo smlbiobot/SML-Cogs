@@ -38,6 +38,28 @@ from discord.ext import commands
 PATH = os.path.join("data", "votemanager")
 JSON = os.path.join(PATH, "settings.json")
 
+class Survey(Box):
+    """A survey"""
+    def __init__(self, title=None, description=None, role_ids=None, options=None, votes=None, timestamp=None):
+        super().__init__()
+
+        if role_ids is None:
+            role_ids = BoxList()
+
+        if options is None:
+            options = BoxList()
+
+        if votes is None:
+            votes = Box()
+
+        self.title = title
+        self.description = description
+        self.role_ids = role_ids
+        self.options = options
+        self.votes = votes
+        self.timestamp = timestamp
+
+
 
 class VoteManager:
     """Vote Manager. Voting module"""
@@ -61,13 +83,14 @@ class VoteManager:
         if server_settings.surveys == Box():
             server_settings.surveys = BoxList()
 
-        server_settings.surveys.append({
-            'title': title,
-            'description': description,
-            'role_ids': [r.id for r in roles],
-            'options': options,
-            'timestamp': dt.datetime.utcnow().timestamp()
-        })
+        survey = Survey(
+            title=title,
+            description=description,
+            role_ids=[r.id for r in roles],
+            options=options,
+            timestamp=dt.datetime.utcnow().timestamp()
+        )
+        server_settings.surveys.append(survey)
 
         self.save_settings()
 
@@ -90,6 +113,7 @@ class VoteManager:
     def reset_server(self, server):
         """Reset server settings."""
         self.settings[server.id] = Box()
+        self.settings[server.id].surveys = BoxList()
         self.save_settings()
 
     @commands.group(pass_context=True, aliases=['vm'])
@@ -211,7 +235,50 @@ class VoteManager:
             return
 
         if option_number is None:
+            await self.bot.say("You didn’t enter your option number. Here are the options:")
             await ctx.invoke(self.votemanager_list, survey_number)
+            return
+
+        if not option_number.isdigit():
+            await self.bot.say("Option number must be a number.")
+            return
+
+        option_number = int(option_number)
+
+        if option_number > len(survey.options) or option_number < 1:
+            await self.bot.say("That is not a valid options.")
+            await ctx.invoke(self.votemanager_list, survey_number)
+            return
+
+        roles = [discord.utils.get(server.roles, id=id) for id in survey.role_ids]
+        valid_roles = [x for x in roles if x in author.roles]
+        if len(valid_roles) == 0:
+            await self.bot.say("You do not have the required roles to vote for this survey.")
+            return
+
+        if author.id in survey.votes.keys():
+            voted_option_id = survey.votes[author.id]
+            await self.bot.say(
+                "You have previously voted for option {}. {}".format(
+                    voted_option_id + 1, survey.options[voted_option_id]
+                )
+            )
+
+        self.add_vote(server, author, survey_number, option_number)
+        await self.bot.say(
+            "You have cast a vote for option {}. {}".format(
+                option_number, survey.options[int(option_number) - 1]
+            )
+        )
+
+    def add_vote(self, server, author, survey_number, option_number):
+        """Add a vote."""
+        survey_id = int(survey_number) - 1
+        option_id = int(option_number) - 1
+        survey = self.get_survey_by_id(server, survey_id)
+        survey.votes[author.id] = option_id
+        self.save_settings()
+
 
 
 def check_folder():
