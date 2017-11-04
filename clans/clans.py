@@ -24,25 +24,19 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
-import itertools
-import re
-import aiohttp
 import os
+import re
 from collections import defaultdict
-from random import choice
 
+import aiohttp
+import crapipy
 import discord
+import yaml
 from __main__ import send_cmd_help
+from box import Box
 from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from discord.ext.commands import Context
-import crapipy
-import yaml
-from box import Box
 
 PATH = os.path.join("data", "clans")
 JSON = os.path.join(PATH, "settings.json")
@@ -62,7 +56,7 @@ class Clans:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
-        
+
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
     async def clansset(self, ctx):
@@ -143,8 +137,6 @@ class Clans:
                 badge_url = 'https://cr-api.github.io/cr-api-assets/badge/{}.png'.format(clan.badge.key)
                 em.set_thumbnail(url=badge_url)
         await self.bot.say(embed=em)
-
-
 
 
 def check_folder():
