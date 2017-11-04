@@ -117,10 +117,11 @@ class Clans:
         config = self.clans_config
         clan_tags = [clan.tag for clan in config.clans]
         clans = await client.get_clans(clan_tags)
+        color = getattr(discord.Color, config.color)()
         em = discord.Embed(
             title=config.name,
             description="Minimum trophies to join our Clash Royale clans. Current trophies required unless PB (personal best) is specified.",
-            color=discord.Color.red()
+            color=color
         )
         badge_url = None
         for clan in clans:
