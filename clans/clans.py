@@ -107,7 +107,8 @@ class Clans:
     async def clans(self, ctx, *args):
         """Display clan info.
 
-        [p]clans m   Shows member count
+        [p]clans -m   Disable member count
+        [p]clans -t   Disable clan tag
         """
         await self.bot.type()
         client = crapipy.AsyncClient()
@@ -121,7 +122,8 @@ class Clans:
             color=color
         )
         badge_url = None
-        show_member_count = "m" in args
+        show_member_count = "-m" not in args
+        show_clan_tag = "-t" not in args
         for clan in clans:
             match = re.search('[\d,O]{4,}', clan.description)
             pb_match = re.search('PB', clan.description)
@@ -137,8 +139,15 @@ class Clans:
                 pb = ' PB'
             member_count = ''
             if show_member_count:
-                member_count = '\n{} / 50'.format(clan.member_count)
-            value = '#{}{}\n{}{}'.format(clan.tag, member_count, trophies, pb)
+                member_count = '{} / 50\n'.format(clan.member_count)
+            clan_tag = ''
+            if show_clan_tag:
+                clan_tag = '#{}\n'.format(clan.tag)
+            value = '{clan_tag}{member_count}{trophies}{pb}'.format(
+                clan_tag=clan_tag,
+                member_count=member_count,
+                trophies=trophies,
+                pb=pb)
             em.add_field(name=name, value=value)
             if badge_url is None:
                 badge_url = 'https://cr-api.github.io/cr-api-assets/badge/{}.png'.format(clan.badge.key)
