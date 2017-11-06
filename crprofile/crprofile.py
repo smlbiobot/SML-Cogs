@@ -179,6 +179,15 @@ class CRPlayerModel:
         self.CHESTS = CHESTS
         self.error = error
 
+    def prop(self, section, prop, default=0):
+        """Return sectional attribute."""
+        attr = self.data.get(section)
+        if attr is not None:
+            value = attr.get(prop)
+            if value is not None:
+                return value
+        return default
+
     @property
     def tag(self):
         """Player tag"""
@@ -290,16 +299,12 @@ class CRPlayerModel:
     @property
     def challenge_cards_won(self):
         """Challenge cards won."""
-        if self.stats is not None:
-            return self.stats.get("challengeCardsWon", 0)
-        return 0
+        return self.prop("stats", "challengeCardsWon", 0)
 
     @property
     def tourney_cards_won(self):
         """Challenge cards won."""
-        if self.stats is not None:
-            return self.stats.get("tournamentCardsWon", 0)
-        return 0
+        return self.prop("stats", "tournamentCardsWon", 0)
 
     @property
     def tourney_cards_per_game(self):
@@ -311,30 +316,22 @@ class CRPlayerModel:
     @property
     def challenge_max_wins(self):
         """Max challenge wins."""
-        if self.stats is not None:
-            return self.stats.get("challengeMaxWins", 0)
-        return 0
+        return self.prop("stats", "challengeMaxWins", 0)
 
     @property
     def total_donations(self):
         """Total donations."""
-        if self.stats is not None:
-            return self.stats.get("totalDonations", 0)
-        return 0
+        return self.prop("stats", "totalDonations", 0)
 
     @property
     def cards_found(self):
         """Cards found."""
-        if self.stats is not None:
-            return self.stats.get("cardsFound", 0)
-        return 0
+        return self.prop("stats", "cardsFound", 0)
 
     @property
     def favorite_card(self):
         """Favorite card."""
-        if self.stats is not None:
-            return self.stats.get("favoriteCard", "soon")
-        return "soon"
+        return self.prop("stats", "favoriteCard", "soon")
 
     @property
     def trophy_current(self):
@@ -344,16 +341,12 @@ class CRPlayerModel:
     @property
     def trophy_highest(self):
         """Personal best."""
-        if self.stats is not None:
-            return self.stats.get("maxTrophies", None)
-        return None
+        return self.prop("stats", "maxTrophies", 0)
 
     @property
     def trophy_legendary(self):
         """Legendary trophies."""
-        if self.stats is not None:
-            return self.stats.get("legendaryTrophies", None)
-        return None
+        return self.prop("stats", "legendaryTrophies", 0)
 
     def trophy_value(self, emoji):
         """Trophy values.
@@ -368,35 +361,27 @@ class CRPlayerModel:
     @property
     def games(self):
         """Game stats."""
-        return self.data.get("games", None)
+        return self.data.get("games")
 
     @property
     def tourney_games(self):
         """Number of tournament games."""
-        if self.games is not None:
-            return self.games.get("tournamentGames", 0)
-        return 0
+        return self.prop("games", "tournamentGames", 0)
 
     @property
     def wins(self):
         """Games won."""
-        if self.games is not None:
-            return self.games.get("wins", 0)
-        return 0
+        return self.prop("games", "wins", 0)
 
     @property
     def losses(self):
         """Games won."""
-        if self.games is not None:
-            return self.games.get("losses", 0)
-        return 0
+        return self.prop("games", "losses", 0)
 
     @property
     def draws(self):
         """Games won."""
-        if self.games is not None:
-            return self.games.get("draws", 0)
-        return 0
+        return self.prop("games", "draws", 0)
 
     def win_losses(self, emoji):
         """Win / losses."""
@@ -409,24 +394,17 @@ class CRPlayerModel:
     @property
     def total_games(self):
         """Total games played."""
-        if self.games is not None:
-            return self.games.get("total", 0)
-        return 0
+        return self.prop("games", "total", 0)
 
     @property
     def win_streak(self):
         """Win streak."""
-        streak = 0
-        if self.games is not None:
-            streak = self.games.get("currentWinStreak", 0)
-        return max(streak, 0)
+        return max(self.prop("games", "currentWinStreak", 0), 0)
 
     @property
     def three_crown_wins(self):
         """Three crown wins."""
-        if self.games is not None:
-            return self.stats.get("threeCrownWins", 0)
-        return 0
+        return self.prop("games", "threeCrownWins", 0)
 
     @property
     def rank(self):
@@ -1213,7 +1191,8 @@ class CRProfile:
 
         def fmt(num, emoji_name):
             emoji = bem(emoji_name)
-            return '{:,} {}'.format(num, emoji)
+            if emoji is not None:
+                return '{:,} {}'.format(num, emoji)
 
         if player.tourney_cards_per_game is None:
             tourney_cards_per_game = 'N/A'
