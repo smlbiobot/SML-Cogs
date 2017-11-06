@@ -81,7 +81,6 @@ class Client():
             d = await self.get_band(tag)
             if d is not None:
                 data.append(d)
-        print(data)
         return data
 
 
