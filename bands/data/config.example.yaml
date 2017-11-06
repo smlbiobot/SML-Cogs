@@ -1,0 +1,15 @@
+name: Reddit Alpha Clan Family
+authorization: brawlstats.io_authentication_key
+color: red
+emblem: A_Char_Rocket_02
+logo_url: https://raw.githubusercontent.com/smlbiobot/racf-discord-doc/master/docs/img/racf/racf-logo-bg-red.png
+bands:
+  - name: Reddit Alpha
+    tag: LQQ
+  - name: Reddit Bravo
+    tag: 82RQLR
+  - name: Reddit Charlie
+    tag: 98VLYJ
+  - name: Reddit Delta
+    tag: Q0YG8V
+    req: RACF members only

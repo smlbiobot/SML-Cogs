@@ -415,7 +415,7 @@ class RACFAudit:
         --debug        Show debug in console 
         """
         server = ctx.message.server
-        family_tags = self.crclan.manager.get_clans(server).keys()
+        family_tags = self.crclan.manager.get_bands(server).keys()
 
         option_exec = '--exec' in options
         option_debug = '--debug' in options
