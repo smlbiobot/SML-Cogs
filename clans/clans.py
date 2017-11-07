@@ -139,16 +139,16 @@ class Clans:
                 pb = ' PB'
             member_count = ''
             if show_member_count:
-                member_count = '{} / 50\n'.format(clan.member_count)
+                member_count = '{} / 50'.format(clan.member_count)
             clan_tag = ''
             if show_clan_tag:
-                clan_tag = '#{}\n'.format(clan.tag)
-            value = '{clan_tag}{member_count}{trophies}{pb}'.format(
+                clan_tag = '#{}'.format(clan.tag)
+            value = '`{trophies}{pb}, {member_count}, {clan_tag}`'.format(
                 clan_tag=clan_tag,
                 member_count=member_count,
                 trophies=trophies,
                 pb=pb)
-            em.add_field(name=name, value=value)
+            em.add_field(name=name, value=value, inline=False)
             if badge_url is None:
                 badge_url = 'https://cr-api.github.io/cr-api-assets/badge/{}.png'.format(clan.badge.key)
                 em.set_thumbnail(url=badge_url)
