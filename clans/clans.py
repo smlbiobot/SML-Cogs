@@ -139,11 +139,11 @@ class Clans:
                 pb = ' PB'
             member_count = ''
             if show_member_count:
-                member_count = '{} / 50'.format(clan.member_count)
+                member_count = ', {} / 50'.format(clan.member_count)
             clan_tag = ''
             if show_clan_tag:
-                clan_tag = '#{}'.format(clan.tag)
-            value = '`{trophies}{pb}, {member_count}, {clan_tag}`'.format(
+                clan_tag = ', #{}'.format(clan.tag)
+            value = '`{trophies}{pb}{member_count}{clan_tag}`'.format(
                 clan_tag=clan_tag,
                 member_count=member_count,
                 trophies=trophies,
