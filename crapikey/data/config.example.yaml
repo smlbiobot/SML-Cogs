@@ -1,0 +1,3 @@
+url:
+  new_key: http://path/to/issue/key
+  remove_key: http://path/to/remove/key
