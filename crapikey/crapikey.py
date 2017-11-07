@@ -81,7 +81,6 @@ class CRAPIKey:
 
         cmd:None       show config via DM.
         cmd:upload     Upload config.yaml
-        cmd:channel    Set channel for key issues
         """
         if cmd is None:
             await self.send_config(ctx)
