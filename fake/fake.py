@@ -63,6 +63,11 @@ class Fake:
         """Name."""
         await self.bot.say(self.faker.name())
 
+    @fake.command(name="ssn", pass_context=True, no_pm=True)
+    async def fake_name(self, ctx):
+        """Name."""
+        await self.bot.say(self.faker.ssn())
+
     @fake.command(name="profile", aliases=[], pass_context=True, no_pm=True)
     async def fake_profile(self, ctx):
         """Profile."""
