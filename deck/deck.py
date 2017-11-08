@@ -228,6 +228,8 @@ class Deck:
     async def card_key_to_decklink(self, key):
         """Card key to decklink id."""
         cards_json = await self.cards_json()
+        if key == 'xbow':
+            key = 'x-bow'
         for k, card_json in cards_json.items():
             if card_json["key"] == key:
                 return card_json["decklink"]
