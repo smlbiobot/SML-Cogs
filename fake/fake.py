@@ -27,11 +27,11 @@ DEALINGS IN THE SOFTWARE.
 import os
 from collections import defaultdict
 
+import discord
 from __main__ import send_cmd_help
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from faker import Faker
-import discord
 
 PATH = os.path.join("data", "fake")
 JSON = os.path.join(PATH, "settings.json")
@@ -50,7 +50,7 @@ class Fake:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
-        self.faker = Faker()
+        self.locales = dataIO.load_json(os.path.join(PATH, "locales.json"))
 
     @commands.group(pass_context=True)
     async def fake(self, ctx):
@@ -58,18 +58,26 @@ class Fake:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @fake.command(name="name", pass_context=True, no_pm=True)
-    async def fake_name(self, ctx):
-        """Name."""
-        await self.bot.say(self.faker.name())
+    @fake.command(name="locales", aliases=[], pass_context=True)
+    async def fake_locales(self, ctx):
+        """List locales"""
+        locales = ["**{}**: {}".format(k, v) for k, v in self.locales.items()]
+        await self.bot.say(", ".join(locales))
 
-    @fake.command(name="ssn", pass_context=True, no_pm=True)
-    async def fake_name(self, ctx):
-        """Name."""
-        await self.bot.say(self.faker.ssn())
+    @fake.command(name="name", pass_context=True)
+    async def fake_name(self, ctx, locale=None):
+        """Fake name."""
+        print(locale)
+        await self.bot.say(Faker(locale).name())
 
-    @fake.command(name="profile", aliases=[], pass_context=True, no_pm=True)
-    async def fake_profile(self, ctx):
+    @fake.command(name="ssn", pass_context=True)
+    async def fake_ssn(self, ctx, locale=None):
+        """Fake SSN."""
+
+        await self.bot.say(Faker(locale).ssn())
+
+    @fake.command(name="profile", aliases=[], pass_context=True)
+    async def fake_profile(self, ctx, locale=None):
         """Profile."""
         em = discord.Embed(title="Fake Profile")
         order = [
@@ -81,15 +89,15 @@ class Fake:
             'residence',
             'website'
         ]
-        profile = self.faker.profile()
+        profile = Faker(locale).profile()
         for k in order:
-            v = profile[k]
-            if isinstance(v, list):
+            v = profile.get(k)
+            if v is None:
+                v = '__'
+            elif isinstance(v, list):
                 v = '\n'.join(v)
             em.add_field(name=k.title(), value=v)
         await self.bot.say(embed=em)
-
-
 
 
 def check_folder():
