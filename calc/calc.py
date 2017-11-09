@@ -24,6 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 from __main__ import send_cmd_help
+from cogs.utils.chat_formatting import box
 from discord.ext import commands
 from py_expression_eval import Parser
 
@@ -66,7 +67,7 @@ class Calc:
             await send_cmd_help(ctx)
             return
 
-        await self.bot.say(input)
+        await self.bot.say(box(input))
 
         parser = Parser()
         try:
@@ -81,7 +82,7 @@ class Calc:
             await self.bot.say(":warning: floating point error.")
             return
 
-        await self.bot.say(out)
+        await self.bot.say(box(out))
 
     @commands.group(pass_context=True)
     async def calcfunc(self, ctx):
@@ -98,11 +99,10 @@ class Calc:
         try:
             parser = Parser()
             out = parser.parse(expression).simplify({}).toString()
-            await self.bot.say(out)
+            await self.bot.say(box(expression))
+            await self.bot.say(box(out))
         except Exception as err:
             await self.bot.say(':warning:' + err)
-
-
 
 
 def setup(bot):
