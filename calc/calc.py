@@ -69,7 +69,17 @@ class Calc:
         await self.bot.say(input)
 
         parser = Parser()
-        out = parser.parse(input).evaluate({})
+        try:
+            out = parser.parse(input).evaluate({})
+        except ZeroDivisionError:
+            await self.bot.say(":warning: Zero division error")
+            return
+        except OverflowError:
+            await self.bot.say(":warning: Overflow error")
+            return
+        except FloatingPointError:
+            await self.bot.say(":warning: floating point error.")
+            return
 
         await self.bot.say(out)
 
