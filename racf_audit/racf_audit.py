@@ -379,10 +379,15 @@ class RACFAudit:
         member_models = await self.family_member_models(server)
         for member_model in member_models:
             if pargs.name is not None:
-                s = unidecode.unidecode(member_model.name)
-                s = ''.join(re.findall(r'\w', s))
-                if pargs.name[0].lower() in s.lower():
+                # simple search
+                if pargs.name[0].lower() in member_model.name.lower():
                     results.append(member_model)
+                else:
+                    # unidecode search
+                    s = unidecode.unidecode(member_model.name)
+                    s = ''.join(re.findall(r'\w', s))
+                    if pargs.name[0].lower() in s.lower():
+                        results.append(member_model)
             if pargs.tag is not None:
                 if pargs.tag[0].lower() in member_model.tag.lower():
                     results.append(member_model)
