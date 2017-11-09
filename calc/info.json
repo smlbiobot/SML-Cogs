@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Calculator",
+	"DESCRIPTION": "Simple calculator",
+	"DISABLED": false,
+	"NAME": "Calc",
+	"REQUIREMENTS": ["py_expression_eval"],
+	"TAGS": ["math", "calculator", "calc"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
