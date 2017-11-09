@@ -83,6 +83,27 @@ class Calc:
 
         await self.bot.say(out)
 
+    @commands.group(pass_context=True)
+    async def calcfunc(self, ctx):
+        """Calculating functions"""
+        if ctx.invoked_subcommand is None:
+            await send_cmd_help(ctx)
+
+    @calcfunc.command(name="simplify", pass_context=True, no_pm=True)
+    async def calcfunc_simplify(self, ctx, *, expression):
+        """Simplify an expression"""
+        if not expression:
+            await send_cmd_help(ctx)
+            return
+        try:
+            parser = Parser()
+            out = parser.parse(expression).simplify({}).toString()
+            await self.bot.say(out)
+        except Exception as err:
+            await self.bot.say(':warning:' + err)
+
+
+
 
 def setup(bot):
     """Setup."""
