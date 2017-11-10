@@ -136,7 +136,7 @@ class NLP:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_server=True)
-    async def autotranslate(self, ctx, language: str):
+    async def autotranslate(self, ctx, *languages):
         """Set auto-translate language or disable it.
 
         Use 0 as language to disable auto-translation."""
@@ -144,18 +144,18 @@ class NLP:
         if server.id not in self.settings:
             self.settings[server.id] = {}
         on_off = True
-        if language.lower() in ['off', '0', 'false']:
+        if languages[0].lower() in ['off', '0', 'false']:
             on_off = False
         self.settings[server.id]["AUTO_TRANSLATE"] = on_off
-        self.settings[server.id]["LANGUAGE"] = language
+        self.settings[server.id]["LANGUAGE"] = languages
         if on_off:
             self.settings[server.id]["CHANNEL"] = ctx.message.channel.id
-            lang = language
-            if language in LANG:
-                lang = LANG[language]
-            await self.bot.say(
-                "Auto-translating messages to {} in {}".format(
-                    lang, ctx.message.channel))
+            for lang in languages:
+                language = LANG.get(lang)
+                if language:
+                    await self.bot.say(
+                        "Auto-translating messages to {} in {}".format(
+                            lang, ctx.message.channel))
         else:
             await self.bot.say(
                 "Auto-translate disabled.")
@@ -179,16 +179,18 @@ class NLP:
         if msg.author == server.me:
             return
         if self.settings[server.id]["AUTO_TRANSLATE"]:
-            try:
-                blob = TextBlob(msg.content)
-                out = blob.translate(to=self.settings[server.id]["LANGUAGE"])
-                author = msg.author
-                await self.bot.send_message(
-                    msg.channel,
-                    "**{}: **{}".format(
-                        author.display_name, out))
-            except textblob.exceptions.NotTranslated:
-                return
+
+            blob = TextBlob(msg.content)
+            for language in self.settings[server.id]["LANGUAGE"]:
+                try:
+                    out = blob.translate(to=language)
+                    author = msg.author
+                    await self.bot.send_message(
+                        msg.channel,
+                        "**{}:** ({}) {}".format(
+                            author.display_name, language, out))
+                except textblob.exceptions.NotTranslated:
+                    pass
 
 
 def check_folder():
