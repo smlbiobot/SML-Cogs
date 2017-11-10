@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Channel Manager",
+	"DESCRIPTION": "Utilities for channel management.",
+	"DISABLED": false,
+	"NAME": "ChannelManager",
+	"REQUIREMENTS": [],
+	"TAGS": ["channel", "utility", "util"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
