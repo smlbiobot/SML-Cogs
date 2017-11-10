@@ -30,6 +30,7 @@ from collections import defaultdict
 import discord
 from __main__ import send_cmd_help
 from cogs.utils.dataIO import dataIO
+from cogs.utils import checks
 from discord import InvalidArgument, Forbidden, HTTPException
 from discord.ext import commands
 
@@ -52,18 +53,21 @@ class ChannelManager:
         self.settings.update(dataIO.load_json(JSON))
 
     @commands.group(aliases=['chm'], pass_context=True)
+    @checks.mod_or_permissions()
     async def channelman(self, ctx):
         """Channel Manager."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @channelman.group(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_channels=True)
     async def create(self, ctx):
         """Create Channel."""
         if ctx.invoked_subcommand is None or isinstance(ctx.invoked_subcommand, commands.Group):
             await send_cmd_help(ctx)
 
     @create.command(name="user", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_channels=True)
     async def create_user(self, ctx, name, user: discord.Member, after: discord.Channel = None):
         """User specific channel.
 
@@ -92,12 +96,14 @@ class ChannelManager:
         await self.bot.say("Channel created.")
 
     @channelman.group(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_channels=True)
     async def move(self, ctx):
         """Move channel."""
         if ctx.invoked_subcommand is None or isinstance(ctx.invoked_subcommand, commands.Group):
             await send_cmd_help(ctx)
 
     @move.command(name="after", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_channels=True)
     async def move_after(self, ctx, channel: discord.Channel, after_channel: discord.Channel):
         """Move channel after a channel."""
         try:
