@@ -178,6 +178,8 @@ class NLP:
             return
         if msg.author == server.me:
             return
+        if msg.author.bot:
+            return
         if self.settings[server.id]["AUTO_TRANSLATE"]:
             blob = TextBlob(msg.content)
             detected_lang = blob.detect_language()
