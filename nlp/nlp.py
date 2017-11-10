@@ -188,16 +188,18 @@ class NLP:
                 if language != detected_lang:
                     try:
                         translated_msg = blob.translate(to=language)
-                        author = msg.author
                         out.append(
-                            "**{}** ({}): {}".format(
-                                author.display_name, language, translated_msg))
+                            "`{}` {}".format(
+                                language, translated_msg))
                     except (textblob.exceptions.NotTranslated,
                             textblob.exceptions.TranslatorError):
                         pass
             if len(out):
-                out.insert(0, "**{}** ({}): {}".format(
-                    msg.author.display_name, detected_lang, msg.content))
+                out.insert(0,
+                           "{}\n`{}` {}".format(
+                               msg.author.display_name,
+                               detected_lang,
+                               msg.content))
                 await self.bot.send_message(msg.channel, '\n'.join(out))
 
 
