@@ -179,18 +179,24 @@ class NLP:
         if msg.author == server.me:
             return
         if self.settings[server.id]["AUTO_TRANSLATE"]:
-
             blob = TextBlob(msg.content)
+            detected_lang = blob.detect_language()
+            out = []
             for language in self.settings[server.id]["LANGUAGE"]:
-                try:
-                    out = blob.translate(to=language)
-                    author = msg.author
-                    await self.bot.send_message(
-                        msg.channel,
-                        "**{}:** ({}) {}".format(
-                            author.display_name, language, out))
-                except textblob.exceptions.NotTranslated:
-                    pass
+                if language != detected_lang:
+                    try:
+                        translated_msg = blob.translate(to=language)
+                        author = msg.author
+                        out.append(
+                            "**{}** ({}): {}".format(
+                                author.display_name, language, translated_msg))
+                    except (textblob.exceptions.NotTranslated,
+                            textblob.exceptions.TranslatorError):
+                        pass
+            if len(out):
+                out.insert(0, "**{}** ({}): {}".format(
+                    msg.author.display_name, detected_lang, msg.content))
+                await self.bot.send_message(msg.channel, '\n'.join(out))
 
 
 def check_folder():
