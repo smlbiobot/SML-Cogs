@@ -35,36 +35,21 @@ from discord.ext import commands
 from discord.ext.commands import Context
 
 import cogs
+import os
 from cogs.utils import checks
+from cogs.utils import dataIO
 from cogs.utils.chat_formatting import pagify
+from box import Box, BoxList
 
-RULES_URL = "https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/"
-ROLES_URL = "https://www.reddit.com/r/CRRedditAlpha/wiki/roles"
-DISCORD_URL = "http://discord.gg/racf"
+import yaml
 
-welcome_msg = "Hi {}! Are you in the Reddit Alpha Clan Family (RACF) / " \
-              "interested in joining our clans / just visiting?"
+
+
 
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 BS_CHANGECLAN_ROLES = ["Member", "Brawl-Stars"]
 DISALLOWED_ROLES = ["SUPERMOD", "MOD", "AlphaBot"]
-HEIST_ROLE = "Heist"
-RECRUIT_ROLE = "Recruit"
-TOGGLE_ROLES = ["Member", "Visitor"]
-TOGGLEABLE_ROLES = [
-    "Heist", "Practice", "Tourney", "CoC",
-    "Battle-Bay", "RACF-Tourney", "Brawl-Stars", "vc-crew"]
-TOGGLE_PERM = {
-    "Member": [
-        "Heist", "Practice", "Tourney", "Recruit", "CoC",
-        "Battle-Bay", "RACF-Tourney", "Brawl-Stars", "vc-crew",
-        "BSPlay", "PvZ", "Practice-EU", "Food"
-    ],
-    "Visitor": [
-        "BSPlay", "Heist"
-    ]
-}
-MEMBER_DEFAULT_ROLES = ["Member", "Tourney", "Practice"]
+MEMBER_DEFAULT_ROLES = ["Member", "Tourney"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel"]
@@ -77,76 +62,6 @@ COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
 COMPETITIVE_TEAM_ROLES = [
     "CRL", "RPL-NA", "RPL-EU", "RPL-APAC", "MLG",
     "ClashWars", "CRL-Elite", "CRL-Legends", "CRL-Rockets"]
-KICK5050_MSG = (
-    "Sorry, but you were 50/50 and we have kicked you from the clan. "
-    "Please join one of our feeders for now. "
-    "Our clans are Alpha / Bravo / Charlie / Delta / "
-    "Echo / Foxtrot / Golf / Hotel with the red rocket emblem. "
-    "Good luck on the ladder!")
-BS_KICK5050_MSG = (
-    "Sorry, but you were 50/50 and we have "
-    "kicked you from the Brawl Stars band. "
-    "Please join one of our feeders for now. "
-    "Our clans are Alpha / Bravo / Charlie "
-    "with the red skull emblem. "
-    "Good luck in your future games!")
-VISITOR_RULES = (
-    "Welcome to the **Reddit Alpha Clan Family** (RACF) Discord server. "
-    "As a visitor, you agree to follow the following rules: \n"
-    "\n"
-    "+ No spamming.\n"
-    "+ No advertisement of any kind, "
-    "e.g. Facebook / Twitter / YouTube / Friend Invite Links\n"
-    "+ Use #bot-commands for bot features, e.g. `!deck` / `!crdata`\n"
-    "+ Use #casino for bot commands related to casino, "
-    "e.g. `!payday` / `!slot` / `!heist`\n"
-    "\n"
-    "Failure to follow these rules will get you kicked from the server. "
-    "Repeat offenders will be banned.\n"
-    "\n"
-    "If you would like to invite your friends to join this server, "
-    "you may use this Discord invite: <http://discord.gg/racf> \n"
-    "\n"
-    "Additional help and information: http://docs.redditalpha.com/ \n"
-    "\n"
-    "Thanks + enjoy!")
-MEMBER_MSG = (
-    "Welcome to the **Reddit Alpha Clan Family** (RACF) Discord server. "
-    "Please check out http://docs.redditalpha.com/ for an overview of our family rules, "
-    "together with help documentation on a plethora of bot commands for you to use and enjoy."
-    "\n\n"
-    "Thanks + enjoy!"
-)
-ELDER_MSG = (
-    "Congratulations on your recent promotion to Elder! \n"
-    "\n"
-    "You have the following responsibilities as elder in the RACF:\n"
-    "\n"
-    "Accept new members.\n"
-    "\n"
-    "When accepting new members, you should:\n"
-    "• Make sure that the person meets trophy requirements.\n"
-    "• Ask if the person is new to the RACF.\n"
-    "• Ask that person to join our Discord server: http://discord.gg/racf\n"
-    "• Let them know about the 50/50 kicking policy.\n"
-    "\n"
-    "Not allowed to kick 50/50.\n"
-    "\n"
-    "Please consult http://docs.redditalpha.com/#/racf/roles for more information."
-)
-ELDER_REFRESH_MSG = (
-    "\n"
-    "You have the following responsibilities as elder in the RACF:\n"
-    "+ Accept new members.\n"
-    "+ When accepting new members, you should:\n"
-    ".. + Make sure that the person meets trophy requirements.\n"
-    ".. + Ask if the person is new to the RACF.\n"
-    ".. + Ask that person to join our Discord server: http://discord.gg/racf\n"
-    ".. + Let them know about the 50/50 kicking policy.\n"
-    "+ Not allowed to kick 50/50.\n"
-    "\n"
-    "Please consult !rules and !roles on the RACF server for more info."
-)
 CLAN_PERMISSION = {
     '2CCCP': {
         'tag': '2CCCP',
@@ -315,6 +230,8 @@ class RACF:
     def __init__(self, bot):
         """Constructor."""
         self.bot = bot
+        with open(os.path.join("data", "racf", "config.yaml")) as f:
+            self.config = Box(yaml.load(f))
 
     @commands.group(aliases=['r'], pass_context=True, no_pm=True)
     async def racf(self, ctx):
@@ -341,7 +258,7 @@ class RACF:
         else:
             em.set_author(name=server.name)
 
-        em.add_field(name='Documentation', value='http://racfdocs.smlbiobot.com')
+        em.add_field(name='Documentation', value=self.config.url.docs)
 
         try:
             await self.bot.say(embed=em)
@@ -463,12 +380,12 @@ class RACF:
                 await ctx.invoke(mm.changerole, member, perm['role'], 'Visitor')
                 channel = discord.utils.get(
                     ctx.message.server.channels, name="visitors")
-                await ctx.invoke(self.dmusers, VISITOR_RULES, member)
+                await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
             else:
-                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', 'Practice', '-Visitor')
+                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', '-Visitor')
                 channel = discord.utils.get(
                     ctx.message.server.channels, name="family-chat")
-                await ctx.invoke(self.dmusers, MEMBER_MSG, member)
+                await ctx.invoke(self.dmusers, self.config.messages.member, member)
 
             if channel is not None:
                 await self.bot.say(
@@ -817,7 +734,7 @@ class RACF:
         to_add_roles = [r for r in server.roles if r.name == 'Visitor']
         for member in members:
             to_remove_roles = [
-                r for r in member.roles if r.name in MEMBER_DEFAULT_ROLES]
+                r for r in member.roles if r.name in self.config.roles.member_default]
             to_remove_roles.extend([
                 r for r in member.roles if r.name in CLANS])
             to_remove_roles.extend([
@@ -835,7 +752,7 @@ class RACF:
             self, ctx: Context, member: discord.Member, *roles):
         """Assign visitor to member and add clan name."""
         server = ctx.message.server
-        roles_param = MEMBER_DEFAULT_ROLES.copy()
+        roles_param = self.config.roles.member_default.copy()
         roles_param.extend(roles)
         roles_param.append("-Visitor")
         channel = discord.utils.get(
@@ -847,7 +764,7 @@ class RACF:
                 "{} Welcome! Main family chat at {} — enjoy!".format(
                     member.mention, channel.mention))
 
-        await ctx.invoke(self.dmusers, MEMBER_MSG, member)
+        await ctx.invoke(self.dmusers, self.config.messages.member, member)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
@@ -927,84 +844,6 @@ class RACF:
             for page in pagify("\n".join(out), shorten_by=12):
                 await self.bot.say(page)
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def toggleheist(self, ctx: Context):
-        """Self-toggle heist role."""
-        author = ctx.message.author
-        server = ctx.message.server
-        heist_role = discord.utils.get(
-            server.roles, name=HEIST_ROLE)
-        if heist_role in author.roles:
-            await self.bot.remove_roles(author, heist_role)
-            await self.bot.say(
-                "Removed {} role from {}.".format(
-                    HEIST_ROLE, author.display_name))
-        else:
-            await self.bot.add_roles(author, heist_role)
-            await self.bot.say(
-                "Added {} role for {}.".format(
-                    HEIST_ROLE, author.display_name))
-
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
-    async def teamadd(self, ctx, member: discord.Member, role):
-        """Add competitive team member roles."""
-        server = ctx.message.server
-        competitive_team_roles = [r.lower() for r in COMPETITIVE_TEAM_ROLES]
-        if role.lower() not in competitive_team_roles:
-            await self.bot.say(
-                "{} is not a competitive team role.".format(role))
-            return
-        if role.lower() not in [r.name.lower() for r in server.roles]:
-            await self.bot.say("{} is not a role on this server.".format(role))
-            return
-        roles = [r for r in server.roles if r.name.lower() == role.lower()]
-        await self.bot.add_roles(member, *roles)
-        await self.bot.say("Added {} for {}".format(role, member.display_name))
-
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
-    async def teamremove(self, ctx, member: discord.Member, role):
-        """Remove competitive team member roles."""
-        server = ctx.message.server
-        competitive_team_roles = [r.lower() for r in COMPETITIVE_TEAM_ROLES]
-        if role.lower() not in competitive_team_roles:
-            await self.bot.say(
-                "{} is not a competitive team role.".format(role))
-            return
-        if role.lower() not in [r.name.lower() for r in server.roles]:
-            await self.bot.say("{} is not a role on this server.".format(role))
-            return
-        roles = [r for r in server.roles if r.name.lower() == role.lower()]
-        await self.bot.remove_roles(member, *roles)
-        await self.bot.say(
-            "Removed {} from {}".format(role, member.display_name))
-
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*COMPETITIVE_CAPTAIN_ROLES)
-    async def teamlist(self, ctx, role_name):
-        """List team members with specific competitive roles.
-
-        Default CSV output.
-        """
-        server = ctx.message.server
-        competitive_team_roles = [r.lower() for r in COMPETITIVE_TEAM_ROLES]
-        if role_name.lower() not in competitive_team_roles:
-            await self.bot.say(
-                "{} is not a competitive team role.".format(role_name))
-            return
-        role = discord.utils.get(server.roles, name=role_name)
-        if role is None:
-            await self.bot.say(
-                '{} is not a valid role on this server.'.format(role_name))
-            return
-        members = [m for m in server.members if role in m.roles]
-        members = sorted(members, key=lambda x: x.display_name)
-        out = ', '.join([m.display_name for m in members])
-        await self.bot.say(
-            'List of members with {}:\n'
-            '{}'.format(role_name, out))
-
     @commands.command(pass_context=True, no_pm=True, aliases=["k5"])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def kick5050(self, ctx, member: discord.Member):
@@ -1012,7 +851,7 @@ class RACF:
 
         Remove clan tags in the process.
         """
-        await ctx.invoke(self.dmusers, KICK5050_MSG, member)
+        await ctx.invoke(self.dmusers, self.config.messages.kick5050, member)
         member_clan = [
             '-{}'.format(r.name) for r in member.roles if r.name in CLANS]
         if len(member_clan):
@@ -1027,7 +866,7 @@ class RACF:
 
         Remove clan tags in the process.
         """
-        await ctx.invoke(self.dmusers, BS_KICK5050_MSG, member)
+        await ctx.invoke(self.dmusers, self.config.messages.bskick5050, member)
         member_clan = [
             '-{}'.format(r.name) for r in member.roles if r.name in BS_CLANS]
         if len(member_clan):
@@ -1077,7 +916,7 @@ class RACF:
     async def visitorrules(self, ctx, *members: discord.Member):
         """DM server rules to user."""
         try:
-            await ctx.invoke(self.dmusers, VISITOR_RULES, *members)
+            await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, *members)
             await self.bot.say(
                 "A list of rules has been sent via DM to {}.".format(
                     ", ".join([m.display_name for m in members])))
@@ -1085,7 +924,7 @@ class RACF:
             await self.bot.say(
                 '{} {}'.format(
                     " ".join([m.mention for m in members]),
-                    VISITOR_RULES))
+                    self.config.messages.visitor_rules))
 
     @commands.command(pass_context=True, no_pm=True)
     async def pay(self, ctx, amt, *members: discord.Member):
@@ -1170,11 +1009,6 @@ class RACF:
 
         await self.bot.say('\n'.join(out))
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def test(self, ctx):
-        """Test."""
-        await self.bot.say("test")
-
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     @commands.command(pass_context=True, no_pm=True)
     async def iosfix(self, ctx: Context, *members: discord.Member):
@@ -1232,7 +1066,7 @@ class RACF:
         for member in members:
             await self.changerole(ctx, member, *elder_roles)
             try:
-                await ctx.invoke(self.dmusers, ELDER_MSG, member)
+                await ctx.invoke(self.dmusers, self.config.messages.elder, member)
             except discord.errors.Forbidden:
                 await self.bot.say(
                     "Unable to send DM to {}. User might have a stricter DM setting.".format(member))
@@ -1247,7 +1081,7 @@ class RACF:
             member_role_names = [r.name for r in member.roles]
             if "Elder" in member_role_names:
                 try:
-                    await ctx.invoke(self.dmusers, '{}\n{}'.format(msg, ELDER_REFRESH_MSG), member)
+                    await ctx.invoke(self.dmusers, '{}\n{}'.format(msg, self.config.messages.elder_refresh), member)
                 except discord.errors.Forbidden:
                     await self.bot.say(
                         "Unable to send DM to {}. User might have a stricter DM setting.".format(member))

@@ -1,0 +1,165 @@
+url:
+  rules: https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/
+  roles: https://www.reddit.com/r/CRRedditAlpha/wiki/roles
+  discord: http://discord.gg/racf
+  docs: http://docs.redditalpha.com
+messages:
+  welcome:
+roles:
+  restricted:
+    - SUPERMOD
+    - MOD
+    - BOT
+  chanceclan:
+    - Leader
+    - Co-Leader
+    - Elder
+    - High Elder
+    - Member
+  bschangeclan:
+    - Member
+    - Brawl-Stars
+  member_default:
+    - Member
+    - Tourney
+  bot_comamnder:
+    - Bot Commander
+  competitive_captain:
+    - Competitive-Captain
+    - Bot Commander
+  competitive_team:
+    - CRL
+    - ClashWars
+    - RPL
+    - RPL-APAC
+    - RPL-EU
+    - RPL-NA
+    - MLG
+clans:
+  cr:
+    - Alpha
+    - Bravo
+    - Charlie
+    - Delta
+    - Echo
+    - Foxtrot
+    - Golf
+    - Hotel
+  bs:
+    - BS-Alpha
+    - BS-Bravo
+    - BS-Charlie
+messages:
+  kick5050: >
+    Sorry, but you were 50/50 and we have kicked you from the clan.
+    Please join one of our feeders for now.
+    Our clans are Alpha / Bravo / Charlie / Delta /
+    Echo / Foxtrot / Golf / Hotel with the red rocket emblem.
+    Good luck on the ladder!
+  bskick5050: >
+    Sorry, but you were 50/50 and we have
+    kicked you from the Brawl Stars band.
+    Please join one of our feeders for now.
+    Our clans are Alpha / Bravo / Charlie
+    with the red skull emblem.
+    Good luck in your future games!
+  visitor_rules: >
+    Welcome to the **Reddit Alpha Clan Family** (RACF) Discord server.
+
+
+    As a visitor, you agree to follow the following rules:
+
+    + No spamming.
+
+    + No advertisement of any kind,
+    e.g. Facebook / Twitter / YouTube / Friend Invite Links
+
+    + Use #bot-commands for bot features, e.g. `!deck` / `!crdata`
+
+    + Use #casino for bot commands related to casino,
+    e.g. `!payday` / `!slot` / `!heist`
+
+    Failure to follow these rules will get you kicked from the server.
+    Repeat offenders will be banned.
+
+
+    If you would like to invite your friends to join this server,
+    you may use this Discord invite: <http://discord.gg/racf>
+
+
+    Additional help and information: http://docs.redditalpha.com/
+
+
+    Thanks + enjoy!
+  member: >
+    Welcome to the **Reddit Alpha Clan Family** (RACF) Discord server.
+
+
+    Please check out http://docs.redditalpha.com/ for an overview of our family rules,
+    together with help documentation on a plethora of bot commands for you to use and enjoy.
+
+
+    Thanks + enjoy!
+  elder: >
+    Congratulations on your recent promotion to Elder!
+
+
+    You have the following responsibilities as an elder in the RACF:
+
+
+    1. Accept new members.
+
+    2. When accepting new members, you should:
+
+    • Make sure that the person meets trophy requirements.
+
+    • Ask if the person is new to the RACF.
+
+    • Ask that person to join our Discord server: http://discord.gg/racf
+
+    • Let them know about the 50/50 kicking policy.
+
+    3. Not allowed to kick 50/50.
+
+
+    Please consult http://docs.redditalpha.com/#/racf/roles for more information.
+  elder_refresh: >
+    You have the following responsibilities as an elder in the RACF:
+
+
+    1. Accept new members.
+
+    2. When accepting new members, you should:
+
+    • Make sure that the person meets trophy requirements.
+
+    • Ask if the person is new to the RACF.
+
+    • Ask that person to join our Discord server: http://discord.gg/racf
+
+    • Let them know about the 50/50 kicking policy.
+
+    3. Not allowed to kick 50/50.
+
+
+    Please consult http://docs.redditalpha.com/#/racf/roles for more information.
+permission:
+  bands:
+  - {assign_role: true, member: false, role: BS-Alpha, tag: LQQ}
+  - {assign_role: true, member: false, role: BS-Bravo, tag: 82RQLR}
+  - {assign_role: true, member: false, role: BS-Charlie, tag: 98VLYJ}
+  - {assign_role: true, member: false, role: BS-Delta, tag: Q0YG8V}
+  clans:
+  - {assign_role: true, member: true, role: Alpha, tag: 2CCCP}
+  - {assign_role: true, member: true, role: Bravo, tag: 2U2GGQJ}
+  - {assign_role: true, member: true, role: Charlie, tag: 2QUVVVP}
+  - {assign_role: true, member: true, role: Delta, tag: Y8GYCGV}
+  - {assign_role: true, member: true, role: Echo, tag: LGVV2CG}
+  - {assign_role: true, member: true, role: Foxtrot, tag: QUYCYV8}
+  - {assign_role: true, member: true, role: Golf, tag: GUYGVJY}
+  - {assign_role: true, member: true, role: Hotel, tag: UGQ28YU}
+  - {assign_role: true, member: false, role: Mini, tag: 22LR8JJ2}
+  - {assign_role: true, member: false, role: Mini2, tag: 2Q09VJC8}
+
+
+
