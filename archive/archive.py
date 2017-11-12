@@ -25,6 +25,8 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
+import io
+import json
 from collections import defaultdict
 import discord
 from discord.ext import commands
@@ -158,6 +160,76 @@ class Archive:
 
         await self.log_server_channel(ctx, server, channel, count, after=message)
         await self.bot.say("Channel logged.")
+
+    @archiveserver.command(name="full", pass_context=True, no_pm=True)
+    async def archiveserver_full(self, ctx, server_name):
+        """Archive all messages from a server. Return as JSON."""
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        if server is None:
+            await self.bot.say("Server not found.")
+            return
+        log = {}
+        for channel in server.channels:
+            await self.bot.type()
+            log[channel.id] = {
+                "id": channel.id,
+                "name": channel.name,
+                "messages": await self.channel_messages(channel, count=10000)
+            }
+
+        filename = "server_archive-{}.json".format(server.id)
+        with io.StringIO() as f:
+            json.dump(log, f, indent=4)
+            f.seek(0)
+            await ctx.bot.send_file(
+                ctx.message.channel,
+                f,
+                filename=filename
+            )
+
+    async def channel_messages(self, channel: discord.Channel,
+            count=1000, before=None, after=None, reverse=False):
+        messages = []
+
+        async for message in self.bot.logs_from(
+                channel, limit=count, before=before, after=after, reverse=reverse):
+            msg = {
+                "timestamp": message.timestamp.isoformat(),
+                "author_id": message.author.id,
+                "author_name": message.author.name,
+                "content": message.content,
+                "embeds": message.embeds,
+                "channel_id": message.channel.id,
+                "channel_name": message.channel.name,
+                "server_id": message.server.id,
+                "server_name": message.server.name,
+                "mention_everyone": message.mention_everyone,
+                "mentions_id": [m.id for m in message.mentions],
+                "mentions_name": [m.name for m in message.mentions],
+                "reactions": [],
+                "attachments": []
+            }
+            for reaction in message.reactions:
+                r = {
+                    'custom_emoji': reaction.custom_emoji,
+                    'count': reaction.count
+                }
+                if reaction.custom_emoji:
+                    # <:emoji_name:emoji_id>
+                    r['emoji'] = '<:{}:{}>'.format(
+                        reaction.emoji.name,
+                        reaction.emoji.id)
+                else:
+                    r['emoji'] = reaction.emoji
+                msg['reactions'].append(r)
+
+            for attach in message.attachments:
+                msg['attachments'].append(attach['url'])
+                messages.append(msg)
+
+        messages = sorted(messages, key=lambda x: x['timestamp'])
+        return messages
+
 
     async def log_server_channel(
             self, ctx, server: discord.Server, channel: discord.Channel,
