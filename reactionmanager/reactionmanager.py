@@ -144,6 +144,30 @@ class ReactionManager:
             await self.bot.say("Cannot find that message id.")
             return
 
+        out = await self.get_reactions(message, exclude_self=exclude_self)
+
+        for page in pagify('\n'.join(out), shorten_by=24):
+            await self.bot.say(page)
+
+
+    @reactionmanager.command(name="getserver", pass_context=True, no_pm=True)
+    @checks.is_owner()
+    async def rm_getserver(self, ctx, server_name, channel_name, message_id, exclude_self=True):
+        """Display list of reactions added by users."""
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        channel = discord.utils.get(server.channels, name=channel_name)
+
+        message = await self.bot.get_message(channel, message_id)
+        if message is None:
+            await self.bot.say("Cannot find that message id.")
+            return
+
+        out = await self.get_reactions(message, exclude_self=exclude_self)
+
+        for page in pagify('\n'.join(out), shorten_by=24):
+            await self.bot.say(page)
+
+    async def get_reactions(self, message, exclude_self=True):
         title = message.channel.name
         description = message.content
 
@@ -174,11 +198,7 @@ class ReactionManager:
 
             out.append(value)
 
-        for page in pagify('\n'.join(out), shorten_by=24):
-            await self.bot.say(page)
-
-        # delete command
-        # await self.bot.delete_message(ctx.message)
+        return out
 
 
 def check_folder():
