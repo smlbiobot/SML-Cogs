@@ -197,7 +197,8 @@ class ReactionManager:
                 if exclude_self and u == self.bot.user:
                     continue
                 valid_users.append(u)
-                valid_users = sorted(valid_users, key=lambda u: u.display_name.lower())
+
+            valid_users = sorted(valid_users, key=lambda u: u.display_name.lower())
             user_ids = [u.id for u in valid_users]
             members = []
             for uid in user_ids:
