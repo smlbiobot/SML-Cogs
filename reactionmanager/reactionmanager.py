@@ -176,6 +176,8 @@ class ReactionManager:
             escape_mass_mentions(description)
         ]
 
+        server = message.server
+
         for reaction in message.reactions:
             if reaction.custom_emoji:
                 # <:emoji_name:emoji_id>
@@ -192,7 +194,13 @@ class ReactionManager:
                     continue
                 valid_users.append(u)
                 valid_users = sorted(valid_users, key=lambda u: u.display_name.lower())
-            users_str = ', '.join([u.display_name for u in valid_users])
+            user_ids = [u.id for u in valid_users]
+            members = []
+            for uid in user_ids:
+                member = server.get_member(uid)
+                if member:
+                    members.append(member)
+            users_str = ', '.join([m.display_name for m in members])
             count = len(valid_users)
             value = '{}: {}: {}'.format(emoji, count, users_str)
 
