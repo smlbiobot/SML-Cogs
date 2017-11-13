@@ -178,6 +178,10 @@ class ReactionManager:
 
         server = message.server
 
+        total_count = 0
+
+        reaction_votes = []
+
         for reaction in message.reactions:
             if reaction.custom_emoji:
                 # <:emoji_name:emoji_id>
@@ -200,11 +204,23 @@ class ReactionManager:
                 member = server.get_member(uid)
                 if member:
                     members.append(member)
+                    total_count += 1
             users_str = ', '.join([m.display_name for m in members])
             count = len(valid_users)
-            value = '{}: {}: {}'.format(emoji, count, users_str)
+            reaction_votes.append({
+                "emoji": emoji,
+                "count": count,
+                "users_str": users_str
+            })
 
+        for v in reaction_votes:
+            emoji = v['emoji']
+            count = v['count']
+            ratio = count / total_count
+            users_str = v['users_str']
+            value = '{}: **{}** ({:.2%}): {}'.format(emoji, count, ratio, users_str)
             out.append(value)
+
 
         return out
 
