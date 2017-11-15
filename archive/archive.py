@@ -30,6 +30,7 @@ import json
 from collections import defaultdict
 import discord
 from discord.ext import commands
+import datetime as dt
 
 from __main__ import send_cmd_help
 from cogs.utils import checks
@@ -57,6 +58,7 @@ class Archive:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
+        self.units = {"minute": 60, "hour": 3600, "day": 86400, "week": 604800, "month": 2592000}
 
     @commands.group(pass_context=True, no_pm=True)
     async def archive(self, ctx):
@@ -145,6 +147,7 @@ class Archive:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @checks.serverowner_or_permissions()
     @archiveserver.command(name="after", pass_context=True, no_pm=True)
     async def archiveserver_after(self, ctx, server_name, channel_name, message_id, count=1000):
         """Archive server after a message"""
@@ -161,6 +164,41 @@ class Archive:
         await self.log_server_channel(ctx, server, channel, count, after=message)
         await self.bot.say("Channel logged.")
 
+    @checks.serverowner_or_permissions()
+    @archiveserver.command(name="since", pass_context=True, no_pm=True)
+    async def archiveserver_since(self, ctx, server_name, channel_name, quantity : int, time_unit : str, count=1000):
+        """Archive server channel since a timestamp.
+
+        Accepts: minutes, hours, days, weeks, month
+        Example:
+        [p]archiveserver since "ABC Server" "EFG Channel" 2 days 2000
+        """
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        if server is None:
+            await self.bot.say("Server not found.")
+            return
+        channel = discord.utils.get(server.channels, name=channel_name)
+        if channel is None:
+            await self.bot.say("Channel not found.")
+            return
+
+        if time_unit.endswith("s"):
+            time_unit = time_unit[:-1]
+            s = "s"
+        if not time_unit in self.units:
+            await self.bot.say("Invalid time unit. Choose minutes/hours/days/weeks/month")
+            return
+        if quantity < 1:
+            await self.bot.say("Quantity must not be 0 or negative.")
+            return
+
+        seconds = self.units[time_unit] * quantity
+        after = dt.datetime.utcnow() - dt.timedelta(seconds=seconds)
+
+        await self.log_server_channel(ctx, server, channel, count, after=after)
+        await self.bot.say("Channel logged.")
+
+    @checks.serverowner_or_permissions()
     @archiveserver.command(name="full", pass_context=True, no_pm=True)
     async def archiveserver_full(self, ctx, server_name):
         """Archive all messages from a server. Return as JSON."""
@@ -237,7 +275,7 @@ class Archive:
         """Save channel messages."""
         channel_messages = []
 
-        await self.bot.say("Logging messages after message ID: {}".format(after.id))
+        await self.bot.say("Logging messages.")
 
         async for message in self.bot.logs_from(
                 channel, limit=count, before=before, after=after, reverse=reverse):
