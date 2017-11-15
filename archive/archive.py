@@ -225,6 +225,80 @@ class Archive:
                 filename=filename
             )
 
+    @checks.serverowner_or_permissions()
+    @archiveserver.command(name="listen", pass_context=True, no_pm=True)
+    async def archiveserver_listen(self, ctx, server_name, channel_name):
+        """Listen to channel on serve and output messages.
+
+        Toggleable. Re-run command to stop.
+        """
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        if server is None:
+            await self.bot.say("Server not found.")
+            return
+        channel = discord.utils.get(server.channels, name=channel_name)
+        if channel is None:
+            await self.bot.say("Channel not found.")
+            return
+        if "channel_listen" not in self.settings:
+            self.settings["channel_listen"] = {}
+        if channel.id in self.settings["channel_listen"]:
+            self.settings["channel_listen"].pop(channel.id, None)
+            await self.bot.say("No longer listening to channel.")
+            dataIO.save_json(JSON, self.settings)
+            return
+        self.settings["channel_listen"][channel.id] = {
+            "log_channel_id": ctx.message.channel.id,
+            "log_channel_name": ctx.message.channel.name,
+            "log_server_id": ctx.message.server.id,
+            "log_server_name": ctx.message.server.name,
+            "timestamp": dt.datetime.utcnow().isoformat()
+        }
+        await self.bot.say("All future messages will be logged.")
+        dataIO.save_json(JSON, self.settings)
+
+    async def on_message(self, message):
+        """If there is a listen event, output message."""
+        channel_listen = self.settings.get("channel_listen")
+        if channel_listen is None:
+            return
+        if message.channel.id not in channel_listen:
+            return
+        settings = channel_listen[message.channel.id]
+        server = discord.utils.get(self.bot.servers, id=settings["log_server_id"])
+        if server is None:
+            return
+        channel = discord.utils.get(server.channels, id=settings["log_channel_id"])
+        if channel is None:
+            return
+        msg = {
+            'author_id': message.author.id,
+            'content': message.content,
+            'timestamp': message.timestamp.isoformat(),
+            'id': message.id,
+            'reactions': [],
+            'attachments': []
+        }
+        for reaction in message.reactions:
+            r = {
+                'custom_emoji': reaction.custom_emoji,
+                'count': reaction.count
+            }
+            if reaction.custom_emoji:
+                # <:emoji_name:emoji_id>
+                r['emoji'] = '<:{}:{}>'.format(
+                    reaction.emoji.name,
+                    reaction.emoji.id)
+            else:
+                r['emoji'] = reaction.emoji
+            msg['reactions'].append(r)
+
+        for attach in message.attachments:
+            msg['attachments'].append(attach['url'])
+        em = self.message_embed(message.server, message.channel, msg)
+        await self.bot.send_message(channel, embed=em)
+
+
     async def channel_messages(self, channel: discord.Channel,
             count=1000, before=None, after=None, reverse=False):
         messages = []
@@ -313,29 +387,34 @@ class Archive:
 
         # write out
         for message in channel_messages:
-            author_id = message['author_id']
-            author = server.get_member(author_id)
-            author_mention = author_id
-            if author is not None:
-                author_mention = author.mention
-            content = message['content']
-            timestamp = message['timestamp']
-            message_id = message['id']
-
-            description = '{}: {}'.format(author_mention, content)
-
-            em = discord.Embed(
-                title=channel.name,
-                description=description)
-
-            for reaction in message['reactions']:
-                em.add_field(name=reaction['emoji'], value=reaction['count'])
-
-            for attach in message['attachments']:
-                em.set_image(url=attach)
-
-            em.set_footer(text='{} - ID: {}'.format(timestamp, message_id))
+            em = self.message_embed(server, channel, message)
             await self.bot.say(embed=em)
+
+    def message_embed(self, server, channel, message):
+        """Return message as a Discord embed."""
+        author_id = message['author_id']
+        author = server.get_member(author_id)
+        author_mention = author_id
+        if author is not None:
+            author_mention = author.mention
+        content = message['content']
+        timestamp = message['timestamp']
+        message_id = message['id']
+
+        description = '{}: {}'.format(author_mention, content)
+
+        em = discord.Embed(
+            title=channel.name,
+            description=description)
+
+        for reaction in message['reactions']:
+            em.add_field(name=reaction['emoji'], value=reaction['count'])
+
+        for attach in message['attachments']:
+            em.set_image(url=attach)
+
+        em.set_footer(text='{} - ID: {}'.format(timestamp, message_id))
+        return em
 
 
 def check_folder():
