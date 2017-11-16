@@ -580,6 +580,7 @@ class CRData:
 
         found_decks = await self.search(ctx, *cards)
         await self.search_results(ctx, found_decks)
+        await self.bot.say(SF_CREDITS)
 
     async def search(self, ctx, *cards):
         """Perform the search and return found decks."""
@@ -840,8 +841,7 @@ class CRData:
         if paginate:
             return True
         else:
-            await self.bot.say(
-                "Search results aborted.\n{}".format(SF_CREDITS))
+            await self.bot.say("Search results aborted.")
             return False
 
     def sfid_to_id(self, sfid: str):
