@@ -1382,6 +1382,7 @@ class CRClan:
             await ctx.invoke(self.crclan_roster, key)
 
     @crclan.command(name="audit", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
     async def crclan_audit(self, ctx, key):
         """Compare roster with Discord roles.
 
@@ -1446,6 +1447,7 @@ class CRClan:
             await self.bot.say(data.cache_message)
 
     @crclan.command(name='iaudit', aliases=['ia'], pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
     async def crclan_iaudit(self, ctx, clankey, *, options=None):
         """Interactive audit of clans by clan key and rolename.
         
