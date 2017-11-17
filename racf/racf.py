@@ -26,25 +26,20 @@ DEALINGS IN THE SOFTWARE.
 import asyncio
 import itertools
 import json
+import os
 from random import choice
 
 import aiohttp
+import cogs
+import crapipy
 import discord
+import yaml
 from __main__ import send_cmd_help
+from box import Box
+from cogs.utils import checks
+from cogs.utils.chat_formatting import pagify
 from discord.ext import commands
 from discord.ext.commands import Context
-
-import cogs
-import os
-from cogs.utils import checks
-from cogs.utils import dataIO
-from cogs.utils.chat_formatting import pagify
-from box import Box, BoxList
-
-import yaml
-
-
-
 
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 BS_CHANGECLAN_ROLES = ["Member", "Brawl-Stars"]
@@ -220,7 +215,6 @@ class SCTag:
             ))
 
 
-
 class RACF:
     """Display RACF specifc info.
 
@@ -286,6 +280,75 @@ class RACF:
                 data
             )
         )
+
+    @racf.command(name="verify2", aliases=['v2'], pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def racf_verify2(self, ctx, member: discord.Member, tag):
+        """Verify CR members by player tag using clan API."""
+        sctag = SCTag(tag)
+        if not sctag.valid:
+            await self.bot.say(sctag.invalid_error_msg)
+            return
+
+        # - Set their tags
+        tag = sctag.tag
+        await ctx.invoke(self.crsettag, tag, member)
+
+        await self.bot.type()
+
+        client = crapipy.AsyncClient()
+        clan_tags = CLAN_PERMISSION.keys()
+        clans = await client.get_clans(clan_tags)
+        found_member = None
+        found_clan = None
+        for clan in clans:
+            for clan_member in clan.members:
+                if found_member is None and clan_member.tag == tag:
+                    found_member = clan_member
+                    found_clan = clan
+
+        # - Assign visitor if not in our clans
+        if found_member is None:
+            await self.bot.say("Cannot find members in our clans.")
+            await ctx.invoke(self.visitor, member)
+            return
+
+        # - Change IGN
+        ign = found_member.name
+        if not ign:
+            await self.bot.say("Cannot find IGN.")
+        else:
+            try:
+                await self.bot.change_nickname(member, ign)
+            except discord.HTTPException:
+                await self.bot.say(
+                    "I don’t have permission to change nick for this user.")
+            else:
+                await self.bot.say("{} changed to {}.".format(member.mention, ign))
+
+        # - Check allow role assignment
+        perm = CLAN_PERMISSION[found_clan.tag]
+        if not perm['assign_role']:
+            await self.bot.say('User belong to a clan that requires roster verifications.')
+            return
+
+        # - Assign role - not members
+        mm = self.bot.get_cog("MemberManagement")
+        if not perm['member']:
+            await ctx.invoke(mm.changerole, member, perm['role'], 'Visitor')
+            channel = discord.utils.get(
+                ctx.message.server.channels, name="visitors")
+            await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
+        else:
+            await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', '-Visitor')
+            channel = discord.utils.get(
+                ctx.message.server.channels, name="family-chat")
+            await ctx.invoke(self.dmusers, self.config.messages.member, member)
+
+        if channel is not None:
+            await self.bot.say(
+                "{} Welcome! You may now chat at {} — enjoy!".format(
+                    member.mention, channel.mention))
 
     @racf.command(name="verify", aliases=['v'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
@@ -394,9 +457,6 @@ class RACF:
 
         else:
             await ctx.invoke(self.visitor, member)
-
-
-
 
     async def _add_roles(self, member, role_names):
         """Add roles"""
@@ -1034,7 +1094,7 @@ class RACF:
 
     @checks.serverowner_or_permissions()
     @commands.command(pass_context=True, no_pm=True)
-    async def sayc(self, ctx, channel:discord.Channel, *, msg):
+    async def sayc(self, ctx, channel: discord.Channel, *, msg):
         """Have bot say stuff in channel. Remove command after run."""
         message = ctx.message
         await self.bot.delete_message(message)
@@ -1123,7 +1183,7 @@ class RACF:
                                 role, member))
 
     @commands.command(pass_context=True, no_pm=True)
-    async def toprole(self, ctx, member: discord.Member=None):
+    async def toprole(self, ctx, member: discord.Member = None):
         """Return top role of self (or another member).
         
         Written mostly for debugging Discord’s odd behavior.
