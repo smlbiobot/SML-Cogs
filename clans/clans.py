@@ -152,6 +152,9 @@ class Clans:
             if badge_url is None:
                 badge_url = 'https://cr-api.github.io/cr-api-assets/badge/{}.png'.format(clan.badge.key)
                 em.set_thumbnail(url=badge_url)
+            em.set_footer(
+                text='If you meet requirements, please request to join in-app. Let us know when you have been accepted so we can update your membership roles.'
+            )
         await self.bot.say(embed=em)
 
 
