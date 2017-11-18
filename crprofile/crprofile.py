@@ -404,7 +404,7 @@ class CRPlayerModel:
     @property
     def three_crown_wins(self):
         """Three crown wins."""
-        return self.prop("games", "threeCrownWins", 0)
+        return self.prop("stats", "threeCrownWins", 0)
 
     @property
     def rank(self):
