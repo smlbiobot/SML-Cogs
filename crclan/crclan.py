@@ -1500,23 +1500,19 @@ class CRClan:
             if player_tag not in clan_model.member_tags:
                 dc_members_not_in_clan.append(dc_member)
 
-        # - Discord Members with clan tag but not in clan
         out = []
+
+        # - Discord Members with clan tag but not in clan
         if len(dc_members_not_in_clan):
             out.append("Discord members with {} role but not in the clan:".format(clanrole.name))
             for m in dc_members_not_in_clan:
-                out.append("+ {}".format(m.display_name))
-            for page in pagify('\n'.join(out)):
-                await self.bot.say(page)
+                out.append("+ {} ({})".format(m.display_name, m.id))
 
         # - Discord Members without associated player tags
-        out = []
         if len(dc_members_with_no_player_tag):
             out.append("Discord members with {} role but no associated player tags:".format(clanrole.name))
             for m in dc_members_with_no_player_tag:
-                out.append("+ {}".format(m.display_name))
-            for page in pagify('\n'.join(out)):
-                await self.bot.say(page)
+                out.append("+ {} ({})".format(m.display_name, m.id))
 
         # - Dicsord members in clan but no clan role
         dc_members_without_role = []
@@ -1526,13 +1522,10 @@ class CRClan:
                 if clanrole not in dc_member.roles:
                     dc_members_without_role.append(dc_member)
 
-        out = []
         if len(dc_members_without_role):
             out.append("Discord members in the clan but does not have the {} role:".format(clanrole.name))
             for m in dc_members_without_role:
-                out.append("+ {}".format(m.display_name))
-            for page in pagify('\n'.join(out)):
-                await self.bot.say(page)
+                out.append("+ {} ({})".format(m.display_name, m.id))
 
         # - Discord members with elder role but not promoted in clan
         elder_role = self.manager.get_elder_role(server)
@@ -1547,12 +1540,9 @@ class CRClan:
                     if dc_member_tag not in clan_elders_tags:
                         members_not_promoted_in_clan.append(dc_member)
         if len(members_not_promoted_in_clan):
-            out = []
             out.append("List of members with the Elder role but not yet promoted in clan:")
             for m in members_not_promoted_in_clan:
                 out.append("+ {}".format(m.display_name))
-            for page in pagify('\n'.join(out)):
-                await self.bot.say(page)
 
         # - Clan members who have no player tag assigned
         server_player_tags = self.manager.get_player_tags(server)
@@ -1561,12 +1551,9 @@ class CRClan:
             if m["tag"] not in server_player_tags:
                 clan_members_not_registered_on_dc.append(m)
         if len(clan_members_not_registered_on_dc):
-            out = []
             out.append("List of IGNs who have not set their player tags on Discord:")
             for m in clan_members_not_registered_on_dc:
                 out.append("+ {}".format(m["name"]))
-            for page in pagify('\n'.join(out)):
-                await self.bot.say(page)
 
         # remove role from members not in clan
         if option_remove_role:
@@ -1578,6 +1565,8 @@ class CRClan:
             for m in dc_members_without_role:
                 await self.add_role(ctx, m, clanrole)
 
+        for page in pagify('\n'.join(out)):
+            await self.bot.say(page)
         await self.bot.say("…End of audit.")
 
     async def add_role(self, ctx, member:discord.Member, role:discord.Role):
