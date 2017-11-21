@@ -117,11 +117,11 @@ class GA:
         client_id = uuid.uuid4()
 
         # message author
-        self.log_author(uuid.uuid4(), server, channel, author)
-        self.log_message(uuid.uuid4(), server, channel, author)
+        self.log_author(client_id, server, channel, author)
+        self.log_message(client_id, server, channel, author)
 
         # message channel
-        self.log_channel(uuid.uuid4(), server, channel, author)
+        self.log_channel(client_id, server, channel, author)
 
     async def on_command(self, command: Command, ctx: Context):
         """Track command usage."""
