@@ -115,11 +115,10 @@ class Clans:
         config = self.clans_config
         clan_tags = [clan.tag for clan in config.clans]
         clans = await client.get_clans(clan_tags)
-        color = getattr(discord.Color, config.color)()
         em = discord.Embed(
             title=config.name,
-            description="Minimum trophies to join our Clash Royale clans. Current trophies required unless PB (personal best) is specified.",
-            color=color
+            description=config.description,
+            color=discord.Color(int(config.color, 16))
         )
         badge_url = None
         show_member_count = "-m" not in args
@@ -128,12 +127,13 @@ class Clans:
             match = re.search('[\d,O]{4,}', clan.description)
             pb_match = re.search('PB', clan.description)
             name = clan.name
-            trophies = 'N/A'
             if match is not None:
                 trophies = match.group(0)
                 trophies = trophies.replace(',', '')
                 trophies = trophies.replace('O', '0')
                 trophies = '{:,}'.format(int(trophies))
+            else:
+                trophies = clan.required_score
             pb = ''
             if pb_match is not None:
                 pb = ' PB'
@@ -152,10 +152,11 @@ class Clans:
             if badge_url is None:
                 badge_url = 'https://cr-api.github.io/cr-api-assets/badge/{}.png'.format(clan.badge.key)
                 em.set_thumbnail(url=badge_url)
-        em.add_field(
-            name='How to join',
-            value='If you meet requirements, please request to join in-app. Let us know after you have been accepted and we will grant you full membership permissions.'
-        )
+        for inf in config.info:
+            em.add_field(
+                name=inf.name,
+                value=inf.value
+            )
         await self.bot.say(embed=em)
 
 

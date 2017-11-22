@@ -1,7 +1,8 @@
 name: Reddit Alpha Clan Family
-key: racf
-color: red
-emblem: A_Char_Rocket_02
+description: >
+  Minimum trophies to join our Clash Royale clans.
+  Current trophies required unless PB (personal best) is specified.
+color: ff0f37
 clans:
   - name: Reddit Alpha
     tag: 2CCCP
@@ -19,3 +20,8 @@ clans:
     tag: GUYGVJY
   - name: Reddit Hotel
     tag: UGQ28YU
+info:
+  - name: How to join
+    value: >
+      If you meet requirements, please request to join in-app.
+      Let us know after you have been accepted.
