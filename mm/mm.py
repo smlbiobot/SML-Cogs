@@ -225,8 +225,6 @@ class MemberManagement:
         if pargs.exclude is not None:
             minus = set([r.lower() for r in pargs.exclude if r.lower() in server_roles_names])
 
-        out = ["**Member Management**"]
-
         # Used for output only, so it won’t mention everyone in chat
         plus_out = plus.copy()
 
@@ -234,14 +232,16 @@ class MemberManagement:
             plus.add('@everyone')
             plus_out.add('everyone')
 
-        help_str = (
-            'Syntax Error: You must include at '
-            'least one role to display results.')
-
         if len(plus) < 1:
-            out.append(help_str)
-        else:
-            out.append("Listing members who have these roles: {}".format(
+            help_str = (
+                'Syntax Error: You must include at '
+                'least one role to display results.')
+            await self.bot.say(help_str)
+            await send_cmd_help(ctx)
+            return
+
+        out = ["**Member Management**"]
+        out.append("Listing members who have these roles: {}".format(
                 ', '.join(plus_out)))
         if len(minus):
             out.append("but not these roles: {}".format(
