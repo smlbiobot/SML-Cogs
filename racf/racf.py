@@ -542,13 +542,23 @@ class RACF:
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*CHANGECLAN_ROLES)
-    async def changeclan(self, ctx, clan: str = None):
+    async def changeclan(self, ctx, clan: str = None, member: discord.Member = None):
         """Update clan role when moved to a new clan.
 
         Example: !changeclan Delta
         """
+        author = ctx.message.author
+        server = ctx.message.server
+        if member is not None:
+            if author != member:
+                if not author.server_permissions.manage_roles:
+                    await self.bot.say("You do not have permissions to edit other people’s roles.")
+                    return
+        else:
+            member = author
+
         clans = [c.lower() for c in CLANS]
-        await self.do_changeclan(ctx, clan, clans)
+        await self.do_changeclan(ctx, member, server, clan, clans)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BS_CHANGECLAN_ROLES)
@@ -557,13 +567,15 @@ class RACF:
 
         Example: !bschangeclan BS-Delta
         """
+        member = ctx.message.author
+        server = ctx.message.server
         if clan is None:
             await send_cmd_help(ctx)
             return
         if not clan.lower().startswith(BS_CLANS_PREFIX.lower()):
             clan = BS_CLANS_PREFIX + clan
         clans = [c.lower() for c in BS_CLANS]
-        await self.do_changeclan(ctx, clan, clans)
+        await self.do_changeclan(ctx, member, server, clan, clans)
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
@@ -578,11 +590,8 @@ class RACF:
             "Added {} for {}".format(
                 role.name, member.display_name))
 
-    async def do_changeclan(self, ctx, clan: str = None, clans=[]):
+    async def do_changeclan(self, ctx, member, server, clan: str = None, clans=[]):
         """Perform clan changes."""
-        author = ctx.message.author
-        server = ctx.message.server
-
         if clan is None:
             await send_cmd_help(ctx)
             return
@@ -594,19 +603,19 @@ class RACF:
 
         clan_roles = [r for r in server.roles if r.name.lower() in clans]
 
-        to_remove_roles = set(author.roles) & set(clan_roles)
+        to_remove_roles = set(member.roles) & set(clan_roles)
         to_add_roles = [
             r for r in server.roles if r.name.lower() == clan.lower()]
 
-        await self.bot.remove_roles(author, *to_remove_roles)
+        await self.bot.remove_roles(member, *to_remove_roles)
         await self.bot.say("Removed {} for {}".format(
             ",".join([r.name for r in to_remove_roles]),
-            author.display_name))
+            member.display_name))
 
-        await self.bot.add_roles(author, *to_add_roles)
+        await self.bot.add_roles(member, *to_add_roles)
         await self.bot.say("Added {} for {}".format(
             ",".join([r.name for r in to_add_roles]),
-            author.display_name))
+            member.display_name))
 
     async def changerole(self, ctx, member: discord.Member = None, *roles: str):
         """Change roles of a user.
