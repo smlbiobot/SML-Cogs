@@ -38,6 +38,8 @@ from cogs.utils.chat_formatting import pagify, box, bold
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from tabulate import tabulate
+import crapipy
+import pprint
 
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
@@ -227,11 +229,13 @@ class RACFAudit:
     async def family_clan_models(self, server):
         """All family clan models."""
         clans = self.clans(server)
-        clan_models = await self.api.clan_models([clan.tag for clan in clans])
-        for clan_model in clan_models:
-            for clan in clans:
-                if clan.tag == clan_model.tag:
-                    clan.model = clan_model
+        clan_tags = [c.tag for c in clans]
+        clan_models = await crapipy.AsyncClient().get_clans(clan_tags)
+        # clan_models = await self.api.clan_models([clan.tag for clan in clans])
+        # for clan_model in clan_models:
+        #     for clan in clans:
+        #         if clan.tag == clan_model.tag:
+        #             clan.model = clan_model
         return clan_models
 
     async def family_member_models(self, server):
@@ -342,14 +346,30 @@ class RACFAudit:
 
         parser.add_argument(
             'name',
-            nargs=1,
+            nargs='?',
             default='_',
             help='IGN')
-
         parser.add_argument(
-            '-t', '--tag',
-            nargs=1,
-            help='Tag')
+            '-c', '--clan',
+            nargs='?',
+            help='Clan')
+        parser.add_argument(
+            '-n', '--min',
+            nargs='?',
+            type=int,
+            default=0,
+            help='Min Trophies')
+        parser.add_argument(
+            '-m', '--max',
+            nargs='?',
+            type=int,
+            default=10000,
+            help='Max Trophies')
+        parser.add_argument(
+            '-l', '--link',
+            action='store_true',
+            default=False
+        )
 
         return parser
 
@@ -360,11 +380,14 @@ class RACFAudit:
         usage: [p]racfaudit search [-h] [-t TAG] name
 
         positional arguments:
-          name               IGN
+          name                  IGN
 
         optional arguments:
-          -h, --help         show this help message and exit
-          -t TAG, --tag TAG  Tag
+          -h, --help            show this help message and exit
+          -c CLAN, --clan CLAN  Clan name
+          -n MIN --min MIN      Min Trophies
+          -m MAX --max MAX      Max Trophies
+          -l --link             Display link to cr-api.com
         """
         parser = self.search_args_parser()
         try:
@@ -377,23 +400,31 @@ class RACFAudit:
         results = []
         await self.bot.type()
         member_models = await self.family_member_models(server)
-        for member_model in member_models:
-            if pargs.name is not None:
+
+        if pargs.name != '_':
+            for member_model in member_models:
                 # simple search
-                if pargs.name[0].lower() in member_model.name.lower():
+                if pargs.name.lower() in member_model.name.lower():
                     results.append(member_model)
                 else:
                     # unidecode search
                     s = unidecode.unidecode(member_model.name)
                     s = ''.join(re.findall(r'\w', s))
-                    if pargs.name[0].lower() in s.lower():
+                    if pargs.name.lower() in s.lower():
                         results.append(member_model)
-            if pargs.tag is not None:
-                if pargs.tag[0].lower() in member_model.tag.lower():
-                    results.append(member_model)
+        else:
+            results = member_models
+            print(len(results))
+
+        # filter by clan name
+        if pargs.clan:
+            results = [m for m in results if pargs.clan.lower() in m.clan_name.lower()]
+
+        # filter by trophies
+        results = [m for m in results if pargs.min <= m.trophies <= pargs.max]
 
         limit = 10
-        if len(results) > 10:
+        if len(results) > limit:
             await self.bot.say(
                 "Found more than {0} results. Returning top {0} only.".format(limit)
             )
@@ -402,7 +433,9 @@ class RACFAudit:
         if len(results):
             out = []
             for member_model in results:
-                out.append("**{0.name}** #{0.tag}, {0.clan_name}, {0.role_name}".format(member_model))
+                out.append("**{0.name}** #{0.tag}, {0.clan_name}, {0.roleName}, {0.trophies}".format(member_model))
+                if pargs.link:
+                    out.append('http://cr-api.com/profile/{}'.format(member_model.tag))
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
         else:
