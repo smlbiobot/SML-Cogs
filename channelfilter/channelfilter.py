@@ -24,21 +24,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
-import itertools
 import os
 from collections import defaultdict
-from random import choice
 
 import discord
 from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from discord.ext.commands import Context
-from box import Box
 
 PATH = os.path.join("data", "channelfilter")
 JSON = os.path.join(PATH, "settings.json")
@@ -55,7 +48,7 @@ class ChannelFilter:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.settings = Box(dataIO.load_json(JSON), default_box=True)
+        self.settings = dataIO.load_json(JSON)
 
     def get_server_settings(self, server):
         """Return server settings."""
@@ -88,7 +81,6 @@ class ChannelFilter:
         dataIO.save_json(JSON, self.settings)
         return True
 
-
     @checks.mod_or_permissions()
     @commands.group(pass_context=True, aliases=['cf', 'cfilter'])
     async def channelfilter(self, ctx):
@@ -96,6 +88,7 @@ class ChannelFilter:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @checks.mod_or_permissions()
     @channelfilter.command(name="add", pass_context=True, no_pm=True)
     async def channelfilter_add(self, ctx, *, word):
         """Add words."""
@@ -104,17 +97,19 @@ class ChannelFilter:
         self.add_word(server, channel, word)
         await self.bot.say("Added word to filter.")
 
+    @checks.mod_or_permissions()
     @channelfilter.command(name="remove", pass_context=True, no_pm=True)
     async def channelfilter_remove(self, ctx, *, word):
         """Remove words."""
         server = ctx.message.server
         channel = ctx.message.channel
-        success =  self.remove_word(server, channel, word)
+        success = self.remove_word(server, channel, word)
         if success:
             await self.bot.say("Removed word from filter.")
         else:
             await self.bot.say("Cannot find that word in filter.")
 
+    @checks.mod_or_permissions()
     @channelfilter.command(name="list", pass_context=True, no_pm=True)
     async def channelfilter_list(self, ctx):
         """Words filtered in channel."""
@@ -126,6 +121,7 @@ class ChannelFilter:
             return
         await self.bot.say(", ".join(channel_settings))
 
+    @checks.mod_or_permissions()
     @channelfilter.command(name="listserver", pass_context=True, no_pm=True)
     async def channelfilter_listserver(self, ctx):
         """Words filtered on server."""
@@ -160,7 +156,6 @@ class ChannelFilter:
         if author.server_permissions.manage_messages:
             return
 
-
         channel_settings = self.get_channel_settings(server, channel)
         for word in channel_settings:
             if word.lower() in message.content.lower():
@@ -171,11 +166,6 @@ class ChannelFilter:
                         author.mention
                     ))
                 await self.bot.delete_message(message)
-
-
-
-
-
 
 
 def check_folder():
