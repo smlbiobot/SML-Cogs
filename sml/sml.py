@@ -91,6 +91,16 @@ class SML:
                 filename=filename
             )
 
+    @commands.command(pass_context=True)
+    async def somecog(self, ctx, *args):
+        if not args:
+            await self.bot.say(1)
+        elif args[0] == 'help':
+            if len(args) == 1:
+                await self.bot.say(2)
+            elif args[1] == 'this':
+                await self.bot.say(3)
+
 
 def check_folder():
     """Check folder."""
