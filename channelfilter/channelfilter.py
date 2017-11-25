@@ -161,7 +161,7 @@ class ChannelFilter:
             if word.lower() in message.content.lower():
                 await self.bot.send_message(
                     channel,
-                    "{} Your message contains words not permitted on this channel."
+                    "{} Your message contains words not permitted on this channel. "
                     "Repeat offenders will be kicked/banned".format(
                         author.mention
                     ))
