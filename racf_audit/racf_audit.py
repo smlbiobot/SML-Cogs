@@ -328,12 +328,14 @@ class RACFAudit:
         await self.update_server_settings(ctx, "member", role_name)
 
     @commands.group(aliases=["racfa"], pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
     async def racfaudit(self, ctx):
         """RACF Audit."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @racfaudit.command(name="config", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
     async def racfaudit_config(self, ctx):
         """Show config."""
         for page in pagify(box(tabulate(self.config['clans'], headers="keys"))):
@@ -374,6 +376,7 @@ class RACFAudit:
         return parser
 
     @racfaudit.command(name="search", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_search(self, ctx, *args):
         """Search for member.
 
