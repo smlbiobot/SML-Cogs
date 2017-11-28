@@ -328,7 +328,6 @@ class RACFAudit:
         await self.update_server_settings(ctx, "member", role_name)
 
     @commands.group(aliases=["racfa"], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
     async def racfaudit(self, ctx):
         """RACF Audit."""
         if ctx.invoked_subcommand is None:
