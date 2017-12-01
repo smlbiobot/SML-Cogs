@@ -1121,18 +1121,14 @@ class RACF:
 
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, no_pm=True)
-    async def reelder(self, ctx, msg):
+    async def reelder(self, ctx, *members: discord.Member):
         """Refresher for elders."""
-        elder_role = "Elder"
-        server = ctx.message.server
-        for member in server.members:
-            member_role_names = [r.name for r in member.roles]
-            if "Elder" in member_role_names:
-                try:
-                    await ctx.invoke(self.dmusers, '{}\n{}'.format(msg, self.config.messages.elder_refresh), member)
-                except discord.errors.Forbidden:
-                    await self.bot.say(
-                        "Unable to send DM to {}. User might have a stricter DM setting.".format(member))
+        for member in members:
+            try:
+                await ctx.invoke(self.dmusers, self.config.messages.elder_refresh, member)
+            except discord.errors.Forbidden:
+                await self.bot.say(
+                    "Unable to send DM to {}. User might have a stricter DM setting.".format(member))
 
     @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
