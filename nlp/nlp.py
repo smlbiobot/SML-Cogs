@@ -280,10 +280,12 @@ class NLP:
                 if len(out):
                     to_channel = self.bot.get_channel(settings.get("to_channel_id"))
                     out.insert(0,
-                               "{}\n`{}` {}".format(
+                               "**{}**\n`{}` {} {}".format(
                                    msg.author.display_name,
                                    detected_lang,
-                                   msg.content))
+                                   msg.content,
+                                   ' '.join([a.get('url') for a in msg.attachments])
+                               ))
                     await self.bot.send_message(to_channel, '\n'.join(out))
 
 
