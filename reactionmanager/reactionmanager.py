@@ -32,7 +32,7 @@ from discord.ext import commands
 
 from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify
+from cogs.utils.chat_formatting import pagify, bold, escape_mass_mentions
 from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "reactionmanager")
@@ -136,20 +136,51 @@ class ReactionManager:
 
     @reactionmanager.command(name="get", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_messages=True)
-    async def rm_get(self, ctx, message_id: int):
+    async def rm_get(self, ctx, channel: discord.Channel, message_id, exclude_self=True):
         """Display list of reactions added by users."""
-        channel = ctx.message.channel
         message = await self.bot.get_message(channel, message_id)
 
         if message is None:
             await self.bot.say("Cannot find that message id.")
             return
 
+        out = await self.get_reactions(message, exclude_self=exclude_self)
+
+        for page in pagify('\n'.join(out), shorten_by=24):
+            await self.bot.say(page)
+
+
+    @reactionmanager.command(name="getserver", pass_context=True, no_pm=True)
+    @checks.is_owner()
+    async def rm_getserver(self, ctx, server_name, channel_name, message_id, exclude_self=True):
+        """Display list of reactions added by users."""
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        channel = discord.utils.get(server.channels, name=channel_name)
+
+        message = await self.bot.get_message(channel, message_id)
+        if message is None:
+            await self.bot.say("Cannot find that message id.")
+            return
+
+        out = await self.get_reactions(message, exclude_self=exclude_self)
+
+        for page in pagify('\n'.join(out), shorten_by=24):
+            await self.bot.say(page)
+
+    async def get_reactions(self, message, exclude_self=True):
         title = message.channel.name
         description = message.content
-        em = discord.Embed(
-            title=title,
-            description=description)
+
+        out = [
+            bold('Channel: {}'.format(title)),
+            escape_mass_mentions(description)
+        ]
+
+        server = message.server
+
+        total_count = 0
+
+        reaction_votes = []
 
         for reaction in message.reactions:
             if reaction.custom_emoji:
@@ -161,19 +192,38 @@ class ReactionManager:
                 emoji = reaction.emoji
 
             reaction_users = await self.bot.get_reaction_users(reaction)
-            users = ' '.join([m.mention for m in reaction_users])
-            name = emoji
-            count = reaction.count
-            value = '{}: {}'.format(count, users)
+            valid_users = []
+            for u in reaction_users:
+                if exclude_self and u == self.bot.user:
+                    continue
+                valid_users.append(u)
 
-            em.add_field(name=name, value=value, inline=True)
+            valid_users = sorted(valid_users, key=lambda u: u.display_name.lower())
+            user_ids = [u.id for u in valid_users]
+            members = []
+            for uid in user_ids:
+                member = server.get_member(uid)
+                if member:
+                    members.append(member)
+                    total_count += 1
+            users_str = ', '.join([m.display_name for m in members])
+            count = len(valid_users)
+            reaction_votes.append({
+                "emoji": emoji,
+                "count": count,
+                "users_str": users_str
+            })
 
-        em.set_footer(
-            text='ID: {} | Updated: {}'.format(
-                message.id,
-                dt.datetime.utcnow().isoformat()))
+        for v in reaction_votes:
+            emoji = v['emoji']
+            count = v['count']
+            ratio = count / total_count
+            users_str = v['users_str']
+            value = '{}: **{}** ({:.2%}): {}'.format(emoji, count, ratio, users_str)
+            out.append(value)
 
-        await self.bot.say(embed=em)
+
+        return out
 
 
 def check_folder():

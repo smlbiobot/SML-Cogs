@@ -4,7 +4,7 @@
 	"DESCRIPTION": "Access Brawl Stars bands with API by Harmiox.",
 	"DISABLED": false,
 	"NAME": "BSData",
-	"REQUIREMENTS": [],
+	"REQUIREMENTS": ["async_timeout", "aiohttp", "asyncio"],
 	"TAGS": ["bs", "brawlstars", "brawl-stars", "clan", "management" "utility"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please log an issue on my GitHub or message me on http://discord.me/sml"
 

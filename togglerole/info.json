@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Toggle Role",
+	"DESCRIPTION": "Toggle roles by users, categorized by user’s roles.",
+	"DISABLED": false,
+	"NAME": "ToggleRole",
+	"REQUIREMENTS": [],
+	"TAGS": ["role", "member", "management", "utility", "util"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: http://github.com/smlbiobot/SML-Cogs or my Discord server: http://discord.me/sml"
+}

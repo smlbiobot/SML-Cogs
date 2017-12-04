@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Discord logging with Keen.IO",
+	"DESCRIPTION": "Keen.IO Event logging",
+	"DISABLED": false,
+	"NAME": "KeenLog",
+	"REQUIREMENTS": ["keen", "pandas", "future", "sparklines", "numpy"],
+	"TAGS": ["log", "logging", "keen"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: http://github.com/smlbiobot/SML-Cogs or my Discord server: http://discord.me/sml"
+}

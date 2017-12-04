@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Vote Manager",
+	"DESCRIPTION": "Customized voting, limit one per person, permitted by roles.",
+	"DISABLED": false,
+	"NAME": "VoteManager",
+	"REQUIREMENTS": ["python-box"],
+	"TAGS": ["vote"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}

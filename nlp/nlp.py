@@ -25,11 +25,12 @@ DEALINGS IN THE SOFTWARE.
 """
 import os
 from collections import OrderedDict
+
 import discord
-from discord.ext import commands
-from discord.ext.commands import Context
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
+from discord.ext.commands import Context
 
 PATH = os.path.join("data", "nlp")
 JSON = os.path.join(PATH, "settings.json")
@@ -89,6 +90,7 @@ LANG = OrderedDict([
     ("vi", "Vietnamese")
 ])
 
+
 class NLP:
     """Natural Launguage Processing.
     """
@@ -96,6 +98,7 @@ class NLP:
     def __init__(self, bot):
         self.bot = bot
         self.settings = dataIO.load_json(JSON)
+        print(self.settings)
 
     @commands.command(pass_context=True)
     async def translate(self, ctx: Context, to_lang: str, *, text: str):
@@ -136,7 +139,7 @@ class NLP:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_server=True)
-    async def autotranslate(self, ctx, language: str):
+    async def autotranslate(self, ctx, *languages):
         """Set auto-translate language or disable it.
 
         Use 0 as language to disable auto-translation."""
@@ -144,24 +147,61 @@ class NLP:
         if server.id not in self.settings:
             self.settings[server.id] = {}
         on_off = True
-        if language.lower() in ['off', '0', 'false']:
+        if languages[0].lower() in ['off', '0', 'false']:
             on_off = False
         self.settings[server.id]["AUTO_TRANSLATE"] = on_off
-        self.settings[server.id]["LANGUAGE"] = language
+        self.settings[server.id]["LANGUAGE"] = languages
         if on_off:
             self.settings[server.id]["CHANNEL"] = ctx.message.channel.id
-            lang = language
-            if language in LANG:
-                lang = LANG[language]
+            for lang in languages:
+                language = LANG.get(lang)
+                if language:
+                    await self.bot.say(
+                        "Auto-translating messages to {} in {}".format(
+                            lang, ctx.message.channel))
+        else:
             await self.bot.say(
-                "Auto-translating messages to {} in {}".format(
-                    lang, ctx.message.channel))
+                "Auto-translate disabled.")
+        dataIO.save_json(JSON, self.settings)
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_server=True)
+    async def translatechannel(self, ctx, channel: discord.Channel, *languages):
+        """Translate one channel to another.
+
+        Useful for mods to monitor chats in another language in another channel.
+        """
+        server = ctx.message.server
+        if server.id not in self.settings:
+            self.settings[server.id] = {}
+        on_off = True
+        if languages[0].lower() in ['off', '0', 'false']:
+            on_off = False
+        self.settings[server.id]["TRANSLATE_CHANNEL"] = {
+            "on_off": on_off,
+            "languages": languages,
+            "from_channel_id": channel.id,
+            "to_channel_id": ctx.message.channel.id,
+        }
+        if on_off:
+            for lang in languages:
+                language = LANG.get(lang)
+                if language:
+                    await self.bot.say(
+                        "Auto-translating messages written in {} to {}".format(
+                            channel.mention,
+                            ctx.message.channel.mention))
         else:
             await self.bot.say(
                 "Auto-translate disabled.")
         dataIO.save_json(JSON, self.settings)
 
     async def on_message(self, msg: discord.Message):
+        """auto translate or channel translate"""
+        await self.autotranslate(msg)
+        await self.translate_channel(msg)
+
+    async def autotranslate(self, msg: discord.Message):
         """Auto-translate if enabled."""
         server = msg.server
         if server is None:
@@ -170,25 +210,83 @@ class NLP:
             return
         if server.id not in self.settings:
             return
-        if "AUTO_TRANSLATE" not in self.settings[server.id]:
-            return
-        if msg.channel is None:
-            return
-        if msg.channel.id != self.settings[server.id]["CHANNEL"]:
-            return
-        if msg.author == server.me:
-            return
-        if self.settings[server.id]["AUTO_TRANSLATE"]:
-            try:
-                blob = TextBlob(msg.content)
-                out = blob.translate(to=self.settings[server.id]["LANGUAGE"])
-                author = msg.author
-                await self.bot.send_message(
-                    msg.channel,
-                    "**{}: **{}".format(
-                        author.display_name, out))
-            except textblob.exceptions.NotTranslated:
+
+        # - Auto-translate chanenl
+        if "AUTO_TRANSLATE" in self.settings[server.id]:
+            if msg.channel is None:
                 return
+            if msg.channel.id != self.settings[server.id]["CHANNEL"]:
+                return
+            if msg.author == server.me:
+                return
+            if msg.author.bot:
+                return
+            if self.settings[server.id]["AUTO_TRANSLATE"]:
+                blob = TextBlob(msg.content)
+                detected_lang = blob.detect_language()
+                out = []
+                for language in self.settings[server.id]["LANGUAGE"]:
+                    if language != detected_lang:
+                        try:
+                            translated_msg = blob.translate(to=language)
+                            out.append(
+                                "`{}` {}".format(
+                                    language, translated_msg))
+                        except (textblob.exceptions.NotTranslated,
+                                textblob.exceptions.TranslatorError):
+                            pass
+                if len(out):
+                    out.insert(0,
+                               "{}\n`{}` {}".format(
+                                   msg.author.display_name,
+                                   detected_lang,
+                                   msg.content))
+                    await self.bot.send_message(msg.channel, '\n'.join(out))
+
+    async def translate_channel(self, msg: discord.Message):
+        """Translate channel."""
+        server = msg.server
+        if server is None:
+            return
+        if not server.id:
+            return
+        if server.id not in self.settings:
+            return
+        if "TRANSLATE_CHANNEL" in self.settings[server.id]:
+            settings = self.settings[server.id]["TRANSLATE_CHANNEL"]
+            if not settings.get("on_off"):
+                return
+            if msg.channel is None:
+                return
+            if msg.channel.id != settings.get("from_channel_id"):
+                return
+            if msg.author == server.me:
+                return
+            if msg.author.bot:
+                return
+            blob = TextBlob(msg.content)
+            detected_lang = blob.detect_language()
+            out = []
+            for language in settings.get("languages"):
+                if language != detected_lang:
+                    try:
+                        translated_msg = blob.translate(to=language)
+                        out.append(
+                            "`{}` {}".format(
+                                language, translated_msg))
+                    except (textblob.exceptions.NotTranslated,
+                            textblob.exceptions.TranslatorError):
+                        pass
+                if len(out):
+                    to_channel = self.bot.get_channel(settings.get("to_channel_id"))
+                    out.insert(0,
+                               "**{}**\n`{}` {} {}".format(
+                                   msg.author.display_name,
+                                   detected_lang,
+                                   msg.content,
+                                   ' '.join([a.get('url') for a in msg.attachments])
+                               ))
+                    await self.bot.send_message(to_channel, '\n'.join(out))
 
 
 def check_folder():

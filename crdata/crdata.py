@@ -274,7 +274,8 @@ class CRData:
         self.settings = dataIO.load_json(SETTINGS_JSON)
         self.clashroyale = dataIO.load_json(CLASHROYALE_JSON)
 
-        self.es = Elasticsearch()
+        if elasticsearch_available:
+            self.es = Elasticsearch()
 
         # init card data
         self.cards = []
@@ -300,7 +301,8 @@ class CRData:
         """Loop task: update data daily."""
         await self.bot.wait_until_ready()
         await self.update_data()
-        await self.eslog_update_data()
+        if elasticsearch_available:
+            await self.eslog_update_data()
         await asyncio.sleep(DATA_UPDATE_INTERVAL)
         if self is self.bot.get_cog('CRData'):
             self.task = self.bot.loop.create_task(self.loop_task())
@@ -578,6 +580,7 @@ class CRData:
 
         found_decks = await self.search(ctx, *cards)
         await self.search_results(ctx, found_decks)
+        await self.bot.say(SF_CREDITS)
 
     async def search(self, ctx, *cards):
         """Perform the search and return found decks."""
@@ -621,22 +624,25 @@ class CRData:
         # sort card in decks
         sorted_decks = []
         for deck in decks:
-            # when data is not clean, "key" may be missin
+            # when data is not clean, "key" may be missing
             # if this is the case, fix it
             clean_deck = []
-            for card in deck.copy():
-                if not "key" in card:
-                    card["key"] = "soon"
-                    card["level"] = 13
-                clean_deck.append(card)
-            deck = clean_deck
 
-            # for unknown reasons deck could sometimes be None in data src
+            # data not clean = deck is None
             if deck is not None:
-                sorted_decks.append(
-                    sorted(
-                        deck.copy(),
-                        key=lambda x: x["key"]))
+                for card in deck.copy():
+                    if not "key" in card:
+                        card["key"] = "soon"
+                        card["level"] = 13
+                    clean_deck.append(card)
+                deck = clean_deck
+
+                # for unknown reasons deck could sometimes be None in data src
+                if deck is not None:
+                    sorted_decks.append(
+                        sorted(
+                            deck.copy(),
+                            key=lambda x: x["key"]))
         decks = sorted_decks
 
         found_decks = []
@@ -835,8 +841,7 @@ class CRData:
         if paginate:
             return True
         else:
-            await self.bot.say(
-                "Search results aborted.\n{}".format(SF_CREDITS))
+            await self.bot.say("Search results aborted.")
             return False
 
     def sfid_to_id(self, sfid: str):
@@ -895,6 +900,10 @@ class CRData:
         for elixir in elixirs:
             if elixir:
                 total += 1
+
+        if total == 0:
+            return 0
+
         return sum(elixirs) / total
 
     async def eslog_update_data(self):

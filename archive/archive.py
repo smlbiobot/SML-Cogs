@@ -25,9 +25,12 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
+import io
+import json
 from collections import defaultdict
 import discord
 from discord.ext import commands
+import datetime as dt
 
 from __main__ import send_cmd_help
 from cogs.utils import checks
@@ -55,6 +58,7 @@ class Archive:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
+        self.units = {"minute": 60, "hour": 3600, "day": 86400, "week": 604800, "month": 2592000}
 
     @commands.group(pass_context=True, no_pm=True)
     async def archive(self, ctx):
@@ -143,6 +147,7 @@ class Archive:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
+    @checks.serverowner_or_permissions()
     @archiveserver.command(name="after", pass_context=True, no_pm=True)
     async def archiveserver_after(self, ctx, server_name, channel_name, message_id, count=1000):
         """Archive server after a message"""
@@ -159,13 +164,192 @@ class Archive:
         await self.log_server_channel(ctx, server, channel, count, after=message)
         await self.bot.say("Channel logged.")
 
+    @checks.serverowner_or_permissions()
+    @archiveserver.command(name="since", pass_context=True, no_pm=True)
+    async def archiveserver_since(self, ctx, server_name, channel_name, quantity : int, time_unit : str, count=1000):
+        """Archive server channel since a timestamp.
+
+        Accepts: minutes, hours, days, weeks, month
+        Example:
+        [p]archiveserver since "ABC Server" "EFG Channel" 2 days 2000
+        """
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        if server is None:
+            await self.bot.say("Server not found.")
+            return
+        channel = discord.utils.get(server.channels, name=channel_name)
+        if channel is None:
+            await self.bot.say("Channel not found.")
+            return
+
+        if time_unit.endswith("s"):
+            time_unit = time_unit[:-1]
+            s = "s"
+        if not time_unit in self.units:
+            await self.bot.say("Invalid time unit. Choose minutes/hours/days/weeks/month")
+            return
+        if quantity < 1:
+            await self.bot.say("Quantity must not be 0 or negative.")
+            return
+
+        seconds = self.units[time_unit] * quantity
+        after = dt.datetime.utcnow() - dt.timedelta(seconds=seconds)
+
+        await self.log_server_channel(ctx, server, channel, count, after=after)
+        await self.bot.say("Channel logged.")
+
+    @checks.serverowner_or_permissions()
+    @archiveserver.command(name="full", pass_context=True, no_pm=True)
+    async def archiveserver_full(self, ctx, server_name):
+        """Archive all messages from a server. Return as JSON."""
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        if server is None:
+            await self.bot.say("Server not found.")
+            return
+        log = {}
+        for channel in server.channels:
+            await self.bot.type()
+            log[channel.id] = {
+                "id": channel.id,
+                "name": channel.name,
+                "messages": await self.channel_messages(channel, count=10000)
+            }
+
+        filename = "server_archive-{}.json".format(server.id)
+        with io.StringIO() as f:
+            json.dump(log, f, indent=4)
+            f.seek(0)
+            await ctx.bot.send_file(
+                ctx.message.channel,
+                f,
+                filename=filename
+            )
+
+    @checks.serverowner_or_permissions()
+    @archiveserver.command(name="listen", pass_context=True, no_pm=True)
+    async def archiveserver_listen(self, ctx, server_name, channel_name):
+        """Listen to channel on serve and output messages.
+
+        Toggleable. Re-run command to stop.
+        """
+        server = discord.utils.get(self.bot.servers, name=server_name)
+        if server is None:
+            await self.bot.say("Server not found.")
+            return
+        channel = discord.utils.get(server.channels, name=channel_name)
+        if channel is None:
+            await self.bot.say("Channel not found.")
+            return
+        if "channel_listen" not in self.settings:
+            self.settings["channel_listen"] = {}
+        if channel.id in self.settings["channel_listen"]:
+            self.settings["channel_listen"].pop(channel.id, None)
+            await self.bot.say("No longer listening to channel.")
+            dataIO.save_json(JSON, self.settings)
+            return
+        self.settings["channel_listen"][channel.id] = {
+            "log_channel_id": ctx.message.channel.id,
+            "log_channel_name": ctx.message.channel.name,
+            "log_server_id": ctx.message.server.id,
+            "log_server_name": ctx.message.server.name,
+            "timestamp": dt.datetime.utcnow().isoformat()
+        }
+        await self.bot.say("All future messages will be logged.")
+        dataIO.save_json(JSON, self.settings)
+
+    async def on_message(self, message):
+        """If there is a listen event, output message."""
+        channel_listen = self.settings.get("channel_listen")
+        if channel_listen is None:
+            return
+        if message.channel.id not in channel_listen:
+            return
+        settings = channel_listen[message.channel.id]
+        server = discord.utils.get(self.bot.servers, id=settings["log_server_id"])
+        if server is None:
+            return
+        channel = discord.utils.get(server.channels, id=settings["log_channel_id"])
+        if channel is None:
+            return
+        msg = {
+            'author_id': message.author.id,
+            'content': message.content,
+            'timestamp': message.timestamp.isoformat(),
+            'id': message.id,
+            'reactions': [],
+            'attachments': []
+        }
+        for reaction in message.reactions:
+            r = {
+                'custom_emoji': reaction.custom_emoji,
+                'count': reaction.count
+            }
+            if reaction.custom_emoji:
+                # <:emoji_name:emoji_id>
+                r['emoji'] = '<:{}:{}>'.format(
+                    reaction.emoji.name,
+                    reaction.emoji.id)
+            else:
+                r['emoji'] = reaction.emoji
+            msg['reactions'].append(r)
+
+        for attach in message.attachments:
+            msg['attachments'].append(attach['url'])
+        em = self.message_embed(message.server, message.channel, msg)
+        await self.bot.send_message(channel, embed=em)
+
+
+    async def channel_messages(self, channel: discord.Channel,
+            count=1000, before=None, after=None, reverse=False):
+        messages = []
+
+        async for message in self.bot.logs_from(
+                channel, limit=count, before=before, after=after, reverse=reverse):
+            msg = {
+                "timestamp": message.timestamp.isoformat(),
+                "author_id": message.author.id,
+                "author_name": message.author.name,
+                "content": message.content,
+                "embeds": message.embeds,
+                "channel_id": message.channel.id,
+                "channel_name": message.channel.name,
+                "server_id": message.server.id,
+                "server_name": message.server.name,
+                "mention_everyone": message.mention_everyone,
+                "mentions_id": [m.id for m in message.mentions],
+                "mentions_name": [m.name for m in message.mentions],
+                "reactions": [],
+                "attachments": []
+            }
+            for reaction in message.reactions:
+                r = {
+                    'custom_emoji': reaction.custom_emoji,
+                    'count': reaction.count
+                }
+                if reaction.custom_emoji:
+                    # <:emoji_name:emoji_id>
+                    r['emoji'] = '<:{}:{}>'.format(
+                        reaction.emoji.name,
+                        reaction.emoji.id)
+                else:
+                    r['emoji'] = reaction.emoji
+                msg['reactions'].append(r)
+
+            for attach in message.attachments:
+                msg['attachments'].append(attach['url'])
+                messages.append(msg)
+
+        messages = sorted(messages, key=lambda x: x['timestamp'])
+        return messages
+
+
     async def log_server_channel(
             self, ctx, server: discord.Server, channel: discord.Channel,
             count=1000, before=None, after=None, reverse=False):
         """Save channel messages."""
         channel_messages = []
 
-        await self.bot.say("Logging messages after message ID: {}".format(after.id))
+        await self.bot.say("Logging messages.")
 
         async for message in self.bot.logs_from(
                 channel, limit=count, before=before, after=after, reverse=reverse):
@@ -203,29 +387,34 @@ class Archive:
 
         # write out
         for message in channel_messages:
-            author_id = message['author_id']
-            author = server.get_member(author_id)
-            author_mention = author_id
-            if author is not None:
-                author_mention = author.mention
-            content = message['content']
-            timestamp = message['timestamp']
-            message_id = message['id']
-
-            description = '{}: {}'.format(author_mention, content)
-
-            em = discord.Embed(
-                title=channel.name,
-                description=description)
-
-            for reaction in message['reactions']:
-                em.add_field(name=reaction['emoji'], value=reaction['count'])
-
-            for attach in message['attachments']:
-                em.set_image(url=attach)
-
-            em.set_footer(text='{} - ID: {}'.format(timestamp, message_id))
+            em = self.message_embed(server, channel, message)
             await self.bot.say(embed=em)
+
+    def message_embed(self, server, channel, message):
+        """Return message as a Discord embed."""
+        author_id = message['author_id']
+        author = server.get_member(author_id)
+        author_mention = author_id
+        if author is not None:
+            author_mention = author.mention
+        content = message['content']
+        timestamp = message['timestamp']
+        message_id = message['id']
+
+        description = '{}: {}'.format(author_mention, content)
+
+        em = discord.Embed(
+            title=channel.name,
+            description=description)
+
+        for reaction in message['reactions']:
+            em.add_field(name=reaction['emoji'], value=reaction['count'])
+
+        for attach in message['attachments']:
+            em.set_image(url=attach)
+
+        em.set_footer(text='{} - ID: {}'.format(timestamp, message_id))
+        return em
 
 
 def check_folder():

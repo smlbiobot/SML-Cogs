@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "CRAPIKey",
+	"DESCRIPTION": "Developer key generator for cr-api.com",
+	"DISABLED": false,
+	"NAME": "CRAPIKey",
+	"REQUIREMENTS": ["aiohttp", "pyyaml", "python-box"],
+	"TAGS": ["cr-api"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}

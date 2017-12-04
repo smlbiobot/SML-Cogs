@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Mention Utility",
+	"DESCRIPTION": "Collection of tools for mentioning. Main feature is to block people from mentioning a list of people.",
+	"DISABLED": false,
+	"NAME": "MentionUtil",
+	"REQUIREMENTS": ["python-box"],
+	"TAGS": [],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}

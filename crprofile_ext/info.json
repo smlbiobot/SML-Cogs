@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Clash Royale profile: Extension",
+	"DESCRIPTION": "Clash Royale profile drawn as SVG, PNG, etc.",
+	"DISABLED": false,
+	"NAME": "CRProfileExt",
+	"REQUIREMENTS": ["reportlab"],
+	"TAGS": ["Clash Royale", "profile", "crprofile"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}

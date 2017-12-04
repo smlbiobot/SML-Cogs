@@ -24,24 +24,20 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import os
 import asyncio
-import itertools
 import datetime as dt
-from random import choice
+import itertools
 import json
-from urllib.parse import urlunparse
+import os
 from datetime import timedelta
-from enum import Enum
+from random import choice
 
 import discord
-from discord.ext import commands
-from discord.ext.commands import Context
-
 from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
+from discord.ext.commands import Context
 
 try:
     import aiohttp
@@ -98,66 +94,154 @@ def grouper(n, iterable, fillvalue=None):
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
-class BSRole(Enum):
-    """Brawl Stars role."""
-
-    MEMBER = 1
-    LEADER = 2
-    ELDER = 3
-    COLEADER = 4
+def random_discord_color():
+    """Return random color as an integer."""
+    color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+    color = int(color, 16)
+    return discord.Color(value=color)
 
 
-BS_ROLES = {
-    BSRole.MEMBER: "Member",
-    BSRole.LEADER: "Leader",
-    BSRole.ELDER: "Elder",
-    BSRole.COLEADER: "Co-Leader"
-}
+def format_timedelta(td):
+    """Timedelta in 4 hr 2 min 3 sec"""
+    l = str(td).split(':')
+    return '{0[0]} hr {0[1]} min {0[2]} sec'.format(l)
 
 
-class BSBandData:
-    """Brawl Stars Band data."""
+async def fetch(url, timeout=10, headers=None):
+    """Fetch URL.
 
-    def __init__(self, **kwargs):
+    :param session: aiohttp.ClientSession
+    :param url: URL
+    :return: Response in JSON
+    """
+    try:
+        async with aiohttp.ClientSession(headers=headers) as session:
+            async with session.get(url, timeout=timeout) as resp:
+                data = await resp.json()
+                return data
+    except asyncio.TimeoutError:
+        return None
+    except aiohttp.ClientResponseError:
+        return None
+    return None
+
+
+class BotEmoji:
+    """Emojis available in bot."""
+
+    def __init__(self, bot, mapping=None):
         """Init.
 
-        Expected list of keywords:
-        From API:
-            badge_export
-            badge_id
-            description
-            id
-                high
-                low
-                unsigned
-            member_count
-            members
-                avatar
-                avatar_export
-                experience_elvel
-                id
-                    high
-                    low
-                    unsigned
-                name
-                role
-                role_id
-                tag
-                trophies
-            name
-            required_score
-            score
-            tag
-            type
-            type_id
-            unk1
-            unk2
+        map: a dictionary mapping a key to to an emoji name.
+        """
+        self.bot = bot
+        self.mapping = mapping
+
+    def name(self, name):
+        """Emoji by name."""
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == name:
+                return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
+
+    def named(self, name):
+        """Emoji object by name"""
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == name:
+                return emoji
+        return None
+
+    def key(self, key):
+        """Chest emojis by api key name or key.
+
+        name is used by this cog.
+        key is values returned by the api.
+        Use key only if name is not set
+        """
+        if key in self.mapping:
+            name = self.mapping[key]
+            return self.name(name)
+        return ''
+
+    def key_to_name(self, key):
+        """Return emoji name by key."""
+        if key in self.mapping:
+            return self.mapping[key]
+        return None
+
+
+class BSBandModel:
+    """Brawl Stars Band data."""
+
+    def __init__(self, data=None):
+        """Init.
         From cog:
             key
             role
             tag
         """
-        self.__dict__.update(kwargs)
+        self.data = data
+        self.members = []
+
+    """
+    API Properties
+    """
+
+    @property
+    def name(self):
+        return self.data.get('name', None)
+
+    @property
+    def tag(self):
+        return self.data.get('tag', None)
+
+    @property
+    def badge_id(self):
+        return self.data.get('badge_id', None)
+
+    @property
+    def badge_export(self):
+        return self.data.get('badge_export', None)
+
+    @property
+    def type_id(self):
+        return self.data.get('type_id', None)
+
+    @property
+    def type(self):
+        return self.data.get('type', None)
+
+    @property
+    def member_count(self):
+        return self.data.get('member_count', None)
+
+    @property
+    def score(self):
+        return self.data.get('score', None)
+
+    @property
+    def required_score(self):
+        return self.data.get('required_score', None)
+
+    @property
+    def description(self):
+        return self.data.get('description', None)
+
+    @property
+    def description_clean(self):
+        return self.data.get('description_clean', None)
+
+    """
+    Property used for BSPlayerModel
+    """
+
+    @property
+    def role(self):
+        return self.data.get('role', None)
+
+    """
+    Model Properties
+    """
 
     @property
     def member_count_str(self):
@@ -165,7 +249,7 @@ class BSBandData:
         count = self.member_count
         if count is None:
             count = 0
-        return '{}/50'.format(count)
+        return '{}/100'.format(count)
 
     @property
     def badge_url(self):
@@ -174,29 +258,47 @@ class BSBandData:
             "http://smlbiobot.github.io/img"
             "/bs-badge/{}.png").format(self.badge_export)
 
-class BSBandMemberData:
+
+class BSBandMemberModel:
     """Brawl Stars Member data."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, data=None):
         """Init.
-
-        Expected list of keywords:
-        From API:
-            experience_level
-            id
-                high
-                low
-                unsigned
-            name
-            role
-            role_id
-            tag
-            trophies
-            unk1
-            unk2
         """
-        self.__dict__.update(kwargs)
+        self.data = data
         self._discord_member = None
+
+    @property
+    def tag(self):
+        return self.data.get('tag', None)
+
+    @property
+    def name(self):
+        return self.data.get('name', None)
+
+    @property
+    def role_id(self):
+        return self.data.get('role_id', None)
+
+    @property
+    def experience_level(self):
+        return self.data.get('experience_level', None)
+
+    @property
+    def trophies(self):
+        return self.data.get('trophies', None)
+
+    @property
+    def avatar(self):
+        return self.data.get('avatar', None)
+
+    @property
+    def avatar_export(self):
+        return self.data.get('avatar_export', None)
+
+    @property
+    def role(self):
+        return self.data.get('role', None)
 
     @property
     def discord_member(self):
@@ -209,68 +311,230 @@ class BSBandMemberData:
         self._discord_member = value
 
 
-class BSBrawlerData:
+class BSBrawlerModel:
     """Brawl Stars Brawler data."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, data=None):
         """Init.
-
-        Expected list of keywords:
-        From API:
-            highest_trophies
-            level
-            name
-            number
-            trophies
-            type
-            value
         """
-        self.__dict__.update(kwargs)
+        self.data = data
 
-class BSPlayerData:
+    @property
+    def tid(self):
+        return self.data.get('tid', None)
+
+    @property
+    def name(self):
+        return self.data.get('name', None)
+
+    @property
+    def icon_export(self):
+        return self.data.get('icon_export', None)
+
+    @property
+    def id(self):
+        return self.data.get('id', None)
+
+    @property
+    def trophies(self):
+        return self.data.get('trophies', None)
+
+    @property
+    def highest_trophies(self):
+        return self.data.get('highest_trophies', None)
+
+    @property
+    def level(self):
+        return self.data.get('level', None)
+
+    @property
+    def rarity(self):
+        return self.data.get('rarity', None)
+
+    @property
+    def rank(self):
+        return self.data.get('rank', None)
+
+    @property
+    def rank_export(self):
+        return self.data.get('rank_export', None)
+
+    @property
+    def required_trophies_for_next_rank(self):
+        return self.data.get('required_trophies_for_next_rank', None)
+
+
+class BSPlayerModel:
     """Brawl Stars player data."""
 
-    def __init__(self, **kwargs):
-        """Init.
+    class BSPlayerBandModel:
+        """Band model inside player.
+        
+        This is different than the BSBandModel because API uses different field name
+        and has different data structure."""
 
-        Expected list of keywords:
-        From API:
-            avatar
-            band
-                badge
-                badge_id
-                high
-                low
-                member_count
-                name
-                requirement
+        def __init__(self, data=None):
+            """Init.
+            From cog:
+                key
                 role
-                role_id
                 tag
-                trophies
-                type
-                type_id
-            brawler_count
-            brawlers[]
-                highest_trophies
-                level
-                name
-                number
-                trophies
-                type
-                value
-            high
-            highest_trophies
-            low
-            survival_wins
-            tag
-            total_experience
-            trophies
-            username
-            wins
+            """
+            self.data = data
+            self.members = []
+
         """
-        self.__dict__.update(kwargs)
+        API Properties
+        """
+
+        @property
+        def name(self):
+            return self.data.get('name', None)
+
+        @property
+        def tag(self):
+            return self.data.get('tag', None)
+
+        @property
+        def badge_id(self):
+            return self.data.get('badge_id', None)
+
+        @property
+        def badge_export(self):
+            return self.data.get('badge_export', None)
+
+        @property
+        def type_id(self):
+            return self.data.get('type_id', None)
+
+        @property
+        def type(self):
+            return self.data.get('type', None)
+
+        @property
+        def member_count(self):
+            return self.data.get('member_count', None)
+
+        @property
+        def score(self):
+            return self.data.get('trophies', None)
+
+        @property
+        def required_score(self):
+            return self.data.get('required_trophies_to_join', None)
+
+        @property
+        def role(self):
+            return self.data.get('role', None)
+
+        """
+        Model Properties
+        """
+
+        @property
+        def badge_url(self):
+            """Return band emblem URL."""
+            return (
+                "http://smlbiobot.github.io/img"
+                "/bs-badge/{}.png").format(self.badge_export)
+
+    def __init__(self, data=None):
+        """Init."""
+        self.data = data
         self._discord_member = None
+        self._brawlers = None
+        self._band = None
+
+    """
+    API properties
+    """
+
+    @property
+    def username(self):
+        return self.data.get('username', None)
+
+    @property
+    def tag(self):
+        return self.data.get('tag', None)
+
+    @property
+    def brawler_count(self):
+        return self.data.get('brawler_count', None)
+
+    @property
+    def brawlers(self):
+        if self._brawlers is not None:
+            return self._brawlers
+        blist = self.data.get('brawlers', None)
+        if blist is None:
+            return None
+        self._brawlers = []
+        for b in blist:
+            b = BSBrawlerModel(data=b)
+            self._brawlers.append(b)
+        return self._brawlers
+
+    @property
+    def value_count(self):
+        return self.data.get('value_count', None)
+
+    @property
+    def wins(self):
+        return self.data.get('wins', None)
+
+    @property
+    def total_experience(self):
+        return self.data.get('total_experience', None)
+
+    @property
+    def trophies(self):
+        return self.data.get('trophies', None)
+
+    @property
+    def highest_trophies(self):
+        return self.data.get('highest_trophies', None)
+
+    @property
+    def account_age_in_days(self):
+        return self.data.get('account_age_in_days', None)
+
+    @property
+    def avatar(self):
+        return self.data.get('avatar', None)
+
+    @property
+    def survival_wins(self):
+        return self.data.get('survival_wins', None)
+
+    @property
+    def avatar_export(self):
+        return self.data.get('avatar_export', None)
+
+    @property
+    def level(self):
+        return self.data.get('level', None)
+
+    @property
+    def current_experience(self):
+        return self.data.get('current_experience', None)
+
+    @property
+    def required_experience(self):
+        return self.data.get('required_experience', None)
+
+    @property
+    def band(self):
+        if self._band is not None:
+            return self._band
+        b = self.data.get('band', None)
+        if b is None:
+            return None
+        self._band = BSPlayerModel.BSPlayerBandModel(data=b)
+        return self._band
+
+    """
+    Cog properties
+    """
 
     @property
     def discord_member(self):
@@ -281,6 +545,201 @@ class BSPlayerData:
     def discord_member(self, value):
         """Discord user id."""
         self._discord_member = value
+
+
+class BSEventModel:
+    """Brawl Stars event model."""
+
+    def __init__(self, data=None):
+        self.data = data
+
+    @property
+    def time(self):
+        return self.data.get('time', None)
+
+    @property
+    def time_starts_in(self):
+        if self.time is None:
+            return 0
+        return self.time.get('starts_in', 0)
+
+    @property
+    def time_ends_in(self):
+        if self.time is None:
+            return 0
+        return self.time.get('ends_in', 0)
+
+    @property
+    def coins(self):
+        return self.data.get('coins', None)
+
+    @property
+    def coins_free(self):
+        if self.coins is None:
+            return 0
+        return self.coins.get('free', 0)
+
+    @property
+    def coins_first_win(self):
+        if self.coins is None:
+            return 0
+        return self.coins.get('first_win', 0)
+
+    @property
+    def coins_max(self):
+        if self.coins is None:
+            return 0
+        return self.coins.get('max', 0)
+
+    @property
+    def number(self):
+        return self.data.get('number', None)
+
+    @property
+    def xp_multiplier(self):
+        return self.data.get('xp_multiplier', None)
+
+    @property
+    def index(self):
+        return self.data.get('index', None)
+
+    @property
+    def location(self):
+        return self.data.get('location', None)
+
+    @property
+    def type(self):
+        return self.data.get('type', None)
+
+    @property
+    def mode(self):
+        return self.data.get('mode', None)
+
+    @property
+    def mode_name(self):
+        if self.mode is None:
+            return ''
+        return self.mode.get('name', '')
+
+    @property
+    def mode_color(self):
+        if self.mode is None:
+            return ''
+        return self.mode.get('color', '')
+
+    @property
+    def mode_description(self):
+        if self.mode is None:
+            return ''
+        return self.mode.get('description', '')
+
+    @property
+    def info(self):
+        return self.data.get('info', None)
+
+    @property
+    def map_url(self):
+        return self.data.get('map', None)
+
+
+class BSDataServerSettings:
+    """Brawl Stars Data server settings."""
+
+    def __init__(self, server):
+        self.server = server
+
+
+class BSDataSettings:
+    """Brawl Stars Data Settings."""
+
+    def __init__(self, bot):
+        """Init."""
+        self.bot = bot
+        self.settings = dataIO.load_json(JSON)
+
+    def save(self):
+        """Save settings to file."""
+        dataIO.save_json(JSON, self.settings)
+
+    def init_server(self, server):
+        """Initialize server settings."""
+        self.settings["servers"][server.id] = SERVER_DEFAULTS
+        self.save()
+
+    def check_server_settings(self, server):
+        """Add server to settings if one does not exist."""
+        if server.id not in self.settings["servers"]:
+            self.settings["servers"][server.id] = SERVER_DEFAULTS
+        self.save()
+
+    @property
+    def servers(self):
+        return self.settings["servers"]
+
+    def server_settings(self, server):
+        self.check_server_settings(server)
+        return self.settings["servers"][server.id]
+
+    @property
+    def player_api_url(self):
+        return self.settings["player_api_url"]
+
+    @player_api_url.setter
+    def player_api_url(self, value):
+        self.settings["player_api_url"] = value
+        self.save()
+
+    @property
+    def band_api_url(self):
+        return self.settings["band_api_url"]
+
+    @band_api_url.setter
+    def band_api_url(self, value):
+        self.settings["band_api_url"] = value
+        self.save()
+
+    @property
+    def event_api_url(self):
+        return self.settings["event_api_url"]
+
+    @event_api_url.setter
+    def event_api_url(self, value):
+        self.settings["event_api_url"] = value
+        self.save()
+
+    @property
+    def api_auth(self):
+        return self.settings["api_auth"]
+
+    @api_auth.setter
+    def api_auth(self, value):
+        self.settings["api_auth"] = value
+        self.save()
+
+    def get_bands_settings(self, server):
+        """Return bands in settings."""
+        return self.server_settings(server)["bands"]
+
+    def set_bands_settings(self, server, data):
+        """Set bands data in settings."""
+        self.server_settings(server)["bands"] = data
+        self.save()
+        return True
+
+    def get_players(self, server):
+        """Return players on a server."""
+        return self.server_settings(server)["players"]
+
+    def get_server(self, server):
+        return self.server_settings(server)
+
+    def add_player(self, server, player_tag, member_id):
+        """Add or edit a player."""
+        if "players" not in self.settings["servers"][server.id]:
+            self.settings["servers"][server.id]["players"] = {}
+        self.settings["servers"][server.id]["players"][member_id] = player_tag
+        self.save()
+
 
 class BSData:
     """Brawl Stars Clan management."""
@@ -288,29 +747,22 @@ class BSData:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.task = bot.loop.create_task(self.loop_task())
-        self.settings = dataIO.load_json(JSON)
-
-    def __unload(self):
-        self.task.cancel()
-
-    async def loop_task(self):
-        """Loop task: update data daily."""
-        await self.bot.wait_until_ready()
-        await self.update_data()
-        await asyncio.sleep(DATA_UPDATE_INTERVAL)
-        if self is self.bot.get_cog('BSBand'):
-            self.task = self.bot.loop.create_task(self.loop_task())
-
-    def check_server_settings(self, server_id):
-        """Add server to settings if one does not exist."""
-        if server_id not in self.settings["servers"]:
-            self.settings["servers"][server_id] = SERVER_DEFAULTS
-        dataIO.save_json(JSON, self.settings)
+        self.settings = BSDataSettings(bot)
+        self.bot_emoji = BotEmoji(
+            bot,
+            mapping={
+                "Smash & Grab": "icon_smashgrab",
+                "Heist": "icon_heist",
+                "Bounty": "icon_bounty",
+                "Showdown": "icon_showdown",
+                "Brawl Ball": "icon_brawlball"
+            }
+        )
+        self.sessions = {}
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
-    async def setbsdata(self, ctx):
+    async def bsdataset(self, ctx):
         """Set Brawl Stars Data settings.
 
         Require: Brawl Stars API by Harmiox.
@@ -318,98 +770,63 @@ class BSData:
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setbsdata.command(name="init", pass_context=True)
-    async def setbsdata_init(self, ctx: Context):
+    @bsdataset.command(name="init", pass_context=True)
+    async def bsdataset_init(self, ctx):
         """Init BS Band settings."""
         server = ctx.message.server
-        self.settings["servers"][server.id] = SERVER_DEFAULTS
-        dataIO.save_json(JSON, self.settings)
+        self.settings.init_server(server)
         await self.bot.say("Server settings initialized.")
 
-    @setbsdata.command(name="bandapi", pass_context=True)
-    async def setbsdata_bandapi(self, ctx: Context, url):
+    @bsdataset.command(name="auth", pass_context=True)
+    async def bsdataset_auth(self, ctx, token):
+        """Authorization (token)."""
+        self.settings.api_auth = token
+        await self.bot.say("Authorization (token) updated.")
+
+    @bsdataset.command(name="bandapi", pass_context=True)
+    async def bsdataset_bandapi(self, ctx, url):
         """BS Band API URL base.
 
         Format:
         If path is hhttp://domain.com/path/LQQ
         Enter http://domain.com/path/
         """
-        self.settings["band_api_url"] = url
-
-        server = ctx.message.server
-        self.check_server_settings(server.id)
-
-        dataIO.save_json(JSON, self.settings)
+        self.settings.band_api_url = url
         await self.bot.say("Band API URL updated.")
 
-    @setbsdata.command(name="playerapi", pass_context=True)
-    async def setbsdata_playerapi(self, ctx: Context, url):
+    @bsdataset.command(name="playerapi", pass_context=True)
+    async def bsdataset_playerapi(self, ctx: Context, url):
         """BS Member API URL base.
 
         Format:
         If path is hhttp://domain.com/path/LQQ
         Enter http://domain.com/path/
         """
-        self.settings["player_api_url"] = url
+        self.settings.player_api_url = url
+        await self.bot.say("Player API URL updated.")
 
-        server = ctx.message.server
-        self.check_server_settings(server.id)
+    @bsdataset.command(name="eventapi", pass_context=True)
+    async def bsdataset_playerapi(self, ctx: Context, url):
+        """BS Event API URL base.
 
-        dataIO.save_json(JSON, self.settings)
-        await self.bot.say("Member API URL updated.")
-
-    @setbsdata.command(name="swapplayers", pass_context=True)
-    async def setbsdata_swapplayers(self, ctx):
-        """LEGACY settings support: swap players dictionary.
-
-        From key to value.
-        Originally:
-        PlayerTag: MemberID
-        Now:
-        MmeberID: PlayerTag
+        Format:
+        If path is http://domain.com/path/
+        Enter http://domain.com/path/
         """
-        for server_id in self.settings["servers"]:
-            players = self.settings["servers"][server_id]["players"]
-            updated_players = {v: k for k, v in players.items()}
-            self.settings["servers"][server_id]["players"] = updated_players
-        dataIO.save_json(JSON, self.settings)
-        await self.bot.say("Players settings updated.")
+        self.settings.event_api_url = url
+        await self.bot.say("Event API URL updated.")
 
     async def get_band_data(self, tag):
         """Return band data JSON."""
-        url = "{}{}".format(self.settings["band_api_url"], tag)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                try:
-                    data = await resp.json()
-                except json.decoder.JSONDecodeError:
-                    data = None
+        url = "{}{}".format(self.settings.band_api_url, tag)
+        data = await fetch(url, headers={"Authorization": self.settings.api_auth})
         return data
-
-    async def update_data(self, band_tag=None):
-        """Perform data update from api."""
-        for server_id in self.settings["servers"]:
-            bands = self.get_bands_settings(server_id)
-
-            for tag, band in bands.items():
-                do_update = False
-                if band_tag is None:
-                    do_update = True
-                elif band_tag == tag:
-                    do_update = True
-                if do_update:
-                    # async with self.get_band_data(tag) as data:
-                    data = await self.get_band_data(tag)
-                    bands[tag].update(data)
-
-            self.set_bands_settings(server_id, bands)
-        return True
 
     def tag2member(self, tag=None):
         """Return Discord member from player tag."""
         for server in self.bot.servers:
             try:
-                players = self.settings["servers"][server.id]["players"]
+                players = self.settings.get_players(server)
                 for member_id, v in players.items():
                     if v == tag:
                         return server.get_member(member_id)
@@ -417,26 +834,8 @@ class BSData:
                 pass
         return None
 
-    @setbsdata.command(name="update", pass_context=True)
-    async def setbsdata_update(self, ctx: Context):
-        """Update data from api."""
-        success = await self.update_data()
-        if success:
-            await self.bot.say("Data updated")
-
-    def get_bands_settings(self, server_id):
-        """Return bands in settings."""
-        self.check_server_settings(server_id)
-        return self.settings["servers"][server_id]["bands"]
-
-    def set_bands_settings(self, server_id, data):
-        """Set bands data in settings."""
-        self.settings["servers"][server_id]["bands"] = data
-        dataIO.save_json(JSON, self.settings)
-        return True
-
-    @setbsdata.command(name="add", pass_context=True)
-    async def setbsdata_add(self, ctx: Context, *clantags):
+    @bsdataset.command(name="add", pass_context=True)
+    async def bsdataset_add(self, ctx: Context, *clantags):
         """Add clan tag(s).
 
         [p]setbsband add LQQ 82RQLR 98VLYJ Q0YG8V
@@ -447,24 +846,24 @@ class BSData:
             return
 
         server = ctx.message.server
-        self.check_server_settings(server.id)
+        # self.check_server_settings(server.id)
 
         for clantag in clantags:
             if clantag.startswith('#'):
                 clantag = clantag[1:]
 
-            bands = self.get_bands_settings(server.id)
+            bands = self.settings.get_bands_settings(server)
             if clantag not in bands:
                 bands[clantag] = BAND_DEFAULTS
 
-            self.set_bands_settings(server.id, bands)
+            self.settings.set_bands_settings(server, bands)
 
             await self.bot.say("added Band with clan tag: #{}".format(clantag))
 
         await self.update_data()
 
-    @setbsdata.command(name="remove", pass_context=True)
-    async def setbsdata_remove(self, ctx: Context, *clantags):
+    @bsdataset.command(name="remove", pass_context=True)
+    async def bsdataset_remove(self, ctx: Context, *clantags):
         """Remove clan tag(s).
 
         [p]setbsband remove LQQ 82RQLR 98VLYJ Q0YG8V
@@ -475,7 +874,7 @@ class BSData:
             return
 
         server = ctx.message.server
-        bands = self.get_bands_settings(server.id)
+        bands = self.settings.get_bands_settings(server)
 
         for clantag in clantags:
             if clantag.startswith('#'):
@@ -486,11 +885,11 @@ class BSData:
                 await self.bot.say("{} not in clan settings.".format(clantag))
                 return
 
-            self.set_bands_settings(server.id, bands)
+            self.settings.set_bands_settings(server, bands)
             await self.bot.say("Removed #{} from bands.".format(clantag))
 
-    @setbsdata.command(name="setkey", pass_context=True)
-    async def setbsdata_setkey(self, ctx, tag, key):
+    @bsdataset.command(name="setkey", pass_context=True)
+    async def bsdataset_setkey(self, ctx, tag, key):
         """Associate band tag with human readable key.
 
         This is used for running other commands to make
@@ -498,14 +897,14 @@ class BSData:
         band tag every time.
         """
         server = ctx.message.server
-        bands = self.get_bands_settings(server.id)
+        bands = self.settings.get_bands_settings(server)
 
         if tag not in bands:
             await self.bot.say(
                 "{} is not a band tag you have added".format(tag))
             return
         bands[tag]["key"] = key
-        self.set_bands_settings(server.id, bands)
+        self.settings.set_bands_settings(server, bands)
         await self.bot.say("Added {} for band #{}.".format(key, tag))
 
     @commands.group(pass_context=True, no_pm=True)
@@ -518,7 +917,7 @@ class BSData:
     async def bsdata_info(self, ctx: Context):
         """Information."""
         server = ctx.message.server
-        bands = self.get_bands_settings(server.id)
+        bands = self.settings.get_bands_settings(server)
         for k, band in bands.items():
             # update band data if it was never fetched
             if band["name"] is None:
@@ -534,17 +933,17 @@ class BSData:
 
     def embed_bsdata_info(self, band):
         """Return band info embed."""
-        data = BSBandData(**band)
+        band_model = BSBandModel(data=band)
         em = discord.Embed(
-            title=data.name,
-            description=data.description)
-        em.add_field(name="Band Trophies", value=data.score)
-        em.add_field(name="Type", value=data.type)
-        em.add_field(name="Required Trophies", value=data.required_score)
-        em.add_field(name="Band Tag", value=data.tag)
+            title=band_model.name,
+            description=band_model.description)
+        em.add_field(name="Band Trophies", value='{:,}'.format(band_model.score))
+        em.add_field(name="Type", value=band_model.type)
+        em.add_field(name="Required Trophies", value='{:,}'.format(band_model.required_score))
+        em.add_field(name="Band Tag", value=band_model.tag)
         em.add_field(
-            name="Members", value=data.member_count_str)
-        em.set_thumbnail(url=data.badge_url)
+            name="Members", value=band_model.member_count_str)
+        em.set_thumbnail(url=band_model.badge_url)
         # em.set_author(name=data.name)
         return em
 
@@ -555,10 +954,10 @@ class BSData:
         Key of each band is set from [p]bsband addkey
         """
         server = ctx.message.server
-        bands = self.get_bands_settings(server.id)
+        bands = self.settings.get_bands_settings(server)
         band_result = None
         for k, band in bands.items():
-            data = BSBandData(**band)
+            data = BSBandModel(data=band)
             if hasattr(data, "key"):
                 if data.key == key:
                     band_result = data
@@ -574,7 +973,7 @@ class BSData:
         # if fields are displayed inline,
         # 24 can fit both 2 and 3-column layout
         members_out = grouper(24, members, None)
-        color = self.random_color()
+        color = random_discord_color()
         page = 1
         for members in members_out:
             em = self.embed_bsdata_roster(members)
@@ -582,12 +981,12 @@ class BSData:
             em.description = (
                 "Tag: {} | "
                 "Required Trophies: {}").format(
-                    band_result.tag, band_result.required_score)
-            em.color = discord.Color(value=color)
-            # em.set_thumbnail(url=band_result.badge_url)
+                band_result.tag, band_result.required_score)
+            em.color = color
+            # em.set_thumbnail(url=band_result.badge_url_base)
             em.set_footer(
                 text="Page {}".format(page),
-                icon_url=band_result.badge_url)
+                icon_url=band_result.badge_url, )
             await self.bot.say(embed=em)
             page = page + 1
 
@@ -596,7 +995,7 @@ class BSData:
         em = discord.Embed(title=".")
         for member in members:
             if member is not None:
-                data = BSBandMemberData(**member)
+                data = BSBandMemberModel(**member)
                 name = "{}, {}".format(data.name, data.role)
                 mention = ""
                 member = self.tag2member(data.tag)
@@ -611,10 +1010,10 @@ class BSData:
         return em
 
     @bsdata.command(name="profile", pass_context=True, no_pm=True)
-    async def bsdata_profile(self, ctx, member: discord.Member=None):
+    async def bsdata_profile(self, ctx, member: discord.Member = None):
         """Return player profile by Discord member name or id."""
         server = ctx.message.server
-        players = self.settings["servers"][server.id]["players"]
+        players = self.settings.get_players(server)
 
         if member is None:
             member = ctx.message.author
@@ -643,71 +1042,104 @@ class BSData:
                 "Run `!bsdata settag` if you need to update it.".format(tag))
             return
 
-        player = BSPlayerData(**data)
+        player = BSPlayerModel(data=data)
         server = ctx.message.server
         player.discord_member = self.get_discord_member(server, tag)
-        await self.bot.say(embed=self.embed_player(player))
+
+        for em in self.player_embeds(player, color=random_discord_color()):
+            await self.bot.say(embed=em)
 
     async def get_player_data(self, tag):
-        """Return band data JSON."""
-        url = "{}{}".format(self.settings["player_api_url"], tag)
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                try:
-                    data = await resp.json()
-                except json.decoder.JSONDecodeError:
-                    data = None
+        """Return player data JSON."""
+        url = "{}{}".format(self.settings.player_api_url, tag)
+        data = await fetch(url, headers={"Authorization": self.settings.api_auth})
         return data
 
-    def embed_player(self, player: BSPlayerData):
+    async def get_player_model(self, tag):
+        """Return player data in BSPlayerModel"""
+        data = await self.get_player_data(tag)
+        if data is None:
+            return None
+        return BSPlayerModel(data=data)
+
+    def player_embeds(self, player: BSPlayerModel, color=None):
         """Return player embed."""
+        embeds = []
+
         em = discord.Embed(
             title=player.username,
-            description="#{}".format(player.tag))
-        band = BSBandData(**player.band)
-        em.color = discord.Color(value=self.random_color())
+            description="#{}".format(player.tag),
+            color=color)
 
         if player.discord_member is not None:
             em.description = '{} {}'.format(
                 em.description,
                 player.discord_member.mention)
 
-        em.add_field(name=band.name, value=band.role)
-        em.add_field(name="Trophies", value=player.trophies)
-        em.add_field(name="Victories", value=player.wins)
-        em.add_field(name="Showdown Victories", value=player.survival_wins)
-        em.add_field(name="Highest Trophies", value=player.highest_trophies)
-        em.add_field(name="Brawlers", value=player.brawler_count)
+        def fmt(value, type):
+            """Format value by type."""
+            if value is None:
+                return ''
+            if type == int:
+                return '{:,}'.format(value)
+
+        em.add_field(name=player.band.name, value=player.band.role)
+        em.add_field(name="Level: XP",
+                     value='{0.level}: {0.current_experience:,} / {0.required_experience:,}'.format(player))
+        em.add_field(name="Trophies {}".format(self.bot_emoji.name('trophy_bs')), value=fmt(player.trophies, int))
+        em.add_field(name="Highest Trophies {}".format(self.bot_emoji.name('trophy_bs')),
+                     value=fmt(player.highest_trophies, int))
+        em.add_field(name="Victories", value=fmt(player.wins, int))
+        em.add_field(name="Showdown Victories", value=fmt(player.survival_wins, int))
+
+        em.set_thumbnail(
+            url='https://smlbiobot.github.io/bs-emoji-servers/avatars/{}.png'.format(
+                player.avatar_export))
+
+        embeds.append(em)
+
+        # - Brawlers
+        em = discord.Embed(
+            title='Brawlers',
+            descripton=fmt(player.brawler_count, int),
+            color=color)
 
         for brawler in player.brawlers:
-            data = BSBrawlerData(**brawler)
-            emoji = self.brawler_emoji(data.name)
-            if emoji is None:
-                emoji = ''
-            name = '{} {} (Level {})'.format(data.name, emoji, data.level)
-            trophies = '{}/{}'.format(data.trophies, data.highest_trophies)
+            icon_export = brawler.icon_export
+            emoji = self.bot_emoji.name(icon_export)
+            name = '{emoji} {name}'.format(
+                name=brawler.name,
+                emoji=emoji,
+                level=brawler.level,
+                level_emoji=self.bot_emoji.name('lvl'))
+            value = '{trophies} / {pb} ({level} upg)'.format(
+                trophies=brawler.trophies,
+                pb=brawler.highest_trophies,
+                level=brawler.level,
+                level_emoji=self.bot_emoji.name('lvl'))
             em.add_field(
                 name=name,
-                value=trophies)
+                value=value)
 
         text = (
             '{0.name}'
-            ' Trophies: {0.trophies}'
-            ' Requirement: {0.requirement}'
+            ' Trophies: {0.score:,}'
+            ' Requirement: {0.required_score:,}'
             ' Tag: {0.tag}'
-            ' Type: {0.type}').format(band)
+            ' Type: {0.type}').format(player.band)
 
         em.set_footer(
             text=text,
-            icon_url=band.badge_url)
+            icon_url=player.band.badge_url)
 
-        return em
+        embeds.append(em)
+        return embeds
 
     def get_discord_member(self, server, player_tag):
         """Return Discord member if tag is associated."""
         member_id = None
         try:
-            players = self.settings["servers"][server.id]["players"]
+            players = self.settings.get_players(server)
             for k, v in players.items():
                 if v == player_tag:
                     member_id = k
@@ -717,21 +1149,22 @@ class BSData:
             return None
         return server.get_member(member_id)
 
-    def set_player_settings(self, server_id, playertag, member_id):
+    def set_player_settings(self, server, playertag, member_id):
         """Set player tag to member id.
 
         Remove previously stored playertags associated with member_id.
         """
-        if "players" not in self.settings["servers"][server_id]:
-            self.settings["servers"][server_id]["players"] = {}
-        players = self.settings["servers"][server_id]["players"]
-        players[member_id] = playertag
-        self.settings["servers"][server_id]["players"] = players
-        dataIO.save_json(JSON, self.settings)
+        self.settings.add_player(server, playertag, member_id)
+        # if "players" not in self.settings["servers"][server_id]:
+        #     self.settings["servers"][server_id]["players"] = {}
+        # players = self.settings["servers"][server_id]["players"]
+        # players[member_id] = playertag
+        # self.settings["servers"][server_id]["players"] = players
+        # dataIO.save_json(JSON, self.settings)
 
     @bsdata.command(name="settag", pass_context=True, no_pm=True)
     async def bsdata_settag(
-            self, ctx, playertag=None, member: discord.Member=None):
+            self, ctx, playertag=None, member: discord.Member = None):
         """Set playertag to discord member.
 
         Setting tag for yourself:
@@ -768,30 +1201,113 @@ class BSData:
         if member is None:
             member = ctx.message.author
 
-        self.set_player_settings(server.id, playertag, member.id)
+        self.set_player_settings(server, playertag, member.id)
 
         await self.bot.say("Associated player tag with Discord Member.")
 
-    @staticmethod
-    def random_color():
-        """Return random color as an integer."""
-        color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
-        color = int(color, 16)
-        return color
-
-    def brawler_emoji(self, name):
-        """Emoji of the brawler.
-
-        Find emoji against all known servers
-        to look for match
-        <:emoji_name:emoji_id>
+    @bsdata.command(name="events", pass_context=True)
+    async def bsdata_events(self, ctx, type="now"):
+        """Return events.
+        
+        [p]bsdata events 
+        [p]bsdata events now
+        [p]bsdata events later
         """
-        for server in self.bot.servers:
-            for emoji in server.emojis:
-                if emoji.name == name:
-                    return '<:{}:{}>'.format(emoji.name, emoji.id)
-        return None
+        author = ctx.message.author
+        server = ctx.message.server
+        channel = ctx.message.channel
 
+        await self.bot.type()
+        url = self.settings.event_api_url
+        data = await fetch(url, headers={"Authorization": self.settings.api_auth})
+        if data is None:
+            await self.bot.say("Error fetching events from API.")
+            return
+        event_data = data[type]
+
+        event_models = (BSEventModel(data=e) for e in event_data)
+
+        await self.bot.type()
+
+        message = None
+        for i, e in enumerate(event_models):
+            if i == 0:
+                message = await self.bot.say(embed=self.event_embed(e))
+            emoji = self.bot_emoji.named('number{}'.format(i+1))
+            await self.bot.add_reaction(message, emoji)
+
+        self.sessions[author.id] = {
+            "data": event_data,
+            "message_id": message.id,
+            "channel_id": channel.id
+        }
+
+    def event_embed(self, event_model, color=None):
+        """BS event embed."""
+        e = event_model
+
+        if color is None:
+            color = discord.Color(value=int(e.mode_color[1:], 16))
+
+        em = discord.Embed(
+            title=e.mode_name,
+            description=e.mode_description,
+            color=color,
+            url=e.map_url
+        )
+        em.add_field(name="Location", value=e.location)
+        em.add_field(name="Type", value=e.type)
+        if e.time_starts_in == 0:
+            starts_in_value = 'Started'
+        else:
+            starts_in_value = format_timedelta(dt.timedelta(seconds=e.time_starts_in))
+        em.add_field(
+            name="Starts in {}".format(self.bot_emoji.name("timer")),
+            value=starts_in_value)
+        em.add_field(
+            name="Ends in {}".format(self.bot_emoji.name("timer")),
+            value=format_timedelta(dt.timedelta(seconds=e.time_ends_in)))
+        em.add_field(
+            name="Coins {}".format(self.bot_emoji.name("coin")),
+            value=(
+                "{0.coins_free} Free | "
+                "{0.coins_first_win} First Win | "
+                "{0.coins_max} Max".format(e))
+        )
+        em.set_thumbnail(url=e.map_url)
+        return em
+
+    async def on_reaction_add(self, reaction, user):
+        """Event: on_reaction_add."""
+        await self.handle_reaction(reaction, user)
+
+    async def on_reaction_remove(self, reaction, user):
+        """Event: on_reaction_remove."""
+        await self.handle_reaction(reaction, user)
+
+    async def handle_reaction(self, reaction, user):
+        """Handle reactions.
+
+        + Check to see if reaction is added in active sessions.
+        + Change embeds based on reaction name.
+        """
+        if user == self.bot.user:
+            return
+        if user.id not in self.sessions:
+            return
+        if self.sessions[user.id]["message_id"] != reaction.message.id:
+            return
+
+        # emoji names: number1, number2, etc.
+        index = int(reaction.emoji.name[-1]) - 1
+
+        session = self.sessions[user.id]
+        channel = self.bot.get_channel(session["channel_id"])
+        message = await self.bot.get_message(channel, session["message_id"])
+        data = session["data"]
+        event_model = BSEventModel(data=data[index])
+
+        await self.bot.edit_message(message, embed=self.event_embed(event_model))
 
 
 def check_folder():
@@ -812,5 +1328,3 @@ def setup(bot):
     check_file()
     n = BSData(bot)
     bot.add_cog(n)
-
-

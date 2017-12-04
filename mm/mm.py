@@ -25,18 +25,19 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import argparse
+import itertools
 import os
 from collections import defaultdict
-import discord
-from discord.ext import commands
-from discord.ext.commands import Context
 from random import choice
-import itertools
+
+import discord
+from __main__ import send_cmd_help
+from cogs.utils import checks
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
-from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
-from __main__ import send_cmd_help
+from discord.ext import commands
+from discord.ext.commands import Context
 
 BOT_COMMANDER_ROLES = ["Bot Commander", "High-Elder"]
 PATH = os.path.join("data", "mm")
@@ -118,7 +119,6 @@ class MemberManagement:
         """
         server = ctx.message.server
         role_settings = self.settings[server.id]["macro"]
-
 
     def parser(self):
         """Process MM arguments."""
@@ -236,8 +236,6 @@ class MemberManagement:
         if pargs.exclude is not None:
             minus = set([r.lower() for r in pargs.exclude if r.lower() in server_roles_names])
 
-        out = ["**Member Management**"]
-
         # Used for output only, so it won’t mention everyone in chat
         plus_out = plus.copy()
 
@@ -245,14 +243,16 @@ class MemberManagement:
             plus.add('@everyone')
             plus_out.add('everyone')
 
-        help_str = (
-            'Syntax Error: You must include at '
-            'least one role to display results.')
-
         if len(plus) < 1:
-            out.append(help_str)
-        else:
-            out.append("Listing members who have these roles: {}".format(
+            help_str = (
+                'Syntax Error: You must include at '
+                'least one role to display results.')
+            await self.bot.say(help_str)
+            await send_cmd_help(ctx)
+            return
+
+        out = ["**Member Management**"]
+        out.append("Listing members who have these roles: {}".format(
                 ', '.join(plus_out)))
         if len(minus):
             out.append("but not these roles: {}".format(
@@ -375,6 +375,19 @@ class MemberManagement:
             embeds.append(data)
         return embeds
 
+    def get_server_roles(self, server, *role_names):
+        """Return list of server roles object by name."""
+        if server is None:
+            return []
+        if len(role_names):
+            roles_lower = [r.lower() for r in role_names]
+            roles = [
+                r for r in server.roles if r.name.lower() in roles_lower
+            ]
+        else:
+            roles = server.roles
+        return roles
+
     @commands.command(pass_context=True, no_pm=True)
     async def listroles(self, ctx: Context, *roles):
         """List all the roles on the server."""
@@ -383,13 +396,7 @@ class MemberManagement:
             return
         out = []
         out.append("__List of roles on {}__".format(server.name))
-        roles_to_list = []
-        if len(roles):
-            roles_lower = [r.lower() for r in roles]
-            roles_to_list = [
-                r for r in server.roles if r.name.lower() in roles_lower]
-        else:
-            roles_to_list = server.roles
+        roles_to_list = self.get_server_roles(server, *roles)
 
         out_roles = {}
         for role in roles_to_list:
@@ -417,19 +424,25 @@ class MemberManagement:
             await ctx.invoke(self.changerole, member, role) #self.changerole(ctx, member, role)
 
     @commands.command(pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
-    async def multiremoverole(self, ctx, role, *members: discord.Member):
-        """Remove a role from multiple users.
-        !multiremoverole rolename User1 User2 User3
-        """
-        role = '-{}'.format(role)
-        for member in members:
-            await ctx.invoke(self.changerole, member, role) #self.changerole(ctx, member, role)self.changerole(ctx, member, role)
-            
-            
+    async def listrolecolors(self, ctx, *roles):
+        """List role colors on the server."""
+        server = ctx.message.server
+        role_objs = self.get_server_roles(server, *roles)
+        out = []
+        for role in server.role_hierarchy:
+            if role in role_objs:
+                rgb = role.color.to_tuple()
+                out.append('**{name}**: {color_rgb}, {color_hex}'.format(
+                    name=role.name,
+                    color_rgb=rgb,
+                    color_hex='#{:02x}{:02x}{:02x}'.format(rgb[0], rgb[1], rgb[2])
+                ))
+        for page in pagify("\n".join(out), shorten_by=12):
+            await self.bot.say(page)
+
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
-    async def changerole(self, ctx, member: discord.Member=None, *roles: str):
+    async def changerole(self, ctx, member: discord.Member = None, *roles: str):
         """Change roles of a user.
 
         Example: !changerole SML +Delta "-Foxtrot Lead" "+Delta Lead"
@@ -470,8 +483,7 @@ class MemberManagement:
 
             if role_in_either:
                 # respect role hiearchy
-                rh = server.role_hierarchy
-                if rh.index(role) <= rh.index(author.top_role):
+                if role.position >= author.top_role.position:
                     await self.bot.say(
                         "{} does not have permission to edit {}.".format(
                             author.display_name, role.name))
@@ -484,7 +496,7 @@ class MemberManagement:
                     except discord.Forbidden:
                         await self.bot.say(
                             "{} does not have permission to edit {}’s roles.".format(
-                            author.display_name, member.display_name))
+                                author.display_name, member.display_name))
                         continue
                     except discord.HTTPException:
                         if role_in_minus:
@@ -505,9 +517,8 @@ class MemberManagement:
                                 "Added {} for {}".format(
                                     role.name, member.display_name))
 
-
     @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*BOT_COMMANDER_ROLES)
+    @checks.mod_or_permissions(manage_roles=True)
     async def searchmember(self, ctx, name=None):
         """Search member on server by name."""
         if name is None:
@@ -540,7 +551,7 @@ class MemberManagement:
             await self.bot.say('\n'.join(out))
 
     @commands.command(pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(mention_everyone=True)
+    @checks.mod_or_permissions(manage_roles=True)
     async def addrole2role(self, ctx: Context, with_role_name, to_add_role_name):
         """Add a role to users with a specific role."""
         server = ctx.message.server
@@ -561,6 +572,59 @@ class MemberManagement:
                         await ctx.invoke(self.changerole, member, to_add_role_name)
                     except:
                         pass
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def multiaddrole(self, ctx, role, *members: discord.Member):
+        """Add a role to multiple users.
+
+        !multiaddrole rolename User1 User2 User3
+        """
+        for member in members:
+            await ctx.invoke(self.changerole, member, role)
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def multiremoverole(self, ctx, role, *members: discord.Member):
+        """Remove a role from multiple users.
+
+        !multiremoverole rolename User1 User2 User3
+        """
+        role = '-{}'.format(role)
+        for member in members:
+            await ctx.invoke(self.changerole, member, role)
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def channelperm(self, ctx, member: discord.Member):
+        """Return channels viewable by member."""
+        author = ctx.message.author
+        server = ctx.message.server
+        if not member:
+            member = author
+
+        text_channels = [c for c in server.channels if c.type == discord.ChannelType.text]
+        text_channels = sorted(text_channels, key=lambda c: c.position)
+        voice_channels = [c for c in server.channels if c.type == discord.ChannelType.voice]
+        voice_channels = sorted(voice_channels, key=lambda c: c.position)
+
+        out = []
+        for c in text_channels:
+            channel_perm = c.permissions_for(member)
+            tests = ['read_messages', 'send_messages']
+            perms = [t for t in tests if getattr(channel_perm, t)]
+            if len(perms):
+                out.append("{channel} {perms}".format(channel=c.mention, perms=', '.join(perms)))
+
+        for c in voice_channels:
+            channel_perm = c.permissions_for(member)
+            tests = ['connect']
+            perms = [t for t in tests if getattr(channel_perm, t)]
+            if len(perms):
+                out.append("{channel}: {perms}".format(channel=c.name, perms=', '.join(perms)))
+
+        for page in pagify('\n'.join(out)):
+            await self.bot.say(page)
 
 
 def check_folder():

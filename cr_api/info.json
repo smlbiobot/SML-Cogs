@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Clash Royale API",
+	"DESCRIPTION": "Wrapper to cr-api.com API. Used as a utility cog to serve all other API cogs. In other words, this is used to be a centralized library to store methods and models, but the views and controllers are stored in other cogs.",
+	"DISABLED": false,
+	"NAME": "ClashRoyaleAPI",
+	"REQUIREMENTS": ["aiohttp", "async_timeout", "asyncio"],
+	"TAGS": ["CR", "Clash Royale", "ClashRoyale", "API", "cr-api", "crapi", "wrapper"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}

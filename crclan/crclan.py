@@ -30,7 +30,7 @@ import datetime as dt
 import itertools
 import json
 import os
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from datetime import timedelta
 from enum import Enum
 from random import choice
@@ -38,11 +38,10 @@ from random import choice
 import aiohttp
 import discord
 from __main__ import send_cmd_help
-from discord.ext import commands
-
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline
+from cogs.utils.chat_formatting import inline, pagify, box
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "crclan")
 PATH_CLANS = os.path.join(PATH, "clans")
@@ -51,7 +50,7 @@ BADGES_JSON = os.path.join(PATH, "badges.json")
 
 DATA_UPDATE_INTERVAL = timedelta(minutes=10).seconds
 
-API_FETCH_TIMEOUT = 5
+API_FETCH_TIMEOUT = 15
 
 BOT_COMMANDER_ROLES = ["Bot Commander"]
 
@@ -76,6 +75,50 @@ def random_discord_color():
     color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
     color = int(color, 16)
     return discord.Color(value=color)
+
+
+def clan_url(clan_tag):
+    """Return clan URL on CR-API."""
+    return 'http://cr-api.com/clan/{}'.format(clan_tag)
+
+
+cr_api_logo_url = 'https://smlbiobot.github.io/img/cr-api/cr-api-logo.png'
+
+
+class SettingsException(Exception):
+    pass
+
+
+class ClanTagNotInSettings(SettingsException):
+    pass
+
+
+class ClanKeyNotInSettings(SettingsException):
+    pass
+
+
+class APIFetchError(SettingsException):
+    pass
+
+
+class RoleNotFound(SettingsException):
+    pass
+
+
+class ErrorMessage:
+    """Error Messages"""
+
+    @staticmethod
+    def key_error(key):
+        return (
+            "Error fetching data from API for clan key {}. "
+            "Please try again later.").format(key)
+
+    @staticmethod
+    def tag_error(tag):
+        return (
+            "Error fetching data from API for clan tag #{}. "
+            "Please try again later.").format(tag)
 
 
 class SCTag:
@@ -129,49 +172,6 @@ class SCTag:
             ))
 
 
-class CRArenaModel:
-    """Clash Royale arenas."""
-
-    def __init__(self, **kwargs):
-        """Init.
-
-        Keyword Args:
-            Name (str)
-            TID (str)
-            TIDText (str)
-            SubtitleTID (str)
-            SubtitleTIDText (str)
-            Arena (int)
-            ChestArena (str)
-            TvArena (str)
-            IsInUse (bool)
-            TrainingCamp (bool)
-            PVEArena (str)
-            TrophyLimit (int)
-            DemoteTrophyLimit (int)
-            SeasonTrophyReset (str)
-            ChestRewardMultiplier (int)
-            ChestShopPriceMultiplier (int)
-            RequestSize (int)
-            MaxDonationCountCommon (int)
-            MaxDonationCountRare (int)
-            MaxDonationCountEpic (int)
-            IconSWF (str)
-            IconExportName (str)
-            MainMenuIconExportName (str)
-            SmallIconExportName (str)
-            MatchmakingMinTrophyDelta (int)
-            MatchmakingMaxTrophyDelta (int)
-            MatchmakingMaxSeconds (int)
-            PvpLocation (str)
-            TeamVsTeamLocation (str)
-            DailyDonationCapacityLimit (int)
-            BattleRewardGold (str)
-            ReleaseDate (str)
-        """
-        self.__dict__.update(kwargs)
-
-
 class CRClanType(Enum):
     """Clash Royale clan type."""
 
@@ -200,43 +200,108 @@ class CRClanType(Enum):
 class CRClanModel:
     """Clash Royale Clan data."""
 
-    def __init__(self, is_cache=False, timestamp=None, loaded=True, **kwargs):
+    def __init__(self, data=None, is_cache=False, timestamp=None, loaded=True):
         """Init.
-
-        Expected list of keywords:
-        From API:
-            badge
-            badge_url
-            currentRank
-            description
-            donations
-            members
-            name
-            numberOfMembers
-            region
-            requiredScore
-            score
-            tag
-            type
-            typeName
-        From cog:
-            key
-            role
         """
-        self.__dict__.update(kwargs)
+        # self.__dict__.update(kwargs)
+        self.data = data
         self.is_cache = is_cache
         self.timestamp = timestamp
         self.loaded = loaded
+        self._members = None
+
+    @property
+    def badge(self):
+        """Badge."""
+        return self.data.get('badge', None)
+
+    @property
+    def badge_url(self):
+        """Badge URL."""
+        try:
+            return self.data['badge']['url']
+        except KeyError:
+            return ''
+
+    @property
+    def current_rank(self):
+        """Current rank."""
+        return self.data.get('currentRank', None)
+
+    @property
+    def description(self):
+        """Description."""
+        return self.data.get('description', None)
+
+    @property
+    def donations(self):
+        """Donations."""
+        return self.data.get('donations', None)
+
+    @property
+    def members(self):
+        """Members."""
+        if self._members is None:
+            self._members = self.data.get('members', None)
+        return self._members
+
+    @members.setter
+    def members(self, value):
+        """Members set"""
+        self._members = value
+
+    @property
+    def member_tags(self):
+        """List of member tags."""
+        return [m["tag"] for m in self.members]
+
+    @property
+    def name(self):
+        """Name."""
+        return self.data.get('name', None)
+
+    @property
+    def member_count(self):
+        """Member count."""
+        return self.data.get('memberCount', None)
+
+    @property
+    def region_name(self):
+        """Region."""
+        region = self.data.get('region', None)
+        if region is not None:
+            return region.get('name', None)
+        return None
+
+    @property
+    def required_score(self):
+        """Trophy requirement."""
+        return self.data.get('requiredScore', None)
+
+    @property
+    def score(self):
+        """Trophies."""
+        return self.data.get('score', None)
 
     @property
     def member_count_str(self):
         """Member count in #/50 format."""
-        count = None
-        if hasattr(self, 'numberOfMembers'):
-            count = self.numberOfMembers
-        if count is None:
-            count = 0
-        return '{}/50'.format(count)
+        return '{}/50'.format(self.member_count)
+
+    @property
+    def tag(self):
+        """Tag."""
+        return self.data.get('tag', None)
+
+    @property
+    def type(self):
+        """Type."""
+        return self.data.get('type', None)
+
+    @property
+    def type_name(self):
+        """"Type name."""
+        return self.data.get('typeName', None)
 
     @property
     def valid(self):
@@ -264,34 +329,62 @@ class CRClanModel:
 class CRClanMemberModel:
     """Clash Royale Member data."""
 
-    def __init__(self, **kwargs):
+    def __init__(self, data):
         """Init.
-
-        Expected list of keywords:
-        From API:
-            arena
-            avatarId
-                high
-                low
-                unsigned
-            clanChestCrowns
-            currentRank
-            donations
-            expLevel
-            homeID
-                high
-                low
-                unsigned
-            league
-            name
-            previousRank
-            role
-            roleName
-            score
-            tag
         """
-        self.__dict__.update(kwargs)
+        self.data = data
         self._discord_member = None
+
+    @property
+    def name(self):
+        """Name aka IGN."""
+        return self.data.get('name', None)
+
+    @property
+    def tag(self):
+        """Player tag."""
+        return self.data.get('tag', None)
+
+    @property
+    def score(self):
+        """Player trophies."""
+        return self.data.get('score', None)
+
+    @property
+    def donations(self):
+        """Donations."""
+        return self.data.get('donations', None)
+
+    @property
+    def clan_chest_crowns(self):
+        """Clan chest crowns"""
+        return self.data.get('clanChestCrowns', None)
+
+    @property
+    def arena(self):
+        """Arena object."""
+        return self.data.get('arena', None)
+
+    @property
+    def arena_str(self):
+        """Arena. eg: Arena 10: Hog Mountain"""
+        arena = self.data.get('arena', None)
+        if arena is not None:
+            return '{}: {}'.format(
+                arena.get('arena', ''),
+                arena.get('name', '')
+            )
+        return ''
+
+    @property
+    def role(self):
+        """Role ID"""
+        return self.data.get('role', None)
+
+    @property
+    def exp_level(self):
+        """Experience level."""
+        return self.data.get('expLevel', None)
 
     @property
     def discord_member_id(self):
@@ -312,20 +405,17 @@ class CRClanMemberModel:
     @property
     def role_name(self):
         """Properly formatted role name."""
-        if self.role == 1:
-            return "Member"
-        elif self.role == 2:
-            return "Leader"
-        elif self.role == 3:
-            return "Elder"
-        elif self.role == 4:
-            return "Co-Leader"
-        return ""
+        return self.data.get('roleName', None)
+
+    @property
+    def previousRank(self):
+        """Previous rank."""
+        return self.data.get('previousRank', 0)
 
     @property
     def currentRank(self):
         """API has typo."""
-        return self.currenRank
+        return self.data.get('currentRank', 0)
 
     @property
     def rank(self):
@@ -358,6 +448,15 @@ class CRClanMemberModel:
             return self.currentRank - self.previousRank
 
     @property
+    def league(self):
+        """League ID from Arena ID."""
+        arenaID = self.arena["arenaID"]
+        leagueID = arenaID - 11
+        if leagueID > 0:
+            return leagueID
+        return 0
+
+    @property
     def league_icon_url(self):
         """League Icon URL."""
         return (
@@ -377,140 +476,6 @@ class CRClanMemberModel:
                     return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
-#
-# class CRClanMemberDoc(DocType):
-#     """CR Clan Member Document."""
-#     arena = Text(fields={'raw': Keyword()})
-#     clan = Nested()
-#     clan_chest_crowns = Integer()
-#     current_rank = Integer()
-#     discord = Nested()
-#     donations = Integer()
-#     experience_level = Integer()
-#     league = Integer()
-#     name = Text(fields={'raw': Keyword()})
-#     name_with_tag = Text(fields={'raw': Keyword()})
-#     previous_rank = Integer()
-#     role = Integer()
-#     role_name = Text(fields={'raw': Keyword()})
-#     score = Integer()
-#     tag = Text(fields={'raw': Keyword()})
-#     timestamp = Date()
-#
-#     class Meta:
-#         doc_type = 'member'
-#
-#     @classmethod
-#     def doc(cls, data):
-#         """Get doc"""
-#         return CRClanMemberDoc(
-#             clan=data.get('clan', None),
-#             clan_chest_crowns=data.get('clanChestCrowns', None),
-#             current_rank=data.get('currenRank', None),
-#             discord=data.get('discord', None),
-#             donations=data.get('donations', None),
-#             discord_member_id=data.get('discord_member_id', None),
-#             experience_level=data.get('expLevel', None),
-#             league=data.get('league', None),
-#             name=data.get('name', None),
-#             name_with_tag='{} #{}'.format(
-#                 data.get('name', ''),
-#                 data.get('tag', None)
-#             ),
-#             previous_rank=data.get('previousRank', None),
-#             role=data.get('role', None),
-#             role_name=data.get('roleName', None),
-#             score=data.get('score', None),
-#             tag=data.get('tag', None),
-#             timestamp=dt.datetime.utcnow(),
-#         )
-#
-#     @classmethod
-#     def log(cls, data, **kwargs):
-#         """Log member."""
-#         doc = CRClanMemberDoc.doc(data)
-#         doc.save(**kwargs)
-#
-#     def save(self, **kwargs):
-#         return super(CRClanMemberDoc, self).save(**kwargs)
-#
-#
-# class CRClanDoc(DocType):
-#     """CR Clan Elastic Search Document."""
-#     timestamp = Date()
-#     badge = Integer()
-#     badge_url = Text(fields={'raw': Keyword()})
-#     current_rank = Integer()
-#     description = Text(
-#         analyzer=analyzer("simple"),
-#         fields={'raw': Keyword()}
-#     )
-#     donations = Integer()
-#     members = Nested(doc_class=CRClanMemberDoc)
-#     name = Text(fields={'raw': Keyword()})
-#     number_of_members = Integer()
-#     region = Integer()
-#     required_score = Integer()
-#     score = Integer()
-#     tag = Text(fields={'raw': Keyword()})
-#     type = Integer()
-#     type_name = Text(fields={'raw': Keyword()})
-#
-#     class Meta:
-#         doc_type = 'clan'
-#
-#     @classmethod
-#     def log(cls, data, **kwargs):
-#         """Log all."""
-#         doc = CRClanDoc(
-#             badge=data.get('badge', None),
-#             badge_url=data.get('badge_url', None),
-#             current_rank=data.get('currentRank', None),
-#             description=data.get('description', None),
-#             donations=data.get('donations', None),
-#             members=[],
-#             name=data.get('name', None),
-#             name_with_tag='{} #{}'.format(
-#                 data.get('name', ''),
-#                 data.get('tag', None)
-#             ),
-#             number_of_members=data.get('numberOfMembers', None),
-#             region=data.get('region', None),
-#             required_score=data.get('requiredScore', None),
-#             score=data.get('score', None),
-#             tag=data.get('tag', None),
-#             timestamp=dt.datetime.utcnow(),
-#             type=data.get('type', None),
-#             type_name=data.get('typeName', None),
-#         )
-#         for member_data in data.get('members', []):
-#             doc.add_member(member_data)
-#         doc.save(**kwargs)
-#
-#     def save(self, **kwargs):
-#         return super(CRClanDoc, self).save(**kwargs)
-#
-#     def add_member(self, data):
-#         self.members.append(
-#             CRClanMemberDoc.doc(data)
-#         )
-#
-
-class SettingsException(Exception):
-    pass
-
-
-class ClanTagNotInSettings(SettingsException):
-    pass
-
-
-class ClanKeyNotInSettings(SettingsException):
-    pass
-
-
-class APIFetchError(SettingsException):
-    pass
-
 
 class ServerModel:
     """Discord server data model.
@@ -529,7 +494,7 @@ class ServerModel:
         self.settings = data
 
 
-class CogModel:
+class ClanManager:
     """Cog settings.
 
     Functionally the CRClan cog model.
@@ -545,11 +510,6 @@ class CogModel:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(filepath))
         self.bot = bot
-
-        # arenas
-        arenas = dataIO.load_json(os.path.join(PATH, 'arenas.json'))
-        self.arenas = [CRArenaModel(**a) for a in arenas]
-        self.arenas = sorted(self.arenas, key=lambda x: x.TrophyLimit, reverse=True)
 
     def init_server(self, server):
         """Initialized server settings.
@@ -577,6 +537,10 @@ class CogModel:
     def get_players(self, server):
         """CR Players settings by server."""
         return self.settings["servers"][server.id]["players"]
+
+    def get_player_tags(self, server):
+        """All player tags known to the server."""
+        return [player_tag for member_id, player_tag in self.get_players(server).items()]
 
     def save(self):
         """Save data to disk."""
@@ -630,12 +594,72 @@ class CogModel:
         self.settings["servers"][server.id]["players"] = players
         self.save()
 
+    def set_elder_role(self, server, role_name):
+        """Set associated elder role on a server."""
+        self.check_server(server)
+        role = discord.utils.get(server.roles, name=role_name)
+        if role is None:
+            raise RoleNotFound
+        try:
+            self.settings["servers"][server.id]["elder_role_id"] = role.id
+        except KeyError:
+            raise
+        self.save()
+
+    def get_elder_role(self, server):
+        """Return elder role on a server."""
+        try:
+            role_id = self.settings["servers"][server.id]["elder_role_id"]
+            return discord.utils.get(server.roles, id=role_id)
+        except KeyError:
+            return None
+
+    def set_member_role(self, server, role_name):
+        """Set associated elder role on a server."""
+        self.check_server(server)
+        role = discord.utils.get(server.roles, name=role_name)
+        if role is None:
+            raise RoleNotFound
+        try:
+            self.settings["servers"][server.id]["member_role_id"] = role.id
+        except KeyError:
+            raise
+        self.save()
+
+    def get_member_role(self, server):
+        """Return elder role on a server."""
+        try:
+            role_id = self.settings["servers"][server.id]["member_role_id"]
+            return discord.utils.get(server.roles, id=role_id)
+        except KeyError:
+            return None
+
     def key2tag(self, server, key):
         """Convert clan key to clan tag."""
         clans = self.get_clans(server)
         for tag, clan in clans.items():
             if clan["key"].lower() == key.lower():
                 return tag
+        return None
+
+    def key2role(self, server, key):
+        """Convert clan key to clan role."""
+        clans = self.get_clans(server)
+        for tag, clan in clans.items():
+            if clan["key"].lower() == key.lower():
+                return clan["role_name"]
+        return None
+
+    def clantag_to_discord_role(self, server, tag):
+        """Convert clan tag to clan role."""
+        return discord.utils.get(server.roles, name=self.clantag_to_discord_role_name(server, tag))
+
+    def clantag_to_discord_role_name(self, server, tag):
+        """Convert clan tag to discord role name."""
+        clans = self.get_clans(server)
+        for clan_tag, clan in clans.items():
+            if clan["tag"] == SCTag(tag).tag:
+                return clan["role_name"]
         return None
 
     def tag2member(self, server, tag):
@@ -669,7 +693,10 @@ class CogModel:
 
     def server_settings(self, server):
         """Return server settings."""
-        return self.settings["servers"][server.id]
+        try:
+            return self.settings["servers"][server.id]
+        except KeyError:
+            return None
 
     def discord_members_by_clankey(self, server, key=None, sort=True):
         """Return list of Discord members by clan key.
@@ -711,7 +738,7 @@ class CogModel:
         is_cache = False
         timestamp = dt.datetime.utcnow()
 
-        return CRClanModel(is_cache, timestamp, **data)
+        return CRClanModel(data=data, is_cache=is_cache, timestamp=timestamp)
 
     def cached_clan_data(self, tag):
         """Load cached clan data. Used when live update failed."""
@@ -720,7 +747,7 @@ class CogModel:
             is_cache = True
             data = dataIO.load_json(filepath)
             timestamp = dt.datetime.fromtimestamp(os.path.getmtime(filepath))
-            return CRClanModel(is_cache, timestamp, **data)
+            return CRClanModel(data=data, is_cache=is_cache, timestamp=timestamp)
         return None
 
     @staticmethod
@@ -753,16 +780,16 @@ class CogModel:
             pass
         return None
 
-    def trophy2arena(self, trophy):
-        """Convert trophy to league based on Arenas."""
-        result = None
-        for arena in self.arenas:
-            if trophy >= arena.TrophyLimit:
-                result = arena
-                break
-
-        if result is not None:
-            return '{}: {}'.format(result.TIDText, result.SubtitleTIDText)
+    def tag2member(self, server, tag):
+        """Return Discord member by player tag."""
+        try:
+            players = self.settings["servers"][server.id]["players"]
+            for member_id, player_tag in players.items():
+                if player_tag == tag:
+                    return server.get_member(member_id)
+        except KeyError:
+            pass
+        return None
 
     @property
     def clan_api_url(self):
@@ -792,25 +819,9 @@ class CogModel:
         self.save()
 
     @property
-    def badge_url(self):
+    def badge_url_base(self):
         """Clan Badge URL."""
-        return 'http://cr-api.com'
-
-
-class ErrorMessage:
-    """Error Messages"""
-
-    @staticmethod
-    def key_error(key):
-        return (
-            "Error fetching data from API for clan key {}. "
-            "Please try again later.").format(key)
-
-    @staticmethod
-    def tag_error(tag):
-        return (
-            "Error fetching data from API for clan tag #{}. "
-            "Please try again later.").format(tag)
+        return 'http://api.cr-api.com'
 
 
 class CRClanInfoView:
@@ -838,17 +849,21 @@ class CRClanInfoView:
         """Return clan info embed."""
         if color is None:
             color = random_discord_color()
+        url = clan_url(data.tag)
         em = discord.Embed(
             title=data.name,
             description=data.description,
-            color=color)
+            color=color,
+            url=url)
         em.add_field(name="Clan Trophies", value=data.score)
-        em.add_field(name="Type", value=CRClanType(data.type).typename)
-        em.add_field(name="Required Trophies", value=data.requiredScore)
+        em.add_field(name="Type", value=data.type_name)
+        em.add_field(name="Required Trophies", value=data.required_score)
         em.add_field(name="Clan Tag", value=data.tag)
         em.add_field(name="Members", value=data.member_count_str)
-        badge_url = '{}{}'.format(self.model.badge_url, data.badge_url)
+        em.add_field(name="Region", value=data.region_name)
+        badge_url = '{}{}'.format(self.model.badge_url_base, data.badge_url)
         em.set_thumbnail(url=badge_url)
+        em.set_footer(text=url, icon_url=cr_api_logo_url)
         return em
 
 
@@ -883,7 +898,8 @@ class CRClanRosterView:
                 'title': data.name,
                 'footer_text': '{} #{} - Page {}'.format(
                     data.name, data.tag, page),
-                'footer_icon_url': self.model.badge_url + data.badge_url
+                'footer_icon_url': self.model.badge_url_base + data.badge_url,
+                'clan_data': data
             }
             em = self.embed(color=color, **kwargs)
             await self.bot.send_message(ctx.message.channel, embed=em)
@@ -895,30 +911,30 @@ class CRClanRosterView:
             self,
             server=None, title=None, members=None,
             footer_text=None, footer_icon_url=None,
-            color=None):
+            color=None, clan_data=None):
         """Return clan roster as Discord embed.
 
         This represents a page of a roster.
         """
-        em = discord.Embed(title=title)
+        em = discord.Embed(title=title, url=clan_url(clan_data.tag))
         em.set_footer(text=footer_text, icon_url=footer_icon_url)
         for member in members:
             if member is not None:
-                data = CRClanMemberModel(**member)
+                data = CRClanMemberModel(member)
                 discord_member = self.model.tag2member(server, data.tag)
                 name = (
                     "{0.name}, {0.role_name} "
-                    "(Lvl {0.expLevel})").format(data)
+                    "(Lvl {0.exp_level})").format(data)
                 stats = (
                     "{0.score:,d}"
                     " | {0.donations:\u00A0>4} d"
-                    " | {0.clanChestCrowns:\u00A0>3} c"
+                    " | {0.clan_chest_crowns:\u00A0>3} c"
                     " | #{0.tag}").format(data)
                 stats = inline(stats)
                 mention = ''
                 if discord_member is not None:
                     mention = discord_member.mention
-                arena = self.model.trophy2arena(data.score)
+                arena = data.arena_str
                 """ Rank str
                 41 ↓ 31
                 """
@@ -952,9 +968,9 @@ class CRClan:
         """Init."""
         self.bot = bot
         self.task = bot.loop.create_task(self.loop_task())
-        self.model = CogModel(JSON, bot)
-        self.roster_view = CRClanRosterView(bot, self.model)
-        self.info_view = CRClanInfoView(bot, self.model)
+        self.manager = ClanManager(JSON, bot)
+        self.roster_view = CRClanRosterView(bot, self.manager)
+        self.info_view = CRClanInfoView(bot, self.manager)
 
     def __unload(self):
         self.task.cancel()
@@ -962,8 +978,8 @@ class CRClan:
     async def loop_task(self):
         """Loop task: update data daily."""
         await self.bot.wait_until_ready()
-        await self.model.update_data()
-        await asyncio.sleep(self.model.data_update_interval)
+        await self.manager.update_data()
+        await asyncio.sleep(self.manager.data_update_interval)
         if self is self.bot.get_cog('CRClan'):
             self.task = self.bot.loop.create_task(self.loop_task())
 
@@ -981,14 +997,14 @@ class CRClan:
     async def crclanset_init(self, ctx):
         """Init CR Clan: server settings."""
         server = ctx.message.server
-        self.model.init_server(server)
+        self.manager.init_server(server)
         await self.bot.say("Server settings initialized.")
 
     @crclanset.command(name="initclans", pass_context=True)
     async def crclanset_init(self, ctx):
         """Init CR Clan: clans settings."""
         server = ctx.message.server
-        self.model.init_clans(server)
+        self.manager.init_clans(server)
         await self.bot.say("Clan settings initialized.")
 
     @crclanset.command(name="dataupdateinterval", pass_context=True)
@@ -997,14 +1013,14 @@ class CRClan:
 
         unit is seconds.
         """
-        self.model.data_update_interval = seconds
+        self.manager.data_update_interval = seconds
         await self.bot.say("Data update interval updated.")
 
     @crclanset.command(name="update", pass_context=True)
     async def crclanset_update(self, ctx):
         """Update data from api."""
         await self.bot.type()
-        dataset = await self.model.update_data()
+        dataset = await self.manager.update_data()
         for data in dataset:
             if not data.loaded:
                 await self.bot.send_message(ctx.message.channel, "Cannot load data for {}.".format(data.tag))
@@ -1014,14 +1030,17 @@ class CRClan:
                 await self.bot.send_message(ctx.message.channel, "Data for {} updated".format(data.name))
 
     @crclanset.command(name="add", pass_context=True)
-    async def crclanset_add(self, ctx, tag, key=None, role_name=None):
+    async def crclanset_add(self, ctx, tag, key=None, role_name=None, unique=True):
         """Add clan tag(s).
 
         [p]crclanset add 2CCCP alpha
 
         tag: clan tag without the # sign
         key: human readable key for easier calls for data
-        role: server role assignment
+        role_name: server role assignment
+        unique: default True. Used to determine if a member can only be in one clan.
+            For example, in some clan families, people’s main account must be in one single clan,
+            but they may have additional accounts in mini accounts.
 
         """
         sctag = SCTag(tag)
@@ -1030,7 +1049,7 @@ class CRClan:
             await self.bot.say(sctag.invalid_error_msg)
             return
 
-        self.model.add_clan(ctx.message.server, sctag.tag, key, role_name)
+        self.manager.add_clan(ctx.message.server, sctag.tag, key, role_name)
 
         await self.bot.say(
             'Added clan #{} with key: {} and role: {}'.format(
@@ -1051,7 +1070,7 @@ class CRClan:
 
         for clantag in clantags:
             try:
-                self.model.remove_clan(server, clantag)
+                self.manager.remove_clan(server, clantag)
             except ClanTagNotInSettings:
                 await self.bot.say("{} is not in clan settings.".format(clantag))
             else:
@@ -1076,13 +1095,69 @@ class CRClan:
             return
 
         try:
-            self.model.set_clan_key(server, sctag.tag, key)
+            self.manager.set_clan_key(server, sctag.tag, key)
         except ClanTagNotInSettings:
             await self.bot.say(
                 "{} is not a clan tag you have added".format(tag))
         else:
             await self.bot.say("Added {} for clan #{}.".format(key, tag))
 
+    @crclanset.command(name="elderrole", pass_context=True)
+    async def crclanset_elderrole(self, ctx, role_name):
+        """Set elder’s role on server."""
+        server = ctx.message.server
+        try:
+            self.manager.set_elder_role(server, role_name)
+        except RoleNotFound:
+            await self.bot.say("Cannot find that role on the server.")
+        else:
+            await self.bot.say("Settings saved.")
+
+    @crclanset.command(name="memberrole", pass_context=True)
+    async def crclanset_memberrole(self, ctx, role_name):
+        """Set elder’s role on server."""
+        server = ctx.message.server
+        try:
+            self.manager.set_member_role(server, role_name)
+        except RoleNotFound:
+            await self.bot.say("Cannot find that role on the server.")
+        else:
+            await self.bot.say("Settings saved.")
+
+    @crclanset.command(name="settings", pass_context=True)
+    async def crclanset_settings(self, ctx):
+        """Display settings for the server."""
+        server = ctx.message.server
+        server_settings = self.manager.server_settings(server)
+        if server_settings is None:
+            await self.bot.say("This server has not settings.")
+            return
+        clans = server_settings.get("clans", None)
+        if clans is None:
+            await self.bot.say("No clans settings found on this server.")
+            return
+        clans = OrderedDict(clans)
+        clans = OrderedDict(sorted(clans.items(), key=lambda item:item[1]['key']))
+        clan_list = [clan for k, clan in clans.items()]
+
+        divider = '-'* 40
+        out = ['CRClan Settings', divider]
+        fmt = '{:<12} ' * 3
+        th = fmt.format("Clan Key", "Role", "Tag")
+        out.append(th)
+        out.append(divider)
+        for k, clan in clans.items():
+            key = clan.get("key", None) or " "
+            role = clan.get("role_name", None) or " "
+            tag = clan.get("tag", None) or " "
+
+            o = fmt.format(key, role, tag)
+            out.append(o)
+        out.append(divider)
+        out.append('Elder role: {}'.format(self.manager.get_elder_role(server)))
+        out.append('Member role: {}'.format(self.manager.get_member_role(server)))
+        for page in pagify(box('\n'.join(out))):
+            await self.bot.say(page)
 
     @commands.group(pass_context=True, no_pm=True)
     async def crclan(self, ctx):
@@ -1137,7 +1212,7 @@ class CRClan:
         if member is None:
             member = ctx.message.author
 
-        self.model.set_player(server, member, sctag.tag)
+        self.manager.set_player(server, member, sctag.tag)
 
         await self.bot.say(
             "Associated player tag #{} with Discord Member {}.".format(
@@ -1151,7 +1226,7 @@ class CRClan:
         author = ctx.message.author
         if member is None:
             member = author
-        tag = self.model.member2tag(server, member)
+        tag = self.manager.member2tag(server, member)
         if tag is None:
             await self.bot.say("Cannot find associated player tag.")
             return
@@ -1190,7 +1265,7 @@ class CRClan:
             if key is None:
                 return False
             else:
-                tag = self.model.key2tag(server, key)
+                tag = self.manager.key2tag(server, key)
 
         sctag = SCTag(tag)
         if not sctag.valid:
@@ -1200,11 +1275,11 @@ class CRClan:
         await self.bot.send_typing(ctx.message.channel)
 
         server = ctx.message.server
-        data = await self.model.get_clan_data(server, tag=sctag.tag)
+        data = await self.manager.get_clan_data(server, tag=sctag.tag)
         data_is_cached = False
         if not data:
             data_is_cached = True
-            data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            data = self.manager.cached_clan_data(self.manager.key2tag(server, key))
             if data is None:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
@@ -1227,11 +1302,11 @@ class CRClan:
         server = ctx.message.server
         await self.bot.send_typing(ctx.message.channel)
 
-        clan_data = await self.model.get_clan_data(server, key=key)
+        clan_data = await self.manager.get_clan_data(server, key=key)
         data_is_cached = False
         if not clan_data:
             data_is_cached = True
-            clan_data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            clan_data = self.manager.cached_clan_data(self.manager.key2tag(server, key))
             if clan_data is None:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
@@ -1272,18 +1347,18 @@ class CRClan:
         # Load data
         server = ctx.message.server
         await self.bot.send_typing(ctx.message.channel)
-        clan_data = await self.model.get_clan_data(server, key=key)
+        clan_data = await self.manager.get_clan_data(server, key=key)
         data_is_cached = False
         if not clan_data:
             data_is_cached = True
-            clan_data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            clan_data = self.manager.cached_clan_data(self.manager.key2tag(server, key))
             if clan_data is None:
                 await self.bot.say("Cannot find key {} in settings.".format(key))
                 return
 
         # Sort data
         if p_args.sort == 'trophies':
-            clan_data.members = sorted(clan_data.members, key=lambda member: -member['score'])
+            clan_data.members = sorted(clan_data.members, key=lambda member: -member['trophies'])
         elif p_args.sort == 'name':
             clan_data.members = sorted(clan_data.members, key=lambda member: member['name'].lower())
         elif p_args.sort == 'level':
@@ -1307,6 +1382,7 @@ class CRClan:
             await ctx.invoke(self.crclan_roster, key)
 
     @crclan.command(name="audit", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
     async def crclan_audit(self, ctx, key):
         """Compare roster with Discord roles.
 
@@ -1317,11 +1393,11 @@ class CRClan:
 
         await self.bot.type()
 
-        data = await self.model.get_clan_data(server, key=key)
+        data = await self.manager.get_clan_data(server, key=key)
         data_is_cached = False
         if not data:
             data_is_cached = True
-            data = self.model.cached_clan_data(self.model.key2tag(server, key))
+            data = self.manager.cached_clan_data(self.manager.key2tag(server, key))
             if data is None:
                 await self.bot.send_message(
                     ctx.message.channel,
@@ -1329,11 +1405,11 @@ class CRClan:
                 return
 
         # alphabetical list of discord members with associated role
-        dc_members = self.model.discord_members_by_clankey(server, key=key)
+        dc_members = self.manager.discord_members_by_clankey(server, key=key)
         dc_names = [m.mention for m in dc_members]
 
         # alphabetical list of members in CR App
-        cr_members = [CRClanMemberModel(**m) for m in data.members]
+        cr_members = [CRClanMemberModel(m) for m in data.members]
         cr_names = [m.name for m in cr_members]
         cr_names = sorted(cr_names, key=lambda x: x.lower())
 
@@ -1370,11 +1446,205 @@ class CRClan:
         if data_is_cached:
             await self.bot.say(data.cache_message)
 
-    @crclan.command(name="trophy2arena", pass_context=True, no_pm=True)
-    async def crclan_trophy2arena(self, ctx, trophy: int):
-        """Convert trophies to arenas."""
-        text = self.model.trophy2arena(trophy)
-        await self.bot.say(text)
+    @crclan.command(name='iaudit', aliases=['ia'], pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def crclan_iaudit(self, ctx, clankey, *, options=None):
+        """Interactive audit of clans by clan key and rolename.
+        
+        Options:
+        --removerole   Remove clan role from people who aren’t in clan
+        --addrole      Add clan role to people who are in clan
+        --exec         Run both add and remove role options
+        """
+        server = ctx.message.server
+
+        clan_tag = self.manager.key2tag(server, clankey)
+        clanrole_name = self.manager.key2role(server, clankey)
+
+        if clan_tag is None:
+            await self.bot.say("Cannot find clan tag with the clan key. Aborting…")
+            return
+
+        # - Check options
+        if options is None:
+            options = ''
+        options = options.split(' ')
+
+        option_remove_role = '--removerole' in options
+        option_add_role = '--addrole' in options
+        option_exec = '--exec' in options
+
+        if option_exec:
+            option_add_role = True
+            option_remove_role = True
+
+        # - get clan data
+        clan_model = await self.manager.get_clan_data(server, key=clankey)
+
+        # - get list of people with rolename
+        clanrole = discord.utils.get(server.roles, name=clanrole_name)
+        dc_members = self.manager.discord_members_by_clankey(server, key=clankey)
+
+        # - assert members have same clan tag as api
+
+        dc_members_not_in_clan = []
+        dc_members_with_no_player_tag = []
+
+        for dc_member in dc_members:
+            player_tag = self.manager.member2tag(server, dc_member)
+
+            if player_tag is None:
+                dc_members_with_no_player_tag.append(dc_member)
+                continue
+
+            if player_tag not in clan_model.member_tags:
+                dc_members_not_in_clan.append(dc_member)
+
+        out = []
+
+        # - Discord Members with clan tag but not in clan
+        if len(dc_members_not_in_clan):
+            out.append("Discord members with {} role but not in the clan:".format(clanrole.name))
+            for m in dc_members_not_in_clan:
+                out.append("+ {} ({})".format(m.display_name, m.id))
+
+        # - Discord Members without associated player tags
+        if len(dc_members_with_no_player_tag):
+            out.append("Discord members with {} role but no associated player tags:".format(clanrole.name))
+            for m in dc_members_with_no_player_tag:
+                out.append("+ {} ({})".format(m.display_name, m.id))
+
+        # - Dicsord members in clan but no clan role
+        dc_members_without_role = []
+        for player_tag in clan_model.member_tags:
+            dc_member = self.manager.tag2member(server, player_tag)
+            if dc_member is not None:
+                if clanrole not in dc_member.roles:
+                    dc_members_without_role.append(dc_member)
+
+        if len(dc_members_without_role):
+            out.append("Discord members in the clan but does not have the {} role:".format(clanrole.name))
+            for m in dc_members_without_role:
+                out.append("+ {} ({})".format(m.display_name, m.id))
+
+        # - Discord members with elder role but not promoted in clan
+        elder_role = self.manager.get_elder_role(server)
+        members_not_promoted_in_clan = []
+        if elder_role is not None:
+            dc_elder_members = [m for m in dc_members if elder_role in m.roles]
+            clan_elders = [m for m in clan_model.members if m["roleName"] == "Elder"]
+            clan_elders_tags = [m["tag"] for m in clan_elders]
+            for dc_member in dc_elder_members:
+                dc_member_tag = self.manager.member2tag(server, dc_member)
+                if dc_member_tag in clan_model.member_tags:
+                    if dc_member_tag not in clan_elders_tags:
+                        members_not_promoted_in_clan.append(dc_member)
+        if len(members_not_promoted_in_clan):
+            out.append("List of members with the Elder role but not yet promoted in clan:")
+            for m in members_not_promoted_in_clan:
+                out.append("+ {}".format(m.display_name))
+
+        # - Clan members who have no player tag assigned
+        server_player_tags = self.manager.get_player_tags(server)
+        clan_members_not_registered_on_dc = []
+        for m in clan_model.members:
+            if m["tag"] not in server_player_tags:
+                clan_members_not_registered_on_dc.append(m)
+        if len(clan_members_not_registered_on_dc):
+            out.append("List of IGNs who have not set their player tags on Discord:")
+            for m in clan_members_not_registered_on_dc:
+                out.append("+ {}".format(m["name"]))
+
+        # remove role from members not in clan
+        if option_remove_role:
+            for m in dc_members_not_in_clan:
+                await self.remove_role(ctx, m, clanrole)
+
+        # add role to members in clan
+        if option_add_role:
+            for m in dc_members_without_role:
+                await self.add_role(ctx, m, clanrole)
+
+        for page in pagify('\n'.join(out)):
+            await self.bot.say(page)
+        await self.bot.say("…End of audit.")
+
+    async def add_role(self, ctx, member:discord.Member, role:discord.Role):
+        """Add role."""
+        try:
+            await self.bot.add_roles(member, role)
+            await self.bot.say("Added {} to {}".format(role.name, member.display_name))
+        except discord.Forbidden:
+            await self.bot.say("You do not have permissions to revoke these roles.")
+            return
+        except discord.HTTPException:
+            await self.bot.say("Removing roles failed for unknown reasons.")
+            return
+
+    async def remove_role(self, ctx, member:discord.Member, role:discord.Role):
+        """Remove role."""
+        try:
+            await self.bot.remove_roles(member, role)
+            await self.bot.say("Removed {} from {}".format(role.name, member.display_name))
+        except discord.Forbidden:
+            await self.bot.say("You do not have permissions to revoke these roles.")
+            return
+        except discord.HTTPException:
+            await self.bot.say("Removing roles failed for unknown reasons.")
+            return
+
+    @crclan.command(name='auditfam', aliases=['af'], pass_context=True, no_pm=True)
+    async def crclan_auditfam(self, ctx, *, options=None):
+        """Audit the entire family.
+        
+        Family clans are determined by what is saved in clans
+        [p]crclanset settings
+
+        Options:
+        --removerole   Remove clan role from people who aren’t in clan
+        --addrole      Add clan role to people who are in clan
+        --exec         Run both add and remove role options
+        """
+        api = self.bot.get_cog("ClashRoyaleAPI")
+        server = ctx.message.server
+        option_exec = '--exec' in options
+
+        await self.bot.type()
+
+        family_tags = self.manager.get_clans(server).keys()
+        await self.bot.say("Family tags: {}".format(",".join(family_tags)))
+        clan_models = await api.clan_models(family_tags)
+
+        # - add role to models
+        for c in clan_models:
+            await self.bot.type()
+            role = self.manager.clantag_to_discord_role(server, c.tag)
+            if role is None:
+                role = 'No found role.'
+            c.role = role
+
+        # - all player models from clan_models
+        # member_models = [m for m in c.members for c in clan_models]
+        member_models = []
+        for c in clan_models:
+            for m in c.members:
+                member_models.append(m)
+        await self.bot.say("Total members: {}".format(len(member_models)))
+
+        members_without_discord = []
+        # - Audit clan roles
+        for c in clan_models:
+            clan_role = c.role
+            for m in c.members:
+                discord_user = self.manager.tag2member(server, m.tag)
+                if discord_user is None:
+                    members_without_discord.append(m)
+                    continue
+                else:
+                    if clan_role not in discord_user.roles:
+                        await self.bot.say("{} does not have {} but is in clan.".format(
+                            discord_user, clan_role
+                        ))
 
 
 def check_folder():

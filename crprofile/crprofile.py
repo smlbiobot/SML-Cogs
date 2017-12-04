@@ -29,7 +29,7 @@ import datetime as dt
 import itertools
 import json
 import os
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from datetime import timedelta
 from random import choice
 
@@ -37,23 +37,23 @@ import aiohttp
 import discord
 import inflect
 from __main__ import send_cmd_help
-from discord.ext import commands
-
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "crprofile")
 PATH_PLAYERS = os.path.join(PATH, "players")
 JSON = os.path.join(PATH, "settings.json")
 BADGES_JSON = os.path.join(PATH, "badges.json")
+CHESTS = dataIO.load_json(os.path.join('data', 'crprofile', 'chests.json'))
 
 DATA_UPDATE_INTERVAL = timedelta(minutes=30).seconds
 
-API_FETCH_TIMEOUT = 5
+API_FETCH_TIMEOUT = 10
 
 BOTCOMMANDER_ROLES = ["Bot Commander"]
 
-CREDITS = 'Harmiox + SML'
+CREDITS = 'Selfish + SML'
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -86,17 +86,16 @@ class BotEmoji:
             'Gold': 'chestgold',
             'Giant': 'chestgiant',
             'Magic': 'chestmagical',
-            'super_magical': 'chestsupermagical',
-            'legendary': 'chestlegendary',
-            'epic': 'chestepic'
+            'SuperMagical': 'chestsupermagical',
+            'Legendary': 'chestlegendary',
+            'Epic': 'chestepic'
         }
 
     def name(self, name):
         """Emoji by name."""
-        for server in self.bot.servers:
-            for emoji in server.emojis:
-                if emoji.name == name:
-                    return '<:{}:{}>'.format(emoji.name, emoji.id)
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == name:
+                return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
     def key(self, key):
@@ -164,174 +163,190 @@ class SCTag:
             ))
 
 
-class CRArenaModel:
-    """Clash Royale arenas."""
-
-    def __init__(self, **kwargs):
-        """Init.
-
-        Keyword Args:
-            Name (str)
-            TID (str)
-            TIDText (str)
-            SubtitleTID (str)
-            SubtitleTIDText (str)
-            Arena (int)
-            ChestArena (str)
-            TvArena (str)
-            IsInUse (bool)
-            TrainingCamp (bool)
-            PVEArena (str)
-            TrophyLimit (int)
-            DemoteTrophyLimit (int)
-            SeasonTrophyReset (str)
-            ChestRewardMultiplier (int)
-            ChestShopPriceMultiplier (int)
-            RequestSize (int)
-            MaxDonationCountCommon (int)
-            MaxDonationCountRare (int)
-            MaxDonationCountEpic (int)
-            IconSWF (str)
-            IconExportName (str)
-            MainMenuIconExportName (str)
-            SmallIconExportName (str)
-            MatchmakingMinTrophyDelta (int)
-            MatchmakingMaxTrophyDelta (int)
-            MatchmakingMaxSeconds (int)
-            PvpLocation (str)
-            TeamVsTeamLocation (str)
-            DailyDonationCapacityLimit (int)
-            BattleRewardGold (str)
-            ReleaseDate (str)
-        """
-        self.__dict__.update(kwargs)
-
-
 class CRPlayerModel:
-    """Clash Royale arenas."""
+    """Clash Royale player model."""
 
-    def __init__(self, is_cache=False, **kwargs):
+    def __init__(self, is_cache=False, data=None, error=False):
         """Init.
 
-        Keyword Args:
-            username (str)
-            tag (str)
-            trophies {}
-                current (int)
-                legend (int)
-                highest (int)
-            level (int)
-            experience (int)
-            rank (int)
-            clan {}
-                name (str)
-                tag (str)
-                role (str)
-                badge_url (str, url)
-                badge_id (int)
-            chests {}
-                order_index (int)
-                count (int)
-                super_magical (int)
-                legendary (int)
-                epic (int)
-                index (int)
-                cycle [str]
-            gold (int)
-            gems (int)
-            wins (int)
-            losses (int)
-            draws (int)
-            three_crown_wins (int)
-            cards_found (int)
-            favorite_card_id (int)
-            favorite_card (str)
-            deck []
-                id (int)
-                level (int)
-                Unk1 (int)
-                Count (int)
-                Unk2 (int)
-                Unk3 (int)
-                New (int)
-                name (str)
-            areana_url (str, url)
+        Params:
+        data: dict from JSON
+        is_cache: True is data is cached (flag)
+        CHESTS: chest cycle from apk
         """
-        self.__dict__.update(kwargs)
+        self.data = data
         self.is_cache = is_cache
+        self.CHESTS = CHESTS
+        self.error = error
+
+    def prop(self, section, prop, default=0):
+        """Return sectional attribute."""
+        attr = self.data.get(section)
+        if attr is not None:
+            value = attr.get(prop)
+            if value is not None:
+                return value
+        return default
+
+    @property
+    def tag(self):
+        """Player tag"""
+        return self.data.get("tag", None)
+
+    @property
+    def name(self):
+        """IGN."""
+        return self.data.get("name", None)
+
+    @property
+    def trophies(self):
+        """Trophies."""
+        return self.data.get("trophies", None)
+
+    @property
+    def experience(self):
+        """Experience."""
+        return self.data.get("experience", None)
+
+    @property
+    def level(self):
+        """XP Level."""
+        if self.experience is not None:
+            return self.experience.get("level", None)
+        return None
 
     @property
     def xp(self):
+        """XP Level."""
+        if self.experience is not None:
+            return self.experience.get("xp", 0)
+        return 0
+
+    @property
+    def xp_total(self):
+        """XP Level."""
+        if self.experience is not None:
+            return self.experience.get("xpRequiredForLevelUp", None)
+        return None
+
+    @property
+    def xp_str(self):
         """Experience in current / total format."""
-        xp_levels = [
-            "0",
-            "20",
-            "50",
-            "100",
-            "200",
-            "400",
-            "1000",
-            "2000",
-            "5000",
-            "10000",
-            "30000",
-            "40000",
-            "80000",
-            "MAX"
-        ]
         current = 'MAX'
         total = 'MAX'
-        if xp_levels[self.level].isdigit():
-            current = '{:,}'.format(int(self.experience))
-            total = '{:,}'.format(int(xp_levels[self.level]))
+        if isinstance(self.xp_total, int):
+            current = '{:,}'.format(self.xp)
+            total = '{:,}'.format(self.xp_total)
         return '{} / {}'.format(current, total)
+
+    @property
+    def clan(self):
+        """Clan."""
+        return self.data.get("clan", None)
+
+    @property
+    def not_in_clan(self):
+        """Not in clan flag."""
+        return self.clan is None
 
     @property
     def clan_name(self):
         """Clan name."""
-        if self.clan["name"] is None:
+        if self.not_in_clan:
             return "No Clan"
-        return self.clan["name"]
+        if self.clan is not None:
+            return self.clan.get("name", None)
+        return None
 
     @property
     def clan_tag(self):
         """Clan tag."""
-        return self.clan["tag"]
+        if self.clan is not None:
+            return self.clan.get("tag", None)
+        return None
 
     @property
     def clan_role(self):
         """Clan role."""
-        return self.clan["role"]
+        if self.not_in_clan:
+            return "N/A"
+        if self.clan is not None:
+            return self.clan.get("role", None)
+        return None
 
     @property
     def clan_name_tag(self):
         """Clan name and tag."""
-        return '{} #{}'.format(self.clan["name"], self.clan["tag"])
+        return '{} #{}'.format(self.clan_name, self.clan_tag)
 
     @property
     def clan_badge_url(self):
         """Clan badge url."""
-        badges = dataIO.load_json(BADGES_JSON)
+        if self.not_in_clan:
+            return "http://smlbiobot.github.io/img/emblems/NoClan.png"
         try:
-            key = str(self.clan["badge_id"] - 1 + 16000000)
-            return 'https://smlbiobot.github.io/img/emblems/{}.png'.format(badges[key])
+            url = self.clan['badge']['url']
+            return 'http://api.cr-api.com' + url
         except KeyError:
-            return 'https://smlbiobot.github.io/img/emblems/NoClan.png'
+            pass
+        return ''
+
+    @property
+    def stats(self):
+        """Stats."""
+        return self.data.get("stats", None)
+
+    @property
+    def challenge_cards_won(self):
+        """Challenge cards won."""
+        return self.prop("stats", "challengeCardsWon", 0)
+
+    @property
+    def tourney_cards_won(self):
+        """Challenge cards won."""
+        return self.prop("stats", "tournamentCardsWon", 0)
+
+    @property
+    def tourney_cards_per_game(self):
+        """Number of tournament cards won per game played."""
+        if self.tourney_games:
+            return self.tourney_cards_won / self.tourney_games
+        return None
+
+    @property
+    def challenge_max_wins(self):
+        """Max challenge wins."""
+        return self.prop("stats", "challengeMaxWins", 0)
+
+    @property
+    def total_donations(self):
+        """Total donations."""
+        return self.prop("stats", "totalDonations", 0)
+
+    @property
+    def cards_found(self):
+        """Cards found."""
+        return self.prop("stats", "cardsFound", 0)
+
+    @property
+    def favorite_card(self):
+        """Favorite card."""
+        return self.prop("stats", "favoriteCard", "soon")
 
     @property
     def trophy_current(self):
         """Current trophies."""
-        return self.trophies["current"]
+        return self.data.get("trophies", None)
 
     @property
     def trophy_highest(self):
         """Personal best."""
-        return self.trophies["highest"]
+        return self.prop("stats", "maxTrophies", 0)
 
     @property
     def trophy_legendary(self):
         """Legendary trophies."""
-        return self.trophies["legend"]
+        return self.prop("stats", "legendaryTrophies", 0)
 
     def trophy_value(self, emoji):
         """Trophy values.
@@ -339,83 +354,211 @@ class CRPlayerModel:
         Current / Highest (PB)
         """
         return '{} / {} PB {}'.format(
-            '{:,}'.format(self.trophies['current']),
-            '{:,}'.format(self.trophies['highest']),
+            '{:,}'.format(self.trophy_current),
+            '{:,}'.format(self.trophy_highest),
             emoji)
 
-    def win_draw_losses(self, emoji):
-        """Win / draw / losses."""
-        return '{} / {} / {} {}'.format(
+    @property
+    def games(self):
+        """Game stats."""
+        return self.data.get("games")
+
+    @property
+    def tourney_games(self):
+        """Number of tournament games."""
+        return self.prop("games", "tournamentGames", 0)
+
+    @property
+    def wins(self):
+        """Games won."""
+        return self.prop("games", "wins", 0)
+
+    @property
+    def losses(self):
+        """Games won."""
+        return self.prop("games", "losses", 0)
+
+    @property
+    def draws(self):
+        """Games won."""
+        return self.prop("games", "draws", 0)
+
+    def win_losses(self, emoji):
+        """Win / losses."""
+        return '{} / {} {}'.format(
             '{:,}'.format(self.wins),
-            '{:,}'.format(self.draws),
             '{:,}'.format(self.losses),
             emoji
         )
 
+    @property
+    def total_games(self):
+        """Total games played."""
+        return self.prop("games", "total", 0)
+
+    @property
+    def win_streak(self):
+        """Win streak."""
+        return max(self.prop("games", "currentWinStreak", 0), 0)
+
+    @property
+    def three_crown_wins(self):
+        """Three crown wins."""
+        return self.prop("stats", "threeCrownWins", 0)
+
+    @property
+    def rank(self):
+        """Global rank"""
+        return self.data.get("globalRank", None)
+
     def rank_str(self, bot_emoji: BotEmoji):
         """Rank in ordinal format."""
+        if self.rank is None:
+            return "Unranked"
         p = inflect.engine()
         o = p.ordinal(self.rank)[-2:]
         return '{:,}{} {}'.format(self.rank, o, bot_emoji.name('rank'))
 
+    """
+    Chests.
+    """
+
+    @property
+    def chest_cycle(self):
+        """Chest cycle."""
+        return self.data.get("chestCycle", None)
+
+    @property
+    def chest_cycle_position(self):
+        """Chest cycle position."""
+        if self.chest_cycle is not None:
+            return self.chest_cycle.get("position", None)
+        return None
+
+    def chest_by_position(self, pos):
+        """Return chest type based on position."""
+        if pos == self.chest_cycle.get("superMagicalPos"):
+            return "SuperMagical"
+        elif pos == self.chest_cycle.get("legendaryPos"):
+            return "Legendary"
+        elif pos == self.chest_cycle.get("epicPos"):
+            return "Epic"
+        return self.CHESTS[pos % len(self.CHESTS)]
+
+    def chests(self, count):
+        """Next n chests."""
+        if self.chest_cycle_position is not None:
+            return [self.chest_by_position(self.chest_cycle_position + i) for i in range(count)]
+        return []
+
+    def chest_index(self, key):
+        """Chest incdex by chest key."""
+        if self.chest_cycle is None:
+            return None
+        if self.chest_cycle_position is None:
+            return None
+        chest_pos = self.chest_cycle.get(key, None)
+        if chest_pos is None:
+            return None
+        return chest_pos - self.chest_cycle_position
+
+    @property
+    def chest_super_magical_index(self):
+        """Super magical index."""
+        return self.chest_index("superMagicalPos")
+
+    @property
+    def chest_legendary_index(self):
+        """Super magical index."""
+        return self.chest_index("legendaryPos")
+
+    @property
+    def chest_epic_index(self):
+        """Super magical index."""
+        return self.chest_index("epicPos")
+
+    def chest_first_index(self, key):
+        """First index of chest by key."""
+        if self.CHESTS is not None:
+            pos = self.chest_cycle_position
+            if pos is not None:
+                start_pos = pos % len(self.CHESTS)
+                chests = self.CHESTS[start_pos:]
+                chests.extend(self.CHESTS)
+                return chests.index(key)
+        return None
+
     @property
     def chest_magical_index(self):
         """First index of magical chest"""
-        # return 0
-        return self.chests["cycle"].index("Magic")
+        return self.chest_first_index('Magic')
 
     @property
     def chest_giant_index(self):
-        """First index of magical chest"""
-        # return 0
-        return self.chests["cycle"].index("Giant")
+        """First index of giant chest"""
+        return self.chest_first_index('Giant')
 
     @property
     def chests_opened(self):
         """Number of chests opened."""
-        return self.chests["index"]
+        return self.chest_cycle_position
 
     def chest_list(self, bot_emoji: BotEmoji):
         """List of chests."""
         # chests
-        # special chests
-        key_list = ['super_magical', 'legendary', 'epic']
-        chests = [(k, v) for k, v in self.chests.items() if k in key_list]
-        # giant magical
-        chests.append(('Giant', self.chest_giant_index))
-        chests.append(('Magic', self.chest_magical_index))
-        chests = sorted(chests, key=lambda c: c[1])
+        special_chests = [
+            ('Magic', self.chest_magical_index),
+            ('Giant', self.chest_giant_index),
+            ('Epic', self.chest_epic_index),
+            ('Legendary', self.chest_legendary_index),
+            ('SuperMagical', self.chest_super_magical_index)
+        ]
+        special_chests = [c for c in special_chests if c[1] is not None]
+        special_chests = sorted(special_chests, key=lambda c: c[1])
 
-        cycle = [bot_emoji.key(c) for c in self.chests['cycle'][:8]]
-        chest_out = ['{}{}'.format(bot_emoji.key(c[0]), c[1] + 1) for c in chests]
-        chest_str = '{} . {}'.format(''.join(cycle), ' . '.join(chest_out))
-        return chest_str
+        out = []
+        for c in self.chests(8):
+            out.append(bot_emoji.key(c))
+
+        # special chests
+        for c in special_chests:
+            # don’t append if index is replaced by a special cycle
+            add_chest = True
+            if c[0] in ('Magic', 'Giant'):
+                if c[1] in [self.chest_epic_index, self.chest_legendary_index, self.chest_super_magical_index]:
+                    add_chest = False
+            if add_chest:
+                out.append(bot_emoji.key(c[0]))
+                out.append('{}'.format(c[1] + 1))
+
+        return ''.join(out)
+
+    def shop_offers(self, name):
+        """Shop offers by name.
+        
+        Valid names are: legendary, epic, arena.
+        """
+        offers = self.data.get("shopOffers")
+        return offers.get(name)
 
     @property
     def shop_offers_arena(self):
         """Get epic shop offer."""
-        if hasattr(self, 'shop_offers'):
-            return self.shop_offers.get('arena', -1)
-        return -1
+        return self.shop_offers("arena")
 
     @property
     def shop_offers_epic(self):
         """Get epic shop offer."""
-        if hasattr(self, 'shop_offers'):
-            return self.shop_offers.get('epic', -1)
-        return -1
+        return self.shop_offers("epic")
 
     @property
     def shop_offers_legendary(self):
         """Get epic shop offer."""
-        if hasattr(self, 'shop_offers'):
-            return self.shop_offers.get('legendary', -1)
-        return -1
+        return self.shop_offers("legendary")
 
     def shop_list(self, bot_emoji: BotEmoji):
         """List of shop offers."""
         offers = [{
-            # 'name': 'chestdraft',
             'name': 'shopgoblin',
             'index': self.shop_offers_arena
         }, {
@@ -425,58 +568,68 @@ class CRPlayerModel:
             'name': 'chestlegendary',
             'index': self.shop_offers_legendary
         }]
-        offers = [offer for offer in offers if offer['index'] > 0]
+        offers = [offer for offer in offers if offer['index'] is not None]
         offers = sorted(offers, key=lambda o: o['index'])
         out = ['{}{} days'.format(bot_emoji.name(o['name']), o['index']) for o in offers]
         return ' '.join(out)
 
     @property
     def win_ratio(self):
-        """Win ratio."""
-        return '{0:.3f}%'.format(
-            (self.wins + self.draws * 0.5) / (self.wins + self.draws + self.losses) * 100)
+        """Win ratio.
+
+        Draws reported by API includes 2v2, so we remove those data
+        """
+        # return (self.wins + self.draws * 0.5) / (self.wins + self.draws + self.losses)
+        return self.wins / (self.wins + self.losses)
 
     @property
     def arena(self):
         """League. Can be either Arena or league."""
-        arenas = dataIO.load_json(os.path.join(PATH, 'arenas.json'))
-        arenas = [CRArenaModel(**a) for a in arenas]
-        arenas = sorted(arenas, key=lambda x: x.TrophyLimit, reverse=True)
-
-        result = None
-        for arena in arenas:
-            if self.trophy_current >= arena.TrophyLimit:
-                result = arena
-                break
-
-        return result
+        try:
+            return self.data["arena"]["arena"]
+        except KeyError:
+            return None
 
     @property
     def arena_text(self):
         """Arena text."""
-        return self.arena.TIDText
+        try:
+            return self.data["arena"]["name"]
+        except KeyError:
+            return None
 
     @property
     def arena_subtitle(self):
         """Arena subtitle"""
-        return self.arena.SubtitleTIDText
+        try:
+            return self.data["arena"]["arena"]
+        except KeyError:
+            return None
+
+    @property
+    def arena_id(self):
+        """Arena ID."""
+        try:
+            return self.data["arena"]["arenaID"]
+        except KeyError:
+            return None
 
     @property
     def league(self):
         """League (int)."""
-        league = max(self.arena.Arena - 11, 0)
+        league = max(self.arena_id - 11, 0)
         return league
 
     def fave_card(self, bot_emoji: BotEmoji):
         """Favorite card in emoji and name."""
         emoji = self.api_cardname_to_emoji(self.favorite_card, bot_emoji)
-        return '{} {}'.format(self.favorite_card, emoji)
+        return '{} {}'.format(self.favorite_card.replace('_', ' ').title(), emoji)
 
     def arena_emoji(self, bot_emoji: BotEmoji):
         if self.league > 0:
             name = 'league{}'.format(self.league)
         else:
-            name = 'arena{}'.format(self.arena.Arena)
+            name = 'arena{}'.format(self.arena_id)
         return bot_emoji.name(name)
 
     @property
@@ -490,9 +643,9 @@ class CRPlayerModel:
 
     def deck_list(self, bot_emoji: BotEmoji):
         """Deck with emoji"""
-        cards = [card["name"] for card in self.deck]
-        cards = [self.api_cardname_to_emoji(name, bot_emoji) for name in cards]
-        levels = [card["level"] for card in self.deck]
+        cards = [card["key"] for card in self.data.get("currentDeck")]
+        cards = [bot_emoji.name(key.replace('-', '')) for key in cards]
+        levels = [card["level"] for card in self.data.get("currentDeck")]
         deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
         return ' '.join(deck)
 
@@ -502,7 +655,7 @@ class CRPlayerModel:
         cards = cr["Cards"]
         result = None
         for crid, o in cards.items():
-            if o["api_id"] == name:
+            if o["sfid"] == name:
                 result = crid
                 break
         if result is None:
@@ -510,11 +663,25 @@ class CRPlayerModel:
         result = result.replace('-', '')
         return bot_emoji.name(result)
 
+    @property
+    def seasons(self):
+        """Season finishes."""
+        s_list = []
+        for s in self.data.get("previousSeasons"):
+            s_list.append({
+                "number": s.get("seasonNumber", None),
+                "highest": s.get("seasonHighest", None),
+                "ending": s.get("seasonEnding", None),
+                "rank": s.get("seasonEndGlobalRank", None)
+            })
+        s_list = sorted(s_list, key=lambda s: s["number"])
+        return s_list
+
 
 class Settings:
     """Cog settings.
 
-    Functionally the CRClan cog model.
+    Functionally the CRProfile cog model.
     """
 
     DEFAULTS = {
@@ -533,11 +700,6 @@ class Settings:
         self.filepath = filepath
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(filepath))
-
-        # arenas
-        arenas = dataIO.load_json(os.path.join(PATH, 'arenas.json'))
-        self.arenas = [CRArenaModel(**a) for a in arenas]
-        self.arenas = sorted(self.arenas, key=lambda x: x.TrophyLimit, reverse=True)
 
     def init_server(self, server):
         """Initialized server settings.
@@ -580,6 +742,16 @@ class Settings:
         self.settings["servers"][server.id]["players"] = players
         self.save()
 
+    def rm_player_tag(self, server, member):
+        """Remove player tag from settings."""
+        self.check_server(server)
+        try:
+            self.settings["servers"][server.id]["players"].pop(member.id, None)
+        except KeyError:
+            pass
+        self.save()
+
+
     def tag2member(self, server, tag):
         """Return Discord member from player tag."""
         try:
@@ -598,23 +770,26 @@ class Settings:
     async def player_data(self, tag):
         """Return CRPlayerModel by tag."""
         tag = SCTag(tag).tag
-        url = "{}{}".format(self.profile_api_url, tag)
+        url = 'http://api.cr-api.com/profile/{}'.format(tag)
 
-        headers = {'authorization': self.profile_api_token}
+        error = False
+        data = None
 
         try:
-            async with aiohttp.ClientSession(headers=headers) as session:
+            async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
-                    data = await resp.json()
+                    if resp.status != 200:
+                        error = True
+                    else:
+                        data = await resp.json()
+                        file_path = self.cached_filepath(tag)
+                        dataIO.save_json(file_path, data)
         except json.decoder.JSONDecodeError:
             raise
         except asyncio.TimeoutError:
             raise
 
-        file_path = self.cached_filepath(tag)
-        dataIO.save_json(file_path, data)
-
-        return CRPlayerModel(**data)
+        return CRPlayerModel(data=data, error=error)
 
     def cached_player_data(self, tag):
         """Return cached data by tag."""
@@ -622,7 +797,7 @@ class Settings:
         if not os.path.exists(file_path):
             return None
         data = dataIO.load_json(file_path)
-        return CRPlayerModel(is_cache=True, **data)
+        return CRPlayerModel(is_cache=True, data=data)
 
     def cached_player_data_timestamp(self, tag):
         """Return timestamp in days-since format of cached data."""
@@ -668,19 +843,6 @@ class Settings:
             pass
         return None
 
-    def trophy2arena(self, trophy):
-        """Convert trophy to league based on Arenas."""
-        result = None
-        for arena in self.arenas:
-            if trophy >= arena.TrophyLimit:
-                result = arena
-                break
-
-        if result is not None:
-            return '{}: {}'.format(result.TIDText, result.SubtitleTIDText)
-
-        return ''
-
     def emoji(self, name=None, key=None):
         """Chest emojis by api key name or key.
 
@@ -708,12 +870,12 @@ class Settings:
 
     @property
     def profile_api_url(self):
-        """Clan API URL."""
+        """Profile API URL."""
         return self.settings["profile_api_url"]
 
     @profile_api_url.setter
     def profile_api_url(self, value):
-        """Set Clan API URL."""
+        """Set Profile API URL."""
         self.settings["profile_api_url"] = value
         self.save()
 
@@ -731,12 +893,12 @@ class Settings:
     @property
     def badge_url(self):
         """Clan Badge URL."""
-        return self.settings.get("badge_url", None)
+        return self.settings.get("badge_url_base", None)
 
     @badge_url.setter
     def badge_url(self, value):
         """lan Badge URL"""
-        self.settings["badge_url"] = value
+        self.settings["badge_url_base"] = value
         self.save()
 
     def set_resources(self, server, value):
@@ -769,35 +931,28 @@ class CRProfile:
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
     async def crprofileset(self, ctx):
-        """Clash Royale clan management API.
-
-        Requires: Clash Royale API access by Selfish.
-        """
+        """Clash Royale profile API."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
     @crprofileset.command(name="initserver", pass_context=True)
     async def crprofileset_initserver(self, ctx):
-        """Init CR Clan: server settings."""
+        """Init CR Profile: server settings."""
         server = ctx.message.server
         self.model.init_server(server)
         await self.bot.say("Server settings initialized.")
 
     @crprofileset.command(name="initplayers", pass_context=True)
     async def crprofileset_initplayers(self, ctx):
-        """Init CR Clan: players settings."""
+        """Init CR Profile: players settings."""
         server = ctx.message.server
         self.model.init_players(server)
         await self.bot.say("Clan settings initialized.")
 
     @crprofileset.command(name="profileapi", pass_context=True)
     async def crprofileset_profileapi(self, ctx, url):
-        """CR Clan API URL base.
-
-        Format:
-        If path is http://domain.com/path/LQQ
-        Enter http://domain.com/path/
-        """
+        """CR Profile API URL base."""
+        # TODO Depreciated as cr-api.com Profile API is now public.
         self.model.profile_api_url = url
         await self.bot.say("Profile API URL updated.")
 
@@ -815,16 +970,27 @@ class CRProfile:
     @crprofileset.command(name="apitoken", pass_context=True)
     async def crprofileset_apiauth(self, ctx, token):
         """API Authentication token."""
+        # TODO Depreciated as cr-api.com Profile API is now public.
+        # TODO Keeping this as token might be implemented later.
         self.model.profile_api_token = token
         await self.bot.say("API token save.")
 
     @crprofileset.command(name="resources", pass_context=True)
     async def crprofileset_resources(self, ctx, enable: bool):
         """Show gold/gems in profile."""
+        # TODO Depreciated as field determined to be “creepy”
         self.model.set_resources(ctx.message.server, enable)
         await self.bot.say(
             "CR profiles {} show resources.".format('will' if enable else 'will not')
         )
+
+    @crprofileset.command(name="rmplayertag", pass_context=True)
+    async def crprofileset_rmplayertag(self, ctx, member:discord.Member):
+        """Remove player tag of a user."""
+        server = ctx.message.server
+        self.model.rm_player_tag(server, member)
+        await self.bot.say("Removed player tag for {}".format(member))
+
 
     @commands.group(pass_context=True, no_pm=True)
     async def crprofile(self, ctx):
@@ -931,8 +1097,18 @@ class CRProfile:
 
         if tag is None:
             await self.bot.say(
-                "{} has not set his player tag with the bot yet.".format(member.display_name)
+                "{} has not set player tag with the bot yet. ".format(member.display_name)
             )
+            # Tailor support message depending on cogs installed
+            racf_cog = self.bot.get_cog("RACF")
+            if racf_cog is None:
+                await self.bot.say(
+                    "Pleaes run `[p]crprofile settag` to set your player tag."
+                )
+            else:
+                await self.bot.say(
+                    "Please run `!crsettag` to set your player tag."
+                )
             return
         await self.display_profile(ctx, tag, resources=resources)
 
@@ -951,7 +1127,7 @@ class CRProfile:
             player_data = self.model.cached_player_data(tag)
 
         if player_data is None:
-            await self.bot.say("Unable to load from API.")
+            await self.bot.send_message(ctx.message.channel, "Unable to load from API.")
             return
         if player_data.is_cache:
             await self.bot.send_message(
@@ -966,7 +1142,6 @@ class CRProfile:
         server = ctx.message.server
         for em in self.embeds_profile(player_data, server=server, resources=resources):
             await self.bot.say(embed=em)
-            # await self.bot.send_message(ctx.message.channel, embed=em)
 
     def embeds_profile(self, player: CRPlayerModel, server=None, resources=False):
         """Return Discord Embed of player profile."""
@@ -980,16 +1155,26 @@ class CRProfile:
         if member is not None:
             mention = member.mention
 
-        # header
-        title = player.clan_name
-        description = '#{}\n{}'.format(player.clan_tag, player.clan_role)
-        em = discord.Embed(title=title, description=description, color=color)
+        profile_url = 'http://cr-api.com/profile/{}'.format(player.tag)
+        clan_url = 'http://cr-api.com/clan/{}'.format(player.clan_tag)
 
-        # clan
-        author_name = '{} #{}'.format(player.username, player.tag)
-        em.set_author(name=author_name)
-        # em.set_author(name=author_name, icon_url=player.clan_badge_url)
-        # em.set_thumbnail(url=player.arena_url)
+        # header
+        title = player.name
+
+        description = (
+            '[{player_tag}]({profile_url})\n'
+            '**[{clan_name}]({clan_url})**\n'
+            '[{clan_tag}]({clan_url})\n'
+            '{clan_role}'
+        ).format(
+            player_tag=player.tag,
+            profile_url=profile_url,
+            clan_name=player.clan_name,
+            clan_tag=player.clan_tag,
+            clan_url=clan_url,
+            clan_role=player.clan_role
+        )
+        em = discord.Embed(title=title, description=description, color=color, url=profile_url)
         em.set_thumbnail(url=player.clan_badge_url)
         header = {
             'Trophies': player.trophy_value(bem('trophy')),
@@ -1006,17 +1191,31 @@ class CRProfile:
 
         def fmt(num, emoji_name):
             emoji = bem(emoji_name)
-            return '{:,} {}'.format(num, emoji)
+            if emoji is not None:
+                return '{:,} {}'.format(num, emoji)
 
-        stats = {
-            'Wins / Draws / Losses': player.win_draw_losses(bem('battle')),
-            'Win Ratio': '{} {}'.format(player.win_ratio, bem('battle')),
-            'Three-Crown Wins': fmt(player.three_crown_wins, 'crownblue'),
-            'Level': player.level,
-            'Experience': player.xp,
-            'Cards Found': fmt(player.cards_found, 'cards'),
-            'Favorite Card': player.fave_card(self.bot_emoji)
-        }
+        if player.tourney_cards_per_game is None:
+            tourney_cards_per_game = 'N/A'
+        else:
+            tourney_cards_per_game = '{:.3f}'.format(player.tourney_cards_per_game)
+
+        stats = OrderedDict([
+            ('Wins / Losses (Ladder 1v1)', player.win_losses(bem('battle'))),
+            ('Ladder Win Percentage', '{:.3%} {}'.format(player.win_ratio, bem('battle'))),
+            ('Total Games (1v1 + 2v2)', fmt(player.total_games, 'battle')),
+            ('Three-Crown Wins', fmt(player.three_crown_wins, 'crownblue')),
+            ('Win Streak', fmt(player.win_streak, 'crownred')),
+            ('Cards Found', fmt(player.cards_found, 'cards')),
+            ('Challenge Cards Won', fmt(player.challenge_cards_won, 'tournament')),
+            ('Challenge Max Wins', fmt(player.challenge_max_wins, 'tournament')),
+            ('Tourney Cards Won', fmt(player.tourney_cards_won, 'tournament')),
+            ('Tourney Games', fmt(player.tourney_games, 'tournament')),
+            ('Tourney Cards/Game', '{} {}'.format(tourney_cards_per_game, bem('tournament'))),
+            ('Total Donations', fmt(player.total_donations, 'cards')),
+            ('Level', fmt(player.level, 'experience')),
+            ('Experience', '{} {}'.format(player.xp_str, bem('experience'))),
+            ('Favorite Card', player.fave_card(self.bot_emoji))
+        ])
         for k, v in stats.items():
             em.add_field(name=k, value=v)
 
@@ -1030,14 +1229,28 @@ class CRProfile:
         # shop offers
         em.add_field(name="Shop Offers", value=player.shop_list(self.bot_emoji), inline=False)
 
+        # season finishes
+        def rank_str(rank):
+            if rank is None:
+                return "Unranked"
+            p = inflect.engine()
+            o = p.ordinal(rank)[-2:]
+            return '{:,}{}'.format(rank, o)
+
+        for s in player.seasons:
+            em.add_field(
+                name="Season {}".format(s["number"]),
+                value="{:,}/{:,} ({})".format(s["ending"], s["highest"], rank_str(s["rank"])),
+                inline=True
+            )
+
+        # link to cr-api.com
+        em.set_footer(
+            text=profile_url,
+            icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
+
         embeds.append(em)
         return embeds
-
-    @crprofile.command(name="trophy2arena", aliases=['t2a'], pass_context=True, no_pm=True)
-    async def crprofile_trophy2arena(self, ctx, trophy: int):
-        """Convert trophies to arenas."""
-        text = self.model.trophy2arena(trophy)
-        await self.bot.say(text)
 
 
 def check_folder():

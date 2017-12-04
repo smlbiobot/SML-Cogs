@@ -32,7 +32,7 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 
-import trueskill
+from trueskill import Rating, rate_1vs1
 
 PATH = os.path.join("data", "ladder")
 JSON = os.path.join(PATH, "settings.json")
@@ -40,6 +40,72 @@ JSON = os.path.join(PATH, "settings.json")
 SERVER_DEFAULTS = {
     "SERIES": {}
 }
+
+class Player:
+    """Player in a game."""
+    def __init__(self, discord_id, rating=None):
+        if rating is None:
+            rating = 1500
+        self.rating = Rating(rating)
+        self.discord_id = discord_id
+
+class Game:
+    """A match."""
+    def __init__(self, player1=None, player2=None):
+        self.player1 = player1
+        self.player2 = player2
+
+    def match_1vs1(self, winner:Player, loser:Player):
+        """Match score reporting."""
+        winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating)
+
+
+class ServerSettings:
+    """Server settings."""
+    def __init__(self, server):
+        """Server settings."""
+        self.server = server
+        self.ladders = []
+        self._model = None
+
+    @property
+    def model(self):
+        return self._model
+
+
+
+
+class Settings:
+    """Ladder settings."""
+    server_default = { "ladders": [] }
+
+    def __init__(self, bot):
+        self.bot = bot
+        self.model = dataIO.load_json(JSON)
+
+    def save(self):
+        """Save settings to file."""
+        dataIO.save_json(JSON, self.model)
+
+    def server_model(self, server):
+        """Return model by server."""
+        self.check_server(server)
+        return self.model[server.id]
+
+    def check_server(self, server):
+        """Create server settings if required."""
+        if server.id not in self.model:
+            self.model[server.id] = self.server_default
+        self.save()
+
+    def init_server(self, server):
+        """Initialize server settings to default"""
+        self.model[server.id] = self.server_default
+        self.save()
+
+    def create_ladder(self, server, name, param):
+        """Create new ladder by name"""
+        pass
 
 
 class Ladder:
@@ -49,13 +115,13 @@ class Ladder:
     http://trueskill.org/
 
     Reuirements:
-    pip install trueskill
+    pip3 install trueskill
     """
 
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.settings = dataIO.load_json(JSON)
+        self.settings = Settings(bot)
 
     def check_server(self, server):
         """Check server settings."""
@@ -82,35 +148,23 @@ class Ladder:
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
-    async def setladder(self, ctx):
+    async def ladderset(self, ctx):
         """Set ladder settings."""
         if ctx.invoked_subcommand is None:
             await send_cmd_help(ctx)
 
-    @setladder.command(name="create", pass_context=True)
-    async def setladder_create(self, ctx, name, *players: discord.Member):
+    @ladderset.command(name="create", pass_context=True)
+    async def ladderset_create(self, ctx, name, *players):
         """Create a new series.
 
-        Creates a new ladder series and initialize with players.
+        Creates a new ladder series and optionally initialize with players.
         """
         server = ctx.message.server
-        if self.check_series(server, name) is not None:
-            await self.bot.say("{} already exists.".format(name))
-            return
-        self.settings[server.id]["SERIES"][name] = {
-            "players": list(set([m.id for m in players])),
-            "matches": [],
-            "id": len(self.settings[server.id]["SERIES"])
-        }
-        dataIO.save_json(JSON, self.settings)
-        await self.bot.say(
-            "Create new series named: {}\n"
-            "with players: {}".format(
-                name,
-                ", ".join([m.display_name for m in players])))
+        self.settings.create_ladder(server, name, *players)
 
-    @setladder.command(name="addplayers", pass_context=True)
-    async def setladder_addplayers(self, ctx, name, *players: discord.Member):
+
+    @ladderset.command(name="addplayers", pass_context=True)
+    async def ladderset_addplayers(self, ctx, name, *players: discord.Member):
         """Add players to an existing series."""
         server = ctx.message.server
         if self.check_series(server, name) is None:

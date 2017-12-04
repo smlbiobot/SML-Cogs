@@ -1,0 +1,53 @@
+name: Reddit Alpha Clan Family
+key: racf
+emblem: A_Char_Rocket_02
+clans:
+  - name: Reddit Alpha
+    tag: 2CCCP
+    role_name: Alpha
+    type: Member
+  - name: Reddit Bravo
+    tag: 2U2GGQJ
+    role_name: Bravo
+    type: Member
+  - name: Reddit Charlie
+    tag: 2QUVVVP
+    role_name: Charlie
+    type: Member
+  - name: Reddit Delta
+    tag: Y8GYCGV
+    role_name: Delta
+    type: Member
+  - name: Reddit Echo
+    tag: LGVV2CG
+    role_name: Echo
+    type: Member
+  - name: Reddit Foxtrot
+    tag: QUYCYV8
+    role_name: Foxtrot
+    type: Member
+  - name: Reddit Golf
+    tag: GUYGVJY
+    role_name: Golf
+    type: Member
+  - name: Reddit Hotel
+    tag: UGQ28YU
+    role_name: Hotel
+    type: Member
+  - name: RACF Mini
+    tag: 22LR8JJ2
+    role_name: Mini
+    type: Visitor
+  - name: RACF Mini 2
+    tag: 2Q09VJC8
+    role_name: Mini2
+    type: Visitor
+membership_types:
+  - name: Member
+    roles:
+    - Member
+    - Tourney
+    - Practice
+  - name: Visitor
+    roles:
+    - Visitor

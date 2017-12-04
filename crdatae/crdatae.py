@@ -217,9 +217,11 @@ class CRDataEnhanced:
 
         decks = []
         for rank, deck in enumerate(data["decks"], 1):
-            cards = [crdata.sfid_to_id(card["key"]) for card in deck]
-            levels = [card["level"] for card in deck]
-            decks.append(Deck(card_keys=cards, card_levels=levels, rank=rank))
+            # fix: bad data
+            if deck is not None:
+                cards = [crdata.sfid_to_id(card["key"]) for card in deck]
+                levels = [card["level"] for card in deck]
+                decks.append(Deck(card_keys=cards, card_levels=levels, rank=rank))
 
         # embeds
         per_page = self.per_page
