@@ -120,7 +120,8 @@ class Clans:
 
         try:
             clans = await client.get_clans(clan_tags)
-            dataIO.save_json(CACHE, clans)
+            clans_dict = [clan.as_dict() for clan in clans]
+            dataIO.save_json(CACHE, clans_dict)
         except crapipy.exceptions.APIError:
             data = dataIO.load_json(CACHE)
             clans = [crapipy.models.Clan(d) for d in data]
