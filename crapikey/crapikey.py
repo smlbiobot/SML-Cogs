@@ -26,10 +26,10 @@ DEALINGS IN THE SOFTWARE.
 
 import json
 import os
-import urllib.parse as urlparse
-from urllib.parse import urlencode
+import urllib
 
 import aiohttp
+import discord
 import yaml
 from __main__ import send_cmd_help
 from box import Box
@@ -43,11 +43,38 @@ YAML = os.path.join(PATH, "config.yaml")
 
 
 def build_url(base, params):
-    url_parts = list(urlparse.urlparse(base))
-    query = dict(urlparse.parse_qsl(url_parts[4]))
-    query.update(params)
-    url_parts[4] = urlencode(query)
-    return urlparse.urlunparse(url_parts)
+    return base + '?' + urllib.parse.urlencode(params)
+
+
+class CRAPIKeyError(Exception):
+    """Generic error"""
+    pass
+
+class ServerResponseError(CRAPIKeyError):
+    """Server didn’t respond with valid json."""
+    pass
+
+class KeyIssueFailed(CRAPIKeyError):
+    """Failed to issue key."""
+    pass
+
+class KeyRemoveFailed(CRAPIKeyError):
+    """Failed to delete key."""
+
+class ErrorMessages:
+    """Error messages."""
+    server_response_error = "No response from server. Please try again later."
+    key_issue_failed = "Issuing key failed. Please contact support."
+    server_invalid_error = "You cannot request a key from this server."
+    key_remove_failed = "Removing key failed. Please contact support."
+
+class MessageTemplates:
+    """System messages."""
+    key_found = "Key Found for {member}. Please check your DM."
+    key_found_dm = "The cr-api.com developer key for {member} is: ```{key}```"
+    channel_invalid = "You cannot request a key from this channel. Please run this command at {channel}."
+    key_removed = "Key removed for {member} with token `{token}`."
+
 
 
 class CRAPIKey:
@@ -95,8 +122,10 @@ class CRAPIKey:
             return
         o = [
             "CR-API Key Config",
-            "New Key URL: {}".format(self.config.url.new_key),
-            "Remove Key URL: {}".format(self.config.url.remove_key)
+            "New Key URL: {}".format(self.config.url.retrieve),
+            "Renew key URL: {}".format(self.config.url.renew),
+            "Drop Key URL: {}".format(self.config.url.drop),
+            "Token: {}".format(self.config.token)
         ]
         await self.bot.send_message(ctx.message.channel, "Check your DM.")
         await self.bot.send_message(author, "\n".join(o))
@@ -132,6 +161,41 @@ class CRAPIKey:
         if not attach_msg.channel.is_private:
             await self.bot.delete_message(attach_msg)
 
+    async def get_user_key(self, member:discord.Member):
+        """Retrieve token of a Discord member."""
+        params = {
+            "id": member.id,
+            "name": member.name,
+            "open_sesame": self.config.token
+        }
+        url = build_url(self.config.url.retrieve, params)
+        data = await self.fetch_json(url)
+
+        if data is None:
+            raise ServerResponseError
+        elif not data["success"]:
+            raise KeyIssueFailed
+        elif not data["token"]:
+            raise KeyIssueFailed
+        else:
+            return data["token"]
+
+    async def remove_user_key(self, token):
+        """Retrieve token of a Discord member."""
+        params = {
+            "open_sesame": self.config.token,
+            "token": token
+        }
+        url = build_url(self.config.url.drop, params)
+        data = await self.fetch_json(url)
+
+        if data is None:
+            raise ServerResponseError
+        else:
+            print(data)
+            return data
+
+
     @checks.is_owner()
     @crapikeyset.command(name="channel", pass_context=True, no_pm=False)
     async def crapikeyset_channel(self, ctx, channel=None):
@@ -140,6 +204,8 @@ class CRAPIKey:
         self.settings["server_id"] = ctx.message.server.id
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Channel set.")
+
+
 
     @commands.group(pass_context=True)
     async def crapikey(self, ctx):
@@ -160,15 +226,11 @@ class CRAPIKey:
         server = ctx.message.server
         channel = ctx.message.channel
         if server.id != self.cmd_server_id:
-            await self.bot.say("You cannot request a key from this server.")
+            await self.bot.say(ErrorMessages.server_invalid_error)
             return False
         elif channel.id != self.cmd_channel_id:
-            await self.bot.say(
-                "You cannot request a key from this channel. "
-                "Please run this command at {}".format(
-                    self.bot.get_channel(self.cmd_channel_id).mention
-                )
-            )
+            await self.bot.say(MessageTemplates.channel_invalid.format(
+                channel=self.bot.get_channel(self.cmd_channel_id).mention))
             return False
         return True
 
@@ -179,50 +241,63 @@ class CRAPIKey:
             return
 
         author = ctx.message.author
+        try:
+            key = await self.get_user_key(author)
+        except ServerResponseError:
+            await self.bot.say(ErrorMessages.server_response_error)
+            return
+        except KeyIssueFailed:
+            await self.bot.say(ErrorMessages.key_issue_failed)
+            return
+        await self.bot.say(MessageTemplates.key_found.format(member=author))
+        await self.bot.send_message(
+            author,
+            MessageTemplates.key_found.format(member=author, key=key))
 
-        params = {
-            "id": author.id,
-            "name": author.name
-        }
-        url = build_url(self.config.url.new_key, params)
-        data = await self.fetch_json(url)
+    @checks.serverowner_or_permissions()
+    @crapikey.command(name="getuser", pass_context=True, no_pm=False)
+    async def crapikey_getuser(self, ctx, member: discord.Member):
+        """Retrieve the token of a Discord member."""
+        try:
+            key = await self.get_user_key(member)
+        except ServerResponseError:
+            await self.bot.say(ErrorMessages.server_response_error)
+            return
+        except KeyIssueFailed:
+            await self.bot.say(ErrorMessages.key_issue_failed)
+            return
+        await self.bot.say(MessageTemplates.key_found.format(member=member))
+        await self.bot.send_message(
+            ctx.message.author,
+            MessageTemplates.key_found_dm.format(
+                member=member,
+                key=key))
 
-        if data is None:
-            await self.bot.say("Error fetching key. Please try again later.")
-        elif not data["success"]:
-            await self.bot.say("Issuing key failed. Please contact support.")
-        else:
-            await self.bot.say("Key issued. Please check your DM.")
-            await self.bot.send_message(
-                author,
-                "Your cr-api.com developer key is: ```{}```".format(data["key"])
-            )
-
-    @crapikey.command(name="remove", aliases=["rm"], pass_context=True, no_pm=True)
-    async def crapikey_remove(self, ctx):
-        """Remove a key."""
-        if not await self.validate_run_channel(ctx):
+    @checks.serverowner_or_permissions()
+    @crapikey.command(name="blacklist", pass_context=True, no_pm=False)
+    async def crapikey_blacklist(self, ctx, member: discord.Member):
+        """Black list a member’s token."""
+        # Fetch token by member
+        try:
+            key = await self.get_user_key(member)
+        except ServerResponseError:
+            await self.bot.say(ErrorMessages.server_response_error)
+            return
+        except KeyIssueFailed:
+            await self.bot.say(ErrorMessages.key_issue_failed)
             return
 
-        author = ctx.message.author
-
-        params = {
-            "id": author.id,
-            "name": author.name,
-            "action": "drop"
-        }
-        url = build_url(self.config.url.new_key, params)
-        data = await self.fetch_json(url)
-
-        if data is None:
-            await self.bot.say("Error fetching key. Please try again later.")
-        elif not data["success"]:
-            await self.bot.say("Key removal failed. Please contact support.")
-        else:
-            await self.bot.say("Key successfully removed.")
+        # Remove token
+        try:
+            data = await self.remove_user_key(key)
+        except CRAPIKeyError:
+            await self.bot.say("Error.")
+            return
+        await self.bot.say(MessageTemplates.key_removed.format(member=member, token=key))
 
     async def fetch_json(self, url):
         data = None
+        print(url)
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as resp:

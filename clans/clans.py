@@ -32,14 +32,17 @@ import aiohttp
 import crapipy
 import discord
 import yaml
+import pprint
 from __main__ import send_cmd_help
-from box import Box
+from box import Box, BoxList
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 
 PATH = os.path.join("data", "clans")
 JSON = os.path.join(PATH, "settings.json")
+CACHE = os.path.join(PATH, "cache.json")
+SAVE_CACHE = os.path.join(PATH, "save_cache.json")
 CONFIG_YAML = os.path.join(PATH, "config.yml")
 
 
@@ -114,7 +117,15 @@ class Clans:
         client = crapipy.AsyncClient()
         config = self.clans_config
         clan_tags = [clan.tag for clan in config.clans]
-        clans = await client.get_clans(clan_tags)
+
+        try:
+            clans = await client.get_clans(clan_tags)
+            dataIO.save_json(CACHE, clans)
+        except crapipy.exceptions.APIError:
+            data = dataIO.load_json(CACHE)
+            clans = [crapipy.models.Clan(d) for d in data]
+
+            await self.bot.say("Cannot load from API. Loading info from cache.")
         em = discord.Embed(
             title=config.name,
             description=config.description,

@@ -1,3 +1,5 @@
 url:
-  new_key: http://path/to/issue/key
-  remove_key: http://path/to/remove/key
+  retrieve: http://path/to/retrieve
+  renew: http://path/to/renew
+  drop: http://path/to/drop
+token: your_token
