@@ -425,10 +425,10 @@ class CRData:
                     try:
                         data = await resp.json()
                     except json.decoder.JSONDecodeError:
-                        data = await resp.text()
+                        # data = await resp.text()
                         # when data cannot be decoded,
                         # likely data source is down
-                        # data = None
+                        data = None
         if data is not None:
             dataIO.save_json(now_path, data)
 
