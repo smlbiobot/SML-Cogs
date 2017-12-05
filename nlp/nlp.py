@@ -198,10 +198,10 @@ class NLP:
 
     async def on_message(self, msg: discord.Message):
         """auto translate or channel translate"""
-        await self.autotranslate(msg)
+        await self._autotranslate(msg)
         await self.translate_channel(msg)
 
-    async def autotranslate(self, msg: discord.Message):
+    async def _autotranslate(self, msg: discord.Message):
         """Auto-translate if enabled."""
         server = msg.server
         if server is None:
