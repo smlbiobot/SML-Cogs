@@ -2,15 +2,19 @@
 
 """
 The MIT License (MIT)
+
 Copyright (c) 2017 SML
+
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
 to deal in the Software without restriction, including without limitation
 the rights to use, copy, modify, merge, publish, distribute, sublicense,
 and/or sell copies of the Software, and to permit persons to whom the
 Software is furnished to do so, subject to the following conditions:
+
 The above copyright notice and this permission notice shall be included in
 all copies or substantial portions of the Software.
+
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
 OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -42,6 +46,7 @@ JSON = os.path.join(PATH, "settings.json")
 
 def grouper(n, iterable, fillvalue=None):
     """Helper function to split lists.
+
     Example:
     grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx
     """
@@ -75,6 +80,7 @@ class MemberManagement:
     @mmset.group(name="role", pass_context=True, no_pm=True)
     async def mmset_role(self, ctx):
         """Role permissions.
+
         Specify list of roles allowed to run mm.
         This is a per-server setting.
         """
@@ -107,6 +113,7 @@ class MemberManagement:
     @mmset_macro.command(name="add", pass_context=True, no_pm=True)
     async def mmset_macro_add(self, ctx, name, *, args):
         """Add macro.
+
         name: name of the macro
         args: list of arguments to run.
         """
@@ -155,21 +162,25 @@ class MemberManagement:
         return parser
 
     @commands.command(pass_context=True)
-    @commands.has_any_role(*BOT_COMMANDER_ROLES)
     async def mm(self, ctx, *args):
         """Member management by roles.
+
         !mm [-h] [-x EXCLUDE [EXCLUDE ...]]
              [-o {id,mention,mentiononly}] [-r1] [-e] [-s {join,alpha}]
              [-r {embed,csv,list,none}] [-m MACRO]
              [roles [roles ...]]
+
         Find members with roles: Member, Elder
         !mm Member Elder
+
         Find members with roles: Member, Elder but not: Heist, CoC
         !mm Member Elder -exclude Heist CoC
         !mm Member Elder -x Heist CoC
+
         Output ID
         !mm Alpha Elder --output id
         !mm Alpha Elder -o id
+
         Optional arguments
         --exclude, -x
             Exclude list of roles
@@ -189,6 +200,18 @@ class MemberManagement:
         --everyone
             Include everyone. Useful for finding members without specific roles.
         """
+        server = ctx.message.server
+        role_settings = self.settings[server.id]["roles"]
+
+        user_roles = ctx.message.author.roles
+        can_run = False
+        for role in user_roles:
+            if role.id in role_settings:
+                can_run = True
+
+        if not can_run:
+            return
+
         parser = self.parser()
         try:
             pargs = parser.parse_args(args)
@@ -206,7 +229,7 @@ class MemberManagement:
         option_none = (pargs.result == 'none')
         option_only_role = pargs.onlyrole
 
-        server = ctx.message.server
+
         server_roles_names = [r.name.lower() for r in server.roles]
         plus = set([r.lower() for r in pargs.roles if r.lower() in server_roles_names])
         minus = set()
@@ -389,6 +412,16 @@ class MemberManagement:
                         role.name, out_roles[role.id]['count']))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
+            
+     
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def multiaddrole(self, ctx, role, *members: discord.Member):
+        """Add a role to multiple users.
+        !multiaddrole rolename User1 User2 User3
+        """
+        for member in members:
+            await ctx.invoke(self.changerole, member, role) #self.changerole(ctx, member, role)
 
     @commands.command(pass_context=True, no_pm=True)
     async def listrolecolors(self, ctx, *roles):
@@ -411,7 +444,9 @@ class MemberManagement:
     @checks.mod_or_permissions(manage_roles=True)
     async def changerole(self, ctx, member: discord.Member = None, *roles: str):
         """Change roles of a user.
+
         Example: !changerole SML +Delta "-Foxtrot Lead" "+Delta Lead"
+
         Multi-word roles must be surrounded by quotes.
         Operators are used as prefix:
         + for role addition
@@ -542,6 +577,7 @@ class MemberManagement:
     @checks.mod_or_permissions(manage_roles=True)
     async def multiaddrole(self, ctx, role, *members: discord.Member):
         """Add a role to multiple users.
+
         !multiaddrole rolename User1 User2 User3
         """
         for member in members:
@@ -551,6 +587,7 @@ class MemberManagement:
     @checks.mod_or_permissions(manage_roles=True)
     async def multiremoverole(self, ctx, role, *members: discord.Member):
         """Remove a role from multiple users.
+
         !multiremoverole rolename User1 User2 User3
         """
         role = '-{}'.format(role)
