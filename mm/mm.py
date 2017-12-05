@@ -162,6 +162,7 @@ class MemberManagement:
         return parser
 
     @commands.command(pass_context=True)
+    @commands.has_any_role(*BOT_COMMANDER_ROLES)
     async def mm(self, ctx, *args):
         """Member management by roles.
 
@@ -200,18 +201,6 @@ class MemberManagement:
         --everyone
             Include everyone. Useful for finding members without specific roles.
         """
-        server = ctx.message.server
-        role_settings = self.settings[server.id]["roles"]
-
-        user_roles = ctx.message.author.roles
-        can_run = False
-        for role in user_roles:
-            if role.id in role_settings:
-                can_run = True
-
-        if not can_run:
-            return
-
         parser = self.parser()
         try:
             pargs = parser.parse_args(args)
@@ -229,7 +218,7 @@ class MemberManagement:
         option_none = (pargs.result == 'none')
         option_only_role = pargs.onlyrole
 
-
+        server = ctx.message.server
         server_roles_names = [r.name.lower() for r in server.roles]
         plus = set([r.lower() for r in pargs.roles if r.lower() in server_roles_names])
         minus = set()
@@ -412,16 +401,6 @@ class MemberManagement:
                         role.name, out_roles[role.id]['count']))
         for page in pagify("\n".join(out), shorten_by=12):
             await self.bot.say(page)
-            
-     
-    @commands.command(pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
-    async def multiaddrole(self, ctx, role, *members: discord.Member):
-        """Add a role to multiple users.
-        !multiaddrole rolename User1 User2 User3
-        """
-        for member in members:
-            await ctx.invoke(self.changerole, member, role) #self.changerole(ctx, member, role)
 
     @commands.command(pass_context=True, no_pm=True)
     async def listrolecolors(self, ctx, *roles):
