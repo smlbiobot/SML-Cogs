@@ -587,13 +587,20 @@ class MemberManagement:
         voice_channels = [c for c in server.channels if c.type == discord.ChannelType.voice]
         voice_channels = sorted(voice_channels, key=lambda c: c.position)
 
+        perm_tests = {
+            'read_messages': 'read msg',
+            'read_message_history': 'read history',
+            'send_messages': 'send msg',
+            'manage_messages': 'manage msg',
+            'add_reactions': 'react'
+        }
+
         out = []
         for c in text_channels:
             channel_perm = c.permissions_for(member)
-            tests = ['read_messages', 'read_message_history', 'send_messages', 'manage_messages', 'add_reactions']
-            perms = [t for t in tests if getattr(channel_perm, t)]
+            perms = [t for t in perm_tests.keys() if getattr(channel_perm, t)]
             if len(perms):
-                out.append("{channel} {perms}".format(channel=c.mention, perms=', '.join(perms)))
+                out.append("{channel} {perms}".format(channel=c.mention, perms=', '.join(perm_tests[t] for t in perms)))
 
         for c in voice_channels:
             channel_perm = c.permissions_for(member)
