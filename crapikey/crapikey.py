@@ -130,7 +130,8 @@ class CRAPIKey:
             "New Key URL: {}".format(self.config.url.retrieve),
             "Renew key URL: {}".format(self.config.url.renew),
             "Drop Key URL: {}".format(self.config.url.drop),
-            "Token: {}".format(self.config.token)
+            "Token: {}".format(self.config.token),
+            "Discord server id: {}".format(self.config.server_id)
         ]
         await self.bot.send_message(ctx.message.channel, "Check your DM.")
         await self.bot.send_message(author, "\n".join(o))
