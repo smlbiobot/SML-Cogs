@@ -40,6 +40,7 @@ from discord.ext import commands
 PATH = os.path.join("data", "crapikey")
 JSON = os.path.join(PATH, "settings.json")
 YAML = os.path.join(PATH, "config.yaml")
+DISCORD_SERVER_ID = '351290254830862337'
 
 
 def build_url(base, params):
@@ -344,6 +345,27 @@ class CRAPIKey:
         except json.JSONDecodeError:
             pass
         return data
+
+    async def on_member_remove(self, member:discord.Member):
+        """Remove key when member leaves"""
+        # remove only if it happens on crapi server
+        if member.server.id != DISCORD_SERVER_ID:
+            return
+        try:
+            key = await self.get_user_key(member)
+        except ServerResponseError:
+            print("Server response error.")
+            return
+        except KeyIssueFailed:
+            print("Key issue failed.")
+            return
+        # Remove token
+        try:
+            data = await self.remove_user_key(key)
+        except CRAPIKeyError:
+            await self.bot.say("Error.")
+            return
+        print("Key for {} removed.".format(member))
 
 
 def check_folder():
