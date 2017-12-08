@@ -57,16 +57,17 @@ class RoyaleRant:
 
         if self.settings.get("twitter_api") is None:
             self.settings["twitter_api"] = {
-                "consumer_key": None,
-                "consumer_secret": None,
-                "access_token": None,
-                "access_token_secret": None
+                "consumer_key": '12345',
+                "consumer_secret": '12345',
+                "access_token": '12345',
+                "access_token_secret": '12345'
             }
             dataIO.save_json(JSON, self.settings)
 
     @property
     def peony_client(self):
         """Return Twitter API instance."""
+        print(self.settings["twitter_api"])
         return peony.PeonyClient(**self.settings['twitter_api'])
 
     @commands.group(pass_context=True)
