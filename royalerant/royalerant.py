@@ -25,6 +25,8 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
+import re
+import aiohttp
 from collections import defaultdict
 
 import discord
@@ -64,10 +66,14 @@ class RoyaleRant:
             }
             dataIO.save_json(JSON, self.settings)
 
+        self._peony_client = None
+
     def peony_client(self):
         """Return Twitter API instance."""
-        print(self.settings["twitter_api"])
-        return peony.PeonyClient(**self.settings['twitter_api'])
+        if self._peony_client is None:
+            self._peony_client = peony.PeonyClient(
+                **self.settings['twitter_api'])
+        return self._peony_client
 
     @commands.group(pass_context=True)
     async def royalerantset(self, ctx):
@@ -105,13 +111,28 @@ class RoyaleRant:
     @commands.command(aliases=['rrant'], pass_context=True, no_pm=True)
     async def royalerant(self, ctx, *, msg):
         """Post a Tweet from @RoyaleRant."""
-        try:
-            resp = await self.peony_client().api.statuses.update.post(status=msg)
-        except peony.exceptions.PeonyException as e:
-            await self.bot.say("Error tweeting: {}".format(e.response))
-            return
-        url = "https://twitter.com/{0[user][screen_name]}/status/{0[id_str]}".format(resp)
-        await self.bot.say("Tweeted: <{}>".format(url))
+        with aiohttp.ClientSession() as session:
+            client = peony.PeonyClient(session=session, **self.settings['twitter_api'])
+            author = ctx.message.author
+            author_initials = "".join(re.findall("[a-zA-Z0-9]+", author.display_name))[:2]
+
+            attachment_urls = [attachment['url'] for attachment in ctx.message.attachments]
+
+            try:
+                media_ids = []
+                if len(attachment_urls):
+                    for url in attachment_urls:
+                        media = await client.upload_media(url, chunk_size=2**18, chunked=True)
+                        media_ids.append(media.media_id)
+
+                tweet = "[{}] {}".format(author_initials, msg)
+                resp = await client.api.statuses.update.post(status=tweet, media_ids=media_ids)
+            except peony.exceptions.PeonyException as e:
+                await self.bot.say("Error tweeting: {}".format(e.response))
+                return
+
+            url = "https://twitter.com/{0[user][screen_name]}/status/{0[id_str]}".format(resp)
+            await self.bot.say("Tweeted: <{}>".format(url))
 
 
 def check_folder():
