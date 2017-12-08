@@ -101,7 +101,7 @@ class RoyaleRant:
         await self.bot.say("Settings updated")
         await self.bot.delete_message(ctx.message)
 
-    @commands.has_any_role("Rant")
+    @commands.has_any_role("Member")
     @commands.command(aliases=['rrant'], pass_context=True, no_pm=True)
     async def royalerant(self, ctx, *, msg):
         """Post a Tweet from @RoyaleRant."""
