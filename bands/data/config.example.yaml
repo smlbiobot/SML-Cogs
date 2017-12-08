@@ -6,10 +6,5 @@ logo_url: https://raw.githubusercontent.com/smlbiobot/racf-discord-doc/master/do
 bands:
   - name: Reddit Alpha
     tag: LQQ
-  - name: Reddit Bravo
-    tag: 82RQLR
   - name: Reddit Charlie
     tag: 98VLYJ
-  - name: Reddit Delta
-    tag: Q0YG8V
-    req: RACF members only
