@@ -55,6 +55,15 @@ class RoyaleRant:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
 
+        if self.settings.get("twitter_api") is None:
+            self.settings["twitter_api"] = {
+                "consumer_key": None,
+                "consumer_secret": None,
+                "access_token": None,
+                "access_token_secret": None
+            }
+            dataIO.save_json(JSON, self.settings)
+
     @property
     def peony_client(self):
         """Return Twitter API instance."""
