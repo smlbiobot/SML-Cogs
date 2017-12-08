@@ -64,7 +64,6 @@ class RoyaleRant:
             }
             dataIO.save_json(JSON, self.settings)
 
-    @property
     def peony_client(self):
         """Return Twitter API instance."""
         print(self.settings["twitter_api"])
@@ -107,7 +106,7 @@ class RoyaleRant:
     async def royalerant(self, ctx, *, msg):
         """Post a Tweet from @RoyaleRant."""
         try:
-            resp = await self.peony_client.api.statuses.update.post(status=msg)
+            resp = await self.peony_client().api.statuses.update.post(status=msg)
         except peony.exceptions.PeonyException as e:
             await self.bot.say("Error tweeting: {}".format(e.response))
             return
