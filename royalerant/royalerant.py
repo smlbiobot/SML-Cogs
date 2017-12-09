@@ -38,7 +38,7 @@ from discord.ext import commands
 
 PATH = os.path.join("data", "royalerant")
 JSON = os.path.join(PATH, "settings.json")
-ROLES = ['Member']
+ROLES = ['Member', 'Guest']
 
 
 def nested_dict():
