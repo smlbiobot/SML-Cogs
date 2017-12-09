@@ -38,7 +38,10 @@ from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from tabulate import tabulate
 import crapipy
+import dateutil.parser
 import pprint
+import humanize
+import datetime as dt
 
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
@@ -58,6 +61,12 @@ def member_has_role(server, member, role_name):
     """Return True if member has specific role."""
     role = discord.utils.get(server.roles, name=role_name)
     return role in member.roles
+
+class RACFAuditException(Exception):
+    pass
+
+class CachedClanModels(RACFAuditException):
+    pass
 
 
 class RACFClan:
@@ -215,6 +224,27 @@ class RACFAudit:
         with open('data/racf_audit/family_config.yaml') as f:
             self.config = yaml.load(f)
 
+    def cache_file_path(self, clan_tag):
+        """Return cache path by clan tag."""
+        return os.path.join(PATH, "clans", clan_tag + ".json")
+
+    def save_to_cache(self, clan_models):
+        """Save clan models to cache."""
+        for clan_model in clan_models:
+            dataIO.save_json(self.cache_file_path(clan_model.tag), clan_model._data)
+
+    def load_from_cache(self, clan_tags):
+        """Return clan models from cache."""
+        clan_models = []
+        fp_timestamp = None
+        for clan_tag in clan_tags:
+            fp = self.cache_file_path(clan_tag)
+            if fp_timestamp is None:
+                fp_timestamp = os.path.getmtime(fp)
+            clan_model = crapipy.models.Clan(dataIO.load_json(fp))
+            clan_models.append(clan_model)
+        return clan_models
+
     @property
     def api(self):
         """CR API cog."""
@@ -225,26 +255,44 @@ class RACFAudit:
         """CRClan cog."""
         return self.bot.get_cog("CRClan")
 
+    def family_clan_models_from_cache(self, server):
+        """All family clan models from cache."""
+        clans = self.clans(server)
+        clan_tags = [c.tag for c in clans]
+        clan_models = self.load_from_cache(clan_tags)
+        return clan_models
+
     async def family_clan_models(self, server):
         """All family clan models."""
         clans = self.clans(server)
         clan_tags = [c.tag for c in clans]
-        clan_models = await crapipy.AsyncClient().get_clans(clan_tags)
-        # clan_models = await self.api.clan_models([clan.tag for clan in clans])
-        # for clan_model in clan_models:
-        #     for clan in clans:
-        #         if clan.tag == clan_model.tag:
-        #             clan.model = clan_model
+        try:
+            clan_models = await crapipy.AsyncClient().get_clans(clan_tags)
+            self.save_to_cache(clan_models)
+            self.settings["cache_timestamp"] = dt.datetime.utcnow().isoformat()
+            dataIO.save_json(JSON, self.settings)
+            # TODO purely for testing
+            # raise crapipy.APIError
+        except crapipy.APIError:
+            raise crapipy.APIError
+
         return clan_models
 
     async def family_member_models(self, server):
         """All family member models."""
-        clan_models = await self.family_clan_models(server)
+        is_cache = False
+        clan_models = []
+        try:
+            clan_models = await self.family_clan_models(server)
+        except crapipy.APIError:
+            # raise crapipy.APIError
+            clan_models = self.family_clan_models_from_cache(server)
+            is_cache = True
         members = []
         for clan_model in clan_models:
             for member_model in clan_model.members:
                 members.append(member_model)
-        return members
+        return members, is_cache
 
     def clan_tags(self, membership_type=None):
         """RACF clans."""
@@ -400,7 +448,18 @@ class RACFAudit:
         server = ctx.message.server
         results = []
         await self.bot.type()
-        member_models = await self.family_member_models(server)
+        member_models, is_cache = await self.family_member_models(server)
+        
+        if is_cache:
+            settings_cache_timestamp = self.settings.get("cache_timestamp")
+            if settings_cache_timestamp is None:
+                await self.bot.say("Cannot reach API and cannot load from cache. Aborting…")
+                return
+            now = dt.datetime.utcnow()
+            cache_time = dateutil.parser.parse(settings_cache_timestamp)
+            await self.bot.say("Cannot load from API. Results are from: {}".format(
+                humanize.naturaltime(now - cache_time)
+            ))
 
         if pargs.name != '_':
             for member_model in member_models:
@@ -557,6 +616,7 @@ class RACFAudit:
 def check_folder():
     """Check folder."""
     os.makedirs(PATH, exist_ok=True)
+    os.makedirs(os.path.join(PATH, "clans"), exist_ok=True)
 
 
 def check_file():
