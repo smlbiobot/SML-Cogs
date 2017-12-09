@@ -38,6 +38,7 @@ from discord.ext import commands
 
 PATH = os.path.join("data", "royalerant")
 JSON = os.path.join(PATH, "settings.json")
+ROLES = ['Member']
 
 
 def nested_dict():
@@ -66,14 +67,10 @@ class RoyaleRant:
             }
             dataIO.save_json(JSON, self.settings)
 
-        self._peony_client = None
 
-    def peony_client(self):
+    def peony_client(self, **kwargs):
         """Return Twitter API instance."""
-        if self._peony_client is None:
-            self._peony_client = peony.PeonyClient(
-                **self.settings['twitter_api'])
-        return self._peony_client
+        return peony.PeonyClient(**self.settings['twitter_api'], **kwargs)
 
     @commands.group(pass_context=True)
     async def royalerantset(self, ctx):
@@ -107,12 +104,12 @@ class RoyaleRant:
         await self.bot.say("Settings updated")
         await self.bot.delete_message(ctx.message)
 
-    @commands.has_any_role("Member")
+    @commands.has_any_role(*ROLES)
     @commands.command(aliases=['rrant'], pass_context=True, no_pm=True)
     async def royalerant(self, ctx, *, msg):
         """Post a Tweet from @RoyaleRant."""
         with aiohttp.ClientSession() as session:
-            client = peony.PeonyClient(session=session, **self.settings['twitter_api'])
+            client = self.peony_client(sessions=session)
             author = ctx.message.author
             author_initials = "".join(re.findall("[a-zA-Z0-9]+", author.display_name))[:2]
 
@@ -133,6 +130,24 @@ class RoyaleRant:
 
             url = "https://twitter.com/{0[user][screen_name]}/status/{0[id_str]}".format(resp)
             await self.bot.say("Tweeted: <{}>".format(url))
+
+    @commands.has_any_role(*ROLES)
+    @commands.command(aliases=['rrantrt'], pass_context=True, no_pm=True)
+    async def royalerant_retweet(self, ctx, arg):
+        """Retweet by original tweet URL or status ID."""
+        client = self.peony_client()
+        status_id = arg
+        if arg.startswith('http'):
+            status_id = re.findall("[0-9]+$", arg)[0]
+        try:
+            resp = await client.api.statuses.retweet.post(id=status_id)
+        except peony.exceptions.PeonyException as e:
+            await self.bot.say("Error tweeting: {}".format(e.response))
+            return
+
+        url = "https://twitter.com/{0[user][screen_name]}/status/{0[id_str]}".format(resp)
+        await self.bot.say("Tweeted: <{}>".format(url))
+
 
 
 def check_folder():
