@@ -31,7 +31,6 @@ from collections import defaultdict
 
 import discord
 import peony
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
@@ -76,7 +75,7 @@ class RoyaleRant:
     async def royalerantset(self, ctx):
         """Settings."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @checks.is_owner()
     @royalerantset.command(name="twitterapi", pass_context=True)
@@ -85,7 +84,7 @@ class RoyaleRant:
                                        access_token=None, access_token_secret=None):
         """Twitter API settings"""
         if not any([consumer_key, consumer_secret, access_token, access_token_secret]):
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             em = discord.Embed(title="RoyaleRant Settings")
             for k, v in self.settings['twitter_api'].items():
                 em.add_field(name=k, value=v)
