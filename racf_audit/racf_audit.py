@@ -32,7 +32,6 @@ from collections import defaultdict, OrderedDict
 import discord
 import unidecode
 import yaml
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify, box, bold
 from cogs.utils.dataIO import dataIO
@@ -294,7 +293,7 @@ class RACFAudit:
     async def racfauditset(self, ctx):
         """RACF Audit Settings."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     async def update_server_settings(self, ctx, key, value):
         """Set server settings."""
@@ -331,7 +330,7 @@ class RACFAudit:
     async def racfaudit(self, ctx):
         """RACF Audit."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @racfaudit.command(name="config", pass_context=True, no_pm=True)
     @checks.mod_or_permissions()
@@ -395,7 +394,7 @@ class RACFAudit:
         try:
             pargs = parser.parse_args(args)
         except SystemExit:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         server = ctx.message.server
