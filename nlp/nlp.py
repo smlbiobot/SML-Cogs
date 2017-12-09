@@ -211,7 +211,7 @@ class NLP:
         if server.id not in self.settings:
             return
 
-        # - Auto-translate chanenl
+        # - Auto-translate channel
         if "AUTO_TRANSLATE" in self.settings[server.id]:
             if msg.channel is None:
                 return
