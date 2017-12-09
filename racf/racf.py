@@ -946,7 +946,7 @@ class RACF:
                 if discord.utils.get(member.roles, name="Visitor") is None:
                     bs_roles.append("Visitor")
         channel = discord.utils.get(
-            ctx.message.server.channels, name="visitors")
+            ctx.message.server.channels, name="brawl-stars")
         await self.changerole(ctx, member, *bs_roles)
         if channel is not None:
             await self.bot.say(
