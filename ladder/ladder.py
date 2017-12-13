@@ -25,13 +25,9 @@ DEALINGS IN THE SOFTWARE.
 import os
 
 import discord
-from discord.ext import commands
-
-from __main__ import send_cmd_help
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
-
+from discord.ext import commands
 from trueskill import Rating, rate_1vs1
 
 PATH = os.path.join("data", "ladder")
@@ -41,27 +37,42 @@ SERVER_DEFAULTS = {
     "SERIES": {}
 }
 
+
 class Player:
     """Player in a game."""
+
     def __init__(self, discord_id, rating=None):
         if rating is None:
             rating = 1500
         self.rating = Rating(rating)
         self.discord_id = discord_id
 
+    def to_dict(self):
+        return {
+            "rating": self.rating,
+            "discord_id": self.discord_id
+        }
+
+    def from_dict(self, d):
+        self.rating = d["rating"]
+        self.discord_id = d["discord_id"]
+
+
 class Game:
     """A match."""
+
     def __init__(self, player1=None, player2=None):
         self.player1 = player1
         self.player2 = player2
 
-    def match_1vs1(self, winner:Player, loser:Player):
+    def match_1vs1(self, winner: Player, loser: Player):
         """Match score reporting."""
         winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating)
 
 
 class ServerSettings:
     """Server settings."""
+
     def __init__(self, server):
         """Server settings."""
         self.server = server
@@ -73,11 +84,31 @@ class ServerSettings:
         return self._model
 
 
+class LadderException(Exception):
+    pass
+
+
+class SeriesExist(LadderException):
+    pass
+
+
+class NoSuchSeries(LadderException):
+    pass
+
+
+class NoSuchPlayer(LadderException):
+    pass
 
 
 class Settings:
     """Ladder settings."""
-    server_default = { "ladders": [] }
+    server_default = {
+        "series": {}
+    }
+    series_default = {
+        "matches": {},
+        "players": {}
+    }
 
     def __init__(self, bot):
         self.bot = bot
@@ -98,14 +129,45 @@ class Settings:
             self.model[server.id] = self.server_default
         self.save()
 
+    def get_series(self, server, name):
+        if name not in self.server_model(server)["series"]:
+            raise NoSuchSeries
+        return self.server_model(server)["series"][name]
+
+    def get_player(self, server, name, player: discord.Member):
+        """Check player settings."""
+        self.check_server(server)
+        try:
+            series = self.get_series(server, name)
+            if player.id not in series["players"]:
+                return False
+        except NoSuchSeries:
+            raise NoSuchSeries
+
+        return True
+
     def init_server(self, server):
         """Initialize server settings to default"""
         self.model[server.id] = self.server_default
         self.save()
 
-    def create_ladder(self, server, name, param):
+    def create(self, server, name, *players: discord.Member):
         """Create new ladder by name"""
-        pass
+        try:
+            series = self.server_model(server)["series"]
+            if name in series:
+                raise SeriesExist
+        series[name] = self.series_default.copy()
+        self.add_players(*players)
+        self.save()
+
+    def add_players(self, server, name, *players: discord.Member):
+        series = self.get_series(server, name)
+        for player in players:
+            if player.id not in series["players"]:
+                series["players"][player.id] = Player(player.id, rating=1000).to_dict()
+        self.save()
+
 
 
 class Ladder:
@@ -123,75 +185,46 @@ class Ladder:
         self.bot = bot
         self.settings = Settings(bot)
 
-    def check_server(self, server):
-        """Check server settings."""
-        if server.id not in self.settings:
-            self.settings[server.id] = SERVER_DEFAULTS
-        dataIO.save_json(JSON, self.settings)
-
-    def check_series(self, server, series):
-        """Check series settings."""
-        self.check_server(server)
-        if series in self.settings[server.id]["SERIES"]:
-            return self.settings[server.id]["SERIES"][series]
-        return None
-
-    def check_player(self, server, player):
-        """Check player settings."""
-        self.check_server(server)
-        if player.id not in self.settings[server.id]:
-            self.settings[server.id][player.id] = {
-                "ratings": [],
-                "matches": []
-            }
-        dataIO.save_json(JSON, self.settings)
-
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
     async def ladderset(self, ctx):
         """Set ladder settings."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @ladderset.command(name="create", pass_context=True)
-    async def ladderset_create(self, ctx, name, *players):
+    async def ladderset_create(self, ctx, name, *players: discord.Member):
         """Create a new series.
 
         Creates a new ladder series and optionally initialize with players.
         """
         server = ctx.message.server
-        self.settings.create_ladder(server, name, *players)
-
+        try:
+            self.settings.create(server, name, *players)
+        except SeriesExist:
+            await self.bot.say("There is an existing series with that name already.")
+            return
+        await self.bot.say("Series added.")
 
     @ladderset.command(name="addplayers", pass_context=True)
     async def ladderset_addplayers(self, ctx, name, *players: discord.Member):
         """Add players to an existing series."""
         server = ctx.message.server
-        if self.check_series(server, name) is None:
-            await self.bot.say("{} does not exist.".format(name))
+        try:
+            self.settings.add_players(server, name, *players)
+        except NoSuchSeries:
+            await self.bot.say("There is no series with that name.")
             return
-        series = self.settings[server.id]["SERIES"][name]
-        for player in players:
-            if player is not None:
-                if player.id in series["players"]:
-                    await self.bot.say(
-                        "{} is already a registered player.".format(
-                            player.display_name))
-                else:
-                    series["players"].append(player.id)
-                    await self.bot.say(
-                        "Added {} to {}.".format(player.display_name, name))
-        dataIO.save_json(JSON, self.settings)
-
+        await self.bot.say("Successfully added players.")
 
     @commands.group(pass_context=True)
     async def ladder(self, ctx):
         """Ladder anking system using TrueSkills."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @ladder.command(name="register", pass_context=True)
-    async def ladder_register(self, ctx):
+    async def ladder_register(self, ctx, name):
         """Allow player to self-register to system."""
         server = ctx.message.server
         author = ctx.message.author
@@ -217,4 +250,3 @@ def setup(bot):
     check_file()
     n = Ladder(bot)
     bot.add_cog(n)
-
