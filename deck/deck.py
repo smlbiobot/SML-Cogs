@@ -635,7 +635,7 @@ class Deck:
             for card in member_deck:
                 if card not in self.valid_card_keys:
                     await self.bot.say("**{}** is not a valid card name.".format(card))
-            await self.bot.say("\nType `!deck cards` for the full list")
+            await self.bot.say("\nType `{}deck cards` for the full list".format(ctx.prefix))
             deck_is_valid = False
 
         if deck_is_valid:
