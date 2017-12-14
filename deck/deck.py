@@ -212,8 +212,9 @@ class Deck:
         else:
             await self.deck_upload(ctx, member_deck, deck_name, author)
             # generate link
-            em = await self.decklink_embed(member_deck)
-            await self.bot.say(embed=em)
+            if self.deck_is_valid:
+                em = await self.decklink_embed(member_deck)
+                await self.bot.say(embed=em)
 
     async def card_decklink_to_key(self, decklink):
         """Decklink id to card."""
