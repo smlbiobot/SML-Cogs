@@ -153,10 +153,9 @@ class Settings:
 
     def create(self, server, name, *players: discord.Member):
         """Create new ladder by name"""
-        try:
-            series = self.server_model(server)["series"]
-            if name in series:
-                raise SeriesExist
+        series = self.server_model(server)["series"]
+        if name in series:
+            raise SeriesExist
         series[name] = self.series_default.copy()
         self.add_players(*players)
         self.save()

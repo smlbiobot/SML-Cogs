@@ -4,7 +4,7 @@
 	"DESCRIPTION": "Save and search Clash Royale decks entered by users",
 	"DISABLED": false,
 	"NAME": "CRData",
-	"REQUIREMENTS": ["Pillow"],
+	"REQUIREMENTS": ["Pillow", "pyyaml"],
 	"TAGS": ["Clash Royale", "clash royale", "deck", "decks", "gaming", "games", "search"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: http://github.com/smlbiobot/SML-Cogs or my Discord server: http://discord.me/sml"
 }

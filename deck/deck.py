@@ -28,6 +28,7 @@ import datetime
 import io
 import os
 import re
+import yaml
 import string
 from concurrent.futures import ThreadPoolExecutor
 
@@ -36,18 +37,19 @@ import discord
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 
-settings_path = os.path.join("data", "deck", "settings.json")
-crdata_path = os.path.join("data", "deck", "clashroyale.json")
+SETTINGS_PATH = os.path.join("data", "deck", "settings.json")
+AKA_PATH = os.path.join("data", "deck", "cards_aka.yaml")
+CARDS_JSON_PATH = os.path.join("data", "deck", "cards.json")
 max_deck_per_user = 5
 
 PAGINATION_TIMEOUT = 20.0
 HELP_URL = "https://github.com/smlbiobot/SML-Cogs/wiki/Deck#usage"
+CARDS_JSON_URL = "https://cr-api.github.io/cr-api-data/json/cards.json"
 
 numbs = {
     "next": "➡",
@@ -76,28 +78,19 @@ class Deck:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.file_path = settings_path
-        self.crdata_path = crdata_path
-
-        self.settings = dataIO.load_json(self.file_path)
-        self.crdata = dataIO.load_json(self.crdata_path)
+        self.settings = dataIO.load_json(SETTINGS_PATH)
+        self.cards = dataIO.load_json(CARDS_JSON_PATH)
 
         # init card data
-        self.cards = []
         self.cards_abbrev = {}
 
-        for card_key, card_value in self.crdata["Cards"].items():
-            self.cards.append(card_key)
-            self.cards_abbrev[card_key] = card_key
+        with open(AKA_PATH) as f:
+            aka = yaml.load(f)
 
-            if card_key.find('-'):
-                self.cards_abbrev[card_key.replace('-', '')] = card_key
-
-            aka_list = card_value["aka"]
-            for aka in aka_list:
-                self.cards_abbrev[aka] = card_key
-                if aka.find('-'):
-                    self.cards_abbrev[aka.replace('-', '')] = card_key
+        for k, v in aka.items():
+            for value in v:
+                self.cards_abbrev[value] = k
+            self.cards_abbrev[k.replace('-', '')] = k
 
         self.card_w = 302
         self.card_h = 363
@@ -117,8 +110,13 @@ class Deck:
         # Used for Pillow blocking code
         self.threadex = ThreadPoolExecutor(max_workers=2)
 
+    @property
+    def valid_card_keys(self):
+        """Valid card keys."""
+        return [card["key"] for card in self.cards]
+
     async def cards_json(self):
-        url = 'https://cr-api.github.io/cr-api-data/dst/cards.json'
+        url = CARDS_JSON_URL
         if self._cards_json is None:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url) as response:
@@ -130,7 +128,7 @@ class Deck:
     async def deckset(self, ctx):
         """Settings."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @deckset.command(name="decklink", pass_context=True, no_pm=True)
     @checks.mod_or_permissions()
@@ -143,7 +141,7 @@ class Deck:
         - none
         """
         if use is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
         server = ctx.message.server
         self.settings["Servers"][server.id]["decklink"] = use
@@ -176,7 +174,7 @@ class Deck:
         """
 
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     async def deck_get_helper(self, ctx,
                               card1=None, card2=None, card3=None, card4=None,
@@ -208,7 +206,7 @@ class Deck:
         member_deck = [card1, card2, card3, card4, card5, card6, card7, card8]
         if not all(member_deck):
             await self.bot.say("Please enter 8 cards.")
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
         elif len(set(member_deck)) < len(member_deck):
             await self.bot.say("Please enter 8 unique cards.")
         else:
@@ -219,20 +217,16 @@ class Deck:
 
     async def card_decklink_to_key(self, decklink):
         """Decklink id to card."""
-        cards_json = await self.cards_json()
-        for k, card_json in cards_json.items():
-            if card_json["decklink"] == decklink:
-                return card_json["key"]
+        for card in self.cards:
+            if decklink == str(card["decklink"]):
+                return card["key"]
         return None
 
     async def card_key_to_decklink(self, key):
         """Card key to decklink id."""
-        cards_json = await self.cards_json()
-        if key == 'xbow':
-            key = 'x-bow'
-        for k, card_json in cards_json.items():
-            if card_json["key"] == key:
-                return card_json["decklink"]
+        for card in self.cards:
+            if key == card["key"]:
+                return str(card["decklink"])
         return None
 
     async def decklink_to_cards(self, url):
@@ -249,16 +243,6 @@ class Deck:
                 card_keys.append(card_key)
         return card_keys
 
-    @deck.command(name="import", aliases=['i'], pass_context=True, no_pm=True)
-    async def deck_import(self, ctx, *, url):
-        """Add a deck using the decklink."""
-        card_keys = await self.decklink_to_cards(url)
-        if card_keys is None:
-            await self.bot.say("Cannot find a URL.")
-            return
-        await ctx.invoke(self.deck_add, *card_keys)
-        await self.bot.delete_message(ctx.message)
-
     @deck.command(name="getlink", aliases=['gl'], pass_context=True, no_pm=True)
     async def deck_getlink(self, ctx, *, url):
         """Get a deck using the decklink."""
@@ -267,6 +251,16 @@ class Deck:
             await self.bot.say("Cannot find a URL.")
             return
         await ctx.invoke(self.deck_get, *card_keys)
+        await self.bot.delete_message(ctx.message)
+
+    @deck.command(name="addlink", aliases=['al', 'import', 'i'], pass_context=True, no_pm=True)
+    async def deck_getlink(self, ctx, *, url):
+        """Add a deck using the decklink."""
+        card_keys = await self.decklink_to_cards(url)
+        if card_keys is None:
+            await self.bot.say("Cannot find a URL.")
+            return
+        await ctx.invoke(self.deck_add, *card_keys)
         await self.bot.delete_message(ctx.message)
 
     @deck.command(name="add", pass_context=True, no_pm=True)
@@ -292,7 +286,7 @@ class Deck:
 
         if not all(member_deck):
             await self.bot.say("Please enter 8 cards.")
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
         elif len(set(member_deck)) < len(member_deck):
             await self.bot.say("Please enter 8 unique cards.")
         else:
@@ -400,76 +394,6 @@ class Deck:
                         await self.bot.say("Results aborted.")
                         return
 
-    @deck.command(name="pagelist", pass_context=True, no_pm=True)
-    async def deck_pagelist(self, ctx, member: discord.Member = None):
-        """List decks of a user with pagination."""
-        author = ctx.message.author
-        server = ctx.message.server
-        member_is_author = False
-        if not member:
-            member = author
-            member_is_author = True
-        self.check_server_settings(server)
-        self.check_member_settings(server, member)
-        decks = self.settings["Servers"][server.id]["Members"][member.id]["Decks"]
-        if not len(decks):
-            if member_is_author:
-                await self.bot.say("You don’t have any decks stored.\n"
-                                   "Type `!deck add` to add some.")
-            else:
-                await self.bot.say("{} hasn’t added any decks yet.".format(member.name))
-            return
-        await self.deck_pagelist_menu(
-            ctx, decks, member, message=None, page=0, timeout=30)
-
-    async def deck_pagelist_menu(
-            self, ctx, decks, member: discord.Member,
-            message: discord.Message = None,
-            page=0, timeout: int = 30):
-        """Menu control logic for this taken from
-        https://github.com/Lunar-Dust/Dusty-Cogs/blob/master/menu/menu.py
-        """
-        if isinstance(decks, dict):
-            decks = [v for k, v in decks.items()]
-        deck = decks[page]
-        description = "**{}**. {}".format(page + 1, deck["DeckName"])
-        if not message:
-            message = \
-                await self.upload_deck_image(
-                    ctx, deck["Deck"], deck["DeckName"], member, description)
-            await self.bot.add_reaction(message, "⬅")
-            await self.bot.add_reaction(message, "❌")
-            await self.bot.add_reaction(message, "➡")
-        else:
-            message = await self.bot.edit_message(message)
-        react = await self.bot.wait_for_reaction(
-            message=message, user=ctx.message.author, timeout=timeout,
-            emoji=["➡", "⬅", "❌"])
-        if react is None:
-            try:
-                await self.bot.remove_reaction(message, "⬅", self.bot.user)
-                await self.bot.remove_reaction(message, "❌", self.bot.user)
-                await self.bot.remove_reaction(message, "➡", self.bot.user)
-            except:
-                pass
-            return None
-        reacts = {v: k for k, v in numbs.items()}
-        react = reacts[react.reaction.emoji]
-        if react == "next":
-            next_page = 0
-            if page == len(decks) - 1:
-                next_page = 0
-            else:
-                next_page = page + 1
-            return await self.deck_pagelist_menu(
-                ctx, decks, member, message=message,
-                page=next_page, timeout=timeout)
-        else:
-            try:
-                return await self.bot.delete_message(message)
-            except:
-                pass
-
     @deck.command(name="show", pass_context=True, no_pm=True)
     async def deck_show(self, ctx, deck_id=None, member: discord.Member = None):
         """Show the deck of a user by id. With link to copy."""
@@ -527,13 +451,16 @@ class Deck:
     async def deck_cards(self, ctx):
         """Display all available cards and acceptable abbreviations."""
         out = []
-        for card_key, card_value in self.crdata["Cards"].items():
-            names = [card_key]
-            name = string.capwords(card_key.replace('-', ' '))
-            for abbrev in card_value["aka"]:
-                names.append(abbrev)
-            rarity = string.capwords(card_value["rarity"])
-            elixir = card_value["elixir"]
+
+        for card in sorted(self.cards, key=lambda x: x["name"].lower()):
+            key = card["key"]
+            names = [key]
+            name = card["name"]
+            for abbrev_k, abbrev_v in self.cards_abbrev.items():
+                if abbrev_v == key:
+                    names.append(abbrev_k)
+            rarity = card["rarity"]
+            elixir = card["elixir"]
             out.append(
                 "**{}** ({}, {} elixir): {}".format(
                     name, rarity, elixir, ", ".join(names)))
@@ -700,16 +627,17 @@ class Deck:
                 "Please enter exactly 8 cards.".format(
                     len(member_deck),
                     's' if len(member_deck) > 1 else ''))
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             deck_is_valid = False
 
         # Ensure: card names are valid
-        if not set(member_deck) < set(self.cards):
+        # if not set(member_deck) < set(self.cards):
+        if not set(member_deck) < set(self.valid_card_keys):
             for card in member_deck:
                 if not card in self.cards:
                     await self.bot.say("**{}** is not a valid card name.".format(card))
             await self.bot.say("\nType `!deck cards` for the full list")
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             deck_is_valid = False
 
         if deck_is_valid:
@@ -726,12 +654,9 @@ class Deck:
             deck, deck_name, author
         )
 
-        # deck_image = self.get_deck_image(deck, deck_name, author)
-
         # construct a filename using first three letters of each card
         filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
 
-        # description = "Deck: {}".format(', '.join(card_names))
         message = None
 
         with io.BytesIO() as f:
@@ -784,11 +709,13 @@ class Deck:
         total_elixir = 0
         # total card exclude mirror (0-elixir cards)
         card_count = 0
-        for card_key, card_value in self.crdata["Cards"].items():
-            if card_key in deck:
-                total_elixir += card_value["elixir"]
-                if card_value["elixir"]:
+
+        for card in self.cards:
+            if card["key"] in deck:
+                total_elixir += card["elixir"]
+                if card["elixir"]:
                     card_count += 1
+
         average_elixir = "{:.3f}".format(total_elixir / card_count)
 
         # text
@@ -869,7 +796,7 @@ class Deck:
 
     def save_settings(self):
         """Save data to settings file."""
-        dataIO.save_json(self.file_path, self.settings)
+        dataIO.save_json(SETTINGS_PATH, self.settings)
 
 
 def check_folder():
@@ -889,7 +816,7 @@ def check_file():
     settings = {
         "Servers": {}
     }
-    f = settings_path
+    f = SETTINGS_PATH
     if not dataIO.is_valid_json(f):
         print("Creating default deck settings.json...")
         dataIO.save_json(f, settings)
