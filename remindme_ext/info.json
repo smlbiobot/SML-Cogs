@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "RemindMe Extension",
+	"DESCRIPTION": "Small utility for extending some functionality of remindme — specifically, listing fugure events.",
+	"DISABLED": false,
+	"NAME": "RemindMeExt",
+	"REQUIREMENTS": ["humanfriendly"],
+	"TAGS": ["remindme"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
