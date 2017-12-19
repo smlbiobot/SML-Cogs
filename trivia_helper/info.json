@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Trivia Helper",
+	"DESCRIPTION": "Easily add new categories to the trivia cog using bot commands. Can parse CSV to questions and answers. ",
+	"DISABLED": false,
+	"NAME": "TrivaiHelper",
+	"REQUIREMENTS": [],
+	"TAGS": [],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
