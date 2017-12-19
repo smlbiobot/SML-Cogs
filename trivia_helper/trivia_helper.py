@@ -41,25 +41,44 @@ class TriviaHelper:
         self.bot = bot
         self.trivia_path = os.path.join("data", "trivia")
 
-    @checks.mod_or_permissions()
-    @commands.command(name="triviacsv", pass_context=True)
-    async def triviacsv(self, ctx, category):
-        """Upload CSV files for trivia"""
-        msg = ctx.message
-        url = msg.attachments[0]["url"]
-        # await self.bot.say(url)
+    async def parse_csv(self, url):
+        """Parse CSV URL for trivia"""
         trivia = []
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 text = await resp.text()
                 reader = csv.DictReader(io.StringIO(text))
                 for row in reader:
+                    # print(row)
                     trivia.append("{}`{}".format(
                         row["Question"], row["Answer"]
                     ))
+        return trivia
+
+    def save_trivia(self, trivia, category):
+        """Save trivia as category data."""
         out_file = os.path.join(self.trivia_path, "{}.txt".format(category))
         with open(out_file, "w") as f:
             f.write('\n'.join(trivia))
+        return out_file
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True)
+    async def triviacsv(self, ctx, category):
+        """Upload CSV files for trivia."""
+        msg = ctx.message
+        url = msg.attachments[0]["url"]
+        # await self.bot.say(url)
+        trivia = await self.parse_csv(url)
+        out_file = self.save_trivia(trivia, category)
+        await self.bot.say("Data saved to {}".format(out_file))
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True)
+    async def triviacsvurl(self, ctx, category, url):
+        """Parse CSV URL for trivia."""
+        trivia = await self.parse_csv(url)
+        out_file = self.save_trivia(trivia, category)
         await self.bot.say("Data saved to {}".format(out_file))
 
 
