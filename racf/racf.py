@@ -28,6 +28,7 @@ import itertools
 import json
 import os
 from random import choice
+from cogs.utils.dataIO import dataIO
 
 import aiohttp
 import cogs
@@ -154,6 +155,9 @@ BAND_PERMISSION = {
 
 }
 
+PATH = os.path.join("data", "racf")
+JSON = os.path.join(PATH, "settings.json")
+
 
 def grouper(n, iterable, fillvalue=None):
     """Group lists into lists of items.
@@ -226,12 +230,36 @@ class RACF:
         self.bot = bot
         with open(os.path.join("data", "racf", "config.yaml")) as f:
             self.config = Box(yaml.load(f))
+        self.settings = dataIO.load_json(JSON)
+
+
+    @property
+    def auth(self):
+        return self.settings.get("auth")
+
+    @auth.setter
+    def auth(self, value):
+        self.settings["auth"] = value
+        dataIO.save_json(JSON, self.settings)
+
+    @commands.group(pass_context=True, no_pm=True)
+    async def racfset(self, ctx):
+        if ctx.invoked_subcommand is None:
+            await self.bot.send_cmd_help(ctx)
+
+    @checks.is_owner()
+    @racfset.command(name="auth", pass_context=True, no_pm=True)
+    async def racfset_auth(self, ctx, token):
+        """Save auth"""
+        self.auth = token
+        await self.bot.say("Token saved.")
+        await self.bot.delete_message(ctx.message)
 
     @commands.group(aliases=['r'], pass_context=True, no_pm=True)
     async def racf(self, ctx):
         """RACF commands."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @racf.command(name="info", pass_context=True, no_pm=True)
     async def racf_info(self, ctx: Context):
@@ -271,84 +299,37 @@ class RACF:
                 "role": "N/A"
             }
         return (
-            "Player Tag: {0[tag]}\n"
-            "IGN: {0[name]}\n"
-            "Clan Name: {0[clan][name]}\n"
-            "Clan Tag: {0[clan][tag]}\n"
-            "Clan Role: {0[clan][role]}\n"
-            "Trophies: {0[trophies]:,} / {0[stats][maxTrophies]:,} PB".format(
-                data
+            "Player Tag: {tag}\n"
+            "IGN: {name}\n"
+            "Clan Name: {clan_name}\n"
+            "Clan Tag: {clan_tag}\n"
+            "Clan Role: {clan_role}\n"
+            "Trophies: {trophies:,} / {pb:,} PB".format(
+                tag=data.get('tag'),
+                name=data.get('name'),
+                clan_name=data['clan']['name'],
+                clan_tag=data['clan']['tag'],
+                clan_role=data.get('role'),
+                trophies=data.get('trophies'),
+                pb=data.get('bestTrophies')
             )
         )
 
-    @racf.command(name="verify2", aliases=['v2'], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
-    async def racf_verify2(self, ctx, member: discord.Member, tag):
-        """Verify CR members by player tag using clan API."""
-        sctag = SCTag(tag)
-        if not sctag.valid:
-            await self.bot.say(sctag.invalid_error_msg)
-            return
+    async def fetch_player_profile(self, tag):
+        """Fetch player profile data."""
+        url = "{}%23{}".format('https://api.clashroyale.com/v1/players/', tag)
+        headers = {'Authorization': 'Bearer {}'.format(self.auth)}
 
-        # - Set their tags
-        tag = sctag.tag
-        await ctx.invoke(self.crsettag, tag, member)
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=headers, timeout=30) as resp:
+                    data = await resp.json()
+        except json.decoder.JSONDecodeError:
+            raise
+        except asyncio.TimeoutError:
+            raise
 
-        await self.bot.type()
-
-        client = crapipy.AsyncClient()
-        clan_tags = CLAN_PERMISSION.keys()
-        clans = await client.get_clans(clan_tags)
-        found_member = None
-        found_clan = None
-        for clan in clans:
-            for clan_member in clan.members:
-                if found_member is None and clan_member.tag == tag:
-                    found_member = clan_member
-                    found_clan = clan
-
-        # - Assign visitor if not in our clans
-        if found_member is None:
-            await self.bot.say("Cannot find members in our clans.")
-            await ctx.invoke(self.visitor, member)
-            return
-
-        # - Change IGN
-        ign = found_member.name
-        if not ign:
-            await self.bot.say("Cannot find IGN.")
-        else:
-            try:
-                await self.bot.change_nickname(member, ign)
-            except discord.HTTPException:
-                await self.bot.say(
-                    "I don’t have permission to change nick for this user.")
-            else:
-                await self.bot.say("{} changed to {}.".format(member.mention, ign))
-
-        # - Check allow role assignment
-        perm = CLAN_PERMISSION[found_clan.tag]
-        if not perm['assign_role']:
-            await self.bot.say('User belong to a clan that requires roster verifications.')
-            return
-
-        # - Assign role - not members
-        mm = self.bot.get_cog("MemberManagement")
-        if not perm['member']:
-            await ctx.invoke(mm.changerole, member, perm['role'], 'Visitor')
-            channel = discord.utils.get(
-                ctx.message.server.channels, name="visitors")
-            await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
-        else:
-            await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', '-Visitor')
-            channel = discord.utils.get(
-                ctx.message.server.channels, name="family-chat")
-            await ctx.invoke(self.dmusers, self.config.messages.member, member)
-
-        if channel is not None:
-            await self.bot.say(
-                "{} Welcome! You may now chat at {} — enjoy!".format(
-                    member.mention, channel.mention))
+        return data
 
     @racf.command(name="verify", aliases=['v'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
@@ -366,23 +347,8 @@ class RACF:
         await ctx.invoke(self.crsettag, tag, member)
 
         # - Lookup profile
-        async def fetch_player_profile(tag):
-            """Fetch player profile data."""
-            url = "{}{}".format('http://api.cr-api.com/profile/', tag)
-
-            try:
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(url, timeout=30) as resp:
-                        data = await resp.json()
-            except json.decoder.JSONDecodeError:
-                raise
-            except asyncio.TimeoutError:
-                raise
-
-            return data
-
         try:
-            player = await fetch_player_profile(tag)
+            player = await self.fetch_player_profile(tag)
         except json.decoder.JSONDecodeError:
             await self.bot.send_message(
                 ctx.message.channel,
@@ -397,18 +363,11 @@ class RACF:
                 "Aborting…")
             return
 
-        if "error" in player:
-            await self.bot.send_message(
-                ctx.message.channel,
-                "API reports error in player tag. Verify tag is correct or try again later."
-                "Aborting…")
-            return
-
         # - Show player info
         await self.bot.say(self.player_info(player))
 
         # - Change nickname to IGN
-        ign = player.get('name', None)
+        ign = player.get('name')
         if ign is None:
             await self.bot.say("Cannot find IGN.")
         else:
@@ -421,13 +380,16 @@ class RACF:
                 await self.bot.say("{} changed to {}.".format(member.mention, ign))
 
         # - Check clan
+        player_clan_tag = None
         try:
             player_clan = player.get("clan", None)
             if player_clan is not None:
-                player_clan_tag = player_clan.get("tag", None)
+                player_clan_tag = player_clan.get("tag")
         except KeyError:
             await self.bot.say("Cannot find clan tag in API. Aborting…")
             return
+
+        player_clan_tag = SCTag(player_clan_tag).tag
 
         if player_clan_tag in CLAN_PERMISSION.keys():
             # - Check allow role assignment
@@ -570,7 +532,7 @@ class RACF:
         member = ctx.message.author
         server = ctx.message.server
         if clan is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
         if not clan.lower().startswith(BS_CLANS_PREFIX.lower()):
             clan = BS_CLANS_PREFIX + clan
@@ -593,7 +555,7 @@ class RACF:
     async def do_changeclan(self, ctx, member, server, clan: str = None, clans=[]):
         """Perform clan changes."""
         if clan is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         if clan.lower() not in clans:
@@ -1013,11 +975,11 @@ class RACF:
         """
         if not pb.isdigit():
             await self.bot.say("PB (Personal Best) must be a number.")
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
         if len(cardlevels) != 8:
             await self.bot.say("You must enter exactly 8 cards.")
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
         rarities = {
             'c': 0,
@@ -1177,6 +1139,20 @@ class RACF:
         await self.bot.say(member.top_role.name)
 
 
+def check_folder():
+    """Check folder."""
+    os.makedirs(PATH, exist_ok=True)
+
+
+def check_file():
+    """Check files."""
+    if not dataIO.is_valid_json(JSON):
+        dataIO.save_json(JSON, {})
+
+
+
 def setup(bot):
+    check_folder()
+    check_file()
     r = RACF(bot)
     bot.add_cog(r)

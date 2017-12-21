@@ -36,7 +36,6 @@ from random import choice
 import aiohttp
 import discord
 import inflect
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
@@ -74,6 +73,13 @@ def random_discord_color():
     color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
     color = int(color, 16)
     return discord.Color(value=color)
+
+class API:
+    """Clash Royale official API."""
+    @staticmethod
+    def url_player(tag):
+        """Return player URL"""
+        return "https://api.clashroyale.com/v1/players/%23" + tag
 
 
 class BotEmoji:
@@ -901,6 +907,17 @@ class Settings:
         self.settings["badge_url_base"] = value
         self.save()
 
+    @property
+    def auth(self):
+        """Authentication bearer token"""
+        return self.settingslget("auth")
+
+    @auth.setter
+    def auth(self, value):
+        """Set authentication bearer token."""
+        self.settings["auth"] = value
+        self.save()
+
     def set_resources(self, server, value):
         """Show gold/gems or not."""
         self.settings[server.id]["show_resources"] = value
@@ -933,7 +950,14 @@ class CRProfile:
     async def crprofileset(self, ctx):
         """Clash Royale profile API."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
+
+    @crprofileset.command(name="auth", pass_context=True)
+    async def crprofileset_auth(self, ctx, token):
+        """Set auth header"""
+        self.model.auth = token
+        await self.bot.say("Auth updated.")
+        await self.bot.delete_message(ctx.message)
 
     @crprofileset.command(name="initserver", pass_context=True)
     async def crprofileset_initserver(self, ctx):
@@ -996,7 +1020,7 @@ class CRProfile:
     async def crprofile(self, ctx):
         """Clash Royale Player Profile."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @crprofile.command(name="settag", pass_context=True, no_pm=True)
     async def crprofile_settag(
