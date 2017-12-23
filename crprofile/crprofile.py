@@ -742,9 +742,11 @@ class Settings:
         error = False
         data = None
 
+        headers = {"auth": self.auth}
+
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
+                async with session.get(url, timeout=API_FETCH_TIMEOUT, headers=headers) as resp:
                     if resp.status != 200:
                         error = True
                     else:
@@ -870,12 +872,12 @@ class Settings:
 
     @property
     def auth(self):
-        """Authentication bearer token"""
+        """Authentication token"""
         return self.settings.get("auth")
 
     @auth.setter
     def auth(self, value):
-        """Set authentication bearer token."""
+        """Set authentication token."""
         self.settings["auth"] = value
         self.save()
 
