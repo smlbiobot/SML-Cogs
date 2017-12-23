@@ -392,9 +392,7 @@ class CRAPIKey:
                 member = default
             else:
                 member = server.get_member(id)
-            out = []
-            out.append('-' * 50)
-            out.append(
+            out = (
                 "{member} ({id})\n"
                 "Blacklisted: {blacklisted}\n"
                 "Request Count: {request_count}\n"
@@ -405,7 +403,7 @@ class CRAPIKey:
                 )
 
             )
-            await self.bot.say(box('\n'.join(out), lang='python'))
+            await self.bot.say(box(out, lang='python'))
 
         await self.server_log(ctx, "List all")
 
