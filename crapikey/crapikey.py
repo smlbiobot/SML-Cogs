@@ -269,9 +269,10 @@ class CRAPIKey:
         if data is None:
             data = '_'
         em = discord.Embed(title="CRAPIKey", description=action, color=discord.Color.red())
-        em.add_field(name="Author", value=ctx.message.author)
-        em.add_field(name="Author ID", value=ctx.message.author.id)
-        em.add_field(name="Channel", value=ctx.message.channel.mention)
+        if ctx is not None:
+            em.add_field(name="Author", value=ctx.message.author)
+            em.add_field(name="Author ID", value=ctx.message.author.id)
+            em.add_field(name="Channel", value=ctx.message.channel.mention)
         em.add_field(name="Response", value=data)
         channel = discord.utils.get(ctx.message.server.channels, name=self.config.channels.log)
         await self.bot.send_message(channel, embed=em)
@@ -427,18 +428,18 @@ class CRAPIKey:
         try:
             data = await self.key_create(member)
             token = data['token']
+            # Remove token
+            try:
+                data = await self.key_delete(token)
+                if data['success']:
+                    print("Key for {} removed.".format(member))
+                await self.server_log(None, "Member left: delete key", data)
+            except ServerError:
+                print("Server error.")
         except ServerError:
             print("Server error.")
-            return
 
-        # Remove token
-        try:
-            data = await self.key_delete(token)
-            if data['success']:
-                print("Key for {} removed.".format(member))
-        except ServerError:
-            await self.bot.say("Error.")
-            return
+
 
 
 def check_folder():
