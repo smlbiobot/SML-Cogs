@@ -738,7 +738,6 @@ class Settings:
         """Return CRPlayerModel by tag."""
         tag = SCTag(tag).tag
         url = API.url_player(tag)
-        print(url)
 
         error = False
         data = None
@@ -1087,7 +1086,7 @@ class CRProfile:
     @crprofile.command(name="cards", pass_context=True, no_pm=True)
     async def crporifle_cards(self, ctx, member: discord.Member = None):
         """Player profile with cards."""
-        await self.get_profile(ctx, member, overview=True, stats=False, cards=True)
+        await self.get_profile(ctx, member, overview=False, stats=False, cards=True)
 
     async def display_profile(self, ctx, tag, overview=True, stats=False, cards=False):
         """Display profile."""
@@ -1120,13 +1119,9 @@ class CRProfile:
         for em in self.embeds_profile(player_data, server=server, overview=overview, stats=stats, cards=cards):
             await self.bot.say(embed=em)
 
-    def embeds_profile(self, player: CRPlayerModel, server=None, overview=True, stats=False, cards=False):
-        """Return Discord Embed of player profile."""
-        embeds = []
-        color = random_discord_color()
+    def embed_profile_overview(self, player: CRPlayerModel, server=None, color=None):
+        """Discord Embed: profile overview."""
         bem = self.bot_emoji.name
-
-        # emoji_xp = self.model.emoji(name="experience")
         member = self.model.tag2member(server, player.tag)
         mention = '_'
         if member is not None:
@@ -1164,65 +1159,87 @@ class CRProfile:
         em.set_footer(
             text=profile_url,
             icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
-        embeds.append(em)
+        return em
+
+    def embed_profile_stats(self, player: CRPlayerModel, color=None):
+        """Discord Embed: profile stats."""
+        em = discord.Embed(title=" ", color=color)
+        bem = self.bot_emoji.name
+
+        def fmt(num, emoji_name):
+            emoji = self.bot_emoji.name(emoji_name)
+            if emoji is not None:
+                return '{:,} {}'.format(num, emoji)
+
+        if player.tourney_cards_per_game is None:
+            tourney_cards_per_game = 'N/A'
+        else:
+            tourney_cards_per_game = '{:.3f}'.format(player.tourney_cards_per_game)
+
+        stats = OrderedDict([
+            ('Wins / Losses (Ladder 1v1)', player.win_losses(bem('battle'))),
+            ('Ladder Win Percentage', '{:.3%} {}'.format(player.win_ratio, bem('battle'))),
+            ('Total Games (1v1 + 2v2)', fmt(player.total_games, 'battle')),
+            ('Three-Crown Wins', fmt(player.three_crown_wins, 'crownblue')),
+            ('Win Streak', fmt(player.win_streak, 'crownred')),
+            ('Cards Found', fmt(player.cards_found, 'cards')),
+            ('Challenge Cards Won', fmt(player.challenge_cards_won, 'tournament')),
+            ('Challenge Max Wins', fmt(player.challenge_max_wins, 'tournament')),
+            ('Tourney Cards Won', fmt(player.tourney_cards_won, 'tournament')),
+            ('Tourney Games', fmt(player.tourney_games, 'tournament')),
+            ('Tourney Cards/Game', '{} {}'.format(tourney_cards_per_game, bem('tournament'))),
+            ('Total Donations', fmt(player.total_donations, 'cards')),
+            ('Level', fmt(player.level, 'experience')),
+            ('Favorite Card', player.fave_card(self.bot_emoji))
+        ])
+        for k, v in stats.items():
+            em.add_field(name=k, value=v)
+
+        # chests
+        em.add_field(name="Chests", value=player.chest_list(self.bot_emoji), inline=False)
+
+        # deck
+        em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
+
+        return em
+
+    def embed_profile_cards(self, player: CRPlayerModel, color=None):
+        """Player card collection."""
+        profile_url = 'http://cr-api.com/profile/{}'.format(player.tag)
+        em = discord.Embed(
+            title="{} #{}".format(player.name, player.tag),
+            color=color,
+            url=profile_url)
+        cards = player.card_collection(self.bot_emoji)
+        for rarity in ['Common', 'Rare', 'Epic', 'Legendary']:
+            value = []
+            for card in cards:
+                if card is not None:
+                    if card['rarity'] == rarity:
+                        value.append(
+                            "{}{}".format(
+                                card['emoji'], card['level']))
+            em.add_field(name=rarity, value=' '.join(value))
+
+        em.set_footer(
+            text=profile_url,
+            icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
+
+        return em
+
+    def embeds_profile(self, player: CRPlayerModel, server=None, overview=True, stats=False, cards=False):
+        """Return Discord Embed of player profile."""
+        embeds = []
+        color = random_discord_color()
+
+        if overview:
+            embeds.append(self.embed_profile_overview(player, server=server, color=color))
 
         if stats:
-
-            # trophies
-            em = discord.Embed(title=" ", color=color)
-
-            def fmt(num, emoji_name):
-                emoji = bem(emoji_name)
-                if emoji is not None:
-                    return '{:,} {}'.format(num, emoji)
-
-            if player.tourney_cards_per_game is None:
-                tourney_cards_per_game = 'N/A'
-            else:
-                tourney_cards_per_game = '{:.3f}'.format(player.tourney_cards_per_game)
-
-            stats = OrderedDict([
-                ('Wins / Losses (Ladder 1v1)', player.win_losses(bem('battle'))),
-                ('Ladder Win Percentage', '{:.3%} {}'.format(player.win_ratio, bem('battle'))),
-                ('Total Games (1v1 + 2v2)', fmt(player.total_games, 'battle')),
-                ('Three-Crown Wins', fmt(player.three_crown_wins, 'crownblue')),
-                ('Win Streak', fmt(player.win_streak, 'crownred')),
-                ('Cards Found', fmt(player.cards_found, 'cards')),
-                ('Challenge Cards Won', fmt(player.challenge_cards_won, 'tournament')),
-                ('Challenge Max Wins', fmt(player.challenge_max_wins, 'tournament')),
-                ('Tourney Cards Won', fmt(player.tourney_cards_won, 'tournament')),
-                ('Tourney Games', fmt(player.tourney_games, 'tournament')),
-                ('Tourney Cards/Game', '{} {}'.format(tourney_cards_per_game, bem('tournament'))),
-                ('Total Donations', fmt(player.total_donations, 'cards')),
-                ('Level', fmt(player.level, 'experience')),
-                ('Favorite Card', player.fave_card(self.bot_emoji))
-            ])
-            for k, v in stats.items():
-                em.add_field(name=k, value=v)
-
-            # chests
-            em.add_field(name="Chests", value=player.chest_list(self.bot_emoji), inline=False)
-
-            # deck
-            em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
-
-            embeds.append(em)
+            embeds.append(self.embed_profile_stats(player, color=color))
 
         if cards:
-            # card colllection
-            em = discord.Embed(title=" ", color=color)
-            cards = player.card_collection(self.bot_emoji)
-            for rarity in ['Common', 'Rare', 'Epic', 'Legendary']:
-                value = []
-                for card in cards:
-                    if card is not None:
-                        if card['rarity'] == rarity:
-                            value.append(
-                                "{}{}".format(
-                                    card['emoji'], card['level']))
-                em.add_field(name=rarity, value=' '.join(value))
-
-            embeds.append(em)
+            embeds.append(self.embed_profile_cards(player, color=color))
 
         return embeds
 
