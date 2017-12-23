@@ -1189,20 +1189,19 @@ class CRProfile:
             tourney_cards_per_game = '{:.3f}'.format(player.tourney_cards_per_game)
 
         stats = OrderedDict([
-            ('Wins / Losses (Ladder 1v1)', player.win_losses(bem('battle'))),
+            ('Ladder Wins / Losses', player.win_losses(bem('battle'))),
             ('Ladder Win Percentage', '{:.3%} {}'.format(player.win_ratio, bem('battle'))),
-            ('Total Games (1v1 + 2v2)', fmt(player.total_games, 'battle')),
-            ('Three-Crown Wins', fmt(player.three_crown_wins, 'crownblue')),
-            ('Win Streak', fmt(player.win_streak, 'crownred')),
-            ('Cards Found', fmt(player.cards_found, 'cards')),
-            ('Challenge Cards Won', fmt(player.challenge_cards_won, 'tournament')),
+            ('Total Games', fmt(player.total_games, 'battle')),
             ('Challenge Max Wins', fmt(player.challenge_max_wins, 'tournament')),
+            ('Challenge Cards Won', fmt(player.challenge_cards_won, 'tournament')),
+            ('Three-Crown Wins', fmt(player.three_crown_wins, 'crownblue')),
             ('Tourney Cards Won', fmt(player.tourney_cards_won, 'tournament')),
             ('Tourney Games', fmt(player.tourney_games, 'tournament')),
             ('Tourney Cards/Game', '{} {}'.format(tourney_cards_per_game, bem('tournament'))),
+            ('Cards Found', fmt(player.cards_found, 'cards')),
             ('Total Donations', fmt(player.total_donations, 'cards')),
             ('Level', fmt(player.level, 'experience')),
-            ('Favorite Card', player.fave_card(self.bot_emoji))
+            ('Favorite Card', player.fave_card(self.bot_emoji)),
         ])
         for k, v in stats.items():
             em.add_field(name=k, value=v)
