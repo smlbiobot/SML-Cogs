@@ -1067,11 +1067,11 @@ class CRProfile:
             racf_cog = self.bot.get_cog("RACF")
             if racf_cog is None:
                 await self.bot.say(
-                    "Pleaes run `[p]crprofile settag` to set your player tag."
+                    "Pleaes run `{}crprofile settag` to set your player tag.".format(ctx.prefix)
                 )
             else:
                 await self.bot.say(
-                    "Please run `!crsettag` to set your player tag."
+                    "Please run `{}crsettag` to set your player tag.".format(ctx.prefix)
                 )
             return
         await self.display_profile(ctx, tag, overview=overview, stats=stats, cards=cards)
