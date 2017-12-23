@@ -1047,7 +1047,7 @@ class CRProfile:
 
     async def get_profile(
             self, ctx, member: discord.Member = None,
-            overview=True, stats=False, cards=False):
+            **kwargs):
         """Logic for profile"""
         await self.bot.type()
         author = ctx.message.author
@@ -1073,7 +1073,7 @@ class CRProfile:
                     "Please run `{}crsettag` to set your player tag.".format(ctx.prefix)
                 )
             return
-        await self.display_profile(ctx, tag, overview=overview, stats=stats, cards=cards)
+        await self.display_profile(ctx, tag, **kwargs)
 
     @crprofile.command(name="get", pass_context=True, no_pm=True)
     async def crprofile_get(self, ctx, member: discord.Member = None):
@@ -1081,14 +1081,19 @@ class CRProfile:
 
         if member is not entered, retrieve own profile
         """
-        await self.get_profile(ctx, member, overview=True, stats=True, cards=False)
+        await self.get_profile(ctx, member, sections=['overview', 'stats'])
 
     @crprofile.command(name="cards", pass_context=True, no_pm=True)
-    async def crporifle_cards(self, ctx, member: discord.Member = None):
-        """Player profile with cards."""
-        await self.get_profile(ctx, member, overview=False, stats=False, cards=True)
+    async def crprofile_cards(self, ctx, member: discord.Member = None):
+        """Card collection."""
+        await self.get_profile(ctx, member, sections=['cards'])
 
-    async def display_profile(self, ctx, tag, overview=True, stats=False, cards=False):
+    @crprofile.command(name="chests", pass_context=True, no_pm=True)
+    async def crprofile_chests(self, ctx, member: discord.Member = None):
+        """Upcoming chests."""
+        await self.get_profile(ctx, member, sections=['chests'])
+
+    async def display_profile(self, ctx, tag, **kwargs):
         """Display profile."""
         sctag = SCTag(tag)
         if not sctag.valid:
@@ -1116,7 +1121,7 @@ class CRProfile:
             )
 
         server = ctx.message.server
-        for em in self.embeds_profile(player_data, server=server, overview=overview, stats=stats, cards=cards):
+        for em in self.embeds_profile(player_data, server=server, **kwargs):
             await self.bot.say(embed=em)
 
     def embed_profile_overview(self, player: CRPlayerModel, server=None, color=None):
@@ -1211,7 +1216,7 @@ class CRProfile:
         return em
 
     def embed_profile_cards(self, player: CRPlayerModel, color=None):
-        """Player card collection."""
+        """Card Collection."""
         profile_url = 'http://cr-api.com/profile/{}'.format(player.tag)
         em = discord.Embed(
             title="{} #{}".format(player.name, player.tag),
@@ -1234,19 +1239,36 @@ class CRProfile:
 
         return em
 
-    def embeds_profile(self, player: CRPlayerModel, server=None, overview=True, stats=False, cards=False):
+    def embed_profile_chests(self, player: CRPlayerModel, color=None):
+        """Upcoming chests"""
+        profile_url = 'http://cr-api.com/profile/{}'.format(player.tag)
+        em = discord.Embed(
+            title="{} #{}".format(player.name, player.tag),
+            color=color,
+            url=profile_url)
+        cards = player.card_collection(self.bot_emoji)
+        em.add_field(name="Chests", value=player.chest_list(self.bot_emoji), inline=False)
+        em.set_footer(
+            text=profile_url,
+            icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
+        return em
+
+    def embeds_profile(self, player: CRPlayerModel, server=None, sections=('overview', 'stats')):
         """Return Discord Embed of player profile."""
         embeds = []
         color = random_discord_color()
 
-        if overview:
+        if 'overview' in sections:
             embeds.append(self.embed_profile_overview(player, server=server, color=color))
 
-        if stats:
+        if 'stats' in sections:
             embeds.append(self.embed_profile_stats(player, color=color))
 
-        if cards:
+        if 'cards' in sections:
             embeds.append(self.embed_profile_cards(player, color=color))
+
+        if 'chests' in sections:
+            embeds.append(self.embed_profile_chests(player, color=color))
 
         return embeds
 
