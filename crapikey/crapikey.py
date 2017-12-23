@@ -171,7 +171,6 @@ class CRAPIKey:
         """Retrieve token of a Discord member."""
         params = {
             "discord_id": member.id,
-            "name": member.name,
             "open_sesame": self.config.open_sesame
         }
         url = build_url(self.config.base, self.config.endpoints.create, params)
@@ -183,7 +182,6 @@ class CRAPIKey:
         """Retrieve token of a Discord member."""
         params = {
             "discord_id": member.id,
-            "name": member.name,
             "open_sesame": self.config.open_sesame
         }
         url = build_url(self.config.base, self.config.endpoints.renew, params)
