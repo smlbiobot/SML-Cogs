@@ -97,6 +97,7 @@ class Constants:
             Constants.__instance = self
         self._cards = None
         self._alliance_badges = None
+        self._rarities = None
 
     @staticmethod
     def get_instance():
@@ -110,6 +111,13 @@ class Constants:
             r = requests.get('https://cr-api.github.io/cr-api-data/json/cards.json')
             self._cards = r.json()
         return self._cards
+
+    @property
+    def rarities(self):
+        if self._rarities is None:
+            r = requests.get('https://cr-api.github.io/cr-api-data/json/rarities.json')
+            self._rarities = r.json()
+        return self._rarities
 
     @property
     def alliance_badges(self):
@@ -376,9 +384,7 @@ class CRPlayerModel:
     @property
     def level(self):
         """XP Level."""
-        if self.stats is not None:
-            return self.stats.get("level", None)
-        return None
+        return self.prop("stats", "level", 0)
 
     @property
     def games(self):
@@ -555,6 +561,9 @@ class CRPlayerModel:
         result = result.replace('-', '')
         return bot_emoji.name(result)
 
+    """
+    Seasons
+    """
 
     @property
     def seasons(self):
@@ -570,6 +579,72 @@ class CRPlayerModel:
         s_list = sorted(s_list, key=lambda s: s["number"])
         return s_list
 
+    """
+    Card Collection
+    """
+    @property
+    def cards(self):
+        """Card collection."""
+        return self.data.get("cards")
+
+    def card_collection(self, bot_emoji):
+
+
+        sort_rarities = {
+            'Common': 1,
+            'Rare': 2,
+            'Epic': 3,
+            'Legendary': 4
+        }
+        cards = self.cards
+        cards = sorted(cards, key=lambda x: (sort_rarities[x['rarity']], x['elixir']))
+
+        out = []
+        for card in cards.copy():
+            key = card['key']
+            key = key.replace('-', '')
+            card['emoji'] = bot_emoji.name(key)
+
+            out.append({
+                'emoji': bot_emoji.name(key),
+                'level': card['level'],
+                'count': card['count'],
+                'rarity': card['rarity']
+            })
+
+        return out
+
+
+
+    def upgrades(self, rarity, count, level):
+        rarities = Constants.get_instance().rarities
+        data = None
+        for r in rarities:
+            if rarity == r['name']:
+                data = r
+                break
+
+        is_max = level == data['level_count']
+
+        upgrade_req = data["upgrade_material_count"][level-1]
+
+        if is_max:
+            percent = 100
+            progress_color = "red"
+            upgrade_str = "{} / MAX".format(count)
+        else:
+            count_str = "{:,}".format(count)
+            percent = min(100, count / upgrade_req * 100)
+            if percent == 100:
+                progress_color = 'green'
+            else:
+                progress_color = 'blue'
+            upgrade_str = "{} / {:,}".format(count_str, upgrade_req)
+        return {
+            "upgrade_str": upgrade_str,
+            "percent": percent,
+            "progress_color": progress_color
+        }
 
 class Settings:
     """Cog settings.
@@ -1114,6 +1189,32 @@ class CRProfile:
 
         # deck
         em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
+
+        embeds.append(em)
+
+        # card colllection
+        em = discord.Embed(title=" ", color=color)
+        cards = player.card_collection(self.bot_emoji)
+        for rarity in ['Common', 'Rare', 'Epic', 'Legendary']:
+            value = []
+            for card in cards:
+                if card is not None:
+                    if card['rarity'] == rarity:
+                        value.append(
+                            "{}{}".format(
+                                card['emoji'], card['level']))
+            em.add_field(name=rarity, value=' '.join(value))
+
+
+        # print(cards)
+        # cards_groups = grouper(24, cards)
+        # for cards_group in cards_groups:
+        #     print(cards_group)
+        #     em = discord.Embed(title=" ", color=color)
+        #     for card in cards_group:
+        #         if card is not None:
+        #             em.add_field(name=card['emoji'], value="{} {}".format(card['level'], card['count']))
+        #     embeds.append(em)
 
         # season finishes
         # def rank_str(rank):
