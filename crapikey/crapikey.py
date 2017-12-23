@@ -379,10 +379,10 @@ class CRAPIKey:
         except ServerError as e:
             await self.send_error_message(ctx, e.data)
 
+        await self.bot.say('All CR-API Keys')
+
         default = '_'
-        color = random_discord_color()
         for key in data:
-            em = discord.Embed(title='CR API Key', color=color)
             id = key.get('id', default)
             blacklisted = key.get('blacklisted', default)
             registered = key.get('registered', default)
@@ -392,14 +392,20 @@ class CRAPIKey:
                 member = default
             else:
                 member = server.get_member(id)
+            out = []
+            out.append('-' * 50)
+            out.append(
+                "{member} ({id})\n"
+                "Blacklisted: {blacklisted}\n"
+                "Request Count: {request_count}\n"
+                "Registered: {registered}\n"
+                "Token: {token}".format(
+                    member=member, id=id, blacklisted=blacklisted,
+                    registered=registered, request_count=request_count, token=token
+                )
 
-            em.add_field(name="Member", value=member)
-            em.add_field(name="ID", value=id)
-            em.add_field(name="Blacklisted", value=blacklisted, inline=False)
-            em.add_field(name="Registered", value=registered)
-            em.add_field(name="Request Count", value=request_count)
-            em.add_field(name="Token", value=token)
-            await self.bot.say(embed=em)
+            )
+            await self.bot.say(box('\n'.join(out), lang='python'))
 
         await self.server_log(ctx, "List all")
 
