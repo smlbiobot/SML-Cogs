@@ -226,7 +226,6 @@ class CRAPIKey:
             "open_sesame": self.config.open_sesame
         }
         url = build_url(self.config.base, self.config.endpoints.listall, params)
-        print(url)
         data = await self.fetch_json(url)
         return data
 
