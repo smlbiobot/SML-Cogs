@@ -450,6 +450,7 @@ class CRPlayerModel:
     """
     Chests.
     """
+
     def chest_list(self, bot_emoji: BotEmoji):
         """List of chests."""
         # chests
@@ -467,7 +468,7 @@ class CRPlayerModel:
                 out.append(bot_emoji.key(c.lower()))
 
         for k, v in special_chests:
-            out.append(bot_emoji.key(k) + str(v+1))
+            out.append(bot_emoji.key(k) + str(v + 1))
 
         return ''.join(out)
 
@@ -582,13 +583,13 @@ class CRPlayerModel:
     """
     Card Collection
     """
+
     @property
     def cards(self):
         """Card collection."""
         return self.data.get("cards")
 
     def card_collection(self, bot_emoji):
-
 
         sort_rarities = {
             'Common': 1,
@@ -614,8 +615,6 @@ class CRPlayerModel:
 
         return out
 
-
-
     def upgrades(self, rarity, count, level):
         rarities = Constants.get_instance().rarities
         data = None
@@ -626,7 +625,7 @@ class CRPlayerModel:
 
         is_max = level == data['level_count']
 
-        upgrade_req = data["upgrade_material_count"][level-1]
+        upgrade_req = data["upgrade_material_count"][level - 1]
 
         if is_max:
             percent = 100
@@ -645,6 +644,7 @@ class CRPlayerModel:
             "percent": percent,
             "progress_color": progress_color
         }
+
 
 class Settings:
     """Cog settings.
@@ -1204,32 +1204,6 @@ class CRProfile:
                             "{}{}".format(
                                 card['emoji'], card['level']))
             em.add_field(name=rarity, value=' '.join(value))
-
-
-        # print(cards)
-        # cards_groups = grouper(24, cards)
-        # for cards_group in cards_groups:
-        #     print(cards_group)
-        #     em = discord.Embed(title=" ", color=color)
-        #     for card in cards_group:
-        #         if card is not None:
-        #             em.add_field(name=card['emoji'], value="{} {}".format(card['level'], card['count']))
-        #     embeds.append(em)
-
-        # season finishes
-        # def rank_str(rank):
-        #     if rank is None:
-        #         return "Unranked"
-        #     p = inflect.engine()
-        #     o = p.ordinal(rank)[-2:]
-        #     return '{:,}{}'.format(rank, o)
-        #
-        # for s in player.seasons:
-        #     em.add_field(
-        #         name="Season {}".format(s["number"]),
-        #         value="{:,}/{:,} ({})".format(s["ending"], s["highest"], rank_str(s["rank"])),
-        #         inline=True
-        #     )
 
         # link to cr-api.com
         em.set_footer(
