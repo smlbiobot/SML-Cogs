@@ -66,7 +66,7 @@ class Clans:
     async def clansset(self, ctx):
         """Settings"""
         if ctx.invoked_subcommand is None:
-            await self.bot.send_cmd_help(ctx)(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @checks.mod_or_permissions()
     @clansset.command(name="config", pass_context=True, no_pm=True)
@@ -100,8 +100,11 @@ class Clans:
 
     async def get_clan(self, tag):
         """Return dict of clan"""
-        url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
-        headers = {'Authorization': 'Bearer {}'.format(self.auth)}
+        # url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
+        # headers = {'Authorization': 'Bearer {}'.format(self.auth)}
+
+        url = 'http://temp-api.cr-api.com/clan/{}'.format(tag)
+        headers = {'auth': self.auth}
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -116,11 +119,25 @@ class Clans:
 
     async def get_clans(self, tags):
         """Return list of clans"""
-        clans = []
-        for tag in tags:
-            clan = await self.get_clan(tag)
-            clans.append(clan)
-        return clans
+        # clans = []
+        # for tag in tags:
+        #     clan = await self.get_clan(tag)
+        #     clans.append(clan)
+        # return clans
+
+        url = 'http://temp-api.cr-api.com/clan/{}'.format(",".join(tags))
+        headers = {'auth': self.auth}
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=headers, timeout=30) as resp:
+                    data = await resp.json()
+        except json.decoder.JSONDecodeError:
+            raise
+        except asyncio.TimeoutError:
+            raise
+
+        return data
 
     @commands.command(pass_context=True, no_pm=True)
     async def clans(self, ctx, *args):
@@ -156,6 +173,7 @@ class Clans:
         badge_url = None
         show_member_count = "-m" not in args
         show_clan_tag = "-t" not in args
+
         for clan in clans:
             desc = clan.get('description')
             match = re.search('[\d,O]{4,}', desc)
@@ -173,7 +191,7 @@ class Clans:
                 pb = ' PB'
             member_count = ''
             if show_member_count:
-                member_count = ', {} / 50'.format(clan.get('members'))
+                member_count = ', {} / 50'.format(len(clan.get('members')))
             clan_tag = ''
             if show_clan_tag:
                 clan_tag = ', {}'.format(clan.get('tag'))
