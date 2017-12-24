@@ -35,7 +35,7 @@ import discord
 import yaml
 from box import Box
 from cogs.utils import checks
-from cogs.utils.chat_formatting import box
+from cogs.utils.chat_formatting import box, bold
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 
@@ -393,21 +393,34 @@ class CRAPIKey:
         registered = key.get('registered', default)
         if isinstance(registered, int):
             registered_iso = dt.datetime.utcfromtimestamp(registered / 1000).isoformat()
+            registered_str = "{} / {}".format(registered, registered_iso)
         else:
-            registered_iso = '-'
+            registered_str = '-'
+
+        id = key.get('id', default)
+        last_request = key.get('lastRequest', default)
+        blacklisted = key.get('blacklisted', default)
+        token = key.get('token', default)
+
+        request_count = key.get('requestCount', default)
+        request_count_str = ''
+        if isinstance(request_count, dict):
+            request_count_str = box('\n'.join(["{} : {:>10,}".format(k, v) for k, v in request_count.items()]), lang='python')
 
         out = (
             "{member} ({id})\n"
+            "Last Request: {last_request}\n"
             "Blacklisted: {blacklisted}\n"
-            "Request Count: {request_count}\n"
             "Registered: {registered}\n"
-            "Token: {token}".format(
-                member=member,
-                id=key.get('id', default),
-                blacklisted=key.get('blacklisted', default),
-                registered="{} / {}".format(registered, registered_iso),
-                request_count=key.get('request_count', default),
-                token=key.get('token', default)
+            "Token: {token}\n"
+            "Request Count: {request_count}\n".format(
+                member=bold(member),
+                id=id,
+                last_request=last_request,
+                blacklisted=blacklisted,
+                registered=registered_str,
+                request_count=request_count_str,
+                token=token
             )
         )
 
