@@ -129,7 +129,7 @@ class Constants:
     def badge_id_to_url(self, id):
         for badge in self.alliance_badges:
             if badge['badge_id'] == id:
-                return "https://cr-api.github.io/cr-api-assets/badge/{}.png".format(badge['name'])
+                return "https://cr-api.github.io/cr-api-assets/badges/{}.png".format(badge['name'])
         return None
 
 
