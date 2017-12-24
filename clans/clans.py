@@ -209,7 +209,7 @@ class Clans:
                 for badge in self.badges:
                     if badge['badge_id'] == badge_id:
                         name = badge['name']
-                        badge_url = 'https://cr-api.github.io/cr-api-assets/badge/{}.png'.format(name)
+                        badge_url = 'https://cr-api.github.io/cr-api-assets/badges/{}.png'.format(name)
                         break
 
         if badge_url is not None:
