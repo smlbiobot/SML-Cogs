@@ -205,12 +205,8 @@ class Clans:
             em.add_field(name=name, value=value, inline=False)
 
             if badge_url is None:
-                badge_id = clan.get('badgeId')
-                for badge in self.badges:
-                    if badge['badge_id'] == badge_id:
-                        name = badge['name']
-                        badge_url = 'https://cr-api.github.io/cr-api-assets/badges/{}.png'.format(name)
-                        break
+                badge_url = clan['badge']['image']
+
 
         if badge_url is not None:
             em.set_thumbnail(url=badge_url)
