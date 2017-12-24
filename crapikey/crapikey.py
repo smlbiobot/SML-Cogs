@@ -387,44 +387,38 @@ class CRAPIKey:
 
         await self.server_log(ctx, "Token2User: {}".format(token), data)
 
-    def key_display_str(self, key, member):
+    def key_display_str(self, key, member, show_token=False):
         """Return formatted output of a key."""
         default = '-'
+
+        out = []
+
+        out.append("{member} ({id})".format(
+            member=bold(member),
+            id=key.get('id', default)))
+
         registered = key.get('registered', default)
         if isinstance(registered, int):
             registered_iso = dt.datetime.utcfromtimestamp(registered / 1000).isoformat()
             registered_str = "{} / {}".format(registered, registered_iso)
         else:
             registered_str = '-'
+        out.append("Registered: {}".format(registered_str))
 
-        id = key.get('id', default)
-        last_request = key.get('lastRequest', default)
-        blacklisted = key.get('blacklisted', default)
-        token = key.get('token', default)
+        out.append("Last Request: {}".format(key.get('lastRequest', default)))
+        out.append("Blacklisted: {}".format(key.get('blacklisted', default)))
+
+        if show_token:
+            out.append("Token: {}".format(key.get('token', default)))
 
         request_count = key.get('requestCount', default)
         request_count_str = ''
         if isinstance(request_count, dict):
             request_count_str = box('\n'.join(["{} : {:>10,}".format(k, v) for k, v in request_count.items()]), lang='python')
 
-        out = (
-            "{member} ({id})\n"
-            "Last Request: {last_request}\n"
-            "Blacklisted: {blacklisted}\n"
-            "Registered: {registered}\n"
-            "Token: {token}\n"
-            "Request Count: {request_count}\n".format(
-                member=bold(member),
-                id=id,
-                last_request=last_request,
-                blacklisted=blacklisted,
-                registered=registered_str,
-                request_count=request_count_str,
-                token=token
-            )
-        )
+        out.append('Request Count: {}'.format(request_count_str))
 
-        return out
+        return '\n'.join(out)
 
     @checks.serverowner_or_permissions(manage_server=True)
     @crapikey.command(name="listall", pass_context=True, no_pm=False)
@@ -454,10 +448,14 @@ class CRAPIKey:
 
     @checks.serverowner_or_permissions(manage_server=True)
     @crapikey.command(name="stats", pass_context=True, no_pm=False)
-    async def crapikey_stats(self, ctx, member: discord.Member = None):
-        """List stats of keys."""
+    async def crapikey_stats(self, ctx, member: discord.Member = None, show_token=False):
+        """List stats of keys.
+
+        [p]crapikey stats        | Total count
+        [p]crapikey stats @SML   | Stats of a user
+        [p]crapikey stats @SML 1 | Stats of a user w/ token
+        """
         data = None
-        server = ctx.message.server
         try:
             data = await self.key_listall()
         except ServerError as e:
@@ -466,7 +464,7 @@ class CRAPIKey:
         if member is None:
             await self.crapikey_stats_all(ctx, data)
         else:
-            await self.crapikey_stats_member(ctx, data, member)
+            await self.crapikey_stats_member(ctx, data, member, show_token=show_token)
 
     async def crapikey_stats_all(self, ctx, data):
         """Show all stats."""
@@ -486,7 +484,7 @@ class CRAPIKey:
         )
         await self.server_log(ctx, "Stats")
 
-    async def crapikey_stats_member(self, ctx, data, member: discord.Member):
+    async def crapikey_stats_member(self, ctx, data, member: discord.Member, show_token=False):
         """Show stats about a member."""
         found_key = None
         for key in data:
@@ -498,7 +496,7 @@ class CRAPIKey:
             await self.bot.say("Cannot find associated key with {}".format(member))
             return
 
-        await self.bot.say(self.key_display_str(found_key, member))
+        await self.bot.say(self.key_display_str(found_key, member, show_token=show_token))
 
     async def send_error_message(self, ctx, data=None):
         """Send error message to channel."""
