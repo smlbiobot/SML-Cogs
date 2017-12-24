@@ -1218,7 +1218,7 @@ class CRProfile:
 
     def embed_profile_cards(self, player: CRPlayerModel, color=None):
         """Card Collection."""
-        profile_url = 'http://cr-api.com/profile/{}'.format(player.tag)
+        profile_url = 'http://cr-api.com/profile/{}/cards'.format(player.tag)
         em = discord.Embed(
             title="{} #{}".format(player.name, player.tag),
             color=color,
