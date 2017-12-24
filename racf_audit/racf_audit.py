@@ -42,6 +42,9 @@ import dateutil.parser
 import pprint
 import humanize
 import datetime as dt
+import aiohttp
+import json
+import asyncio
 
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
@@ -266,17 +269,33 @@ class RACFAudit:
         """All family clan models."""
         clans = self.clans(server)
         clan_tags = [c.tag for c in clans]
+        url = 'http://temp-api.cr-api.com/clan/{}'.format(','.join(clan_tags))
+        headers = {'auth': self.auth}
         try:
-            clan_models = await crapipy.AsyncClient().get_clans(clan_tags)
-            self.save_to_cache(clan_models)
-            self.settings["cache_timestamp"] = dt.datetime.utcnow().isoformat()
-            dataIO.save_json(JSON, self.settings)
-            # TODO purely for testing
-            # raise crapipy.APIError
-        except crapipy.APIError:
-            raise crapipy.APIError
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url, headers=headers) as resp:
+                    if resp.status != 200:
+                        error = True
+                    else:
+                        data = await resp.json()
+                        return data
+        except json.decoder.JSONDecodeError:
+            raise
+        except asyncio.TimeoutError:
+            raise
 
-        return clan_models
+
+        # try:
+        #     clan_models = await crapipy.AsyncClient().get_clans(clan_tags)
+        #     self.save_to_cache(clan_models)
+        #     self.settings["cache_timestamp"] = dt.datetime.utcnow().isoformat()
+        #     dataIO.save_json(JSON, self.settings)
+        #     # TODO purely for testing
+        #     # raise crapipy.APIError
+        # except crapipy.APIError:
+        #     raise crapipy.APIError
+
+        # return clan_models
 
     async def family_member_models(self, server):
         """All family member models."""
@@ -359,7 +378,7 @@ class RACFAudit:
     @racfauditset.command(name="coleader", pass_context=True, no_pm=True)
     @checks.mod_or_permissions()
     async def racfauditset_coleader(self, ctx, role_name):
-        """Elder role name."""
+        """Co-Leader role name."""
         await self.update_server_settings(ctx, "coleader", role_name)
 
     @racfauditset.command(name="elder", pass_context=True, no_pm=True)
@@ -371,8 +390,21 @@ class RACFAudit:
     @racfauditset.command(name="member", pass_context=True, no_pm=True)
     @checks.mod_or_permissions()
     async def racfauditset_member(self, ctx, role_name):
-        """Elder role name."""
+        """Member role name."""
         await self.update_server_settings(ctx, "member", role_name)
+
+    @racfauditset.command(name="auth", pass_context=True, no_pm=True)
+    @checks.is_owner()
+    async def racfauditset_auth(self, ctx, token):
+        """Set API Authentication token."""
+        self.settings["auth"] = token
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Updated settings.")
+
+    @property
+    def auth(self):
+        """API authentication token."""
+        return self.settings.get("auth")
 
     @commands.group(aliases=["racfa"], pass_context=True, no_pm=True)
     async def racfaudit(self, ctx):

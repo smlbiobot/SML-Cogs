@@ -366,6 +366,27 @@ class CRAPIKey:
         await self.server_log(ctx, "Blacklist Token: {}".format(token), data)
 
     @checks.serverowner_or_permissions(manage_server=True)
+    @crapikey.command(name="token2user", pass_context=True, no_pm=False)
+    async def crapikey_token2user(self, ctx, token):
+        """Convert a token to a user."""
+        data = None
+        try:
+            data = await self.key_token2id(token)
+            id = data['id']
+            member = ctx.server.get_member(id)
+            await self.bot.say(
+                "{member} ({id}) is assigned with this token `{token}`".format(
+                    member=member,
+                    token=token,
+                    id=id,
+                )
+            )
+        except ServerError as e:
+            await self.send_error_message(ctx, e.data)
+
+        await self.server_log(ctx, "Token2User: {}".format(token), data)
+
+    @checks.serverowner_or_permissions(manage_server=True)
     @crapikey.command(name="listall", pass_context=True, no_pm=False)
     async def crapikey_listall(self, ctx):
         """List all keys."""
@@ -415,6 +436,7 @@ class CRAPIKey:
             code = 'Unknown'
         if message is None:
             message = '_'
+        message = message.replace('http://discord.me/cr_api', '<http://discord.me/cr_api>')
         await self.bot.say(
             "Error \n"
             "Code: {code}\n"
