@@ -425,6 +425,33 @@ class CRAPIKey:
 
         await self.server_log(ctx, "List all")
 
+    @checks.serverowner_or_permissions(manage_server=True)
+    @crapikey.command(name="stats", pass_context=True, no_pm=False)
+    async def crapikey_stats(self, ctx):
+        """List stats of keys."""
+        data = None
+        server = ctx.message.server
+        try:
+            data = await self.key_listall()
+        except ServerError as e:
+            await self.send_error_message(ctx, e.data)
+
+        total_keys = len(data)
+        blacklisted = 0
+        for key in data:
+            if key.get('blacklisted'):
+                blacklisted += 1
+
+        await self.bot.say(
+            "Total keys: {total_keys}\n"
+            "Blacklisted: {blacklisted} ({blacklisted_ratio:.2%})".format(
+                total_keys=total_keys,
+                blacklisted=blacklisted,
+                blacklisted_ratio=blacklisted / total_keys
+            )
+        )
+        await self.server_log(ctx, "Stats")
+
     async def send_error_message(self, ctx, data=None):
         """Send error message to channel."""
         if data is None:
@@ -461,8 +488,6 @@ class CRAPIKey:
                 print("Server error.")
         except ServerError:
             print("Server error.")
-
-
 
 
 def check_folder():
