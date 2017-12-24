@@ -309,10 +309,10 @@ class CRPlayerModel:
         if self.not_in_clan:
             return "http://smlbiobot.github.io/img/emblems/NoClan.png"
         try:
-            url = Constants.get_instance().badge_id_to_url(self.clan['badge'])
+            return self.clan['badge']['image']
         except KeyError:
             pass
-        return url
+        return ''
 
     @property
     def stats(self):
