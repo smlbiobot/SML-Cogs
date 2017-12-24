@@ -24,6 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import datetime as dt
 import json
 import os
 import pprint
@@ -386,6 +387,32 @@ class CRAPIKey:
 
         await self.server_log(ctx, "Token2User: {}".format(token), data)
 
+    def key_display_str(self, key, member):
+        """Return formatted output of a key."""
+        default = '-'
+        registered = key.get('registered', default)
+        if isinstance(registered, int):
+            registered_iso = dt.datetime.utcfromtimestamp(registered / 1000).isoformat()
+        else:
+            registered_iso = '-'
+
+        out = (
+            "{member} ({id})\n"
+            "Blacklisted: {blacklisted}\n"
+            "Request Count: {request_count}\n"
+            "Registered: {registered}\n"
+            "Token: {token}".format(
+                member=member,
+                id=key.get('id', default),
+                blacklisted=key.get('blacklisted', default),
+                registered="{} / {}".format(registered, registered_iso),
+                request_count=key.get('request_count', default),
+                token=key.get('token', default)
+            )
+        )
+
+        return out
+
     @checks.serverowner_or_permissions(manage_server=True)
     @crapikey.command(name="listall", pass_context=True, no_pm=False)
     async def crapikey_listall(self, ctx):
@@ -401,33 +428,20 @@ class CRAPIKey:
 
         default = '_'
         for key in data:
+
             id = key.get('id', default)
-            blacklisted = key.get('blacklisted', default)
-            registered = key.get('registered', default)
-            request_count = key.get('requestCount', 0)
-            token = key.get('token', default)
             if id == default:
                 member = default
             else:
                 member = server.get_member(id)
-            out = (
-                "{member} ({id})\n"
-                "Blacklisted: {blacklisted}\n"
-                "Request Count: {request_count}\n"
-                "Registered: {registered}\n"
-                "Token: {token}".format(
-                    member=member, id=id, blacklisted=blacklisted,
-                    registered=registered, request_count=request_count, token=token
-                )
 
-            )
-            await self.bot.say(box(out, lang='python'))
+            await self.bot.say(self.key_display_str(key, member))
 
         await self.server_log(ctx, "List all")
 
     @checks.serverowner_or_permissions(manage_server=True)
     @crapikey.command(name="stats", pass_context=True, no_pm=False)
-    async def crapikey_stats(self, ctx):
+    async def crapikey_stats(self, ctx, member: discord.Member = None):
         """List stats of keys."""
         data = None
         server = ctx.message.server
@@ -436,6 +450,13 @@ class CRAPIKey:
         except ServerError as e:
             await self.send_error_message(ctx, e.data)
 
+        if member is None:
+            await self.crapikey_stats_all(ctx, data)
+        else:
+            await self.crapikey_stats_member(ctx, data, member)
+
+    async def crapikey_stats_all(self, ctx, data):
+        """Show all stats."""
         total_keys = len(data)
         blacklisted = 0
         for key in data:
@@ -451,6 +472,20 @@ class CRAPIKey:
             )
         )
         await self.server_log(ctx, "Stats")
+
+    async def crapikey_stats_member(self, ctx, data, member: discord.Member):
+        """Show stats about a member."""
+        found_key = None
+        for key in data:
+            if key['id'] == member.id:
+                found_key = key
+                break
+
+        if found_key is None:
+            await self.bot.say("Cannot find associated key with {}".format(member))
+            return
+
+        await self.bot.say(self.key_display_str(found_key, member))
 
     async def send_error_message(self, ctx, data=None):
         """Send error message to channel."""
