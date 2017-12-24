@@ -86,6 +86,8 @@ class Clans:
         self.settings['config'] = CONFIG_YAML
         dataIO.save_json(JSON, self.settings)
 
+        await self.bot.delete_message(ctx.message)
+
     @property
     def clans_config(self):
         if os.path.exists(CONFIG_YAML):
