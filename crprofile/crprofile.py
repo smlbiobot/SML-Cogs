@@ -434,10 +434,43 @@ class CRPlayerModel:
         """Three crown wins."""
         return self.prop("stats", "threeCrownWins", 0)
 
+    """
+        Rank.
+        """
+
+    @property
+    def league_statistics(self):
+        return self.data.get("leagueStatistics")
+
+    @property
+    def current_season(self):
+        if self.league_statistics:
+            return self.league_statistics.get('currentSeason')
+        return None
+
+    @property
+    def current_season_rank(self):
+        if self.current_season:
+            return self.current_season.get('rank')
+        return None
+
     @property
     def rank(self):
         """Global rank"""
-        return self.data.get("globalRank", None)
+        return self.current_season_rank
+
+    def rank_ord_str(rank):
+        """Rank in ordinal format."""
+        if rank is not None:
+            p = inflect.engine()
+            o = p.ordinal(rank)[-2:]
+            return '{:,}{}'.format(rank, o)
+        return 'Unranked'
+
+    @property
+    def rank_ord(self):
+        """Rank in ordinal format."""
+        return self.rank_ord_str(self.rank)
 
     def rank_str(self, bot_emoji: BotEmoji):
         """Rank in ordinal format."""
