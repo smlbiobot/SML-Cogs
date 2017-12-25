@@ -374,10 +374,10 @@ class CRAPIKey:
         try:
             data = await self.key_token2id(token)
             id = data['id']
-            member = ctx.server.get_member(id)
+            member = ctx.message.server.get_member(id)
             await self.bot.say(
                 "{member} ({id}) is assigned with this token `{token}`".format(
-                    member=member,
+                    member=member.mention,
                     token=token,
                     id=id,
                 )

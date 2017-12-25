@@ -520,12 +520,14 @@ class CRData:
         decks = data["decks"]
         for i, deck in enumerate(decks):
             cards = [self.sfid_to_id(card["key"]) for card in deck]
-            levels = [card["level"] for card in deck]
+            # levels = [card.get('level', 0) for card in deck]
 
             desc = "**Rank {}: **".format(i + 1)
-            for j, card in enumerate(cards):
-                desc += "{} ".format(self.id_to_name(card))
-                desc += "({}), ".format(levels[j])
+            desc += ', '.join([self.id_to_name(card) for card in cards])
+
+            # for j, card in enumerate(cards):
+            #     desc += "{} ".format(self.id_to_name(card))
+                # desc += "({}), ".format(levels[j])
 
             show_next = await self.show_result_row(
                 ctx,
@@ -534,7 +536,7 @@ class CRData:
                 len(decks),
                 deck_name="Rank {}".format(i + 1),
                 author="Top 200 Decks",
-                description=desc[:-1])
+                description=desc)
 
             if not show_next:
                 return
@@ -692,13 +694,14 @@ class CRData:
             rank = ", ".join(data["ranks"])
             usage = data["count"]
             cards = [self.sfid_to_id(card["key"]) for card in deck]
-            levels = [card["level"] for card in deck]
+            # levels = [card["level"] for card in deck]
 
             # desc = "**Rank {}: (Usage: {})**".format(rank, usage)
             desc = "**Rank {}: **".format(rank)
             for j, card in enumerate(cards):
-                desc += "{} ".format(self.id_to_name(card))
-                desc += "({}), ".format(levels[j])
+                desc += "{}".format(self.id_to_name(card))
+                desc += ', '
+                # desc += "({}), ".format(levels[j])
             desc = desc[:-1]
 
             show_next = await self.show_result_row(
@@ -846,10 +849,16 @@ class CRData:
 
     def sfid_to_id(self, sfid: str):
         """Convert Starfire ID to Card ID."""
-        cards = self.clashroyale["Cards"]
-        for card_key, card_data in cards.items():
-            if card_data["sfid"] == sfid:
-                return card_key
+        if sfid == 'x_bow':
+            return 'xbow'
+        if sfid == 'x-bow':
+            return 'xbow'
+        return sfid.replace('_', '-')
+        # cards = self.clashroyale["Cards"]
+        # for card_key, card_data in cards.items():
+        #     if card_data.get('sfid') == sfid:
+        #         return card_key
+        # return None
 
     def sfid_to_name(self, sfid: str):
         """Convert Starfire ID to Name."""
@@ -859,6 +868,8 @@ class CRData:
 
     def id_to_name(self, id: str):
         """Convert ID to Name."""
+        if id is None:
+            return None
         s = id.replace('-', ' ')
         s = string.capwords(s)
         return s

@@ -376,6 +376,12 @@
             "cpid": "Hog Rider",
             "sfid": "hog_rider"
         },
+        "hunter": {
+            "aka": [],
+            "elixir": 4,
+            "rarity": "epic",
+            "sfic": "hunter"
+        },
         "ice-golem": {
             "aka": [
                 "ig"
@@ -626,6 +632,12 @@
             "cpid": "Royal Giant",
             "sfid": "royal_giant"
         },
+        "royal-ghost": {
+            "aka": ["ghost"],
+            "elixir": 3,
+            "rarity": "legendary",
+            "sfid": "royal-ghost"
+        },
         "skeleton-army": {
             "aka": [
                 "skarmy",
@@ -759,7 +771,7 @@
         },
         "xbow": {
             "aka": [
-                "x-bow"
+                "xbow"
             ],
             "elixir": 6,
             "rarity": "epic",
@@ -774,6 +786,13 @@
             "tid": "TID_SPELL_INFO_ZAP",
             "cpid": "Zap",
             "sfid": "zap"
+        },
+        "zappies": {
+            "aka": [],
+            "elixir": 4,
+            "rarity": "rare",
+            "cpid": "Zap",
+            "sfid": "zappies"
         },
         "soon": {
             "aka": [],
