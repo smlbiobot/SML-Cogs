@@ -314,8 +314,7 @@ class CRDataEnhanced:
         decks = []
         for fd in found_decks:
             card_keys = [crdata.sfid_to_id(card["key"]) for card in fd["deck"]]
-            card_levels = [card["level"] for card in fd["deck"]]
-            deck = Deck(card_keys=card_keys, card_levels=card_levels, rank=fd["ranks"][0], usage=fd["count"])
+            deck = Deck(card_keys=card_keys, rank=fd["ranks"][0], usage=fd["count"])
             decks.append(deck)
 
         per_page = self.per_page
