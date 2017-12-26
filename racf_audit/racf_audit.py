@@ -234,7 +234,7 @@ class RACFAudit:
     def save_to_cache(self, clan_models):
         """Save clan models to cache."""
         for clan_model in clan_models:
-            dataIO.save_json(self.cache_file_path(clan_model.tag), clan_model._data)
+            dataIO.save_json(self.cache_file_path(clan_model.tag), clan_model.to_dict())
 
     def load_from_cache(self, clan_tags):
         """Return clan models from cache."""
@@ -269,33 +269,21 @@ class RACFAudit:
         """All family clan models."""
         clans = self.clans(server)
         clan_tags = [c.tag for c in clans]
-        url = 'http://temp-api.cr-api.com/clan/{}'.format(','.join(clan_tags))
-        headers = {'auth': self.auth}
+        clan_models = []
+
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=headers) as resp:
-                    if resp.status != 200:
-                        error = True
-                    else:
-                        data = await resp.json()
-                        return data
-        except json.decoder.JSONDecodeError:
-            raise
-        except asyncio.TimeoutError:
-            raise
+            client = crapipy.AsyncClient(token=self.auth)
+            clan_models = await client.get_clans(clan_tags)
 
+            self.save_to_cache(clan_models)
+            self.settings["cache_timestamp"] = dt.datetime.utcnow().isoformat()
+            dataIO.save_json(JSON, self.settings)
+            # TODO purely for testing
+            # raise crapipy.APIError
+        except crapipy.APIError:
+            raise crapipy.APIError
 
-        # try:
-        #     clan_models = await crapipy.AsyncClient().get_clans(clan_tags)
-        #     self.save_to_cache(clan_models)
-        #     self.settings["cache_timestamp"] = dt.datetime.utcnow().isoformat()
-        #     dataIO.save_json(JSON, self.settings)
-        #     # TODO purely for testing
-        #     # raise crapipy.APIError
-        # except crapipy.APIError:
-        #     raise crapipy.APIError
-
-        # return clan_models
+        return clan_models
 
     async def family_member_models(self, server):
         """All family member models."""
@@ -310,6 +298,7 @@ class RACFAudit:
         members = []
         for clan_model in clan_models:
             for member_model in clan_model.members:
+                member_model.clan = clan_model
                 members.append(member_model)
         return members, is_cache
 
@@ -525,7 +514,7 @@ class RACFAudit:
         if len(results):
             out = []
             for member_model in results:
-                out.append("**{0.name}** #{0.tag}, {0.clan_name}, {0.roleName}, {0.trophies}".format(member_model))
+                out.append("**{0.name}** #{0.tag}, {0.clan.name}, {0.role}, {0.trophies}".format(member_model))
                 if pargs.link:
                     out.append('http://cr-api.com/profile/{}'.format(member_model.tag))
             for page in pagify('\n'.join(out)):
