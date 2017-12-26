@@ -633,10 +633,10 @@
             "sfid": "royal_giant"
         },
         "royal-ghost": {
-            "aka": ["ghost"],
+            "aka": ["ghost", "royalghost"],
             "elixir": 3,
             "rarity": "legendary",
-            "sfid": "royal-ghost"
+            "sfid": "royal_ghost"
         },
         "skeleton-army": {
             "aka": [
