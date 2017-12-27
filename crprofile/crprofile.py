@@ -1177,8 +1177,11 @@ class CRProfile:
             'member': 'Member',
             'elder': 'Elder',
             'coleader': 'Co-Leader',
-            'leader': 'Leader'
+            'leader': 'Leader',
+            'n/a': 'N/A'
         }
+
+        clan_role = player.clan_role
 
         description = (
             '[{player_tag}]({profile_url})\n'
@@ -1191,7 +1194,7 @@ class CRProfile:
             clan_name=player.clan_name,
             clan_tag=player.clan_tag,
             clan_url=clan_url,
-            clan_role=roles[player.clan_role.lower()]
+            clan_role=roles.get(player.clan_role.lower(), 'N/A')
         )
         em = discord.Embed(title=title, description=description, color=color, url=profile_url)
         em.set_thumbnail(url=player.clan_badge_url)
