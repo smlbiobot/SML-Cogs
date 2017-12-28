@@ -221,8 +221,7 @@ class RACFAudit:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.settings = nested_dict()
-        self.settings.update(dataIO.load_json(JSON))
+        self.settings = dataIO.load_json(JSON)
 
         with open('data/racf_audit/family_config.yaml') as f:
             self.config = yaml.load(f)
@@ -389,6 +388,13 @@ class RACFAudit:
         self.settings["auth"] = token
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Updated settings.")
+
+    @racfauditset.command(name="settings", pass_context=True, no_pm=True)
+    @checks.is_owner()
+    async def racfauditset_settings(self, ctx):
+        """Set API Authentication token."""
+        await self.bot.say(box(self.settings))
+
 
     @property
     def auth(self):
