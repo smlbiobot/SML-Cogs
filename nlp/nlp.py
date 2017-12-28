@@ -177,12 +177,21 @@ class NLP:
         on_off = True
         if languages[0].lower() in ['off', '0', 'false']:
             on_off = False
-        self.settings[server.id]["TRANSLATE_CHANNEL"] = {
+        translate_channels = self.settings[server.id].get("TRANSLATE_CHANNELS")
+        if translate_channels is None:
+            self.settings[server.id]["TRANSLATE_CHANNELS"] = {}
+
+        self.settings[server.id]["TRANSLATE_CHANNELS"][channel.id] = {
             "on_off": on_off,
             "languages": languages,
             "from_channel_id": channel.id,
             "to_channel_id": ctx.message.channel.id,
         }
+
+        # remove legacy settings if exists
+        if "TRANSLATE_CHANNEL" in self.settings[server.id]:
+            self.settings[server.id].pop("TRANSLATE_CHANNEL")
+
         if on_off:
             for lang in languages:
                 language = LANG.get(lang)
@@ -193,13 +202,14 @@ class NLP:
                             ctx.message.channel.mention))
         else:
             await self.bot.say(
-                "Auto-translate disabled.")
+                "Auto-translate disabled for {}.".format(channel.mention))
+            self.settings[server.id]["TRANSLATE_CHANNELS"].pop(channel.id)
         dataIO.save_json(JSON, self.settings)
 
     async def on_message(self, msg: discord.Message):
         """auto translate or channel translate"""
         await self._autotranslate(msg)
-        await self.translate_channel(msg)
+        await self.translate_channels(msg)
 
     async def _autotranslate(self, msg: discord.Message):
         """Auto-translate if enabled."""
@@ -243,7 +253,7 @@ class NLP:
                                    msg.content))
                     await self.bot.send_message(msg.channel, '\n'.join(out))
 
-    async def translate_channel(self, msg: discord.Message):
+    async def translate_channels(self, msg: discord.Message):
         """Translate channel."""
         server = msg.server
         if server is None:
@@ -252,41 +262,50 @@ class NLP:
             return
         if server.id not in self.settings:
             return
-        if "TRANSLATE_CHANNEL" in self.settings[server.id]:
-            settings = self.settings[server.id]["TRANSLATE_CHANNEL"]
-            if not settings.get("on_off"):
-                return
-            if msg.channel is None:
-                return
-            if msg.channel.id != settings.get("from_channel_id"):
-                return
-            if msg.author == server.me:
-                return
-            if msg.author.bot:
-                return
-            blob = TextBlob(msg.content)
-            detected_lang = blob.detect_language()
-            out = []
-            for language in settings.get("languages"):
-                if language != detected_lang:
-                    try:
-                        translated_msg = blob.translate(to=language)
-                        out.append(
-                            "`{}` {}".format(
-                                language, translated_msg))
-                    except (textblob.exceptions.NotTranslated,
-                            textblob.exceptions.TranslatorError):
-                        pass
-                if len(out):
-                    to_channel = self.bot.get_channel(settings.get("to_channel_id"))
-                    out.insert(0,
-                               "**{}**\n`{}` {} {}".format(
-                                   msg.author.display_name,
-                                   detected_lang,
-                                   msg.content,
-                                   ' '.join([a.get('url') for a in msg.attachments])
-                               ))
-                    await self.bot.send_message(to_channel, '\n'.join(out))
+        if "TRANSLATE_CHANNELS" not in self.settings[server.id]:
+            return
+        if msg.channel.id not in self.settings[server.id]["TRANSLATE_CHANNELS"]:
+            return
+        for channel_id, channel_settings in self.settings[server.id]["TRANSLATE_CHANNELS"].items():
+            if msg.channel.id == channel_id:
+                await self.translate_channel(msg, channel_settings)
+
+    async def translate_channel(self, msg, settings):
+        """Translate channel according to settings."""
+        server = msg.server
+        if not settings.get("on_off"):
+            return
+        if msg.channel is None:
+            return
+        if msg.channel.id != settings.get("from_channel_id"):
+            return
+        if msg.author == server.me:
+            return
+        if msg.author.bot:
+            return
+        blob = TextBlob(msg.content)
+        detected_lang = blob.detect_language()
+        out = []
+        for language in settings.get("languages"):
+            if language != detected_lang:
+                try:
+                    translated_msg = blob.translate(to=language)
+                    out.append(
+                        "`{}` {}".format(
+                            language, translated_msg))
+                except (textblob.exceptions.NotTranslated,
+                        textblob.exceptions.TranslatorError):
+                    pass
+            if len(out):
+                to_channel = self.bot.get_channel(settings.get("to_channel_id"))
+                out.insert(0,
+                           "**{}**\n`{}` {} {}".format(
+                               msg.author.display_name,
+                               detected_lang,
+                               msg.content,
+                               ' '.join([a.get('url') for a in msg.attachments])
+                           ))
+                await self.bot.send_message(to_channel, '\n'.join(out))
 
 
 def check_folder():
