@@ -472,61 +472,65 @@ class RACFAudit:
             await self.bot.send_cmd_help(ctx)
             return
 
-        server = ctx.message.server
-        results = []
-        await self.bot.type()
-        member_models, is_cache = await self.family_member_models(server)
-        
-        if is_cache:
-            settings_cache_timestamp = self.settings.get("cache_timestamp")
-            if settings_cache_timestamp is None:
-                await self.bot.say("Cannot reach API and cannot load from cache. Aborting…")
-                return
-            now = dt.datetime.utcnow()
-            cache_time = dateutil.parser.parse(settings_cache_timestamp)
-            await self.bot.say("Cannot load from API. Results are from: {}".format(
-                humanize.naturaltime(now - cache_time)
-            ))
+        client = crapipy.AsyncClient(token=self.auth)
+        clans = await client.get_clans(self.clan_tags())
+        print(clans)
 
-        if pargs.name != '_':
-            for member_model in member_models:
-                # simple search
-                if pargs.name.lower() in member_model.name.lower():
-                    results.append(member_model)
-                else:
-                    # unidecode search
-                    s = unidecode.unidecode(member_model.name)
-                    s = ''.join(re.findall(r'\w', s))
-                    if pargs.name.lower() in s.lower():
-                        results.append(member_model)
-        else:
-            results = member_models
-            print(len(results))
-
-        # filter by clan name
-        if pargs.clan:
-            results = [m for m in results if pargs.clan.lower() in m.clan_name.lower()]
-
-        # filter by trophies
-        results = [m for m in results if pargs.min <= m.trophies <= pargs.max]
-
-        limit = 10
-        if len(results) > limit:
-            await self.bot.say(
-                "Found more than {0} results. Returning top {0} only.".format(limit)
-            )
-            results = results[:limit]
-
-        if len(results):
-            out = []
-            for member_model in results:
-                out.append("**{0.name}** #{0.tag}, {0.clan.name}, {0.role}, {0.trophies}".format(member_model))
-                if pargs.link:
-                    out.append('http://cr-api.com/profile/{}'.format(member_model.tag))
-            for page in pagify('\n'.join(out)):
-                await self.bot.say(page)
-        else:
-            await self.bot.say("No results found.")
+        # server = ctx.message.server
+        # results = []
+        # await self.bot.type()
+        # member_models, is_cache = await self.family_member_models(server)
+        #
+        # if is_cache:
+        #     settings_cache_timestamp = self.settings.get("cache_timestamp")
+        #     if settings_cache_timestamp is None:
+        #         await self.bot.say("Cannot reach API and cannot load from cache. Aborting…")
+        #         return
+        #     now = dt.datetime.utcnow()
+        #     cache_time = dateutil.parser.parse(settings_cache_timestamp)
+        #     await self.bot.say("Cannot load from API. Results are from: {}".format(
+        #         humanize.naturaltime(now - cache_time)
+        #     ))
+        #
+        # if pargs.name != '_':
+        #     for member_model in member_models:
+        #         # simple search
+        #         if pargs.name.lower() in member_model.name.lower():
+        #             results.append(member_model)
+        #         else:
+        #             # unidecode search
+        #             s = unidecode.unidecode(member_model.name)
+        #             s = ''.join(re.findall(r'\w', s))
+        #             if pargs.name.lower() in s.lower():
+        #                 results.append(member_model)
+        # else:
+        #     results = member_models
+        #     print(len(results))
+        #
+        # # filter by clan name
+        # if pargs.clan:
+        #     results = [m for m in results if pargs.clan.lower() in m.clan_name.lower()]
+        #
+        # # filter by trophies
+        # results = [m for m in results if pargs.min <= m.trophies <= pargs.max]
+        #
+        # limit = 10
+        # if len(results) > limit:
+        #     await self.bot.say(
+        #         "Found more than {0} results. Returning top {0} only.".format(limit)
+        #     )
+        #     results = results[:limit]
+        #
+        # if len(results):
+        #     out = []
+        #     for member_model in results:
+        #         out.append("**{0.name}** #{0.tag}, {0.clan.name}, {0.role}, {0.trophies}".format(member_model))
+        #         if pargs.link:
+        #             out.append('http://cr-api.com/profile/{}'.format(member_model.tag))
+        #     for page in pagify('\n'.join(out)):
+        #         await self.bot.say(page)
+        # else:
+        #     await self.bot.say("No results found.")
 
     @racfaudit.command(name="run", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
