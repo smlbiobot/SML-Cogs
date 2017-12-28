@@ -98,7 +98,6 @@ class NLP:
     def __init__(self, bot):
         self.bot = bot
         self.settings = dataIO.load_json(JSON)
-        print(self.settings)
 
     @commands.command(pass_context=True)
     async def translate(self, ctx: Context, to_lang: str, *, text: str):
