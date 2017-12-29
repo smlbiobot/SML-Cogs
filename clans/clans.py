@@ -25,9 +25,11 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import asyncio
+import argparse
 import json
 import os
 import re
+import unidecode
 from collections import defaultdict
 
 import aiohttp
@@ -36,6 +38,7 @@ import yaml
 from box import Box
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from cogs.utils.chat_formatting import pagify
 from discord.ext import commands
 
 PATH = os.path.join("data", "clans")
@@ -102,10 +105,7 @@ class Clans:
 
     async def get_clan(self, tag):
         """Return dict of clan"""
-        # url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
-        # headers = {'Authorization': 'Bearer {}'.format(self.auth)}
-
-        url = 'http://temp-api.cr-api.com/clan/{}'.format(tag)
+        url = 'http://api.cr-api.com/clan/{}'.format(tag)
         headers = {'auth': self.auth}
 
         try:
@@ -121,13 +121,7 @@ class Clans:
 
     async def get_clans(self, tags):
         """Return list of clans"""
-        # clans = []
-        # for tag in tags:
-        #     clan = await self.get_clan(tag)
-        #     clans.append(clan)
-        # return clans
-
-        url = 'http://temp-api.cr-api.com/clan/{}'.format(",".join(tags))
+        url = 'http://api.cr-api.com/clan/{}'.format(",".join(tags))
         headers = {'auth': self.auth}
 
         try:
@@ -217,6 +211,140 @@ class Clans:
                 value=inf.value
             )
         await self.bot.say(embed=em)
+
+
+    def search_args_parser(self):
+        """Search arguments parser."""
+        # Process arguments
+        parser = argparse.ArgumentParser(prog='[p]racfaudit search')
+
+        parser.add_argument(
+            'name',
+            nargs='?',
+            default='_',
+            help='IGN')
+        parser.add_argument(
+            '-c', '--clan',
+            nargs='?',
+            help='Clan')
+        parser.add_argument(
+            '-n', '--min',
+            nargs='?',
+            type=int,
+            default=0,
+            help='Min Trophies')
+        parser.add_argument(
+            '-m', '--max',
+            nargs='?',
+            type=int,
+            default=10000,
+            help='Max Trophies')
+        parser.add_argument(
+            '-l', '--link',
+            action='store_true',
+            default=False
+        )
+
+        return parser
+
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(pass_context=True)
+    async def clanmembersearch(self, ctx, *args):
+        """Search for member.
+
+        usage: [p]crmembersearch [-h] [-t TAG] name
+
+        positional arguments:
+          name                  IGN
+
+        optional arguments:
+          -h, --help            show this help message and exit
+          -c CLAN, --clan CLAN  Clan name
+          -n MIN --min MIN      Min Trophies
+          -m MAX --max MAX      Max Trophies
+          -l --link             Display link to cr-api.com
+        """
+        parser = self.search_args_parser()
+        try:
+            pargs = parser.parse_args(args)
+        except SystemExit:
+            await self.bot.send_cmd_help(ctx)
+            return
+
+        await self.bot.type()
+        config = self.clans_config
+        clan_tags = [clan.tag for clan in config.clans]
+
+        api_error = False
+        clans = []
+        try:
+            clans = await self.get_clans(clan_tags)
+            dataIO.save_json(CACHE, clans)
+        except json.decoder.JSONDecodeError:
+            api_error = True
+        except asyncio.TimeoutError:
+            api_error = True
+
+        if api_error:
+            await self.bot.say("Cannot load clans from API.")
+            return
+
+        members = []
+        for clan in clans:
+            for member in clan.get('members'):
+                member = Box(member)
+                member.clan = clan
+                members.append(member)
+
+        results = []
+
+        if pargs.name != '_':
+            for member in members:
+                # simple search
+                if pargs.name.lower() in member['name'].lower():
+                    results.append(member)
+                else:
+                    # unidecode search
+                    s = unidecode.unidecode(member['name'])
+                    s = ''.join(re.findall(r'\w', s))
+                    if pargs.name.lower() in s.lower():
+                        results.append(member)
+        else:
+            results = members
+            print(len(results))
+
+        # filter by clan name
+        if pargs.clan:
+            results = [m for m in results if pargs.clan.lower() in m.clan.name.lower()]
+
+        # filter by trophies
+        results = [m for m in results if pargs.min <= m['trophies'] <= pargs.max]
+
+        limit = 10
+        if len(results) > limit:
+            await self.bot.say(
+                "Found more than {0} results. Returning top {0} only.".format(limit)
+            )
+            results = results[:limit]
+
+        roles = {
+            'leader': 'Leader',
+            'coleader': 'Co-Leader',
+            'elder': 'Elder',
+            'member': 'Member'
+        }
+
+        if len(results):
+            out = []
+            for member_model in results:
+                member_model['role_name'] = roles[member_model['role'].lower()]
+                out.append("**{0.name}** #{0.tag}, {0.clan.name}, {0.role_name}, {0.trophies}".format(member_model))
+                if pargs.link:
+                    out.append('http://cr-api.com/profile/{}'.format(member_model.tag))
+            for page in pagify('\n'.join(out)):
+                await self.bot.say(page)
+        else:
+            await self.bot.say("No results found.")
 
 
 def check_folder():
