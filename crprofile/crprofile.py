@@ -80,9 +80,9 @@ class API:
     """Clash Royale official API."""
 
     @staticmethod
-    def url_player(tag):
+    def player(tag):
         """Return player URL"""
-        return "http://temp-api.cr-api.com/player/" + tag.upper()
+        return "http://api.cr-api.com/player/" + tag.upper()
 
 
 class Constants:
@@ -770,7 +770,7 @@ class Settings:
     async def player_data(self, tag):
         """Return CRPlayerModel by tag."""
         tag = SCTag(tag).tag
-        url = API.url_player(tag)
+        url = API.player(tag)
 
         error = False
         data = None
