@@ -998,6 +998,12 @@ class CRProfile:
     @commands.group(pass_context=True, no_pm=True)
     async def crprofile(self, ctx):
         """Clash Royale Player Profile."""
+        if self.model.auth is None:
+            await self.bot.say(
+                "You must have a cr-api.com developer key to run this command. "
+                "Please visit http://docs.cr-api.com/#/authentication to learn how to obtain one, "
+                "then run `!crprofileset auth insert_developer_key` to set it.")
+            return
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
