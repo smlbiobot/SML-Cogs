@@ -468,23 +468,14 @@ class CRAPIKey:
 
     @checks.serverowner_or_permissions(manage_server=True)
     @crapikey.command(name="adminstats", pass_context=True, no_pm=False)
-    async def crapikey_adminstats(self, ctx, member: discord.Member = None, show_token=False):
+    async def crapikey_adminstats(self, ctx, member: discord.Member):
         """List stats of keys.
 
         [p]crapikey adminstats        | Total count
         [p]crapikey adminstats @SML   | Stats of a user
         [p]crapikey adminstats @SML 1 | Stats of a user w/ token
         """
-        data = None
-        try:
-            data = await self.key_listall()
-        except ServerError as e:
-            await self.send_error_message(ctx, e.data)
-
-        if member is None:
-            await self.crapikey_stats_all(ctx, data)
-        else:
-            await self.crapikey_stats_member(ctx, member)
+        await self.crapikey_stats_member(ctx, member)
 
     async def crapikey_stats_all(self, ctx, data):
         """Show all stats."""
@@ -515,7 +506,6 @@ class CRAPIKey:
 
         em = discord.Embed(title="CR-API Key Stats", description="{}".format(member))
         em.add_field(name="User ID", value=member.id)
-        em.add_field(name="Registered", value=dt.datetime.utcfromtimestamp(stats.get('registered') / 1000).isoformat())
         request_count = stats.get('requestCount')
         if len(request_count):
             requests = ['{:<10} {:>7,} {:>6.2f} r/min'.format(k, v, v / 24 / 60) for k, v in request_count.items()]
