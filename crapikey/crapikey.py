@@ -38,6 +38,7 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import box, bold
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
+import statistics
 
 PATH = os.path.join("data", "crapikey")
 JSON = os.path.join(PATH, "settings.json")
@@ -175,7 +176,6 @@ class CRAPIKey:
             "open_sesame": self.config.open_sesame
         }
         url = build_url(self.config.base, self.config.endpoints.create, params)
-
         data = await self.fetch_json(url)
         return data
 
@@ -196,6 +196,16 @@ class CRAPIKey:
             "open_sesame": self.config.open_sesame
         }
         url = build_url(self.config.base, self.config.endpoints.token2id, params)
+        data = await self.fetch_json(url)
+        return data
+
+    async def key_id2token(self, id):
+        """Convert discord id to token"""
+        params = {
+            "discord_id": id,
+            "open_sesame": self.config.open_sesame
+        }
+        url = build_url(self.config.base, self.config.endpoints.create, params)
         data = await self.fetch_json(url)
         return data
 
@@ -256,7 +266,7 @@ class CRAPIKey:
         elif not self.valid_channel(channel):
             channel = discord.utils.get(server.channels, name=self.config.channels.endusers)
             await self.bot.say(
-                "You cannot request a key from this channel. "
+                "You cannot run this command in this channel. "
                 "Please run this command at {channel}.".format(
                     channel=channel.mention))
             return False
@@ -446,14 +456,24 @@ class CRAPIKey:
 
         await self.server_log(ctx, "List all")
 
+    @crapikey.command(name="stats", pass_context=True, no_pm=True)
+    async def crapikey_stats(self, ctx):
+        """Stats by user."""
+        if not await self.validate_run_channel(ctx):
+            return
+
+        author = ctx.message.author
+        await self.crapikey_stats_member(ctx, author)
+
+
     @checks.serverowner_or_permissions(manage_server=True)
-    @crapikey.command(name="stats", pass_context=True, no_pm=False)
-    async def crapikey_stats(self, ctx, member: discord.Member = None, show_token=False):
+    @crapikey.command(name="adminstats", pass_context=True, no_pm=False)
+    async def crapikey_adminstats(self, ctx, member: discord.Member = None, show_token=False):
         """List stats of keys.
 
-        [p]crapikey stats        | Total count
-        [p]crapikey stats @SML   | Stats of a user
-        [p]crapikey stats @SML 1 | Stats of a user w/ token
+        [p]crapikey adminstats        | Total count
+        [p]crapikey adminstats @SML   | Stats of a user
+        [p]crapikey adminstats @SML 1 | Stats of a user w/ token
         """
         data = None
         try:
@@ -464,7 +484,7 @@ class CRAPIKey:
         if member is None:
             await self.crapikey_stats_all(ctx, data)
         else:
-            await self.crapikey_stats_member(ctx, data, member, show_token=show_token)
+            await self.crapikey_stats_member(ctx, member)
 
     async def crapikey_stats_all(self, ctx, data):
         """Show all stats."""
@@ -484,19 +504,25 @@ class CRAPIKey:
         )
         await self.server_log(ctx, "Stats")
 
-    async def crapikey_stats_member(self, ctx, data, member: discord.Member, show_token=False):
+    async def crapikey_stats_member(self, ctx, member: discord.Member):
         """Show stats about a member."""
-        found_key = None
-        for key in data:
-            if key['id'] == member.id:
-                found_key = key
-                break
-
-        if found_key is None:
-            await self.bot.say("Cannot find associated key with {}".format(member))
+        resp = await self.key_id2token(member.id)
+        member_token = resp.get('token')
+        if member_token is None:
+            await self.bot.say("Error fetching token. Aborting…")
             return
+        stats = await self.key_token2id(member_token)
 
-        await self.bot.say(self.key_display_str(found_key, member, show_token=show_token))
+        em = discord.Embed(title="CR-API Key Stats", description="{} {}".format(member, member.id))
+        em.add_field(name="Registered", value=dt.datetime.utcfromtimestamp(stats.get('registered') / 1000).isoformat())
+        request_count = stats.get('requestCount')
+        if len(request_count):
+            requests = ['{:<10} {:>7,} {:>6.2f} r/min'.format(k, v, v / 24 / 60) for k, v in request_count.items()]
+        else:
+            requests = ['_']
+        em.add_field(name="Requests", value=box('\n'.join(requests)))
+        em.add_field(name="Last Requested", value=stats.get('lastRequest'))
+        await self.bot.say(embed=em)
 
     async def send_error_message(self, ctx, data=None):
         """Send error message to channel."""
