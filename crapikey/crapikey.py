@@ -508,7 +508,19 @@ class CRAPIKey:
         em.add_field(name="User ID", value=member.id)
         request_count = stats.get('requestCount')
         if len(request_count):
-            requests = ['{:<10} {:>7,} {:>6.2f} r/min'.format(k, v, v / 24 / 60) for k, v in request_count.items()]
+            # format the request counts
+            requests = []
+            requests.append('{:<10} {:>7} {:>6}'.format('Date', 'Daily', 'r/min'))
+            for i, (k, v) in enumerate(request_count.items()):
+                date = k
+                daily_requests = v
+                if i == len(request_count) - 1:
+                    timedelta = dt.datetime.utcnow() - dt.datetime.strptime(k, '%Y-%m-%d')
+                    req_per_min = v / timedelta.seconds * 60
+                else:
+                    req_per_min = v / 24 / 60
+
+                requests.append('{:<10} {:>7,} {:>6.2f}'.format(date, daily_requests, req_per_min))
         else:
             requests = ['_']
         em.add_field(name="Requests", value=box('\n'.join(requests)), inline=False)
