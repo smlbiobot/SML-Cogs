@@ -513,7 +513,8 @@ class CRAPIKey:
             return
         stats = await self.key_token2id(member_token)
 
-        em = discord.Embed(title="CR-API Key Stats", description="{} {}".format(member, member.id))
+        em = discord.Embed(title="CR-API Key Stats", description="{}".format(member))
+        em.add_field(name="User ID", value=member.id)
         em.add_field(name="Registered", value=dt.datetime.utcfromtimestamp(stats.get('registered') / 1000).isoformat())
         request_count = stats.get('requestCount')
         if len(request_count):
