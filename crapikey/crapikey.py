@@ -512,7 +512,6 @@ class CRAPIKey:
         else:
             requests = ['_']
         em.add_field(name="Requests", value=box('\n'.join(requests)))
-        em.add_field(name="Last Requested", value=stats.get('lastRequest'))
         await self.bot.say(embed=em)
 
     async def send_error_message(self, ctx, data=None):
