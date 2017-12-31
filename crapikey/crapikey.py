@@ -511,7 +511,7 @@ class CRAPIKey:
             requests = ['{:<10} {:>7,} {:>6.2f} r/min'.format(k, v, v / 24 / 60) for k, v in request_count.items()]
         else:
             requests = ['_']
-        em.add_field(name="Requests", value=box('\n'.join(requests)))
+        em.add_field(name="Requests", value=box('\n'.join(requests)), inline=False)
         await self.bot.say(embed=em)
 
     async def send_error_message(self, ctx, data=None):
