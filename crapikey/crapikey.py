@@ -506,7 +506,7 @@ class CRAPIKey:
 
         em = discord.Embed(title="CR-API Key Stats", description="{}".format(member))
         em.add_field(name="User ID", value=member.id)
-        request_count = stats.get('requestCount')
+        request_count = stats.get('requestCount', [])
         if len(request_count):
             # format the request counts
             requests = []
