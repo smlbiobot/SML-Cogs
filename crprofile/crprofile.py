@@ -581,6 +581,10 @@ class CRPlayerModel:
         deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
         return ' '.join(deck)
 
+    @property
+    def decklink(self):
+        return self.data.get('deckLink', '')
+
     def api_cardname_to_emoji(self, name, bot_emoji: BotEmoji):
         """Convert api card id to card emoji."""
         cr = dataIO.load_json(os.path.join(PATH, "clashroyale.json"))
@@ -1134,6 +1138,16 @@ class CRProfile:
         """Upcoming chests."""
         await self.get_profile(ctx, member, sections=['chests'])
 
+    @crprofile.command(name="deck", pass_context=True, no_pm=True)
+    async def crprofile_deck(self, ctx, member: discord.Member = None):
+        """Current deck."""
+        await self.get_profile(ctx, member, sections=['deck'])
+
+    @crprofile.command(name="tagdeck", pass_context=True, no_pm=True)
+    async def crprofile_tagdeck(self, ctx, tag):
+        """Current deck of player tag."""
+        await self.display_profile(ctx, tag, sections=['deck'])
+
     async def display_profile(self, ctx, tag, **kwargs):
         """Display profile."""
         sctag = SCTag(tag)
@@ -1173,7 +1187,7 @@ class CRProfile:
         if member is not None:
             mention = member.mention
 
-        profile_url = 'http://cr-api.com/profile/{}'.format(player.tag)
+        profile_url = 'http://cr-api.com/player/{}'.format(player.tag)
         clan_url = 'http://cr-api.com/clan/{}'.format(player.clan_tag)
 
         # header
@@ -1260,7 +1274,7 @@ class CRProfile:
 
     def embed_profile_cards(self, player: CRPlayerModel, color=None):
         """Card Collection."""
-        profile_url = 'http://cr-api.com/profile/{}/cards'.format(player.tag)
+        profile_url = 'http://cr-api.com/player/{}/cards'.format(player.tag)
         em = discord.Embed(
             title="{} #{}".format(player.name, player.tag),
             color=color,
@@ -1284,13 +1298,28 @@ class CRProfile:
 
     def embed_profile_chests(self, player: CRPlayerModel, color=None):
         """Upcoming chests"""
-        profile_url = 'http://cr-api.com/profile/{}'.format(player.tag)
+        profile_url = 'http://cr-api.com/player/{}'.format(player.tag)
         em = discord.Embed(
-            title="{} #{}".format(player.name, player.tag),
+            title="{} #{}: Current Deck".format(player.name, player.tag),
             color=color,
             url=profile_url)
         cards = player.card_collection(self.bot_emoji)
         em.add_field(name="Chests", value=player.chest_list(self.bot_emoji), inline=False)
+        em.set_footer(
+            text=profile_url,
+            icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
+        return em
+
+    def embed_profile_deck(self, player: CRPlayerModel, color=None):
+        """Current deck."""
+        decklink_url = player.decklink
+        profile_url = 'http://cr-api.com/player/{}'.format(player.tag)
+        em = discord.Embed(
+            title="{} #{}".format(player.name, player.tag),
+            color=color,
+            url=decklink_url)
+        cards = player.card_collection(self.bot_emoji)
+        em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
         em.set_footer(
             text=profile_url,
             icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
@@ -1312,6 +1341,9 @@ class CRProfile:
 
         if 'chests' in sections:
             embeds.append(self.embed_profile_chests(player, color=color))
+
+        if 'deck' in sections:
+            embeds.append(self.embed_profile_deck(player, color=color))
 
         return embeds
 
