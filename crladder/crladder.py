@@ -174,15 +174,27 @@ class Settings:
         self.model.auth = value
         self.save()
 
+    def legacy_update(self):
+        """Update players from dict to list."""
+        for server_k, server in self.model.servers.items():
+            for series_name, series in server.series.items():
+                player_list = []
+                for player_id, player in series.players.items():
+                    player_list.append(player.copy())
+                series.players = player_list
+        self.save()
+
+
+
     def server_model(self, server):
         """Return model by server."""
         self.check_server(server)
-        return self.model[server.id]
+        return self.model.servers[server.id]
 
     def check_server(self, server):
         """Create server settings if required."""
-        if server.id not in self.model:
-            self.model[server.id] = self.server_default
+        if server.id not in self.model.servers:
+            self.self.model.servers[server.id] = self.server_default
         self.save()
 
     def get_all_series(self, server):
@@ -195,9 +207,6 @@ class Settings:
             raise NoSuchSeries
         else:
             return series
-            # if name not in self.server_model(server)["series"]:
-            #     raise NoSuchSeries
-            # return self.server_model(server)["series"][name]
 
     def set_series_status(self, server, name, status):
         """
@@ -215,12 +224,13 @@ class Settings:
         self.check_server(server)
         try:
             series = self.get_series(server, name)
-            if player.id not in series["players"]:
-                return False
+            for p in series.players:
+                if p.discord_id == player.id:
+                    return p
         except NoSuchSeries:
             raise NoSuchSeries
-
-        return True
+        else:
+            return None
 
     def init_server(self, server):
         """Initialize server settings to default"""
@@ -249,9 +259,13 @@ class Settings:
     def add_player(self, server, name, player: discord.Member, player_tag=None):
         """Add a player to a series."""
         series = self.get_series(server, name)
-        if player.id not in series["players"]:
-            series["players"][player.id] = Player(player.id, tag=player_tag, rating=1000).to_dict()
-        self.save()
+        series_player = self.get_player(server, name, player)
+        if series_player is not None:
+            return False
+        else:
+            series["players"].append(Player(discord_id=player.id, tag=player_tag).to_dict())
+            self.save()
+            return True
 
     def add_players(self, server, name, *players: discord.Member):
         series = self.get_series(server, name)
@@ -302,6 +316,13 @@ class CRLadder:
         await self.bot.say("Token saved.")
         await self.bot.delete_message(ctx.message)
 
+    @checks.is_owner()
+    @crladderset.command(name="legacyupdate", pass_context=True)
+    async def crladderset_legacyupdate(self, ctx):
+        """Update legacy database."""
+        self.settings.legacy_update()
+        await self.bot.say("Updated old DB to new.")
+
     @checks.mod_or_permissions()
     @crladderset.command(name="create", pass_context=True)
     async def crladderset_create(self, ctx, name):
@@ -311,7 +332,6 @@ class CRLadder:
         """
         server = ctx.message.server
         try:
-            # self.settings.create(server, name, *players)
             self.settings.create(server, name)
         except SeriesExist:
             await self.bot.say("There is an existing series with that name already.")
@@ -363,8 +383,9 @@ class CRLadder:
 
         # Fetch player tag from crprofile
         if player_tag is None:
-            player_tag = self.settings.get_player_tag(server, player)
-            if player_tag is None:
+            try:
+                player_tag = self.settings.get_player_tag(server, player)
+            except CannotFindPlayer:
                 await self.bot.say("Cannot find player tag in system. Aborting…")
                 return
 
@@ -460,7 +481,7 @@ class CRLadder:
             await self.bot.say(embed=em)
 
     @crladder.command(name="battle", pass_context=True)
-    async def crladder_battle(self, ctx, name, member:discord.Member):
+    async def crladder_battle(self, ctx, name, member: discord.Member):
         """Report battle."""
 
 
