@@ -23,6 +23,7 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import os
+import aiohttp
 
 import discord
 from box import Box
@@ -31,6 +32,7 @@ from cogs.utils.chat_formatting import inline, bold
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from trueskill import Rating, rate_1vs1
+import datetime as dt
 
 PATH = os.path.join("data", "crladder")
 JSON = os.path.join(PATH, "settings.json")
@@ -51,6 +53,32 @@ def normalize_tag(tag):
     t = t.upper()
     return t
 
+class LadderException(Exception):
+    pass
+
+
+class SeriesExist(LadderException):
+    pass
+
+
+class NoSuchSeries(LadderException):
+    pass
+
+
+class NoSuchPlayer(LadderException):
+    pass
+
+
+class CannotFindPlayer(LadderException):
+    pass
+
+class APIError(LadderException):
+    def __init__(self, response):
+        self.response = response
+
+class ClashRoyaleAPI:
+    def __init__(self, token):
+        self.token = token
 
 class Player:
     """Player in a game."""
@@ -118,29 +146,75 @@ class ServerSettings:
         return self._model
 
 
-class LadderException(Exception):
-    pass
 
 
-class SeriesExist(LadderException):
-    pass
+class Battle:
+    def __init__(self, battle_dict):
+        self.data = Box(battle_dict, default_box=True, camel_killer_box=True)
+
+    @property
+    def type(self):
+        return self.data.get("type")
+
+    def type_is(self, type_name):
+        return self.type == type_name
+
+    @property
+    def valid_type(self):
+        return self.type_is("friendly") or self.type_is("clanMate")
+
+    @property
+    def timestamp(self):
+        return self.data.get('utcTime')
+
+    @property
+    def timestamp_dt(self):
+        return dt.datetime.utcfromtimestamp(self.timestamp)
+
+    @property
+    def team_deck(self):
+        player = self.data.team[0]
+        deck = [card.key for card in player.deck]
+        return deck
+
+    @property
+    def team_decklink(self):
+        player = self.data.team[0]
+        return player.deck_link
+
+    @property
+    def opponent_deck(self):
+        player = self.data.opponent[0]
+        deck = [card.key for card in player.deck]
+        return deck
+
+    @property
+    def opponent_decklink(self):
+        player = self.data.opponent[0]
+        return player.deck_link
+
+    @property
+    def winner(self):
+        return self.data.winner
+
+    @property
+    def result(self):
+        if self.winner == 1:
+            return "Win"
+        elif self.winner == -1:
+            return "Loss"
+        else:
+            return "Draw"
+
+    @property
+    def team_crowns(self):
+        return self.data.get("teamCrowns")
+
+    @property
+    def opponent_crowns(self):
+        return self.data.get("opponentCrowns")
 
 
-class NoSuchSeries(LadderException):
-    pass
-
-
-class NoSuchPlayer(LadderException):
-    pass
-
-
-class CannotFindPlayer(LadderException):
-    pass
-
-
-class ClashRoyaleAPI:
-    def __init__(self, token):
-        self.token = token
 
 
 class Settings:
@@ -285,6 +359,40 @@ class Settings:
             raise CannotFindPlayer
         else:
             return player_tag
+
+    def verify_player(self, series, member: discord.Member):
+        """Verify player is in series."""
+        for player in series.players:
+            if player.discord_id == member.id:
+                return True
+        return False
+
+    async def find_battle(self, series, member1: discord.Member, member2: discord.Member):
+        """Find battle by member1 vs member2."""
+        for player in series.players:
+            if player.discord_id == member1.id:
+                player1 = player
+            if player.discord_id == member2.id:
+                player2 = player
+
+        url = 'http://api.cr-api.com/player/{}?keys=battles'.format(player1.tag)
+        response = {}
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url, headers={'auth': self.auth}) as resp:
+                if resp.status != 200:
+                    raise APIError(resp)
+                else:
+                    response = await resp.json()
+
+        all_battles = response.get('battles')
+        battles = []
+        for battle in all_battles:
+            b = Battle(battle)
+            if b.valid_type:
+                battles.append(b)
+
+        return battles
+
 
 
 class CRLadder:
@@ -474,15 +582,88 @@ class CRLadder:
             for p in players:
                 player = Player.from_dict(p)
                 member = server.get_member(player.discord_id)
-                player_list.append("{} #{}".format(bold(member.display_name), player.tag))
-                player_list.append(inline("{:10.2f} {:5.2f}".format(player.rating.mu, player.rating.sigma)))
+                if member is not None:
+                    player_list.append("{} #{}".format(bold(member.display_name), player.tag))
+                    player_list.append(inline("{:10.2f} {:5.2f}".format(player.rating.mu, player.rating.sigma)))
             em.add_field(name="Players", value='\n'.join(player_list), inline=False)
 
             await self.bot.say(embed=em)
 
+    def bot_emoji(self, name):
+        """Emoji by name."""
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == name:
+                return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
+
     @crladder.command(name="battle", pass_context=True)
     async def crladder_battle(self, ctx, name, member: discord.Member):
         """Report battle."""
+        server = ctx.message.server
+        author = ctx.message.author
+        await self.bot.type()
+
+        try:
+            series = self.settings.get_series(server, name)
+        except NoSuchSeries:
+            await self.bot.say("Cannot find a series named {}", format(name))
+        else:
+            if not self.settings.verify_player(series, author):
+                await self.bot.say("You are not registered in this series.")
+                return
+            if not self.settings.verify_player(series, member):
+                await self.bot.say("{} is not registered is this series.".format(member))
+                return
+            try:
+                battles = await self.settings.find_battle(series, author, member)
+            except APIError as e:
+                await self.bot.say(e.response)
+            else:
+                for battle in battles:
+                    if battle.winner == 1:
+                        color = discord.Color.green()
+                    elif battle.winner == 0:
+                        color = discord.Color.light_grey()
+                    elif battle.winner == -1:
+                        color = discord.Color.red()
+                    else:
+                        color = discord.Color.gold()
+
+
+                    em = discord.Embed(
+                        title="Battle: {} vs {}".format(author, member),
+                        description="Series: {}".format(name),
+                        color=color
+                    )
+                    em.add_field(
+                        name="Result",
+                        value=battle.result
+                    )
+                    em.add_field(
+                        name="Score",
+                        value="{} - {}".format(battle.team_crowns, battle.opponent_crowns)
+                    )
+                    em.add_field(
+                        name="UTC Time",
+                        value=battle.timestamp_dt.isoformat()
+                    )
+                    em.add_field(
+                        name=author,
+                        value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.team_deck]),
+                        inline=False
+                    )
+                    em.add_field(
+                        name=member,
+                        value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.team_deck]),
+                        inline=False
+                    )
+                    await self.bot.say(embed=em)
+
+                # print(battles)
+                # await self.bot.say("printed to console.")
+
+
+
 
 
 def check_folder():
