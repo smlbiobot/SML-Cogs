@@ -32,7 +32,7 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import inline, bold, box
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from trueskill import Rating, rate_1vs1
+from trueskill import Rating, rate_1vs1, quality_1vs1
 
 PATH = os.path.join("data", "crladder")
 JSON = os.path.join(PATH, "settings.json")
@@ -674,15 +674,15 @@ class CRLadder:
                 color=discord.Color.red())
             em.add_field(name="Status", value=series.get('status', '_'))
 
-            player_list = [box("{:>8} {:>8}".format("Mu", "Sigma"))]
+            player_list = [inline("{:_>8} {:_>8}".format("Rating", "Sigma"))]
             players = series.players.copy()
             players = sorted(players, key=lambda p: p.rating['mu'], reverse=True)
             for p in players:
                 player = Player.from_dict(p)
                 member = server.get_member(player.discord_id)
                 if member is not None:
-                    player_list.append("{} #{}".format(bold(member.display_name), player.tag))
-                    player_list.append(box("{:8.2f} {:8.2f}".format(player.rating.mu, player.rating.sigma)))
+                    player_list.append("{} #{}".format(member.display_name, player.tag))
+                    player_list.append(inline("{:_>8.0f} {:_>8.2f}".format(player.rating.mu, player.rating.sigma)))
             em.add_field(name="Players", value='\n'.join(player_list), inline=False)
 
             await self.bot.say(embed=em)
@@ -811,6 +811,33 @@ class CRLadder:
                     updated = self.settings.update_player_rating(server, name, p_author)
                     updated = self.settings.update_player_rating(server, name, p_member)
                     await self.bot.say("Elo updated.")
+
+    @crladder.command(name="quality", aliases=['q'], pass_context=True)
+    async def crladder_qualify(self, ctx, name, member1: discord.Member, member2:discord.Member=None):
+        """Head to head winning chance."""
+        author = ctx.message.author
+        server = ctx.message.server
+        if member2 is None:
+            pm1 = author
+            pm2 = member1
+        else:
+            pm1 = member1
+            pm2 = member2
+        try:
+            p1 = Player.from_dict(self.settings.get_player(server, name, pm1))
+            p2 = Player.from_dict(self.settings.get_player(server, name, pm2))
+        except NoSuchSeries:
+            await self.bot.say("No series with that name on this server.")
+        except NoSuchPlayer:
+            await self.bot.say("Player not found.")
+        else:
+            await self.bot.say(
+                "If {} plays against {}, "
+                "there is a {:.1%} chance to draw.".format(
+                    pm1, pm2, quality_1vs1(p1.rating, p2.rating)
+                )
+            )
+
 
 
 def check_folder():
