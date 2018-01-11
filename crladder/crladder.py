@@ -183,6 +183,10 @@ class Battle:
         return player.deck_link
 
     @property
+    def team_tag(self):
+        return self.data.team[0].tag
+
+    @property
     def opponent_deck(self):
         player = self.data.opponent[0]
         deck = [card.key for card in player.deck]
@@ -192,6 +196,10 @@ class Battle:
     def opponent_decklink(self):
         player = self.data.opponent[0]
         return player.deck_link
+
+    @property
+    def opponent_tag(self):
+        return self.data.opponent[0].tag
 
     @property
     def winner(self):
@@ -388,7 +396,12 @@ class Settings:
         battles = []
         for battle in all_battles:
             b = Battle(battle)
-            if b.valid_type:
+            add_this = True
+            if not b.valid_type:
+                add_this = False
+            if b.opponent_tag != player2.tag:
+                add_this = False
+            if add_this:
                 battles.append(b)
 
         return battles
@@ -654,7 +667,7 @@ class CRLadder:
                     )
                     em.add_field(
                         name=member,
-                        value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.team_deck]),
+                        value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.opponent_deck]),
                         inline=False
                     )
                     await self.bot.say(embed=em)
