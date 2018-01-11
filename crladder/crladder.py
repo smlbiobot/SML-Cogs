@@ -107,6 +107,9 @@ class Player:
         self.discord_id = discord_id
         self.tag = normalize_tag(tag)
 
+    def __repr__(self):
+        return '<Player: {0}>'.format(str(self.to_dict()))
+
     def to_dict(self):
         return {
             "rating": {
@@ -264,8 +267,6 @@ class Match:
                 }
             }
         }
-
-import json
 
 
 class Settings:
@@ -457,6 +458,13 @@ class Settings:
 
         return battles
 
+    def is_battle_saved(self, server, name, battle: Battle):
+        self.save()
+        series = self.get_series(server, name)
+        keys = [k for k in series.matches.keys()]
+        is_in = str(battle.timestamp) in keys
+        return is_in
+
     def save_battle(self,
                     player1: Player = None,
                     player2: Player = None,
@@ -466,7 +474,7 @@ class Settings:
         match = Match(player1=player1, player2=player2, player1_old_rating=player1_old_rating,
                       player2_old_rating=player2_old_rating, battle=battle)
 
-        series.matches[battle.timestamp] = match.to_dict()
+        series.matches[str(battle.timestamp)] = match.to_dict()
         self.save()
 
     def update_player_rating(self, server, name, player):
@@ -483,7 +491,6 @@ class Settings:
         }
         self.save()
         return True
-
 
 
 class CRLadder:
@@ -714,12 +721,15 @@ class CRLadder:
 
                 if len(battles) > 1:
                     await self.bot.say("Found multiple battles. Using only last battle.")
+                if len(battles) == 0:
+                    await self.bot.say("No battle found.")
+                    return
 
-                battles = sorted(battles, key=lambda x: x.timestamp)
+                battles = sorted(battles, key=lambda x: int(x.timestamp))
                 battle = battles[-1]
 
                 save_battle = True
-                if str(battle.timestamp) in series.matches.keys():
+                if self.settings.is_battle_saved(server, name, battle):
                     save_battle = False
 
                 def match_1vs1(winner: Player, loser: Player):
@@ -727,8 +737,9 @@ class CRLadder:
                     winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating)
                     return winner, loser
 
-                p_author = Player.from_dict(self.settings.get_player(server, name, author))
-                p_member = Player.from_dict(self.settings.get_player(server, name, member))
+                p_author = Player.from_dict(self.settings.get_player(server, name, author).copy())
+                p_member = Player.from_dict(self.settings.get_player(server, name, member).copy())
+                # print(p_author)
 
                 p_author_rating_old = p_author.rating
                 p_member_rating_old = p_member.rating
@@ -743,7 +754,6 @@ class CRLadder:
                     p_member, p_author = match_1vs1(p_member, p_author)
                 else:
                     color = discord.Color.gold()
-
 
                 em = discord.Embed(
                     title="Battle: {} vs {}".format(author, member),
@@ -791,7 +801,6 @@ class CRLadder:
                         inline=False
                     )
                 await self.bot.say(embed=em)
-
 
                 # save battle
                 if save_battle:
