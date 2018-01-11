@@ -32,7 +32,7 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import inline, bold, box
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from trueskill import Rating, rate_1vs1, quality_1vs1
+from trueskill import TrueSkill, Rating, rate_1vs1, quality_1vs1
 
 PATH = os.path.join("data", "crladder")
 JSON = os.path.join(PATH, "settings.json")
@@ -41,7 +41,21 @@ SERVER_DEFAULTS = {
     "SERIES": {}
 }
 
-DEFAULT_RATING = 1000
+# recommneded formula
+RATING = 1000
+SIGMA = RATING / 3
+BETA = SIGMA / 2
+TAU = BETA / 100
+DRAW_PROBABILITY = 0.5
+
+
+env = TrueSkill(
+    mu=RATING,
+    sigma=SIGMA,
+    beta=BETA,
+    tau=TAU,
+    draw_probability=DRAW_PROBABILITY,
+    backend=None)
 
 
 def normalize_tag(tag):
@@ -89,21 +103,19 @@ class ClashRoyaleAPI:
 class Player:
     """Player in a game."""
 
-    def __init__(self, discord_id=None, tag=None, rating=DEFAULT_RATING):
+    def __init__(self, discord_id=None, tag=None, rating=RATING, sigma=SIGMA):
         """
         Player.
         :param discord_id: Discord user id.
         :param tag: Clash Royale player tag.
         :param rating: Initial rating.
         """
-        if isinstance(rating, dict):
-            self.rating = Rating(**rating)
-        elif isinstance(rating, int):
-            self.rating = Rating(mu=rating)
-        elif isinstance(rating, float):
-            self.rating = Rating(mu=rating)
+        if isinstance(rating, Rating):
+            self.rating = rating
+        elif isinstance(rating, dict):
+            self.rating = env.create_rating(mu=rating['mu'], sigma=rating['sigma'])
         else:
-            self.rating = Rating()
+            self.rating = env.create_rating()
         self.discord_id = discord_id
         self.tag = normalize_tag(tag)
 
@@ -399,13 +411,6 @@ class Settings:
             series["players"].append(Player(discord_id=player.id, tag=player_tag).to_dict())
             self.save()
             return True
-
-    def add_players(self, server, name, *players: discord.Member):
-        series = self.get_series(server, name)
-        for player in players:
-            if player.id not in series["players"]:
-                series["players"][player.id] = Player(player.id, rating=1000).to_dict()
-        self.save()
 
     def get_player_tag(self, server, player: discord.Member):
         """Search crprofile cog for Clash Royale player tag."""
@@ -732,9 +737,9 @@ class CRLadder:
                 if self.settings.is_battle_saved(server, name, battle):
                     save_battle = False
 
-                def match_1vs1(winner: Player, loser: Player):
+                def match_1vs1(winner: Player, loser: Player, drawn=False):
                     """Match score reporting."""
-                    winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating)
+                    winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating, drawn=drawn)
                     return winner, loser
 
                 p_author = Player.from_dict(self.settings.get_player(server, name, author).copy())
@@ -749,6 +754,7 @@ class CRLadder:
                     p_author, p_member = match_1vs1(p_author, p_member)
                 elif battle.winner == 0:
                     color = discord.Color.light_grey()
+                    p_author, p_member = match_1vs1(p_author, p_member, drawn=True)
                 elif battle.winner == -1:
                     color = discord.Color.red()
                     p_member, p_author = match_1vs1(p_member, p_author)
