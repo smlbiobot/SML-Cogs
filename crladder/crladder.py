@@ -85,19 +85,10 @@ class Player:
 
     @staticmethod
     def from_dict(d):
-        # db = Box(d, default_box=True)
         if isinstance(d, dict):
             p = Player(**d)
         else:
             p = Player()
-        print("dict", isinstance(d, dict))
-        print("str", isinstance(d, str))
-        # p = Player(discord_id=d.get('discord_id'), tag=d.get('tag'))
-        # p.discord_id = db.discord_id
-        # p.tag = db.tag
-        # rating = db.rating
-        # if rating:
-        #     p.rating = Rating(mu=rating.mu, sigma=rating.sigma)
         return p
 
 
@@ -467,6 +458,10 @@ class CRLadder:
             em.add_field(name="Players", value='\n'.join(player_list), inline=False)
 
             await self.bot.say(embed=em)
+
+    @crladder.command(name="battle", pass_context=True)
+    async def crladder_battle(self, ctx, name, member:discord.Member):
+        """Report battle."""
 
 
 def check_folder():
