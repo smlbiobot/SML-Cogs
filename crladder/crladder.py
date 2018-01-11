@@ -29,7 +29,7 @@ import aiohttp
 import discord
 from box import Box
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline, bold
+from cogs.utils.chat_formatting import inline, bold, box
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from trueskill import Rating, rate_1vs1
@@ -223,10 +223,9 @@ class Match:
                  player2: Player = None,
                  player1_old_rating: Rating = None,
                  player2_old_rating: Rating = None,
-                 series=None, battle=None):
+                 battle=None):
         self.player1 = player1
         self.player2 = player2
-        self.series = series
         self.battle = battle
         self.player1_old_rating = player1_old_rating
         self.player2_old_rating = player2_old_rating
@@ -266,6 +265,8 @@ class Match:
             }
         }
 
+import json
+
 
 class Settings:
     """CRLadder settings."""
@@ -286,6 +287,15 @@ class Settings:
 
     def save(self):
         """Save settings to file."""
+        # preprocess rating if found
+        for server_id, server in self.model.servers.items():
+            for name, series in server.series.items():
+                for player in series.players:
+                    if isinstance(player.rating, Rating):
+                        player.rating = {
+                            "mu": float(player.rating.mu),
+                            "sigma": float(player.rating.sigma)
+                        }
         dataIO.save_json(JSON, self.model)
 
     @property
@@ -316,7 +326,7 @@ class Settings:
     def check_server(self, server):
         """Create server settings if required."""
         if server.id not in self.model.servers:
-            self.self.model.servers[server.id] = self.server_default
+            self.model.servers[server.id] = self.server_default
         self.save()
 
     def get_all_series(self, server):
@@ -454,9 +464,26 @@ class Settings:
                     player2_old_rating: Rating = None,
                     series=None, battle=None):
         match = Match(player1=player1, player2=player2, player1_old_rating=player1_old_rating,
-                      player2_old_rating=player2_old_rating, series=series, battle=battle)
+                      player2_old_rating=player2_old_rating, battle=battle)
+
         series.matches[battle.timestamp] = match.to_dict()
         self.save()
+
+    def update_player_rating(self, server, name, player):
+        series = self.get_series(server, name)
+        update_player = None
+        for p in series.players:
+            if p.tag == player.tag:
+                update_player = p
+        if update_player is None:
+            return False
+        update_player.rating = {
+            "mu": float(player.rating.mu),
+            "sigma": float(player.rating.sigma)
+        }
+        self.save()
+        return True
+
 
 
 class CRLadder:
@@ -640,15 +667,15 @@ class CRLadder:
                 color=discord.Color.red())
             em.add_field(name="Status", value=series.get('status', '_'))
 
-            player_list = []
+            player_list = [box("{:>8} {:>8}".format("Mu", "Sigma"))]
             players = series.players.copy()
-            players = sorted(players, key=lambda p: p.rating.mu, reverse=True)
+            players = sorted(players, key=lambda p: p.rating['mu'], reverse=True)
             for p in players:
                 player = Player.from_dict(p)
                 member = server.get_member(player.discord_id)
                 if member is not None:
                     player_list.append("{} #{}".format(bold(member.display_name), player.tag))
-                    player_list.append(inline("{:10.2f} {:5.2f}".format(player.rating.mu, player.rating.sigma)))
+                    player_list.append(box("{:8.2f} {:8.2f}".format(player.rating.mu, player.rating.sigma)))
             em.add_field(name="Players", value='\n'.join(player_list), inline=False)
 
             await self.bot.say(embed=em)
@@ -700,8 +727,8 @@ class CRLadder:
                     winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating)
                     return winner, loser
 
-                p_author = Player(self.settings.get_player(server, name, author))
-                p_member = Player(self.settings.get_player(server, name, member))
+                p_author = self.settings.get_player(server, name, author)
+                p_member = self.settings.get_player(server, name, member)
 
                 p_author_rating_old = p_author.rating
                 p_member_rating_old = p_member.rating
@@ -716,6 +743,7 @@ class CRLadder:
                     p_member, p_author = match_1vs1(p_member, p_author)
                 else:
                     color = discord.Color.gold()
+
 
                 em = discord.Embed(
                     title="Battle: {} vs {}".format(author, member),
@@ -764,12 +792,17 @@ class CRLadder:
                     )
                 await self.bot.say(embed=em)
 
+
                 # save battle
                 if save_battle:
                     self.settings.save_battle(
                         player1=p_author, player2=p_member, player1_old_rating=p_author_rating_old,
-                        player2_old_rating=p_member_rating_old, series=series, battle=battle
+                        player2_old_rating=p_member_rating_old,  battle=battle
                     )
+                    # updated = self.settings.update_player_rating(server, name, p_author)
+                    # await self.bot.say(updated)
+                    # updated = self.settings.update_player_rating(server, name, p_member)
+                    # await self.bot.say(updated)
                     await self.bot.say("Elo updated.")
 
 
