@@ -469,11 +469,11 @@ class CRLadder:
             em.add_field(name="Status", value=series.get('status', '_'))
 
             player_list = []
-            players = [p for id_, p in series.players.items()]
-            players = sorted(players, key=lambda p: p.rating.mu)
+            players = series.players.copy()
+            players = sorted(players, key=lambda p: p.rating.mu, reverse=True)
             for p in players:
                 player = Player.from_dict(p)
-                member = await self.bot.get_user_info(player.discord_id)
+                member = server.get_member(player.discord_id)
                 player_list.append("{} #{}".format(bold(member.display_name), player.tag))
                 player_list.append(inline("{:10.2f} {:5.2f}".format(player.rating.mu, player.rating.sigma)))
             em.add_field(name="Players", value='\n'.join(player_list), inline=False)
