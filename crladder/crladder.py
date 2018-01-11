@@ -478,8 +478,8 @@ class Settings:
         if update_player is None:
             return False
         update_player.rating = {
-            "mu": float(player.rating["mu"]),
-            "sigma": float(player.rating["sigma"])
+            "mu": float(player.rating.mu),
+            "sigma": float(player.rating.sigma)
         }
         self.save()
         return True
@@ -727,8 +727,8 @@ class CRLadder:
                     winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating)
                     return winner, loser
 
-                p_author = self.settings.get_player(server, name, author)
-                p_member = self.settings.get_player(server, name, member)
+                p_author = Player.from_dict(self.settings.get_player(server, name, author))
+                p_member = Player.from_dict(self.settings.get_player(server, name, member))
 
                 p_author_rating_old = p_author.rating
                 p_member_rating_old = p_member.rating
@@ -800,9 +800,7 @@ class CRLadder:
                         player2_old_rating=p_member_rating_old, series=series, battle=battle
                     )
                     updated = self.settings.update_player_rating(server, name, p_author)
-                    # await self.bot.say(updated)
                     updated = self.settings.update_player_rating(server, name, p_member)
-                    # await self.bot.say(updated)
                     await self.bot.say("Elo updated.")
 
 
