@@ -172,7 +172,7 @@ class Battle:
     @property
     def team_decklink(self):
         player = self.data.team[0]
-        return player.deck_link
+        return player.deckLink
 
     @property
     def team_tag(self):
@@ -187,7 +187,7 @@ class Battle:
     @property
     def opponent_decklink(self):
         player = self.data.opponent[0]
-        return player.deck_link
+        return player.deckLink
 
     @property
     def opponent_tag(self):
@@ -218,11 +218,18 @@ class Battle:
 class Match:
     """A match."""
 
-    def __init__(self, member1: discord.Member = None, member2: discord.Member = None, series=None, battle=None):
-        self.member1 = member1
-        self.member2 = member2
+    def __init__(self,
+                 player1: Player = None,
+                 player2: Player = None,
+                 player1_old_rating: Rating = None,
+                 player2_old_rating: Rating = None,
+                 series=None, battle=None):
+        self.player1 = player1
+        self.player2 = player2
         self.series = series
         self.battle = battle
+        self.player1_old_rating = player1_old_rating
+        self.player2_old_rating = player2_old_rating
 
     def to_dict(self):
         return {
@@ -233,14 +240,30 @@ class Match:
                 "decklink": self.battle.team_decklink,
                 "crowns": self.battle.team_crowns,
                 "tag": self.battle.team_tag,
+                "old_rating": {
+                    "mu": self.player1_old_rating.mu,
+                    "sigma": self.player1_old_rating.sigma,
+                },
+                "new_rating": {
+                    "mu": self.player1.rating.mu,
+                    "sigma": self.player1.rating.sigma,
+                }
+
             },
             "player2": {
                 "deck": self.battle.opponent_deck,
                 "decklink": self.battle.opponent_decklink,
                 "crowns": self.battle.opponent_crowns,
                 "tag": self.battle.opponent_tag,
+                "old_rating": {
+                    "mu": self.player2_old_rating.mu,
+                    "sigma": self.player2_old_rating.sigma,
+                },
+                "new_rating": {
+                    "mu": self.player2.rating.mu,
+                    "sigma": self.player2.rating.sigma,
+                }
             }
-
         }
 
 
@@ -424,16 +447,16 @@ class Settings:
 
         return battles
 
-    def save_battle(self, series, battle):
-        series.matches[battle.timestamp] = {
-            "timestamp": battle.timestamp,
-            "timestamp_iso": battle.timestamp_dt.isoformat(),
-            "team": {
-                "deck": battle.team_deck,
-                "decklink": battle.team_decklink,
-
-            }
-        }
+    def save_battle(self,
+                    player1: Player = None,
+                    player2: Player = None,
+                    player1_old_rating: Rating = None,
+                    player2_old_rating: Rating = None,
+                    series=None, battle=None):
+        match = Match(player1=player1, player2=player2, player1_old_rating=player1_old_rating,
+                      player2_old_rating=player2_old_rating, series=series, battle=battle)
+        series.matches[battle.timestamp] = match.to_dict()
+        self.save()
 
 
 class CRLadder:
@@ -668,6 +691,10 @@ class CRLadder:
                 battles = sorted(battles, key=lambda x: x.timestamp)
                 battle = battles[-1]
 
+                save_battle = True
+                if str(battle.timestamp) in series.matches.keys():
+                    save_battle = False
+
                 def match_1vs1(winner: Player, loser: Player):
                     """Match score reporting."""
                     winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating)
@@ -712,22 +739,38 @@ class CRLadder:
                     value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.team_deck]),
                     inline=False
                 )
-                em.add_field(
-                    name="Elo",
-                    value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_author_rating_old.mu, p_author.rating.mu)),
-                    inline=False
-                )
+                if save_battle:
+                    em.add_field(
+                        name="Elo",
+                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_author_rating_old.mu, p_author.rating.mu)),
+                        inline=False
+                    )
                 em.add_field(
                     name=str(member),
                     value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.opponent_deck]),
                     inline=False
                 )
-                em.add_field(
-                    name="Elo",
-                    value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_member_rating_old.mu, p_member.rating.mu)),
-                    inline=False
-                )
+                if save_battle:
+                    em.add_field(
+                        name="Elo",
+                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_member_rating_old.mu, p_member.rating.mu)),
+                        inline=False
+                    )
+                if not save_battle:
+                    em.add_field(
+                        name=":warning: Warning",
+                        value="This battle is not saved because it has already been registered.",
+                        inline=False
+                    )
                 await self.bot.say(embed=em)
+
+                # save battle
+                if save_battle:
+                    self.settings.save_battle(
+                        player1=p_author, player2=p_member, player1_old_rating=p_author_rating_old,
+                        player2_old_rating=p_member_rating_old, series=series, battle=battle
+                    )
+                    await self.bot.say("Elo updated.")
 
 
 def check_folder():
