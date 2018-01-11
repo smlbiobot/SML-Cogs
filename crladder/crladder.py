@@ -22,9 +22,10 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import datetime as dt
 import os
-import aiohttp
 
+import aiohttp
 import discord
 from box import Box
 from cogs.utils import checks
@@ -32,7 +33,6 @@ from cogs.utils.chat_formatting import inline, bold
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from trueskill import Rating, rate_1vs1
-import datetime as dt
 
 PATH = os.path.join("data", "crladder")
 JSON = os.path.join(PATH, "settings.json")
@@ -40,6 +40,8 @@ JSON = os.path.join(PATH, "settings.json")
 SERVER_DEFAULTS = {
     "SERIES": {}
 }
+
+DEFAULT_RATING = 1000
 
 
 def normalize_tag(tag):
@@ -52,6 +54,7 @@ def normalize_tag(tag):
     t = t.strip()
     t = t.upper()
     return t
+
 
 class LadderException(Exception):
     pass
@@ -72,18 +75,21 @@ class NoSuchPlayer(LadderException):
 class CannotFindPlayer(LadderException):
     pass
 
+
 class APIError(LadderException):
     def __init__(self, response):
         self.response = response
+
 
 class ClashRoyaleAPI:
     def __init__(self, token):
         self.token = token
 
+
 class Player:
     """Player in a game."""
 
-    def __init__(self, discord_id=None, tag=None, rating=1500):
+    def __init__(self, discord_id=None, tag=None, rating=DEFAULT_RATING):
         """
         Player.
         :param discord_id: Discord user id.
@@ -120,18 +126,6 @@ class Player:
         return p
 
 
-class Game:
-    """A match."""
-
-    def __init__(self, player1=None, player2=None):
-        self.player1 = player1
-        self.player2 = player2
-
-    def match_1vs1(self, winner: Player, loser: Player):
-        """Match score reporting."""
-        winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating)
-
-
 class ServerSettings:
     """Server settings."""
 
@@ -144,8 +138,6 @@ class ServerSettings:
     @property
     def model(self):
         return self._model
-
-
 
 
 class Battle:
@@ -223,6 +215,33 @@ class Battle:
         return self.data.get("opponentCrowns")
 
 
+class Match:
+    """A match."""
+
+    def __init__(self, member1: discord.Member = None, member2: discord.Member = None, series=None, battle=None):
+        self.member1 = member1
+        self.member2 = member2
+        self.series = series
+        self.battle = battle
+
+    def to_dict(self):
+        return {
+            "timestamp": self.battle.timestamp,
+            "timestamp_iso": self.battle.timestamp_dt.isoformat(),
+            "player1": {
+                "deck": self.battle.team_deck,
+                "decklink": self.battle.team_decklink,
+                "crowns": self.battle.team_crowns,
+                "tag": self.battle.team_tag,
+            },
+            "player2": {
+                "deck": self.battle.opponent_deck,
+                "decklink": self.battle.opponent_decklink,
+                "crowns": self.battle.opponent_crowns,
+                "tag": self.battle.opponent_tag,
+            }
+
+        }
 
 
 class Settings:
@@ -266,8 +285,6 @@ class Settings:
                 series.players = player_list
         self.save()
 
-
-
     def server_model(self, server):
         """Return model by server."""
         self.check_server(server)
@@ -301,14 +318,14 @@ class Settings:
         series['status'] = status
         self.save()
 
-    def get_player(self, server, name, player: discord.Member):
+    def get_player(self, server, name, member: discord.Member):
         """Check player settings."""
         self.check_server(server)
         try:
             series = self.get_series(server, name)
-            for p in series.players:
-                if p.discord_id == player.id:
-                    return p
+            for player in series.players:
+                if player.discord_id == member.id:
+                    return player
         except NoSuchSeries:
             raise NoSuchSeries
         else:
@@ -375,8 +392,9 @@ class Settings:
                 return True
         return False
 
-    async def find_battle(self, series, member1: discord.Member, member2: discord.Member):
+    async def find_battles(self, series, member1: discord.Member, member2: discord.Member):
         """Find battle by member1 vs member2."""
+        player1, player2 = None, None
         for player in series.players:
             if player.discord_id == member1.id:
                 player1 = player
@@ -406,6 +424,16 @@ class Settings:
 
         return battles
 
+    def save_battle(self, series, battle):
+        series.matches[battle.timestamp] = {
+            "timestamp": battle.timestamp,
+            "timestamp_iso": battle.timestamp_dt.isoformat(),
+            "team": {
+                "deck": battle.team_deck,
+                "decklink": battle.team_decklink,
+
+            }
+        }
 
 
 class CRLadder:
@@ -628,55 +656,78 @@ class CRLadder:
                 await self.bot.say("{} is not registered is this series.".format(member))
                 return
             try:
-                battles = await self.settings.find_battle(series, author, member)
+                battles = await self.settings.find_battles(series, author, member)
             except APIError as e:
-                await self.bot.say(e.response)
+                print(e.response)
+                await self.bot.say("Error fetching results from API. Please try again later.")
             else:
-                for battle in battles:
-                    if battle.winner == 1:
-                        color = discord.Color.green()
-                    elif battle.winner == 0:
-                        color = discord.Color.light_grey()
-                    elif battle.winner == -1:
-                        color = discord.Color.red()
-                    else:
-                        color = discord.Color.gold()
 
+                if len(battles) > 1:
+                    await self.bot.say("Found multiple battles. Using only last battle.")
 
-                    em = discord.Embed(
-                        title="Battle: {} vs {}".format(author, member),
-                        description="Series: {}".format(name),
-                        color=color
-                    )
-                    em.add_field(
-                        name="Result",
-                        value=battle.result
-                    )
-                    em.add_field(
-                        name="Score",
-                        value="{} - {}".format(battle.team_crowns, battle.opponent_crowns)
-                    )
-                    em.add_field(
-                        name="UTC Time",
-                        value=battle.timestamp_dt.isoformat()
-                    )
-                    em.add_field(
-                        name=author,
-                        value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.team_deck]),
-                        inline=False
-                    )
-                    em.add_field(
-                        name=member,
-                        value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.opponent_deck]),
-                        inline=False
-                    )
-                    await self.bot.say(embed=em)
+                battles = sorted(battles, key=lambda x: x.timestamp)
+                battle = battles[-1]
 
-                # print(battles)
-                # await self.bot.say("printed to console.")
+                def match_1vs1(winner: Player, loser: Player):
+                    """Match score reporting."""
+                    winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating)
+                    return winner, loser
 
+                p_author = Player(self.settings.get_player(server, name, author))
+                p_member = Player(self.settings.get_player(server, name, member))
 
+                p_author_rating_old = p_author.rating
+                p_member_rating_old = p_member.rating
 
+                if battle.winner == 1:
+                    color = discord.Color.green()
+                    p_author, p_member = match_1vs1(p_author, p_member)
+                elif battle.winner == 0:
+                    color = discord.Color.light_grey()
+                elif battle.winner == -1:
+                    color = discord.Color.red()
+                    p_member, p_author = match_1vs1(p_member, p_author)
+                else:
+                    color = discord.Color.gold()
+
+                em = discord.Embed(
+                    title="Battle: {} vs {}".format(author, member),
+                    description="Series: {}".format(name),
+                    color=color
+                )
+                em.add_field(
+                    name="Result",
+                    value=battle.result
+                )
+                em.add_field(
+                    name="Score",
+                    value="{} - {}".format(battle.team_crowns, battle.opponent_crowns)
+                )
+                em.add_field(
+                    name="UTC Time",
+                    value=battle.timestamp_dt.isoformat()
+                )
+                em.add_field(
+                    name=str(author),
+                    value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.team_deck]),
+                    inline=False
+                )
+                em.add_field(
+                    name="Elo",
+                    value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_author_rating_old.mu, p_author.rating.mu)),
+                    inline=False
+                )
+                em.add_field(
+                    name=str(member),
+                    value=''.join([self.bot_emoji(key.replace('-', '')) for key in battle.opponent_deck]),
+                    inline=False
+                )
+                em.add_field(
+                    name="Elo",
+                    value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_member_rating_old.mu, p_member.rating.mu)),
+                    inline=False
+                )
+                await self.bot.say(embed=em)
 
 
 def check_folder():
