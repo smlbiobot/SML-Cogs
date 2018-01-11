@@ -1,10 +1,10 @@
 {
 	"AUTHOR": "SML",
-	"SHORT": "Ladder",
-	"DESCRIPTION": "Ladder system for competitive gaming using Trueskill system",
+	"SHORT": "Clash Royale Ladder",
+	"DESCRIPTION": "Clash Royale ladder system for competitive gaming using Trueskill system and cr-api.com",
 	"DISABLED": false,
 	"NAME": "Ladder",
-	"REQUIREMENTS": ["trueskill"],
+	"REQUIREMENTS": ["trueskill", "yaml", "python-box"],
 	"TAGS": ["competitive", "elo", "glicko", "trueskill", "skill", "skills", "ladder"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: http://github.com/smlbiobot/SML-Cogs or my Discord server: http://discord.me/sml"
 }
