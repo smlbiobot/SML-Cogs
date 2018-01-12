@@ -139,7 +139,8 @@ class Player:
     @property
     def rating_display(self):
         """Display rating as mu - sigma * 3."""
-        return self.rating.mu - self.rating.sigma * 3 + RATING
+        # return self.rating.mu - self.rating.sigma * 3
+        return self.rating.mu
 
     def __repr__(self):
         return '<Player: {0}>'.format(str(self.to_dict()))
@@ -395,12 +396,12 @@ class Settings:
         if member is not None:
             names = self.get_series_names_by_member(server, member)
 
-            print(names)
+            # print(names)
             if len(names) == 0:
                 raise NoSuchSeries
             elif len(names) == 1:
                 series = self.get_series_by_name(server, names[0])
-                print(series)
+                # print(series)
                 return series
             else:
                 raise PlayerInMultipleActiveSeries
@@ -826,8 +827,14 @@ class CRLadder:
                 return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
+    @checks.is_owner()
+    @crladder.command(name="battleforce", pass_context=True)
+    async def crladder_battleforce(self, ctx, member: discord.Member, name=None):
+        """Report battle and force elo update."""
+        await ctx.invoke(self.crladder_battle, member, name=name, force_update=True)
+
     @crladder.command(name="battle", pass_context=True)
-    async def crladder_battle(self, ctx, member: discord.Member, name=None):
+    async def crladder_battle(self, ctx, member: discord.Member, name=None, force_update=False):
         """Report battle."""
         server = ctx.message.server
         author = ctx.message.author
@@ -878,6 +885,10 @@ class CRLadder:
                 if self.settings.is_battle_saved(server, name, battle):
                     save_battle = False
 
+                # force update for debugging
+                if force_update:
+                    save_battle = True
+
                 def match_1vs1(winner: Player, loser: Player, drawn=False):
                     """Match score reporting."""
                     winner.rating, loser.rating = rate_1vs1(winner.rating, loser.rating, drawn=drawn)
@@ -887,23 +898,28 @@ class CRLadder:
                 p_member = Player.from_dict(self.settings.get_player(server, name, member).copy())
                 # print(p_author)
 
-                p_author_rating_old = p_author.rating
-                p_member_rating_old = p_member.rating
+                p_author_rating_old = env.create_rating(mu=p_author.rating.mu, sigma=p_author.rating.sigma)
+                p_member_rating_old = env.create_rating(mu=p_member.rating.mu, sigma=p_member.rating.sigma)
 
                 if battle.winner > 0:
                     color = discord.Color.green()
                     p_author, p_member = match_1vs1(p_author, p_member)
+                    # print("p_author", p_author)
+                    # print("p_member", p_member)
                 elif battle.winner == 0:
                     color = discord.Color.light_grey()
                     p_author, p_member = match_1vs1(p_author, p_member, drawn=True)
                 elif battle.winner < 0:
                     color = discord.Color.red()
                     p_member, p_author = match_1vs1(p_member, p_author)
+                    # print("p_author", p_author)
+                    # print("p_member", p_member)
                 else:
                     color = discord.Color.gold()
 
                 def display_rating(rating):
-                    return 1000 + rating.mu - rating.sigma * 3
+                    # return rating.mu - rating.sigma * 3
+                    return rating.mu
 
                 em = discord.Embed(
                     title="Battle: {} vs {}".format(author, member),
