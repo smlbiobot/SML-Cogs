@@ -48,7 +48,6 @@ BETA = SIGMA / 2
 TAU = BETA / 100
 DRAW_PROBABILITY = 0.5
 
-
 env = TrueSkill(
     mu=RATING,
     sigma=SIGMA,
@@ -87,6 +86,10 @@ class NoSuchPlayer(LadderException):
 
 
 class CannotFindPlayer(LadderException):
+    pass
+
+
+class PlayerInMultipleActiveSeries(LadderException):
     pass
 
 
@@ -294,7 +297,7 @@ class Settings:
     }
     series_default = {
         "matches": {},
-        "players": {},
+        "players": [],
         "status": "inactive"
     }
     series_status = ['active', 'inactive', 'completed']
@@ -302,15 +305,16 @@ class Settings:
     def __init__(self, bot):
         self.bot = bot
         model = dataIO.load_json(JSON)
-        self.model = Box(model, default_box=True)
+        # self.model = Box(model, default_box=True)
+        self.model = model
 
     def save(self):
         """Save settings to file."""
         # preprocess rating if found
-        for server_id, server in self.model.servers.items():
-            for name, series in server.series.items():
-                for player in series.players:
-                    if isinstance(player.rating, Rating):
+        for server_id, server in self.model['servers'].items():
+            for name, series in server['series'].items():
+                for player in series['players']:
+                    if isinstance(player['rating'], Rating):
                         player.rating = {
                             "mu": float(player.rating.mu),
                             "sigma": float(player.rating.sigma)
@@ -320,44 +324,64 @@ class Settings:
     @property
     def auth(self):
         """cr-api.com Authentication token."""
-        return self.model.auth
+        return self.model['auth']
 
     @auth.setter
     def auth(self, value):
-        self.model.auth = value
+        self.model['auth'] = value
         self.save()
 
     def legacy_update(self):
         """Update players from dict to list."""
-        for server_k, server in self.model.servers.items():
-            for series_name, series in server.series.items():
+        for server_k, server in self.model['servers'].items():
+            for series_name, series in server['series'].items():
                 player_list = []
-                for player_id, player in series.players.items():
+                for player_id, player in series['players'].items():
                     player_list.append(player.copy())
-                series.players = player_list
+                series['players'] = player_list
         self.save()
 
     def server_model(self, server):
         """Return model by server."""
         self.check_server(server)
-        return self.model.servers[server.id]
+        return self.model['servers'][server.id]
 
     def check_server(self, server):
         """Create server settings if required."""
-        if server.id not in self.model.servers:
-            self.model.servers[server.id] = self.server_default
+        if server.id not in self.model['servers']:
+            self.model['servers'][server.id] = self.server_default
         self.save()
 
     def get_all_series(self, server):
         """Get all series."""
-        return self.server_model(server)["series"]
+        return self.model['servers'][server.id]["series"]
 
-    def get_series(self, server, name):
-        series = self.server_model(server)["series"].get(name)
-        if series is None:
-            raise NoSuchSeries
-        else:
-            return series
+    def get_series(self, server, name=None, member=None):
+        if name is not None:
+            series = self.model['servers'][server.id]["series"].get(name)
+            if series is None:
+                raise NoSuchSeries
+            else:
+                return series
+
+        if member is not None:
+            names = []
+            for series_name, series in self.server_model(server)["series"].items():
+                if series.get('status') == 'active':
+                    for player in series['players']:
+                        if player['discord_id'] == member.id:
+                            names.append(series_name)
+            if len(names) == 0:
+                raise NoSuchSeries
+            elif len(names) == 1:
+                name = names[0]
+                series = self.server_model(server)["series"].get(name)
+                if series is not None:
+                    return series
+            else:
+                raise PlayerInMultipleActiveSeries
+
+        raise NoSuchSeries
 
     def set_series_status(self, server, name, status):
         """
@@ -366,7 +390,7 @@ class Settings:
         :param name: name of the series.
         :return:
         """
-        series = self.get_series(server, name)
+        series = self.get_series(server, name=name)
         series['status'] = status
         self.save()
 
@@ -374,9 +398,9 @@ class Settings:
         """Check player settings."""
         self.check_server(server)
         try:
-            series = self.get_series(server, name)
-            for player in series.players:
-                if player.discord_id == member.id:
+            series = self.get_series(server, name=name)
+            for player in series['players']:
+                if player['discord_id'] == member.id:
                     return player
         except NoSuchSeries:
             raise NoSuchSeries
@@ -399,7 +423,7 @@ class Settings:
     def remove_series(self, server, name):
         """Remove series."""
         try:
-            series = self.get_series(server, name)
+            series = self.get_series(server, name=name)
         except NoSuchSeries:
             raise
         else:
@@ -409,7 +433,7 @@ class Settings:
 
     def add_player(self, server, name, player: discord.Member, player_tag=None):
         """Add a player to a series."""
-        series = self.get_series(server, name)
+        series = self.get_series(server, name=name)
         series_player = self.get_player(server, name, player)
         if series_player is not None:
             return False
@@ -432,21 +456,21 @@ class Settings:
 
     def verify_player(self, series, member: discord.Member):
         """Verify player is in series."""
-        for player in series.players:
-            if player.discord_id == member.id:
+        for player in series['players']:
+            if player['discord_id'] == member.id:
                 return True
         return False
 
     async def find_battles(self, series, member1: discord.Member, member2: discord.Member):
         """Find battle by member1 vs member2."""
         player1, player2 = None, None
-        for player in series.players:
-            if player.discord_id == member1.id:
+        for player in series['players']:
+            if player['discord_id'] == member1.id:
                 player1 = player
-            if player.discord_id == member2.id:
+            if player['discord_id'] == member2.id:
                 player2 = player
 
-        url = 'http://api.cr-api.com/player/{}?keys=battles'.format(player1.tag)
+        url = 'http://api.cr-api.com/player/{}?keys=battles'.format(player1['tag'])
         response = {}
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers={'auth': self.auth}) as resp:
@@ -462,7 +486,7 @@ class Settings:
             add_this = True
             if not b.valid_type:
                 add_this = False
-            if b.opponent_tag != player2.tag:
+            if b.opponent_tag != player2['tag']:
                 add_this = False
             if add_this:
                 battles.append(b)
@@ -471,7 +495,7 @@ class Settings:
 
     def is_battle_saved(self, server, name, battle: Battle):
         self.save()
-        series = self.get_series(server, name)
+        series = self.get_series(server, name=name)
         keys = [k for k in series.matches.keys()]
         is_in = str(battle.timestamp) in keys
         return is_in
@@ -489,14 +513,14 @@ class Settings:
         self.save()
 
     def update_player_rating(self, server, name, player):
-        series = self.get_series(server, name)
+        series = self.get_series(server, name=name)
         update_player = None
-        for p in series.players:
-            if p.tag == player.tag:
+        for p in series['players']:
+            if p['tag'] == player.tag:
                 update_player = p
         if update_player is None:
             return False
-        update_player.rating = {
+        update_player['rating'] = {
             "mu": float(player.rating.mu),
             "sigma": float(player.rating.sigma)
         }
@@ -649,7 +673,7 @@ class CRLadder:
         server = ctx.message.server
         author = ctx.message.author
         try:
-            series = self.settings.get_series(server, name)
+            series = self.settings.get_series(server, name=name)
         except NoSuchSeries:
             await self.bot.say(
                 "There is no such series in that name. "
@@ -681,7 +705,7 @@ class CRLadder:
             use = args[0].lower()
 
         try:
-            series = self.settings.get_series(server, name)
+            series = self.settings.get_series(server, name=name)
         except NoSuchSeries:
             await self.bot.say("Cannot find a series named {}", format(name))
         else:
@@ -691,7 +715,7 @@ class CRLadder:
             em.add_field(name="Status", value=series.get('status', '_'))
 
             player_list = []
-            players = [Player.from_dict(d) for d in series.players]
+            players = [Player.from_dict(d) for d in series['players']]
             players = sorted(players, key=lambda p: p.rating_display, reverse=True)
             for p in players:
                 member = server.get_member(p.discord_id)
@@ -713,16 +737,23 @@ class CRLadder:
         return ''
 
     @crladder.command(name="battle", pass_context=True)
-    async def crladder_battle(self, ctx, name, member: discord.Member):
+    async def crladder_battle(self, ctx, member: discord.Member, name=None):
         """Report battle."""
         server = ctx.message.server
         author = ctx.message.author
         await self.bot.type()
 
         try:
-            series = self.settings.get_series(server, name)
+            if name is None:
+                series = self.settings.get_series(server, member=member)
+            else:
+                series = self.settings.get_series(server, name=name)
         except NoSuchSeries:
             await self.bot.say("Cannot find a series named {}", format(name))
+            return
+        except PlayerInMultipleActiveSeries:
+            await self.bot.say("Player is in multiple series. Please specify name of the series.")
+            return
         else:
             if not self.settings.verify_player(series, author):
                 await self.bot.say("You are not registered in this series.")
@@ -832,7 +863,7 @@ class CRLadder:
                     await self.bot.say("Elo updated.")
 
     @crladder.command(name="quality", aliases=['q'], pass_context=True)
-    async def crladder_qualify(self, ctx, name, member1: discord.Member, member2:discord.Member=None):
+    async def crladder_qualify(self, ctx, name, member1: discord.Member, member2: discord.Member = None):
         """Head to head winning chance."""
         author = ctx.message.author
         server = ctx.message.server
@@ -856,7 +887,6 @@ class CRLadder:
                     pm1, pm2, quality_1vs1(p1.rating, p2.rating)
                 )
             )
-
 
 
 def check_folder():
