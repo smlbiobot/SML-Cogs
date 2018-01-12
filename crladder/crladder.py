@@ -223,9 +223,9 @@ class Battle:
 
     @property
     def result(self):
-        if self.winner == 1:
+        if self.winner > 0:
             return "Win"
-        elif self.winner == -1:
+        elif self.winner < 0:
             return "Loss"
         else:
             return "Draw"
@@ -359,32 +359,40 @@ class Settings:
         """Get all series."""
         return self.model['servers'][server.id]["series"]
 
+    def get_series_by_name(self, server, name):
+        series = self.model['servers'][server.id]["series"].get(name)
+        if series is None:
+            raise NoSuchSeries
+        else:
+            return series
+
+    def get_series_names_by_member(self, server, member):
+        names = []
+        for series_name, series in self.server_model(server)["series"].items():
+            if series.get('status') == 'active':
+                for player in series['players']:
+                    if str(player['discord_id']) == str(member.id):
+                        names.append(series_name)
+        return names
+
     def get_series(self, server, name=None, member=None):
         if name is not None:
-            series = self.model['servers'][server.id]["series"].get(name)
-            if series is None:
-                raise NoSuchSeries
-            else:
-                return series
+            return self.get_series_by_name(server, name)
 
         if member is not None:
-            names = []
-            for series_name, series in self.server_model(server)["series"].items():
-                if series.get('status') == 'active':
-                    for player in series['players']:
-                        if player['discord_id'] == member.id:
-                            names.append(series_name)
+            names = self.get_series_names_by_member(server, member)
+
+            print(names)
             if len(names) == 0:
                 raise NoSuchSeries
             elif len(names) == 1:
-                name = names[0]
-                series = self.server_model(server)["series"].get(name)
-                if series is not None:
-                    return series
+                series = self.get_series_by_name(server, names[0])
+                print(series)
+                return series
             else:
                 raise PlayerInMultipleActiveSeries
 
-        raise NoSuchSeries
+
 
     def set_series_status(self, server, name, status):
         """
@@ -748,9 +756,16 @@ class CRLadder:
 
         try:
             if name is None:
-                series = self.settings.get_series(server, member=member)
+                names = self.settings.get_series_names_by_member(server, member)
+                if len(names) == 0:
+                    raise NoSuchSeries
+                elif len(names) == 1:
+                    name = names[0]
+                    series = self.settings.get_series_by_name(server, name)
+                else:
+                    raise PlayerInMultipleActiveSeries
             else:
-                series = self.settings.get_series(server, name=name)
+                series = self.settings.get_series_by_name(server, name)
         except NoSuchSeries:
             await self.bot.say("Cannot find series.")
             return
