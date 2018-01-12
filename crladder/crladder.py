@@ -757,10 +757,15 @@ class CRLadder:
         server = ctx.message.server
         await self.bot.type()
 
-        if not len(args):
-            use = "rating_display"
-        else:
-            use = args[0].lower()
+        winloss = False
+        use = "rating_display"
+
+        if len(args):
+            if 'mu' in args:
+                use = 'mu'
+            if 'winloss' in args:
+                winloss = True
+
 
         try:
             series = self.settings.get_series(server, name=name)
@@ -789,7 +794,8 @@ class CRLadder:
 
                     if use == 'rating_display':
                         player_list.append("`{:_>4.0f}` \t{}".format(p.rating_display, member))
-                        player_list.append("\t{}".format(inline(record)))
+                        if winloss:
+                            player_list.append("\t{}".format(inline(record)))
                     elif use == 'mu':
                         player_list.append(str(member))
                         player_list.append("\t`{}`".format(record))
@@ -802,14 +808,15 @@ class CRLadder:
             pages = grouper(30, player_list)
             color = random_discord_color()
             for page in pages:
+                lines = [p for p in page if p is not None]
                 em = discord.Embed(
                     title=name, description="Clash Royale ladder series.",
                     color=color)
                 em.add_field(name="Status", value=series.get('status', '_'))
 
-                em.add_field(name="Players", value='\n'.join(page), inline=False)
+                em.add_field(name="Players", value='\n'.join(lines), inline=False)
 
-            await self.bot.say(embed=em)
+                await self.bot.say(embed=em)
 
     def bot_emoji(self, name):
         """Emoji by name."""
