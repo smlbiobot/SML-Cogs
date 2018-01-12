@@ -305,8 +305,8 @@ class Settings:
     def __init__(self, bot):
         self.bot = bot
         model = dataIO.load_json(JSON)
-        # self.model = Box(model, default_box=True)
-        self.model = model
+        self.model = Box(model, default_box=True)
+        # self.model = model
 
         if "servers" not in self.model:
             self.model["servers"] = {}
@@ -499,7 +499,7 @@ class Settings:
     def is_battle_saved(self, server, name, battle: Battle):
         self.save()
         series = self.get_series(server, name=name)
-        keys = [k for k in series.matches.keys()]
+        keys = [k for k in series['matches'].keys()]
         is_in = str(battle.timestamp) in keys
         return is_in
 
@@ -512,7 +512,7 @@ class Settings:
         match = Match(player1=player1, player2=player2, player1_old_rating=player1_old_rating,
                       player2_old_rating=player2_old_rating, battle=battle)
 
-        series.matches[str(battle.timestamp)] = match.to_dict()
+        series['matches'][str(battle.timestamp)] = match.to_dict()
         self.save()
 
     def update_player_rating(self, server, name, player):
@@ -752,7 +752,7 @@ class CRLadder:
             else:
                 series = self.settings.get_series(server, name=name)
         except NoSuchSeries:
-            await self.bot.say("Cannot find a series named {}", format(name))
+            await self.bot.say("Cannot find a series named.")
             return
         except PlayerInMultipleActiveSeries:
             await self.bot.say("Player is in multiple series. Please specify name of the series.")
@@ -793,8 +793,8 @@ class CRLadder:
                 p_member = Player.from_dict(self.settings.get_player(server, name, member).copy())
                 # print(p_author)
 
-                p_author_rating_old = p_author.rating_display
-                p_member_rating_old = p_member.rating_display
+                p_author_rating_old = p_author.rating
+                p_member_rating_old = p_member.rating
 
                 if battle.winner == 1:
                     color = discord.Color.green()
@@ -807,6 +807,9 @@ class CRLadder:
                     p_member, p_author = match_1vs1(p_member, p_author)
                 else:
                     color = discord.Color.gold()
+
+                def display_rating(rating):
+                    return 1000 + rating.mu - rating.sigma * 3
 
                 em = discord.Embed(
                     title="Battle: {} vs {}".format(author, member),
@@ -833,7 +836,7 @@ class CRLadder:
                 if save_battle:
                     em.add_field(
                         name="Elo",
-                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_author_rating_old, p_author.rating_display)),
+                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(display_rating(p_author_rating_old), p_author.rating_display)),
                         inline=False
                     )
                 em.add_field(
@@ -844,7 +847,7 @@ class CRLadder:
                 if save_battle:
                     em.add_field(
                         name="Elo",
-                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_member_rating_old, p_member.rating_display)),
+                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(display_rating(p_member_rating_old), p_member.rating_display)),
                         inline=False
                     )
                 if not save_battle:
