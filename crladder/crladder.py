@@ -33,6 +33,8 @@ from cogs.utils.chat_formatting import inline, bold, box
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from trueskill import TrueSkill, Rating, rate_1vs1, quality_1vs1
+import itertools
+from random import choice
 
 PATH = os.path.join("data", "crladder")
 JSON = os.path.join(PATH, "settings.json")
@@ -67,6 +69,18 @@ def normalize_tag(tag):
     t = t.strip()
     t = t.upper()
     return t
+
+def grouper(n, iterable, fillvalue=None):
+    """Group lists into lists of items.
+    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
+    args = [iter(iterable)] * n
+    return itertools.zip_longest(*args, fillvalue=fillvalue)
+
+def random_discord_color():
+    """Return random color as an integer."""
+    color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+    color = int(color, 16)
+    return discord.Color(value=color)
 
 
 class LadderException(Exception):
@@ -753,10 +767,7 @@ class CRLadder:
         except NoSuchSeries:
             await self.bot.say("Cannot find a series named {}", format(name))
         else:
-            em = discord.Embed(
-                title=name, description="Clash Royale ladder series.",
-                color=discord.Color.red())
-            em.add_field(name="Status", value=series.get('status', '_'))
+
 
             #  calculate total wins/losses by player
             stats = self.calculate_stats(series)
@@ -788,8 +799,15 @@ class CRLadder:
                             p.rating.sigma
                         ))
 
+            pages = grouper(30, player_list)
+            color = random_discord_color()
+            for page in pages:
+                em = discord.Embed(
+                    title=name, description="Clash Royale ladder series.",
+                    color=color)
+                em.add_field(name="Status", value=series.get('status', '_'))
 
-            em.add_field(name="Players", value='\n'.join(player_list), inline=False)
+                em.add_field(name="Players", value='\n'.join(page), inline=False)
 
             await self.bot.say(embed=em)
 
