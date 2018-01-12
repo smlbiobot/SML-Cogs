@@ -752,7 +752,7 @@ class CRLadder:
             else:
                 series = self.settings.get_series(server, name=name)
         except NoSuchSeries:
-            await self.bot.say("Cannot find a series named.")
+            await self.bot.say("Cannot find series.")
             return
         except PlayerInMultipleActiveSeries:
             await self.bot.say("Player is in multiple series. Please specify name of the series.")
@@ -796,13 +796,13 @@ class CRLadder:
                 p_author_rating_old = p_author.rating
                 p_member_rating_old = p_member.rating
 
-                if battle.winner == 1:
+                if battle.winner > 0:
                     color = discord.Color.green()
                     p_author, p_member = match_1vs1(p_author, p_member)
                 elif battle.winner == 0:
                     color = discord.Color.light_grey()
                     p_author, p_member = match_1vs1(p_author, p_member, drawn=True)
-                elif battle.winner == -1:
+                elif battle.winner < 0:
                     color = discord.Color.red()
                     p_member, p_author = match_1vs1(p_member, p_author)
                 else:
