@@ -270,8 +270,7 @@ class Match:
                 "new_rating": {
                     "mu": self.player1.rating.mu,
                     "sigma": self.player1.rating.sigma,
-                }
-
+                },
             },
             "player2": {
                 "deck": self.battle.opponent_deck,
@@ -704,6 +703,40 @@ class CRLadder:
                     name
                 ))
 
+    def calculate_stats(self, series):
+        """Calculate stats.
+
+        dictionary key: player tag.
+        """
+        # stats key = tag
+        stats = {}
+        # populate dicts
+        for player in series['players']:
+            stats[player["tag"]] = {
+                "wins": 0,
+                "losses": 0,
+                "draws": 0,
+                "games": 0
+            }
+
+        for timestamp, match in series['matches'].items():
+            p1 = match['player1']
+            p2 = match['player2']
+            stats[p1['tag']]['games'] += 1
+            stats[p2['tag']]['games'] += 1
+            if p1['crowns'] > p2['crowns']:
+                stats[p1['tag']]['wins'] += 1
+                stats[p2['tag']]['losses'] += 1
+            elif p1['crowns'] == p2['crowns']:
+                stats[p1['tag']]['draws'] += 1
+                stats[p2['tag']]['draws'] += 1
+            elif p1['crowns'] < p2['crowns']:
+                stats[p1['tag']]['losses'] += 1
+                stats[p2['tag']]['wins'] += 1
+
+        return stats
+
+
     @crladder.command(name="info", pass_context=True)
     async def crladder_info(self, ctx, name, *args):
         """Info about a series."""
@@ -725,16 +758,36 @@ class CRLadder:
                 color=discord.Color.red())
             em.add_field(name="Status", value=series.get('status', '_'))
 
+            #  calculate total wins/losses by player
+            stats = self.calculate_stats(series)
+
             player_list = []
             players = [Player.from_dict(d) for d in series['players']]
             players = sorted(players, key=lambda p: p.rating_display, reverse=True)
             for p in players:
                 member = server.get_member(p.discord_id)
+                tag = p.tag
+
                 if member is not None:
+                    record = '{:3,}.\t{:3,}W\t{:3,}D\t{:3,}L'.format(
+                        stats[p.tag]["games"],
+                        stats[p.tag]["wins"],
+                        stats[p.tag]["draws"],
+                        stats[p.tag]["losses"],
+                    )
+
                     if use == 'rating_display':
                         player_list.append("`{:_>4.0f}` \t{}".format(p.rating_display, member))
+                        player_list.append("\t{}".format(inline(record)))
                     elif use == 'mu':
-                        player_list.append("`{:_>4.0f}` \t{}".format(p.rating.mu, member))
+                        player_list.append(str(member))
+                        player_list.append("\t`{}`".format(record))
+                        player_list.append("\t`{:>4.0f} R`\t`{:>4.0f} μ`\t`{:>4.0f} σ`".format(
+                            p.rating_display,
+                            p.rating.mu,
+                            p.rating.sigma
+                        ))
+
 
             em.add_field(name="Players", value='\n'.join(player_list), inline=False)
 
