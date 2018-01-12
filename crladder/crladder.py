@@ -979,7 +979,7 @@ class CRLadder:
                     await self.bot.say("Elo updated.")
 
     @crladder.command(name="quality", aliases=['q'], pass_context=True)
-    async def crladder_qualify(self, ctx, name, member1: discord.Member, member2: discord.Member = None):
+    async def crladder_quality(self, ctx, name, member1: discord.Member, member2: discord.Member = None):
         """Head to head winning chance."""
         author = ctx.message.author
         server = ctx.message.server
