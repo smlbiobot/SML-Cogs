@@ -119,6 +119,11 @@ class Player:
         self.discord_id = discord_id
         self.tag = normalize_tag(tag)
 
+    @property
+    def rating_display(self):
+        """Display rating as mu - sigma * 3."""
+        return self.rating.mu - self.rating.sigma * 3 + RATING
+
     def __repr__(self):
         return '<Player: {0}>'.format(str(self.to_dict()))
 
@@ -127,6 +132,7 @@ class Player:
             "rating": {
                 "mu": self.rating.mu,
                 "sigma": self.rating.sigma,
+                "display": self.rating_display
             },
             "discord_id": self.discord_id,
             "tag": self.tag
@@ -664,10 +670,15 @@ class CRLadder:
                 ))
 
     @crladder.command(name="info", pass_context=True)
-    async def crladder_info(self, ctx, name):
+    async def crladder_info(self, ctx, name, *args):
         """Info about a series."""
         server = ctx.message.server
         await self.bot.type()
+
+        if not len(args):
+            use = "rating_display"
+        else:
+            use = args[0].lower()
 
         try:
             series = self.settings.get_series(server, name)
@@ -679,15 +690,17 @@ class CRLadder:
                 color=discord.Color.red())
             em.add_field(name="Status", value=series.get('status', '_'))
 
-            player_list = [inline("{:_>8} {:_>8}".format("Rating", "Sigma"))]
-            players = series.players.copy()
-            players = sorted(players, key=lambda p: p.rating['mu'], reverse=True)
+            player_list = []
+            players = [Player.from_dict(d) for d in series.players]
+            players = sorted(players, key=lambda p: p.rating_display, reverse=True)
             for p in players:
-                player = Player.from_dict(p)
-                member = server.get_member(player.discord_id)
+                member = server.get_member(p.discord_id)
                 if member is not None:
-                    player_list.append("{} #{}".format(member.display_name, player.tag))
-                    player_list.append(inline("{:_>8.0f} {:_>8.2f}".format(player.rating.mu, player.rating.sigma)))
+                    if use == 'rating_display':
+                        player_list.append("`{:_>4.0f}` \t{}".format(p.rating_display, member))
+                    elif use == 'mu':
+                        player_list.append("`{:_>4.0f}` \t{}".format(p.rating.mu, member))
+
             em.add_field(name="Players", value='\n'.join(player_list), inline=False)
 
             await self.bot.say(embed=em)
@@ -746,8 +759,8 @@ class CRLadder:
                 p_member = Player.from_dict(self.settings.get_player(server, name, member).copy())
                 # print(p_author)
 
-                p_author_rating_old = p_author.rating
-                p_member_rating_old = p_member.rating
+                p_author_rating_old = p_author.rating_display
+                p_member_rating_old = p_member.rating_display
 
                 if battle.winner == 1:
                     color = discord.Color.green()
@@ -786,7 +799,7 @@ class CRLadder:
                 if save_battle:
                     em.add_field(
                         name="Elo",
-                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_author_rating_old.mu, p_author.rating.mu)),
+                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_author_rating_old, p_author.rating_display)),
                         inline=False
                     )
                 em.add_field(
@@ -797,7 +810,7 @@ class CRLadder:
                 if save_battle:
                     em.add_field(
                         name="Elo",
-                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_member_rating_old.mu, p_member.rating.mu)),
+                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(p_member_rating_old, p_member.rating_display)),
                         inline=False
                     )
                 if not save_battle:
