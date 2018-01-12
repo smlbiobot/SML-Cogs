@@ -308,6 +308,9 @@ class Settings:
         # self.model = Box(model, default_box=True)
         self.model = model
 
+        if "servers" not in self.model:
+            self.model["servers"] = {}
+
     def save(self):
         """Save settings to file."""
         # preprocess rating if found
