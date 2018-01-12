@@ -755,18 +755,28 @@ class CRLadder:
 
     @crladder.command(name="info", pass_context=True)
     async def crladder_info(self, ctx, name, *args):
-        """Info about a series."""
+        """Info about a series.
+
+        Options:
+        winloss: show TOTAL/W/D/L
+        showall: show all registered players (default: False. Show only people with games)
+        """
         server = ctx.message.server
         await self.bot.type()
 
         winloss = False
         use = "rating_display"
 
+        # if show all members or show only people with games played
+        showall = False
+
         if len(args):
             if 'mu' in args:
                 use = 'mu'
             if 'winloss' in args:
                 winloss = True
+            if 'showall' in args:
+                showall = True
 
 
         try:
@@ -784,28 +794,28 @@ class CRLadder:
             players = sorted(players, key=lambda p: p.rating_display, reverse=True)
             for p in players:
                 member = server.get_member(p.discord_id)
-                tag = p.tag
 
                 if member is not None:
-                    record = '{:3,}.\t{:3,}W\t{:3,}D\t{:3,}L'.format(
-                        stats[p.tag]["games"],
-                        stats[p.tag]["wins"],
-                        stats[p.tag]["draws"],
-                        stats[p.tag]["losses"],
-                    )
+                    if showall or stats[p.tag]["games"] > 0:
+                        record = '{:3,}.\t{:3,}W\t{:3,}D\t{:3,}L'.format(
+                            stats[p.tag]["games"],
+                            stats[p.tag]["wins"],
+                            stats[p.tag]["draws"],
+                            stats[p.tag]["losses"],
+                        )
 
-                    if use == 'rating_display':
-                        player_list.append("`{:_>4.0f}` \t{}".format(p.rating_display, member))
-                        if winloss:
-                            player_list.append("\t{}".format(inline(record)))
-                    elif use == 'mu':
-                        player_list.append(str(member))
-                        player_list.append("\t`{}`".format(record))
-                        player_list.append("\t`{:>4.0f} R`\t`{:>4.0f} μ`\t`{:>4.0f} σ`".format(
-                            p.rating_display,
-                            p.rating.mu,
-                            p.rating.sigma
-                        ))
+                        if use == 'rating_display':
+                            player_list.append("`{:_>4.0f}` \t{}".format(p.rating_display, member))
+                            if winloss:
+                                player_list.append("\t{}".format(inline(record)))
+                        elif use == 'mu':
+                            player_list.append(str(member))
+                            player_list.append("\t`{}`".format(record))
+                            player_list.append("\t`{:>4.0f} R`\t`{:>4.0f} μ`\t`{:>4.0f} σ`".format(
+                                p.rating_display,
+                                p.rating.mu,
+                                p.rating.sigma
+                            ))
 
             pages = grouper(30, player_list)
             color = random_discord_color()
