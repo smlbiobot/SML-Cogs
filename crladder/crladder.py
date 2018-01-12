@@ -807,12 +807,13 @@ class CRLadder:
 
             pages = grouper(30, player_list)
             color = random_discord_color()
-            for page in pages:
+            for index, page in enumerate(pages):
                 lines = [p for p in page if p is not None]
                 em = discord.Embed(
                     title=name, description="Clash Royale ladder series.",
                     color=color)
-                em.add_field(name="Status", value=series.get('status', '_'))
+                if index == 0:
+                    em.add_field(name="Status", value=series.get('status', '_'))
 
                 em.add_field(name="Players", value='\n'.join(lines), inline=False)
 
