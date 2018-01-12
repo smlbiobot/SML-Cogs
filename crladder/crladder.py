@@ -44,14 +44,14 @@ SERVER_DEFAULTS = {
 }
 
 # recommneded formula
-RATING = 1000
-SIGMA = RATING / 3
+MU = 1000
+SIGMA = MU / 3
 BETA = SIGMA / 2
 TAU = BETA / 100
-DRAW_PROBABILITY = 0.5
+DRAW_PROBABILITY = 0.01
 
 env = TrueSkill(
-    mu=RATING,
+    mu=MU,
     sigma=SIGMA,
     beta=BETA,
     tau=TAU,
@@ -120,19 +120,14 @@ class ClashRoyaleAPI:
 class Player:
     """Player in a game."""
 
-    def __init__(self, discord_id=None, tag=None, rating=RATING, sigma=SIGMA):
+    def __init__(self, discord_id=None, tag=None, mu=MU, sigma=SIGMA):
         """
         Player.
         :param discord_id: Discord user id.
         :param tag: Clash Royale player tag.
         :param rating: Initial rating.
         """
-        if isinstance(rating, Rating):
-            self.rating = rating
-        elif isinstance(rating, dict):
-            self.rating = env.create_rating(mu=rating['mu'], sigma=rating['sigma'])
-        else:
-            self.rating = env.create_rating()
+        self.rating = env.create_rating(mu=mu, sigma=sigma)
         self.discord_id = discord_id
         self.tag = normalize_tag(tag)
 
@@ -159,7 +154,13 @@ class Player:
     @staticmethod
     def from_dict(d):
         if isinstance(d, dict):
-            p = Player(**d)
+            rating = d.get('rating', {'mu': MU, 'sigma': SIGMA})
+            p = Player(
+                discord_id=d.get('discord_id'),
+                tag=d.get('tag'),
+                mu=rating.get('mu'),
+                sigma=rating.get('sigma')
+            )
         else:
             p = Player()
         return p
@@ -990,17 +991,31 @@ class CRLadder:
             pm1 = member1
             pm2 = member2
         try:
-            p1 = Player.from_dict(self.settings.get_player(server, name, pm1))
-            p2 = Player.from_dict(self.settings.get_player(server, name, pm2))
+            series = self.settings.get_series_by_name(server, name)
+            if series is None:
+                raise NoSuchSeries
+            p1 = None
+            p2 = None
+            for player in series['players']:
+                if str(player['discord_id']) == pm1.id:
+                    p1 = player
+                if str(player['discord_id']) == pm2.id:
+                    p2 = player
+            if p1 is None:
+                raise NoSuchPlayer
+            if p2 is None:
+                raise NoSuchPlayer
         except NoSuchSeries:
             await self.bot.say("No series with that name on this server.")
         except NoSuchPlayer:
             await self.bot.say("Player not found.")
         else:
+            p1_rating = env.create_rating(mu=p1['rating']['mu'], sigma=p1['rating']['sigma'])
+            p2_rating = env.create_rating(mu=p2['rating']['mu'], sigma=p2['rating']['sigma'])
             await self.bot.say(
                 "If {} plays against {}, "
                 "there is a {:.1%} chance to draw.".format(
-                    pm1, pm2, quality_1vs1(p1.rating, p2.rating)
+                    pm1, pm2, quality_1vs1(p1_rating, p2_rating)
                 )
             )
 
