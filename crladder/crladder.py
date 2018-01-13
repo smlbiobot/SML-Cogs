@@ -32,7 +32,7 @@ import aiohttp
 import discord
 from box import Box
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline
+from cogs.utils.chat_formatting import inline, box
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from trueskill import Rating
@@ -807,7 +807,6 @@ class CRLadder:
                             )
                             player_list.append("\t{}".format(inline(record)))
 
-
             pages = grouper(30, player_list)
             color = random_discord_color()
             for index, page in enumerate(pages):
@@ -1016,12 +1015,14 @@ class CRLadder:
             p1_rating = env.create_rating(mu=p1['rating']['mu'], sigma=p1['rating']['sigma'])
             p2_rating = env.create_rating(mu=p2['rating']['mu'], sigma=p2['rating']['sigma'])
             await self.bot.say(
-                "Winning probabilities for series {}:\n"
-                "{} {:.1%} vs {} {:.1%}".format(
-                    name,
-                    pm1, win_probability(p1_rating, p2_rating),
-                    pm2, win_probability(p2_rating, p1_rating)
-                )
+                box(
+                    "Winning probabilities for series {}:\n"
+                    "{: >6.1%} {}\n"
+                    "{: >6.1%} {}".format(
+                        name,
+                        win_probability(p1_rating, p2_rating), pm1,
+                        win_probability(p2_rating, p1_rating), pm2,
+                    ), lang='py')
             )
 
     @crladder.command(name="quality", aliases=['q'], pass_context=True)
