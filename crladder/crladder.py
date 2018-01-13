@@ -23,18 +23,20 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import datetime as dt
+import itertools
+import math
 import os
+from random import choice
 
 import aiohttp
 import discord
 from box import Box
 from cogs.utils import checks
-from cogs.utils.chat_formatting import inline, bold, box
+from cogs.utils.chat_formatting import inline
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from trueskill import TrueSkill, Rating, rate_1vs1, quality_1vs1
-import itertools
-from random import choice
+from trueskill import Rating
+from trueskill import TrueSkill, rate_1vs1, quality_1vs1
 
 PATH = os.path.join("data", "crladder")
 JSON = os.path.join(PATH, "settings.json")
@@ -70,17 +72,25 @@ def normalize_tag(tag):
     t = t.upper()
     return t
 
+
 def grouper(n, iterable, fillvalue=None):
     """Group lists into lists of items.
     grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
     args = [iter(iterable)] * n
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
+
 def random_discord_color():
     """Return random color as an integer."""
     color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
     color = int(color, 16)
     return discord.Color(value=color)
+
+
+def win_probability(rA: Rating, rB: Rating):
+    delta_mu = rA.mu - rB.mu
+    rsss = math.sqrt(rA.sigma ** 2 + rB.sigma ** 2)
+    return env.cdf(delta_mu / rsss)
 
 
 class LadderException(Exception):
@@ -406,8 +416,6 @@ class Settings:
                 return series
             else:
                 raise PlayerInMultipleActiveSeries
-
-
 
     def set_series_status(self, server, name, status):
         """
@@ -752,7 +760,6 @@ class CRLadder:
 
         return stats
 
-
     @crladder.command(name="info", pass_context=True)
     async def crladder_info(self, ctx, name, *args):
         """Info about a series.
@@ -778,13 +785,11 @@ class CRLadder:
             if 'showall' in args:
                 showall = True
 
-
         try:
             series = self.settings.get_series(server, name=name)
         except NoSuchSeries:
             await self.bot.say("Cannot find a series named {}", format(name))
         else:
-
 
             #  calculate total wins/losses by player
             stats = self.calculate_stats(series)
@@ -957,7 +962,8 @@ class CRLadder:
                 if save_battle:
                     em.add_field(
                         name="Elo",
-                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(display_rating(p_author_rating_old), p_author.rating_display)),
+                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(display_rating(p_author_rating_old),
+                                                                       p_author.rating_display)),
                         inline=False
                     )
                 em.add_field(
@@ -968,7 +974,8 @@ class CRLadder:
                 if save_battle:
                     em.add_field(
                         name="Elo",
-                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(display_rating(p_member_rating_old), p_member.rating_display)),
+                        value=inline("{:>10,.1f} -> {:>10,.1f}".format(display_rating(p_member_rating_old),
+                                                                       p_member.rating_display)),
                         inline=False
                     )
                 if not save_battle:
@@ -989,9 +996,51 @@ class CRLadder:
                     updated = self.settings.update_player_rating(server, name, p_member)
                     await self.bot.say("Elo updated.")
 
+    @crladder.command(name="winprob", aliases=['w'], pass_context=True)
+    async def crladder_winprob(self, ctx, name, member1: discord.Member, member2: discord.Member = None):
+        """1v1 win probability."""
+        author = ctx.message.author
+        server = ctx.message.server
+        if member2 is None:
+            pm1 = author
+            pm2 = member1
+        else:
+            pm1 = member1
+            pm2 = member2
+        try:
+            series = self.settings.get_series_by_name(server, name)
+            if series is None:
+                raise NoSuchSeries
+            p1 = None
+            p2 = None
+            for player in series['players']:
+                if str(player['discord_id']) == pm1.id:
+                    p1 = player
+                if str(player['discord_id']) == pm2.id:
+                    p2 = player
+            if p1 is None:
+                raise NoSuchPlayer
+            if p2 is None:
+                raise NoSuchPlayer
+        except NoSuchSeries:
+            await self.bot.say("No series with that name on this server.")
+        except NoSuchPlayer:
+            await self.bot.say("Player not found.")
+        else:
+            p1_rating = env.create_rating(mu=p1['rating']['mu'], sigma=p1['rating']['sigma'])
+            p2_rating = env.create_rating(mu=p2['rating']['mu'], sigma=p2['rating']['sigma'])
+            await self.bot.say(
+                "Winning probabilities for series {}:\n"
+                "{} {:.1%} vs {} {:.1%}".format(
+                    name,
+                    pm1, win_probability(p1_rating, p2_rating),
+                    pm2, win_probability(p2_rating, p1_rating)
+                )
+            )
+
     @crladder.command(name="quality", aliases=['q'], pass_context=True)
     async def crladder_quality(self, ctx, name, member1: discord.Member, member2: discord.Member = None):
-        """Head to head winning chance."""
+        """1v1 Drawing chance."""
         author = ctx.message.author
         server = ctx.message.server
         if member2 is None:
