@@ -767,18 +767,22 @@ class CRLadder:
         Options:
         winloss: show TOTAL/W/D/L
         showall: show all registered players (default: False. Show only people with games)
+        listids: Output all member ids at end
         """
         server = ctx.message.server
         await self.bot.type()
 
         winloss = False
         showall = False
+        listids = False
 
         if len(args):
             if 'winloss' in args:
                 winloss = True
             if 'showall' in args:
                 showall = True
+            if 'listids' in args:
+                listids = True
 
         try:
             series = self.settings.get_series(server, name=name)
@@ -790,10 +794,12 @@ class CRLadder:
             stats = self.calculate_stats(series)
 
             player_list = []
+            player_ids = []
             players = [Player.from_dict(d) for d in series['players']]
             players = sorted(players, key=lambda p: p.rating_display, reverse=True)
             for p in players:
                 member = server.get_member(p.discord_id)
+                player_ids.append(p.discord_id)
 
                 if member is not None:
                     if showall or stats[p.tag]["games"] > 0:
@@ -820,6 +826,9 @@ class CRLadder:
                 em.add_field(name="Players", value='\n'.join(lines), inline=False)
 
                 await self.bot.say(embed=em)
+
+            if listids:
+                await self.bot.say('Participant IDs: {}'.format(' '.join(player_ids)))
 
     def bot_emoji(self, name):
         """Emoji by name."""
