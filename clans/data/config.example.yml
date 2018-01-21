@@ -6,20 +6,28 @@ color: ff0f37
 clans:
   - name: Reddit Alpha
     tag: 2CCCP
+    key: alpha
   - name: Reddit Bravo
     tag: 2U2GGQJ
+    key: bravo
   - name: Reddit Charlie
     tag: 2QUVVVP
+    key: charlie
   - name: Reddit Delta
     tag: Y8GYCGV
+    key: delta
   - name: Reddit Echo
     tag: LGVV2CG
+    key: echo
   - name: Reddit Foxtrot
     tag: QUYCYV8
+    key: foxtrot
   - name: Reddit Golf
     tag: GUYGVJY
+    key: golf
   - name: Reddit Hotel
     tag: UGQ28YU
+    key: hotel
 info:
   - name: How to join
     value: >

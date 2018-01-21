@@ -823,6 +823,17 @@ class ClanManager:
         """Clan Badge URL."""
         return 'http://api.cr-api.com'
 
+    @property
+    def auth(self):
+        """API Auth token"""
+        return self.settings.get('auth')
+
+    @auth.setter
+    def auth(self, value):
+        """API Auth token."""
+        self.settings["auth"] = value
+        self.save()
+
 
 class CRClanInfoView:
     """Clan info view.
@@ -999,6 +1010,14 @@ class CRClan:
         server = ctx.message.server
         self.manager.init_server(server)
         await self.bot.say("Server settings initialized.")
+
+    @checks.is_owner()
+    @crclanset.command(name="auth", pass_context=True)
+    async def crclanset_auth(self, ctx, token):
+        """Save auth token."""
+        self.manager.auth = token
+        await self.bot.say("Token set.")
+        await self.bot.delete_messagge(ctx.message)
 
     @crclanset.command(name="initclans", pass_context=True)
     async def crclanset_init(self, ctx):

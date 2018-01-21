@@ -46,6 +46,7 @@ JSON = os.path.join(PATH, "settings.json")
 CACHE = os.path.join(PATH, "cache.json")
 SAVE_CACHE = os.path.join(PATH, "save_cache.json")
 CONFIG_YAML = os.path.join(PATH, "config.yml")
+AUTH_YAML = os.path.join(PATH, "auth.yml")
 BADGES = os.path.join(PATH, "alliance_badges.json")
 
 
@@ -63,6 +64,7 @@ class Clans:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
         self.badges = dataIO.load_json(BADGES)
+        self._auth = None
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
@@ -91,6 +93,26 @@ class Clans:
 
         await self.bot.delete_message(ctx.message)
 
+    @checks.mod_or_permissions()
+    @clansset.command(name="auth", pass_context=True, no_pm=True)
+    async def clansset_auth(self, ctx):
+        """Upload auth yaml file. See auth.example.yml for how to format it."""
+        attach = ctx.message.attachments[0]
+        url = attach["url"]
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                with open(AUTH_YAML, "wb") as f:
+                    f.write(await resp.read())
+
+        await self.bot.say(
+            "Attachment received and saved as {}".format(AUTH_YAML))
+
+        # self.settings['auth'] = CONFIG_YAML
+        # dataIO.save_json(JSON, self.settings)
+
+        await self.bot.delete_message(ctx.message)
+
     @property
     def clans_config(self):
         if os.path.exists(CONFIG_YAML):
@@ -101,7 +123,12 @@ class Clans:
 
     @property
     def auth(self):
-        return self.clans_config.get('auth')
+        if self._auth is None:
+            if os.path.exists(AUTH_YAML):
+                with open(AUTH_YAML) as f:
+                    config = yaml.load(f)
+                    self._auth = config['token']
+        return self._auth
 
     async def get_clan(self, tag):
         """Return dict of clan"""
