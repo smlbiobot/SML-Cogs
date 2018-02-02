@@ -549,7 +549,7 @@ class CRPlayerModel:
     @property
     def league(self):
         """League (int)."""
-        league = max(self.arena_id - 11, 0)
+        league = max(self.arena_id - 12, 0)
         return league
 
     def fave_card(self, bot_emoji: BotEmoji):
