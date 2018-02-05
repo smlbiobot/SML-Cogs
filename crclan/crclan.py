@@ -721,10 +721,11 @@ class ClanManager:
         """
         tag = SCTag(tag).tag
         url = "{}{}".format(self.clan_api_url, tag)
+        headers = {"auth": self.auth}
 
         try:
             async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=API_FETCH_TIMEOUT) as resp:
+                async with session.get(url, timeout=API_FETCH_TIMEOUT, headers=headers) as resp:
                     data = await resp.json()
         except json.decoder.JSONDecodeError:
             return False
@@ -1017,7 +1018,7 @@ class CRClan:
         """Save auth token."""
         self.manager.auth = token
         await self.bot.say("Token set.")
-        await self.bot.delete_messagge(ctx.message)
+        await self.bot.delete_message(ctx.message)
 
     @crclanset.command(name="initclans", pass_context=True)
     async def crclanset_init(self, ctx):
