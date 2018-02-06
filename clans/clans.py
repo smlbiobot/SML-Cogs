@@ -24,21 +24,21 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import asyncio
 import argparse
+import asyncio
 import json
 import os
 import re
-import unidecode
 from collections import defaultdict
 
 import aiohttp
 import discord
+import unidecode
 import yaml
 from box import Box
 from cogs.utils import checks
-from cogs.utils.dataIO import dataIO
 from cogs.utils.chat_formatting import pagify
+from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 
 PATH = os.path.join("data", "clans")
@@ -201,6 +201,7 @@ class Clans:
             desc = clan.get('description')
             match = re.search('[\d,O]{4,}', desc)
             pb_match = re.search('PB', desc)
+            psf_match = re.search('PSF', desc)
             name = clan.get('name')
             if match is not None:
                 trophies = match.group(0)
@@ -212,22 +213,25 @@ class Clans:
             pb = ''
             if pb_match is not None:
                 pb = ' PB'
+            psf = ''
+            if psf_match is not None:
+                psf = ' PSF'
             member_count = ''
             if show_member_count:
                 member_count = ', {} / 50'.format(len(clan.get('members')))
             clan_tag = ''
             if show_clan_tag:
                 clan_tag = ', {}'.format(clan.get('tag'))
-            value = '`{trophies}{pb}{member_count}{clan_tag}`'.format(
+            value = '`{trophies}{pb}{psf}{member_count}{clan_tag}`'.format(
                 clan_tag=clan_tag,
                 member_count=member_count,
                 trophies=trophies,
-                pb=pb)
+                pb=pb,
+                psf=psf)
             em.add_field(name=name, value=value, inline=False)
 
             if badge_url is None:
                 badge_url = clan['badge']['image']
-
 
         if badge_url is not None:
             em.set_thumbnail(url=badge_url)
@@ -239,10 +243,8 @@ class Clans:
             )
         await self.bot.say(embed=em)
 
-
     def search_args_parser(self):
         """Search arguments parser."""
-        # Process arguments
         parser = argparse.ArgumentParser(prog='[p]racfaudit search')
 
         parser.add_argument(
@@ -367,7 +369,7 @@ class Clans:
                 member_model['role_name'] = roles[member_model['role'].lower()]
                 out.append("**{0.name}** #{0.tag}, {0.clan.name}, {0.role_name}, {0.trophies}".format(member_model))
                 if pargs.link:
-                    out.append('http://cr-api.com/profile/{}'.format(member_model.tag))
+                    out.append('http://cr-api.com/player/{}'.format(member_model.tag))
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
         else:
