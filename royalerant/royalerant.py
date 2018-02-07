@@ -107,6 +107,8 @@ class RoyaleRant:
     @commands.command(aliases=['rrant'], pass_context=True, no_pm=True)
     async def royalerant(self, ctx, *, msg):
         """Post a Tweet from @RoyaleRant."""
+        clean_content = ctx.message.clean_content
+        msg = clean_content[clean_content.index(' '):]
         with aiohttp.ClientSession() as session:
             client = self.peony_client(sessions=session)
             author = ctx.message.author
