@@ -29,7 +29,6 @@ import re
 import discord
 from discord.ext import commands
 
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
@@ -104,7 +103,7 @@ class TimeZone:
     async def settimezone(self, ctx):
         """Set Timezone settings."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @settimezone.command(name="googleapikey", pass_context=True)
     async def settimezone_googleapikey(self, ctx, apikey):
@@ -117,7 +116,7 @@ class TimeZone:
     async def timezone(self, ctx):
         """Timezone."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @timezone.command(name="list", pass_context=True)
     async def timezone_list(self, ctx):
@@ -236,7 +235,7 @@ class TimeZone:
     async def gmaps(self, ctx):
         """Timezone."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @gmaps.command(name="geocode", pass_context=True)
     async def gmaps_geocode(self, ctx, *, address):
