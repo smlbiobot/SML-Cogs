@@ -26,14 +26,15 @@ DEALINGS IN THE SOFTWARE.
 
 import os
 import re
-import aiohttp
 from collections import defaultdict
 
+import aiohttp
 import discord
 import peony
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
+from peony.exceptions import PeonyException
 
 PATH = os.path.join("data", "royalerant")
 JSON = os.path.join(PATH, "settings.json")
@@ -65,7 +66,6 @@ class RoyaleRant:
                 "access_token_secret": '12345'
             }
             dataIO.save_json(JSON, self.settings)
-
 
     def peony_client(self, **kwargs):
         """Return Twitter API instance."""
@@ -118,7 +118,7 @@ class RoyaleRant:
                 media_ids = []
                 if len(attachment_urls):
                     for url in attachment_urls:
-                        media = await client.upload_media(url, chunk_size=2**18, chunked=True)
+                        media = await client.upload_media(url, chunk_size=2 ** 18, chunked=True)
                         media_ids.append(media.media_id)
 
                 tweet = "[{}] {}".format(author_initials, msg)
@@ -140,13 +140,12 @@ class RoyaleRant:
             status_id = re.findall("[0-9]+$", arg)[0]
         try:
             resp = await client.api.statuses.retweet.post(id=status_id)
-        except peony.exceptions.PeonyException as e:
+        except PeonyException as e:
             await self.bot.say("Error tweeting: {}".format(e.response))
             return
 
         url = "https://twitter.com/{0[user][screen_name]}/status/{0[id_str]}".format(resp)
         await self.bot.say("Tweeted: <{}>".format(url))
-
 
 
 def check_folder():
