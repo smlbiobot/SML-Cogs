@@ -54,6 +54,17 @@ def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
 
+def clean_tag(tag):
+    """clean up tag."""
+    if tag is None:
+        return None
+    t = tag
+    if t.startswith('#'):
+        t = t[1:]
+    t = t.strip()
+    t = t.upper()
+    return t
+
 class APIError(Exception):
     def __init__(self, message):
         self.message = message
@@ -365,9 +376,7 @@ class Clans:
         try:
             clans = await self.get_clans(clan_tags)
             dataIO.save_json(CACHE, clans)
-        except json.decoder.JSONDecodeError:
-            api_error = True
-        except asyncio.TimeoutError:
+        except APIError:
             api_error = True
 
         if api_error:
@@ -376,9 +385,15 @@ class Clans:
 
         members = []
         for clan in clans:
-            for member in clan.get('members'):
+            if self.api_provider == 'official':
+                member_list = clan.get('memberList')
+            else:
+                member_list = clan.get('members')
+
+            for member in member_list:
                 member = Box(member)
                 member.clan = clan
+                member.tag = clean_tag(member.tag)
                 members.append(member)
 
         results = []
