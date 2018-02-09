@@ -54,6 +54,10 @@ def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
 
+class APIError(Exception):
+    def __init__(self, message):
+        self.message = message
+
 
 class Clans:
     """Auto parse clan info and display requirements"""
@@ -66,12 +70,31 @@ class Clans:
         self.badges = dataIO.load_json(BADGES)
         self._auth = None
 
+        provider = self.settings.get('provider')
+        if provider is None:
+            provider = 'cr-api'
+
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
     async def clansset(self, ctx):
         """Settings"""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
+
+    @checks.mod_or_permissions()
+    @clansset.command(name="api", pass_context=True, no_pm=True)
+    async def clansset_api(self, ctx, provider):
+        """Set API provider.
+
+        Possible values: cr-api, official
+        """
+        if provider == 'cr-api':
+            self.settings['provider'] = 'cr-api'
+        elif provider == 'official':
+            self.settings['provider'] = 'official'
+
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("API Provider updated.")
 
     @checks.mod_or_permissions()
     @clansset.command(name="config", pass_context=True, no_pm=True)
@@ -108,9 +131,6 @@ class Clans:
         await self.bot.say(
             "Attachment received and saved as {}".format(AUTH_YAML))
 
-        # self.settings['auth'] = CONFIG_YAML
-        # dataIO.save_json(JSON, self.settings)
-
         await self.bot.delete_message(ctx.message)
 
     @property
@@ -127,40 +147,65 @@ class Clans:
             if os.path.exists(AUTH_YAML):
                 with open(AUTH_YAML) as f:
                     config = yaml.load(f)
-                    self._auth = config['token']
+                    if self.api_provider == 'cr-api':
+                        self._auth = config.get('cr_api_token')
+                    else:
+                        self._auth = config.get('official_token')
         return self._auth
+
+    @property
+    def api_provider(self):
+        if self.settings.get('provider') == 'official':
+            return 'official'
+        return 'cr-api'
 
     async def get_clan(self, tag):
         """Return dict of clan"""
-        url = 'http://api.cr-api.com/clan/{}'.format(tag)
-        headers = {'auth': self.auth}
-
         try:
+            if self.api_provider == 'official':
+                url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
+                headers = {'Authorization': 'Bearer {}'.format(self.auth)}
+            else:
+                url = 'http://api.cr-api.com/clan/{}'.format(tag)
+                headers = {'auth': self.auth}
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers=headers, timeout=30) as resp:
                     data = await resp.json()
         except json.decoder.JSONDecodeError:
-            raise
+            raise APIError('json.decoder.JSONDecodeError')
         except asyncio.TimeoutError:
-            raise
-
-        return data
+            raise APIError('asyncio.TimeoutError')
+        except aiohttp.client_exceptions.ContentTypeError:
+            raise APIError('aiohttp.client_exceptions.ContentTypeError')
+        else:
+            return data
 
     async def get_clans(self, tags):
         """Return list of clans"""
-        url = 'http://api.cr-api.com/clan/{}'.format(",".join(tags))
-        headers = {'auth': self.auth}
-
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=headers, timeout=30) as resp:
-                    data = await resp.json()
+            if self.api_provider == 'official':
+                urls = ['https://api.clashroyale.com/v1/clans/%23{}'.format(tag) for tag in tags]
+                headers = {'Authorization': 'Bearer {}'.format(self.auth)}
+                data = []
+                async with aiohttp.ClientSession() as session:
+                    for url in urls:
+                        async with session.get(url, headers=headers, timeout=30) as resp:
+                            await asyncio.sleep(0)
+                            data.append(await resp.json())
+            else:
+                url = 'http://api.cr-api.com/clan/{}'.format(",".join(tags))
+                headers = {'auth': self.auth}
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, headers=headers, timeout=30) as resp:
+                        data = await resp.json()
         except json.decoder.JSONDecodeError:
-            raise
+            raise APIError('json.decoder.JSONDecodeError')
         except asyncio.TimeoutError:
-            raise
-
-        return data
+            raise APIError('asyncio.TimeoutError')
+        except aiohttp.client_exceptions.ContentTypeError:
+            raise APIError('aiohttp.client_exceptions.ContentTypeError')
+        else:
+            return data
 
     @commands.command(pass_context=True, no_pm=True)
     async def clans(self, ctx, *args):
@@ -218,7 +263,13 @@ class Clans:
                 psf = ' PSF'
             member_count = ''
             if show_member_count:
-                member_count = ', {} / 50'.format(len(clan.get('members')))
+                if self.api_provider == 'official':
+                    member_count = clan.get('members')
+                else:
+                    member_count = len(clan.get('members'))
+
+                member_count = ', {} / 50'.format(member_count)
+
             clan_tag = ''
             if show_clan_tag:
                 clan_tag = ', {}'.format(clan.get('tag'))
@@ -231,7 +282,12 @@ class Clans:
             em.add_field(name=name, value=value, inline=False)
 
             if badge_url is None:
-                badge_url = clan['badge']['image']
+                if self.api_provider == 'official':
+                    for badge in self.badges:
+                        if badge.get('id') == clan.get('badgeId'):
+                            badge_url = 'https://cr-api.github.io/cr-api-assets/badges/{}.png'.format(badge.get('name'))
+                else:
+                    badge_url = clan['badge']['image']
 
         if badge_url is not None:
             em.set_thumbnail(url=badge_url)
