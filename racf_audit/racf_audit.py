@@ -371,7 +371,9 @@ class RACFAudit:
     def clan_tags(self):
         tags = []
         for clan in self.config.get('clans'):
-            tags.append(clan.get('tag'))
+            # only clans with member roles
+            if clan.get('type') == 'Member':
+                tags.append(clan.get('tag'))
         return tags
 
     def search_args_parser(self):
@@ -533,8 +535,6 @@ class RACFAudit:
             await self.bot.say(e.status_message)
             return
         else:
-
-            print(member_models)
             # Show settings
             await ctx.invoke(self.racfaudit_config)
 
@@ -550,78 +550,71 @@ class RACFAudit:
                 for member_model in member_models:
                     print(member_model.get('tag'), member_model.get('discord_member'))
 
-        """
-        Member processing.
+            """
+            Member processing.
+    
+            """
+            audit_results = {
+                "elder_promotion_req": [],
+                "coleader_promotion_req": [],
+                "leader_promotion_req": [],
+                "no_discord": [],
+                "no_clan_role": []
+            }
 
-        """
-        # clan_defaults = {
-        #     "elder_promotion_req": [],
-        #     "coleader_promotion_req": [],
-        #     "no_discord": [],
-        #     "no_clan_role": []
-        # }
-        # clans_out = OrderedDict([(c.name, clan_defaults) for c in clans])
-        #
-        # def update_clan(clan_name, field, member_model):
-        #     clans_out[clan_name][field].append(member_model)
-        #
-        # out = []
-        # for i, member_model in enumerate(member_models):
-        #     if i % 20 == 0:
-        #         await self.bot.type()
-        #
-        #     ma = MemberAudit(member_model, server, clans)
-        #     clan_name = member_model.clan_name
-        #     m_out = []
-        #     if ma.has_discord:
-        #         if not ma.api_is_elder and ma.discord_role_elder:
-        #             update_clan(clan_name, "elder_promotion_req", member_model)
-        #             m_out.append(":warning: Has Elder role but not promoted in clan.")
-        #         if not ma.api_is_coleader and ma.discord_role_coleader:
-        #             update_clan(clan_name, "coleader_promotion_req", member_model)
-        #             m_out.append(":warning: Has Co-Leader role but not promoted in clan.")
-        #         clan_role = self.clan_name_to_role(server, member_model.clan_name)
-        #         if clan_role is not None:
-        #             if clan_role not in ma.discord_clan_roles:
-        #                 update_clan(clan_name, "no_clan_role", member_model)
-        #                 m_out.append(":warning: Does not have {}".format(clan_role.name))
-        #     else:
-        #         update_clan(clan_name, "no_discord", member_model)
-        #         m_out.append(':x: No Discord')
-        #
-        #     if len(m_out):
-        #         out.append(
-        #             "**{ign}** {clan}\n{status}".format(
-        #                 ign=member_model.name,
-        #                 clan=member_model.clan_name,
-        #                 status='\n'.join(m_out)
-        #             )
-        #         )
-        #
-        # # line based output
-        # for page in pagify('\n'.join(out)):
-        #     await self.bot.type()
-        #     await self.bot.say(page)
-        #
-        # # clan based output
-        # out = []
-        # print(clans_out)
-        # for clan_name, clan_dict in clans_out.items():
-        #     out.append("**{}**".format(clan_name))
-        #     if len(clan_dict["elder_promotion_req"]):
-        #         out.append("Elders that need to be promoted:")
-        #         out.append(", ".join([m.name for m in clan_dict["elder_promotion_req"]]))
-        #     if len(clan_dict["no_discord"]):
-        #         out.append("No Discord:")
-        #         out.append(", ".join([m.name for m in clan_dict["no_discord"]]))
-        #     if len(clan_dict["no_clan_role"]):
-        #         out.append("No clan role on Discord:")
-        #         out.append(", ".join([m.name for m in clan_dict["no_clan_role"]]))
-        #
-        # for page in pagify('\n'.join(out), shorten_by=24):
-        #     await self.bot.type()
-        #     if len(page):
-        #         await self.bot.say(page)
+            for member_model in member_models:
+                has_discord = member_model.get('discord_member')
+                if has_discord is None:
+                    audit_results["no_discord"].append(member_model)
+
+                if has_discord:
+                    discord_member = member_model.get('discord_member')
+                    is_elder = False
+                    is_coleader = False
+                    is_leader = False
+                    for r in discord_member.roles:
+                        if r.name.lower() == 'elder':
+                            is_elder = True
+                        if r.name.lower() == 'coleader':
+                            is_coleader = True
+                        if r.name.lower() == 'leader':
+                            is_leader = True
+                    if is_elder:
+                        if member_model.get('role').lower() != 'elder':
+                            audit_results["elder_promotion_req"].append(member_model)
+                    if is_coleader:
+                        if member_model.get('role').lower() != 'coleader':
+                            audit_results["coleader_promotion_req"].append(member_model)
+                    if is_leader:
+                        if member_model.get('role').lower() != 'leader':
+                            audit_results["leader_promotion_req"].append(member_model)
+
+            # show results
+            def list_member(member_model):
+                """member row"""
+                clan = member_model.get('clan')
+                clan_name = None
+                if clan is not None:
+                    clan_name = clan.get('name')
+
+                row = "**{name}** #{tag}, {clan_name}, {role}, {trophies}".format(
+                    name=member_model.get('name'),
+                    tag=member_model.get('tag'),
+                    clan_name=clan_name,
+                    role=get_role_name(member_model.get('role')),
+                    trophies=member_model.get('trophies')
+                )
+                return row
+
+            await self.bot.say("-" * 40)
+            await self.bot.say("__Members without discord__")
+            out = []
+            for member_model in audit_results["no_discord"]:
+                out.append(list_member(member_model))
+
+            for page in pagify('\n'.join(out)):
+                await self.bot.say(page)
+
 
 
 def check_folder():
