@@ -148,75 +148,155 @@ class DiscordUsers:
                 return u.user
         return None
 
+def clean_tag(tag):
+    """clean up tag."""
+    if tag is None:
+        return None
+    t = tag
+    if t.startswith('#'):
+        t = t[1:]
+    t = t.strip()
+    t = t.upper()
+    return t
 
-class MemberAudit:
-    """Member audit object associates API model with discord model."""
+def get_role_name(role):
+    if role is None:
+        return ''
 
-    def __init__(self, member_model, server, clans):
-        self.member_model = member_model
-        self.server = server
-        self.clans = clans
+    role = role.lower()
 
-    @property
-    def discord_member(self):
-        return self.member_model.discord_member
+    roles_dict = {
+        'leader': 'Leader',
+        'coleader': 'Co-Leader',
+        'elder': 'Elder',
+        'member': 'Member'
+    }
 
-    @property
-    def has_discord(self):
-        return self.discord_member is not None
+    if role in roles_dict.keys():
+        return roles_dict.get(role)
 
-    @property
-    def api_clan_name(self):
-        return self.member_model.clan_name
+    return ''
 
-    @property
-    def api_is_member(self):
-        return self.member_model.role_is_member
 
-    @property
-    def api_is_elder(self):
-        return self.member_model.role_is_elder
-
-    @property
-    def api_is_coleader(self):
-        return self.member_model.role_is_coleader
-
-    @property
-    def api_is_leader(self):
-        return self.member_model.role_is_leader
-
-    @property
-    def discord_role_member(self):
-        return member_has_role(self.server, self.discord_member, "Member")
+class ClashRoyaleAPIError(Exception):
+    def __init__(self, status=None, message=None):
+        super().__init__()
+        self._status = status
+        self._message = message
 
     @property
-    def discord_role_elder(self):
-        return member_has_role(self.server, self.discord_member, "Elder")
+    def status(self):
+        return self._status
 
     @property
-    def discord_role_coleader(self):
-        return member_has_role(self.server, self.discord_member, "Co-Leader")
+    def message(self):
+        return self._message
 
     @property
-    def discord_role_leader(self):
-        return member_has_role(self.server, self.discord_member, "Leader")
+    def status_message(self):
+        out = []
+        if self._status is not None:
+            out.append(str(self._status))
+        if self._message is not None:
+            out.append(self._message)
+        return '. '.join(out)
 
-    @property
-    def discord_clan_roles(self):
-        if self.discord_member is None:
-            return []
-        return [c.role for c in self.clans if c.role in self.discord_member.roles]
+class ClashRoyaleAPI:
+    def __init__(self, token):
+        self.token = token
+
+    async def fetch_with_session(self, session, url, timeout=30.0):
+        """Perform the actual fetch with the session object."""
+        headers = {
+            'Authorization': 'Bearer {}'.format(self.token)
+        }
+        async with session.get(url, headers=headers) as resp:
+            async with aiohttp.Timeout(timeout):
+                body = await resp.json()
+                if resp.status != 200:
+                    raise ClashRoyaleAPIError(status=resp.status, message=resp.reason)
+        return body
+
+    async def fetch(self, url):
+        """Fetch request."""
+        error_msg = None
+        try:
+            async with aiohttp.ClientSession() as session:
+                body = await self.fetch_with_session(session, url)
+        except asyncio.TimeoutError:
+            error_msg = 'Request timed out'
+            raise ClashRoyaleAPIError(message=error_msg)
+        except aiohttp.ServerDisconnectedError as err:
+            error_msg = 'Server disconnected error: {}'.format(err)
+            raise ClashRoyaleAPIError(message=error_msg)
+        except (aiohttp.ClientError, ValueError) as err:
+            error_msg = 'Request connection error: {}'.format(err)
+            raise ClashRoyaleAPIError(message=error_msg)
+        except json.JSONDecodeError:
+            error_msg = "Non JSON returned"
+            raise ClashRoyaleAPIError(message=error_msg)
+        else:
+            return body
+        finally:
+            if error_msg is not None:
+                raise ClashRoyaleAPIError(message=error_msg)
+
+
+    async def fetch_multi(self, urls):
+        """Perform parallel fetch"""
+        results = []
+        error_msg = None
+        try:
+            async with aiohttp.ClientSession() as session:
+                for url in urls:
+                    await asyncio.sleep(0)
+                    body = await self.fetch_with_session(session, url)
+                    results.append(body)
+        except asyncio.TimeoutError:
+            error_msg = 'Request timed out'
+            raise ClashRoyaleAPIError(message=error_msg)
+        except aiohttp.ServerDisconnectedError as err:
+            error_msg = 'Server disconnected error: {}'.format(err)
+            raise ClashRoyaleAPIError(message=error_msg)
+        except (aiohttp.ClientError, ValueError) as err:
+            error_msg = 'Request connection error: {}'.format(err)
+            raise ClashRoyaleAPIError(message=error_msg)
+        except json.JSONDecodeError:
+            error_msg = "Non JSON returned"
+            raise ClashRoyaleAPIError(message=error_msg)
+        else:
+            return results
+        finally:
+            if error_msg is not None:
+                raise ClashRoyaleAPIError(message=error_msg)
+
+    async def fetch_clan(self, tag):
+        """Get a clan."""
+        tag = clean_tag(tag)
+        url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
+        body = await self.fetch(url)
+        return body
+
+    async def fetch_clan_list(self, tags):
+        """Get multiple clans."""
+        tags = [clean_tag(tag) for tag in tags]
+        urls = ['https://api.clashroyale.com/v1/clans/%23{}'.format(tag) for tag in tags]
+        results = await self.fetch_multi(urls)
+        return results
+
+
+
+
 
 
 class RACFAudit:
     """RACF Audit.
     
     Requires use of additional cogs for functionality:
-    SML-Cogs: cr_api : ClashRoyaleAPI
     SML-Cogs: crclan : CRClan
     SML-Cogs: mm : MemberManagement
     """
-    required_cogs = ['cr_api', 'crclan', 'mm']
+    required_cogs = ['crclan', 'mm']
 
     def __init__(self, bot):
         """Init."""
@@ -225,123 +305,6 @@ class RACFAudit:
 
         with open('data/racf_audit/family_config.yaml') as f:
             self.config = yaml.load(f)
-
-    def cache_file_path(self, clan_tag):
-        """Return cache path by clan tag."""
-        return os.path.join(PATH, "clans", clan_tag + ".json")
-
-    def save_to_cache(self, clan_models):
-        """Save clan models to cache."""
-        for clan_model in clan_models:
-            dataIO.save_json(self.cache_file_path(clan_model.tag), clan_model.to_dict())
-
-    def load_from_cache(self, clan_tags):
-        """Return clan models from cache."""
-        clan_models = []
-        fp_timestamp = None
-        for clan_tag in clan_tags:
-            fp = self.cache_file_path(clan_tag)
-            if fp_timestamp is None:
-                fp_timestamp = os.path.getmtime(fp)
-            clan_model = crapipy.models.Clan(dataIO.load_json(fp))
-            clan_models.append(clan_model)
-        return clan_models
-
-    @property
-    def api(self):
-        """CR API cog."""
-        return self.bot.get_cog("ClashRoyaleAPI")
-
-    @property
-    def crclan(self):
-        """CRClan cog."""
-        return self.bot.get_cog("CRClan")
-
-    def family_clan_models_from_cache(self, server):
-        """All family clan models from cache."""
-        clans = self.clans(server)
-        clan_tags = [c.tag for c in clans]
-        clan_models = self.load_from_cache(clan_tags)
-        return clan_models
-
-    async def family_clan_models(self, server):
-        """All family clan models."""
-        clans = self.clans(server)
-        clan_tags = [c.tag for c in clans]
-        clan_models = []
-
-        try:
-            client = crapipy.AsyncClient(token=self.auth)
-            clan_models = await client.get_clans(clan_tags)
-
-            self.save_to_cache(clan_models)
-            self.settings["cache_timestamp"] = dt.datetime.utcnow().isoformat()
-            dataIO.save_json(JSON, self.settings)
-            # TODO purely for testing
-            # raise crapipy.APIError
-        except crapipy.APIError:
-            raise crapipy.APIError
-
-        return clan_models
-
-    async def family_member_models(self, server):
-        """All family member models."""
-        is_cache = False
-        clan_models = []
-        try:
-            clan_models = await self.family_clan_models(server)
-        except crapipy.APIError:
-            # raise crapipy.APIError
-            clan_models = self.family_clan_models_from_cache(server)
-            is_cache = True
-        members = []
-        for clan_model in clan_models:
-            for member_model in clan_model.members:
-                member_model.clan = clan_model
-                members.append(member_model)
-        return members, is_cache
-
-    def clan_tags(self, membership_type=None):
-        """RACF clans."""
-        tags = []
-        for clan in self.config['clans']:
-            if membership_type is None:
-                tags.append(clan['tag'])
-            elif membership_type == clan['type']:
-                tags.append(clan['tag'])
-        return tags
-
-    def clans(self, server):
-        """List of RACFClan objects based on config."""
-        out = []
-        for clan in self.config['clans']:
-            out.append(
-                RACFClan(
-                    name=clan['name'],
-                    tag=clan['tag'],
-                    role=server_role(server, clan['role_name']),
-                    membership_type=clan['type']
-                )
-            )
-        return out
-
-    def clan_roles(self, server):
-        """Clan roles."""
-        return [clan.role for clan in self.clans(server)]
-
-    def clan_name_to_role(self, server, clan_name):
-        """Return Discord Role object by clan name."""
-        for clan in self.clans(server):
-            if clan.name == clan_name:
-                return clan.role
-        return None
-
-    def check_cogs(self):
-        """Check required cogs are loaded."""
-        for cog in self.required_cogs:
-            if self.bot.get_cog(cog) is None:
-                return False
-        return True
 
     @commands.group(aliases=["racfas"], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
@@ -357,30 +320,6 @@ class RACFAudit:
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Updated settings.")
 
-    @racfauditset.command(name="leader", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
-    async def racfauditset_leader(self, ctx, role_name):
-        """Leader role name."""
-        await self.update_server_settings(ctx, "leader", role_name)
-
-    @racfauditset.command(name="coleader", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
-    async def racfauditset_coleader(self, ctx, role_name):
-        """Co-Leader role name."""
-        await self.update_server_settings(ctx, "coleader", role_name)
-
-    @racfauditset.command(name="elder", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
-    async def racfauditset_elder(self, ctx, role_name):
-        """Elder role name."""
-        await self.update_server_settings(ctx, "elder", role_name)
-
-    @racfauditset.command(name="member", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions()
-    async def racfauditset_member(self, ctx, role_name):
-        """Member role name."""
-        await self.update_server_settings(ctx, "member", role_name)
-
     @racfauditset.command(name="auth", pass_context=True, no_pm=True)
     @checks.is_owner()
     async def racfauditset_auth(self, ctx, token):
@@ -388,6 +327,7 @@ class RACFAudit:
         self.settings["auth"] = token
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Updated settings.")
+        await self.bot.delete_message(ctx.message)
 
     @racfauditset.command(name="settings", pass_context=True, no_pm=True)
     @checks.is_owner()
@@ -413,6 +353,12 @@ class RACFAudit:
         """Show config."""
         for page in pagify(box(tabulate(self.config['clans'], headers="keys"))):
             await self.bot.say(page)
+
+    def clan_tags(self):
+        tags = []
+        for clan in self.config.get('clans'):
+            tags.append(clan.get('tag'))
+        return tags
 
     def search_args_parser(self):
         """Search arguments parser."""
@@ -448,6 +394,23 @@ class RACFAudit:
 
         return parser
 
+    async def family_member_models(self):
+        """All family member models."""
+        try:
+            api = ClashRoyaleAPI(self.auth)
+            tags = self.clan_tags()
+            clan_models = await api.fetch_clan_list(tags)
+        except ClashRoyaleAPIError as e:
+            pass
+        else:
+            members = []
+            for clan_model in clan_models:
+                for member_model in clan_model.get('memberList'):
+                    member_model['tag'] = clean_tag(member_model.get('tag'))
+                    member_model['clan'] = clan_model
+                    members.append(member_model)
+            return members
+
     @racfaudit.command(name="search", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_search(self, ctx, *args):
@@ -472,47 +435,35 @@ class RACFAudit:
             await self.bot.send_cmd_help(ctx)
             return
 
-        client = crapipy.AsyncClient(token=self.auth)
-        clans = await client.get_clans(self.clan_tags())
-        # print(clans)
-
-        server = ctx.message.server
         results = []
         await self.bot.type()
-        member_models, is_cache = await self.family_member_models(server)
 
-        if is_cache:
-            settings_cache_timestamp = self.settings.get("cache_timestamp")
-            if settings_cache_timestamp is None:
-                await self.bot.say("Cannot reach API and cannot load from cache. Aborting…")
-                return
-            now = dt.datetime.utcnow()
-            cache_time = dateutil.parser.parse(settings_cache_timestamp)
-            await self.bot.say("Cannot load from API. Results are from: {}".format(
-                humanize.naturaltime(now - cache_time)
-            ))
+        try:
+            member_models = await self.family_member_models()
+        except ClashRoyaleAPIError as e:
+            await self.bot.say(e.status_message)
+            return
 
         if pargs.name != '_':
             for member_model in member_models:
                 # simple search
-                if pargs.name.lower() in member_model.name.lower():
+                if pargs.name.lower() in member_model.get('name').lower():
                     results.append(member_model)
                 else:
                     # unidecode search
-                    s = unidecode.unidecode(member_model.name)
+                    s = unidecode.unidecode(member_model.get('name'))
                     s = ''.join(re.findall(r'\w', s))
                     if pargs.name.lower() in s.lower():
                         results.append(member_model)
         else:
             results = member_models
-            print(len(results))
 
         # filter by clan name
         if pargs.clan:
-            results = [m for m in results if pargs.clan.lower() in m.clan_name.lower()]
+            results = [m for m in results if pargs.clan.lower() in m.get('clan_name').lower()]
 
         # filter by trophies
-        results = [m for m in results if pargs.min <= m.trophies <= pargs.max]
+        results = [m for m in results if pargs.min <= m.get('trophies') <= pargs.max]
 
         limit = 10
         if len(results) > limit:
@@ -524,125 +475,136 @@ class RACFAudit:
         if len(results):
             out = []
             for member_model in results:
-                out.append("**{0.name}** #{0.tag}, {0.clan.name}, {0.role}, {0.trophies}".format(member_model))
+                clan = member_model.get('clan')
+                clan_name = None
+                if clan is not None:
+                    clan_name = clan.get('name')
+
+                out.append("**{name}** #{tag}, {clan_name}, {role}, {trophies}".format(
+                    name=member_model.get('name'),
+                    tag=member_model.get('tag'),
+                    clan_name=clan_name,
+                    role=get_role_name(member_model.get('role')),
+                    trophies=member_model.get('trophies')
+                ))
                 if pargs.link:
-                    out.append('http://cr-api.com/profile/{}'.format(member_model.tag))
+                    out.append('http://cr-api.com/player/{}'.format(member_model.get('tag')))
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
         else:
             await self.bot.say("No results found.")
-
-    @racfaudit.command(name="run", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
-    async def racfaudit_run(self, ctx, *, options=''):
-        """Audit the entire RACF family.
-        
-        Options:
-        --removerole   Remove clan role from people who aren’t in clan
-        --addrole      Add clan role to people who are in clan
-        --exec         Run both add and remove role options
-        --debug        Show debug in console 
-        """
-        server = ctx.message.server
-        family_tags = self.crclan.manager.get_bands(server).keys()
-
-        option_exec = '--exec' in options
-        option_debug = '--debug' in options
-
-        await self.bot.type()
-
-        clans = self.clans(server)
-
-        # Show settings
-        await ctx.invoke(self.racfaudit_config)
-
-        # Create list of all discord users with associated tags
-        discord_users = DiscordUsers(crclan_cog=self.crclan, server=server)
-
-        # Member models from API
-        member_models = await self.family_member_models(server)
-
-        # associate Discord user to member
-        for member_model in member_models:
-            member_model.discord_member = discord_users.tag_to_member(member_model.tag)
-
-        if option_debug:
-            for du in discord_users.user_list:
-                print(du.tag, du.user)
-
-        """
-        Member processing.
-        
-        """
-        clan_defaults = {
-            "elder_promotion_req": [],
-            "coleader_promotion_req": [],
-            "no_discord": [],
-            "no_clan_role": []
-        }
-        clans_out = OrderedDict([(c.name, clan_defaults) for c in clans])
-
-        def update_clan(clan_name, field, member_model):
-            clans_out[clan_name][field].append(member_model)
-
-        out = []
-        for i, member_model in enumerate(member_models):
-            if i % 20 == 0:
-                await self.bot.type()
-
-            ma = MemberAudit(member_model, server, clans)
-            clan_name = member_model.clan_name
-            m_out = []
-            if ma.has_discord:
-                if not ma.api_is_elder and ma.discord_role_elder:
-                    update_clan(clan_name, "elder_promotion_req", member_model)
-                    m_out.append(":warning: Has Elder role but not promoted in clan.")
-                if not ma.api_is_coleader and ma.discord_role_coleader:
-                    update_clan(clan_name, "coleader_promotion_req", member_model)
-                    m_out.append(":warning: Has Co-Leader role but not promoted in clan.")
-                clan_role = self.clan_name_to_role(server, member_model.clan_name)
-                if clan_role is not None:
-                    if clan_role not in ma.discord_clan_roles:
-                        update_clan(clan_name, "no_clan_role", member_model)
-                        m_out.append(":warning: Does not have {}".format(clan_role.name))
-            else:
-                update_clan(clan_name, "no_discord", member_model)
-                m_out.append(':x: No Discord')
-
-            if len(m_out):
-                out.append(
-                    "**{ign}** {clan}\n{status}".format(
-                        ign=member_model.name,
-                        clan=member_model.clan_name,
-                        status='\n'.join(m_out)
-                    )
-                )
-
-        # line based output
-        for page in pagify('\n'.join(out)):
-            await self.bot.type()
-            await self.bot.say(page)
-
-        # clan based output
-        out = []
-        print(clans_out)
-        for clan_name, clan_dict in clans_out.items():
-            out.append("**{}**".format(clan_name))
-            if len(clan_dict["elder_promotion_req"]):
-                out.append("Elders that need to be promoted:")
-                out.append(", ".join([m.name for m in clan_dict["elder_promotion_req"]]))
-            if len(clan_dict["no_discord"]):
-                out.append("No Discord:")
-                out.append(", ".join([m.name for m in clan_dict["no_discord"]]))
-            if len(clan_dict["no_clan_role"]):
-                out.append("No clan role on Discord:")
-                out.append(", ".join([m.name for m in clan_dict["no_clan_role"]]))
-
-        for page in pagify('\n'.join(out), shorten_by=24):
-            await self.bot.type()
-            if len(page):
-                await self.bot.say(page)
-
+    #
+    # @racfaudit.command(name="run", pass_context=True, no_pm=True)
+    # @checks.mod_or_permissions(manage_roles=True)
+    # async def racfaudit_run(self, ctx, *, options=''):
+    #     """Audit the entire RACF family.
+    #
+    #     Options:
+    #     --removerole   Remove clan role from people who aren’t in clan
+    #     --addrole      Add clan role to people who are in clan
+    #     --exec         Run both add and remove role options
+    #     --debug        Show debug in console
+    #     """
+    #     server = ctx.message.server
+    #     family_tags = self.crclan.manager.get_bands(server).keys()
+    #
+    #     option_exec = '--exec' in options
+    #     option_debug = '--debug' in options
+    #
+    #     await self.bot.type()
+    #
+    #     clans = self.clans(server)
+    #
+    #     # Show settings
+    #     await ctx.invoke(self.racfaudit_config)
+    #
+    #     # Create list of all discord users with associated tags
+    #     discord_users = DiscordUsers(crclan_cog=self.crclan, server=server)
+    #
+    #     # Member models from API
+    #     member_models = await self.family_member_models(server)
+    #
+    #     # associate Discord user to member
+    #     for member_model in member_models:
+    #         member_model.discord_member = discord_users.tag_to_member(member_model.tag)
+    #
+    #     if option_debug:
+    #         for du in discord_users.user_list:
+    #             print(du.tag, du.user)
+    #
+    #     """
+    #     Member processing.
+    #
+    #     """
+    #     clan_defaults = {
+    #         "elder_promotion_req": [],
+    #         "coleader_promotion_req": [],
+    #         "no_discord": [],
+    #         "no_clan_role": []
+    #     }
+    #     clans_out = OrderedDict([(c.name, clan_defaults) for c in clans])
+    #
+    #     def update_clan(clan_name, field, member_model):
+    #         clans_out[clan_name][field].append(member_model)
+    #
+    #     out = []
+    #     for i, member_model in enumerate(member_models):
+    #         if i % 20 == 0:
+    #             await self.bot.type()
+    #
+    #         ma = MemberAudit(member_model, server, clans)
+    #         clan_name = member_model.clan_name
+    #         m_out = []
+    #         if ma.has_discord:
+    #             if not ma.api_is_elder and ma.discord_role_elder:
+    #                 update_clan(clan_name, "elder_promotion_req", member_model)
+    #                 m_out.append(":warning: Has Elder role but not promoted in clan.")
+    #             if not ma.api_is_coleader and ma.discord_role_coleader:
+    #                 update_clan(clan_name, "coleader_promotion_req", member_model)
+    #                 m_out.append(":warning: Has Co-Leader role but not promoted in clan.")
+    #             clan_role = self.clan_name_to_role(server, member_model.clan_name)
+    #             if clan_role is not None:
+    #                 if clan_role not in ma.discord_clan_roles:
+    #                     update_clan(clan_name, "no_clan_role", member_model)
+    #                     m_out.append(":warning: Does not have {}".format(clan_role.name))
+    #         else:
+    #             update_clan(clan_name, "no_discord", member_model)
+    #             m_out.append(':x: No Discord')
+    #
+    #         if len(m_out):
+    #             out.append(
+    #                 "**{ign}** {clan}\n{status}".format(
+    #                     ign=member_model.name,
+    #                     clan=member_model.clan_name,
+    #                     status='\n'.join(m_out)
+    #                 )
+    #             )
+    #
+    #     # line based output
+    #     for page in pagify('\n'.join(out)):
+    #         await self.bot.type()
+    #         await self.bot.say(page)
+    #
+    #     # clan based output
+    #     out = []
+    #     print(clans_out)
+    #     for clan_name, clan_dict in clans_out.items():
+    #         out.append("**{}**".format(clan_name))
+    #         if len(clan_dict["elder_promotion_req"]):
+    #             out.append("Elders that need to be promoted:")
+    #             out.append(", ".join([m.name for m in clan_dict["elder_promotion_req"]]))
+    #         if len(clan_dict["no_discord"]):
+    #             out.append("No Discord:")
+    #             out.append(", ".join([m.name for m in clan_dict["no_discord"]]))
+    #         if len(clan_dict["no_clan_role"]):
+    #             out.append("No clan role on Discord:")
+    #             out.append(", ".join([m.name for m in clan_dict["no_clan_role"]]))
+    #
+    #     for page in pagify('\n'.join(out), shorten_by=24):
+    #         await self.bot.type()
+    #         if len(page):
+    #             await self.bot.say(page)
+    #
 
 def check_folder():
     """Check folder."""
