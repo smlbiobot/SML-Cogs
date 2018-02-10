@@ -37,7 +37,6 @@ from random import choice
 
 import aiohttp
 import discord
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.chat_formatting import inline, pagify, box
 from cogs.utils.dataIO import dataIO
@@ -1003,7 +1002,7 @@ class CRClan:
         Requires: Clash Royale API access by Selfish.
         """
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @crclanset.command(name="init", pass_context=True)
     async def crclanset_init(self, ctx):
@@ -1083,7 +1082,7 @@ class CRClan:
 
         """
         if not clantags:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         server = ctx.message.server
@@ -1183,7 +1182,7 @@ class CRClan:
     async def crclan(self, ctx):
         """Clash Royale clan."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @crclan.command(name="about", pass_context=True, no_pm=True)
     async def crclan_about(self, ctx):
@@ -1359,7 +1358,7 @@ class CRClan:
             p_args = parser.parse_args(args)
         except SystemExit:
             # await self.bot.send_message(ctx.message.channel, box(parser.format_help()))
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         # key = p_args.key
