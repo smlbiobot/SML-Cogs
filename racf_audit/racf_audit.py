@@ -48,6 +48,7 @@ import asyncio
 
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
+PLAYERS = os.path.join("data", "racf_audit", "players.json")
 
 
 def nested_dict():
@@ -303,6 +304,12 @@ class RACFAudit:
         self.bot = bot
         self.settings = dataIO.load_json(JSON)
 
+        players_path = os.path.join(PATH, "players.json")
+        if not os.path.exists(players_path):
+            players_path = os.path.join(PATH, "players_bak.json")
+        self.players = dataIO.load_json(players_path)
+        dataIO.save_json(PLAYERS, self.players)
+
         with open('data/racf_audit/family_config.yaml') as f:
             self.config = yaml.load(f)
 
@@ -493,118 +500,119 @@ class RACFAudit:
                 await self.bot.say(page)
         else:
             await self.bot.say("No results found.")
-    #
-    # @racfaudit.command(name="run", pass_context=True, no_pm=True)
-    # @checks.mod_or_permissions(manage_roles=True)
-    # async def racfaudit_run(self, ctx, *, options=''):
-    #     """Audit the entire RACF family.
-    #
-    #     Options:
-    #     --removerole   Remove clan role from people who aren’t in clan
-    #     --addrole      Add clan role to people who are in clan
-    #     --exec         Run both add and remove role options
-    #     --debug        Show debug in console
-    #     """
-    #     server = ctx.message.server
-    #     family_tags = self.crclan.manager.get_bands(server).keys()
-    #
-    #     option_exec = '--exec' in options
-    #     option_debug = '--debug' in options
-    #
-    #     await self.bot.type()
-    #
-    #     clans = self.clans(server)
-    #
-    #     # Show settings
-    #     await ctx.invoke(self.racfaudit_config)
-    #
-    #     # Create list of all discord users with associated tags
-    #     discord_users = DiscordUsers(crclan_cog=self.crclan, server=server)
-    #
-    #     # Member models from API
-    #     member_models = await self.family_member_models(server)
-    #
-    #     # associate Discord user to member
-    #     for member_model in member_models:
-    #         member_model.discord_member = discord_users.tag_to_member(member_model.tag)
-    #
-    #     if option_debug:
-    #         for du in discord_users.user_list:
-    #             print(du.tag, du.user)
-    #
-    #     """
-    #     Member processing.
-    #
-    #     """
-    #     clan_defaults = {
-    #         "elder_promotion_req": [],
-    #         "coleader_promotion_req": [],
-    #         "no_discord": [],
-    #         "no_clan_role": []
-    #     }
-    #     clans_out = OrderedDict([(c.name, clan_defaults) for c in clans])
-    #
-    #     def update_clan(clan_name, field, member_model):
-    #         clans_out[clan_name][field].append(member_model)
-    #
-    #     out = []
-    #     for i, member_model in enumerate(member_models):
-    #         if i % 20 == 0:
-    #             await self.bot.type()
-    #
-    #         ma = MemberAudit(member_model, server, clans)
-    #         clan_name = member_model.clan_name
-    #         m_out = []
-    #         if ma.has_discord:
-    #             if not ma.api_is_elder and ma.discord_role_elder:
-    #                 update_clan(clan_name, "elder_promotion_req", member_model)
-    #                 m_out.append(":warning: Has Elder role but not promoted in clan.")
-    #             if not ma.api_is_coleader and ma.discord_role_coleader:
-    #                 update_clan(clan_name, "coleader_promotion_req", member_model)
-    #                 m_out.append(":warning: Has Co-Leader role but not promoted in clan.")
-    #             clan_role = self.clan_name_to_role(server, member_model.clan_name)
-    #             if clan_role is not None:
-    #                 if clan_role not in ma.discord_clan_roles:
-    #                     update_clan(clan_name, "no_clan_role", member_model)
-    #                     m_out.append(":warning: Does not have {}".format(clan_role.name))
-    #         else:
-    #             update_clan(clan_name, "no_discord", member_model)
-    #             m_out.append(':x: No Discord')
-    #
-    #         if len(m_out):
-    #             out.append(
-    #                 "**{ign}** {clan}\n{status}".format(
-    #                     ign=member_model.name,
-    #                     clan=member_model.clan_name,
-    #                     status='\n'.join(m_out)
-    #                 )
-    #             )
-    #
-    #     # line based output
-    #     for page in pagify('\n'.join(out)):
-    #         await self.bot.type()
-    #         await self.bot.say(page)
-    #
-    #     # clan based output
-    #     out = []
-    #     print(clans_out)
-    #     for clan_name, clan_dict in clans_out.items():
-    #         out.append("**{}**".format(clan_name))
-    #         if len(clan_dict["elder_promotion_req"]):
-    #             out.append("Elders that need to be promoted:")
-    #             out.append(", ".join([m.name for m in clan_dict["elder_promotion_req"]]))
-    #         if len(clan_dict["no_discord"]):
-    #             out.append("No Discord:")
-    #             out.append(", ".join([m.name for m in clan_dict["no_discord"]]))
-    #         if len(clan_dict["no_clan_role"]):
-    #             out.append("No clan role on Discord:")
-    #             out.append(", ".join([m.name for m in clan_dict["no_clan_role"]]))
-    #
-    #     for page in pagify('\n'.join(out), shorten_by=24):
-    #         await self.bot.type()
-    #         if len(page):
-    #             await self.bot.say(page)
-    #
+
+    @racfaudit.command(name="run", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def racfaudit_run(self, ctx, *, options=''):
+        """Audit the entire RACF family.
+
+        Options:
+        --removerole   Remove clan role from people who aren’t in clan
+        --addrole      Add clan role to people who are in clan
+        --exec         Run both add and remove role options
+        --debug        Show debug in console
+        """
+        option_debug = '--debug' in options
+        option_addrole = '--addrole' in options
+        option_removerole = '--removerole' in options
+        option_exec = '--exec' in options
+
+        results = []
+        await self.bot.type()
+
+        try:
+            member_models = await self.family_member_models()
+        except ClashRoyaleAPIError as e:
+            await self.bot.say(e.status_message)
+            return
+
+        # Show settings
+        await ctx.invoke(self.racfaudit_config)
+
+        # Create list of all discord users with associated tags
+        discord_users = DiscordUsers(crclan_cog=self.bot.get_cog('CRClan'), server=ctx.message.server)
+
+        # associate Discord user to member
+        for member_model in member_models:
+            member_model['discord_member'] = discord_users.tag_to_member(member_model.get('tag'))
+
+        if option_debug:
+            for du in discord_users.user_list:
+                print(du.tag, du.user)
+
+        """
+        Member processing.
+
+        """
+        # clan_defaults = {
+        #     "elder_promotion_req": [],
+        #     "coleader_promotion_req": [],
+        #     "no_discord": [],
+        #     "no_clan_role": []
+        # }
+        # clans_out = OrderedDict([(c.name, clan_defaults) for c in clans])
+        #
+        # def update_clan(clan_name, field, member_model):
+        #     clans_out[clan_name][field].append(member_model)
+        #
+        # out = []
+        # for i, member_model in enumerate(member_models):
+        #     if i % 20 == 0:
+        #         await self.bot.type()
+        #
+        #     ma = MemberAudit(member_model, server, clans)
+        #     clan_name = member_model.clan_name
+        #     m_out = []
+        #     if ma.has_discord:
+        #         if not ma.api_is_elder and ma.discord_role_elder:
+        #             update_clan(clan_name, "elder_promotion_req", member_model)
+        #             m_out.append(":warning: Has Elder role but not promoted in clan.")
+        #         if not ma.api_is_coleader and ma.discord_role_coleader:
+        #             update_clan(clan_name, "coleader_promotion_req", member_model)
+        #             m_out.append(":warning: Has Co-Leader role but not promoted in clan.")
+        #         clan_role = self.clan_name_to_role(server, member_model.clan_name)
+        #         if clan_role is not None:
+        #             if clan_role not in ma.discord_clan_roles:
+        #                 update_clan(clan_name, "no_clan_role", member_model)
+        #                 m_out.append(":warning: Does not have {}".format(clan_role.name))
+        #     else:
+        #         update_clan(clan_name, "no_discord", member_model)
+        #         m_out.append(':x: No Discord')
+        #
+        #     if len(m_out):
+        #         out.append(
+        #             "**{ign}** {clan}\n{status}".format(
+        #                 ign=member_model.name,
+        #                 clan=member_model.clan_name,
+        #                 status='\n'.join(m_out)
+        #             )
+        #         )
+        #
+        # # line based output
+        # for page in pagify('\n'.join(out)):
+        #     await self.bot.type()
+        #     await self.bot.say(page)
+        #
+        # # clan based output
+        # out = []
+        # print(clans_out)
+        # for clan_name, clan_dict in clans_out.items():
+        #     out.append("**{}**".format(clan_name))
+        #     if len(clan_dict["elder_promotion_req"]):
+        #         out.append("Elders that need to be promoted:")
+        #         out.append(", ".join([m.name for m in clan_dict["elder_promotion_req"]]))
+        #     if len(clan_dict["no_discord"]):
+        #         out.append("No Discord:")
+        #         out.append(", ".join([m.name for m in clan_dict["no_discord"]]))
+        #     if len(clan_dict["no_clan_role"]):
+        #         out.append("No clan role on Discord:")
+        #         out.append(", ".join([m.name for m in clan_dict["no_clan_role"]]))
+        #
+        # for page in pagify('\n'.join(out), shorten_by=24):
+        #     await self.bot.type()
+        #     if len(page):
+        #         await self.bot.say(page)
+
 
 def check_folder():
     """Check folder."""
