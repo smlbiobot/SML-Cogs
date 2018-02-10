@@ -25,26 +25,21 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import argparse
+import asyncio
+import json
 import os
 import re
-from collections import defaultdict, OrderedDict
+from collections import defaultdict
 
+import aiohttp
 import discord
 import unidecode
 import yaml
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify, box, bold
+from cogs.utils.chat_formatting import pagify, box
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from tabulate import tabulate
-import crapipy
-import dateutil.parser
-import pprint
-import humanize
-import datetime as dt
-import aiohttp
-import json
-import asyncio
 
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
@@ -66,8 +61,10 @@ def member_has_role(server, member, role_name):
     role = discord.utils.get(server.roles, name=role_name)
     return role in member.roles
 
+
 class RACFAuditException(Exception):
     pass
+
 
 class CachedClanModels(RACFAuditException):
     pass
@@ -149,6 +146,7 @@ class DiscordUsers:
                 return u.user
         return None
 
+
 def clean_tag(tag):
     """clean up tag."""
     if tag is None:
@@ -159,6 +157,7 @@ def clean_tag(tag):
     t = t.strip()
     t = t.upper()
     return t
+
 
 def get_role_name(role):
     if role is None:
@@ -202,6 +201,7 @@ class ClashRoyaleAPIError(Exception):
             out.append(self._message)
         return '. '.join(out)
 
+
 class ClashRoyaleAPI:
     def __init__(self, token):
         self.token = token
@@ -241,7 +241,6 @@ class ClashRoyaleAPI:
         finally:
             if error_msg is not None:
                 raise ClashRoyaleAPIError(message=error_msg)
-
 
     async def fetch_multi(self, urls):
         """Perform parallel fetch"""
@@ -286,10 +285,6 @@ class ClashRoyaleAPI:
         return results
 
 
-
-
-
-
 class RACFAudit:
     """RACF Audit.
     
@@ -307,11 +302,17 @@ class RACFAudit:
         players_path = os.path.join(PATH, "players.json")
         if not os.path.exists(players_path):
             players_path = os.path.join(PATH, "players_bak.json")
-        self.players = dataIO.load_json(players_path)
-        dataIO.save_json(PLAYERS, self.players)
+        players = dataIO.load_json(players_path)
+        dataIO.save_json(PLAYERS, players)
 
         with open('data/racf_audit/family_config.yaml') as f:
             self.config = yaml.load(f)
+
+    @property
+    def players(self):
+        """Player dictionary, userid -> tag"""
+        players = dataIO.load_json(PLAYERS)
+        return players
 
     @commands.group(aliases=["racfas"], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
@@ -327,6 +328,13 @@ class RACFAudit:
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Updated settings.")
 
+    async def set_player_tag(self, tag, member: discord.Member):
+        """Allow external programs to set player tags. (RACF)"""
+        await asyncio.sleep(0)
+        players = self.players
+        players[member.id] = tag
+        dataIO.save_json(PLAYERS, players)
+
     @racfauditset.command(name="auth", pass_context=True, no_pm=True)
     @checks.is_owner()
     async def racfauditset_auth(self, ctx, token):
@@ -341,7 +349,6 @@ class RACFAudit:
     async def racfauditset_settings(self, ctx):
         """Set API Authentication token."""
         await self.bot.say(box(self.settings))
-
 
     @property
     def auth(self):
@@ -525,20 +532,23 @@ class RACFAudit:
         except ClashRoyaleAPIError as e:
             await self.bot.say(e.status_message)
             return
+        else:
 
-        # Show settings
-        await ctx.invoke(self.racfaudit_config)
+            print(member_models)
+            # Show settings
+            await ctx.invoke(self.racfaudit_config)
 
-        # Create list of all discord users with associated tags
-        discord_users = DiscordUsers(crclan_cog=self.bot.get_cog('CRClan'), server=ctx.message.server)
+            server = ctx.message.server
 
-        # associate Discord user to member
-        for member_model in member_models:
-            member_model['discord_member'] = discord_users.tag_to_member(member_model.get('tag'))
+            # associate Discord user to member
+            tag2member_id = {v: k for k, v in self.players.items()}
+            for member_model in member_models:
+                discord_id = tag2member_id.get(member_model.get('tag'))
+                member_model['discord_member'] = server.get_member(discord_id)
 
-        if option_debug:
-            for du in discord_users.user_list:
-                print(du.tag, du.user)
+            if option_debug:
+                for member_model in member_models:
+                    print(member_model.get('tag'), member_model.get('discord_member'))
 
         """
         Member processing.

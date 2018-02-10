@@ -28,17 +28,15 @@ import itertools
 import json
 import os
 from random import choice
-from cogs.utils.dataIO import dataIO
 
 import aiohttp
 import cogs
-import crapipy
 import discord
 import yaml
-from __main__ import send_cmd_help
 from box import Box
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
+from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import Context
 
@@ -231,7 +229,6 @@ class RACF:
         with open(os.path.join("data", "racf", "config.yaml")) as f:
             self.config = Box(yaml.load(f))
         self.settings = dataIO.load_json(JSON)
-
 
     @property
     def auth(self):
@@ -1062,11 +1059,14 @@ class RACF:
         """
         crclan = self.bot.get_cog("CRClan")
         crprofile = self.bot.get_cog("CRProfile")
+        racfaudit = self.bot.get_cog("RACFAudit")
 
         if crclan is not None:
             await ctx.invoke(crclan.crclan_settag, tag, member)
         if crprofile is not None:
             await ctx.invoke(crprofile.crprofile_settag, tag, member)
+        if racfaudit is not None:
+            await racfaudit.set_player_tag(tag, member)
 
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     @commands.command(pass_context=True, no_pm=True)
@@ -1148,7 +1148,6 @@ def check_file():
     """Check files."""
     if not dataIO.is_valid_json(JSON):
         dataIO.save_json(JSON, {})
-
 
 
 def setup(bot):
