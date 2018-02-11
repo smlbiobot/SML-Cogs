@@ -446,6 +446,14 @@ class RACFAudit:
                 members.append(member_model)
         return members
 
+    @racfaudit.command(name="tag", pass_context=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def racfaudit_tag(self, ctx, member:discord.Member):
+        """Find member tag in DB."""
+        for tag, m in self.players.items():
+            if m["user_id"] == member.id:
+                await self.bot.say("RACF Audit database: `{}` is associated to `#{}`".format(member, tag))
+
     @racfaudit.command(name="search", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_search(self, ctx, *args):
