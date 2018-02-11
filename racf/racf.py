@@ -341,7 +341,7 @@ class RACF:
         tag = sctag.tag
 
         # - Set their tags
-        await ctx.invoke(self.crsettag, tag, member)
+        await ctx.invoke(self.crsettagmod, tag, member)
 
         # - Lookup profile
         try:
