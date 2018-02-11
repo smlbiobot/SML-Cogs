@@ -336,7 +336,7 @@ class RACFAudit:
         if tag in players.keys():
             if not force:
                 return False
-        players[member.id] = {
+        players[tag] = {
             "tag": clean_tag(tag),
             "user_id": member.id,
             "user_name": member.display_name
