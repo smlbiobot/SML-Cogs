@@ -542,17 +542,56 @@ class RACFAudit:
         else:
             await self.bot.say("No results found.")
 
+    def run_args_parser(self):
+        """Search arguments parser."""
+        # Process arguments
+        parser = argparse.ArgumentParser(prog='[p]racfaudit run')
+
+        parser.add_argument(
+            '-x', '--exec',
+            action='store_true',
+            default=False,
+            help='Execute add/remove roles')
+        parser.add_argument(
+            '-d', '--debug',
+            action='store_true',
+            default=False,
+            help='Debug')
+        parser.add_argument(
+            '-c', '--clan',
+            nargs='+',
+            help='Clan(s) to show')
+        parser.add_argument(
+            '-s', '--settings',
+            action='store_true',
+            default=False,
+            help='Settings')
+
+        return parser
+
     @racfaudit.command(name="run", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
-    async def racfaudit_run(self, ctx, *, options=''):
+    async def racfaudit_run(self, ctx, *args):
         """Audit the entire RACF family.
 
-        Options:
-        --exec         Run both add and remove role options
-        --debug        Show debug in console
+        [p]racfaudit run [-h] [-x] [-d] [-c CLAN [CLAN ...]]
+
+        optional arguments:
+          -h, --help            show this help message and exit
+          -x, --exec            Execute add/remove roles
+          -d, --debug           Debug
+          -c CLAN [CLAN ...], --clan CLAN [CLAN ...]
+                                Clan(s) to show
         """
-        option_debug = '--debug' in options
-        option_exec = '--exec' in options
+        parser = self.run_args_parser()
+        try:
+            pargs = parser.parse_args(args)
+        except SystemExit:
+            await self.bot.send_cmd_help(ctx)
+            return
+
+        option_debug = pargs.debug
+        option_exec = pargs.exec
 
         await self.bot.type()
 
@@ -562,8 +601,10 @@ class RACFAudit:
             await self.bot.say(e.status_message)
             return
         else:
+            await self.bot.say("**RACF Family Audit**")
             # Show settings
-            await ctx.invoke(self.racfaudit_config)
+            if pargs.settings:
+                await ctx.invoke(self.racfaudit_config)
 
             server = ctx.message.server
 
@@ -668,6 +709,19 @@ class RACFAudit:
             for clan in self.config['clans']:
                 await self.bot.type()
                 await asyncio.sleep(0)
+
+                display_output = False
+
+                if pargs.clan:
+                    for c in pargs.clan:
+                        if c.lower() in clan['name'].lower():
+                            display_output = True
+                else:
+                    display_output = True
+
+                if not display_output:
+                    continue
+
                 if clan['type'] == 'Member':
                     out.append("-" * 40)
                     out.append(inline(clan.get('name')))
