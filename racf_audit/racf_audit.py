@@ -43,7 +43,7 @@ from tabulate import tabulate
 
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
-PLAYERS = os.path.join("data", "racf_audit", "players.json")
+PLAYERS = os.path.join("data", "racf_audit", "player_db.json")
 
 
 def nested_dict():
@@ -300,9 +300,9 @@ class RACFAudit:
         self.settings = dataIO.load_json(JSON)
         self._clan_roles = None
 
-        players_path = os.path.join(PATH, "players.json")
+        players_path = os.path.join(PATH, PLAYERS)
         if not os.path.exists(players_path):
-            players_path = os.path.join(PATH, "players_bak.json")
+            players_path = os.path.join(PATH, "player_db_bak.json")
         players = dataIO.load_json(players_path)
         dataIO.save_json(PLAYERS, players)
 
@@ -329,14 +329,26 @@ class RACFAudit:
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Updated settings.")
 
-    async def set_player_tag(self, tag, member: discord.Member):
+    async def set_player_tag(self, tag, member: discord.Member, force=False):
         """Allow external programs to set player tags. (RACF)"""
         await asyncio.sleep(0)
         players = self.players
-        players[member.id] = tag
+        if tag in players.keys():
+            if not force:
+                return False
+        players[member.id] = {
+            "tag": clean_tag(tag),
+            "user_id": member.id,
+            "user_name": member.display_name
+        }
         dataIO.save_json(PLAYERS, players)
+        return True
 
-    @racfauditset.command(name="auth", pass_context=True, no_pm=True)
+    async def get_player_tag(self, tag):
+        await asyncio.sleep(0)
+        return self.players.get(tag)
+
+    @racfauditset.command(name="auth", pass_context=True)
     @checks.is_owner()
     async def racfauditset_auth(self, ctx, token):
         """Set API Authentication token."""
@@ -345,7 +357,7 @@ class RACFAudit:
         await self.bot.say("Updated settings.")
         await self.bot.delete_message(ctx.message)
 
-    @racfauditset.command(name="settings", pass_context=True, no_pm=True)
+    @racfauditset.command(name="settings", pass_context=True)
     @checks.is_owner()
     async def racfauditset_settings(self, ctx):
         """Set API Authentication token."""
@@ -423,20 +435,16 @@ class RACFAudit:
 
     async def family_member_models(self):
         """All family member models."""
-        try:
-            api = ClashRoyaleAPI(self.auth)
-            tags = self.clan_tags()
-            clan_models = await api.fetch_clan_list(tags)
-        except ClashRoyaleAPIError as e:
-            pass
-        else:
-            members = []
-            for clan_model in clan_models:
-                for member_model in clan_model.get('memberList'):
-                    member_model['tag'] = clean_tag(member_model.get('tag'))
-                    member_model['clan'] = clan_model
-                    members.append(member_model)
-            return members
+        api = ClashRoyaleAPI(self.auth)
+        tags = self.clan_tags()
+        clan_models = await api.fetch_clan_list(tags)
+        members = []
+        for clan_model in clan_models:
+            for member_model in clan_model.get('memberList'):
+                member_model['tag'] = clean_tag(member_model.get('tag'))
+                member_model['clan'] = clan_model
+                members.append(member_model)
+        return members
 
     @racfaudit.command(name="search", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
@@ -527,17 +535,12 @@ class RACFAudit:
         """Audit the entire RACF family.
 
         Options:
-        --removerole   Remove clan role from people who aren’t in clan
-        --addrole      Add clan role to people who are in clan
         --exec         Run both add and remove role options
         --debug        Show debug in console
         """
         option_debug = '--debug' in options
-        option_addrole = '--addrole' in options
-        option_removerole = '--removerole' in options
         option_exec = '--exec' in options
 
-        results = []
         await self.bot.type()
 
         try:
@@ -552,10 +555,14 @@ class RACFAudit:
             server = ctx.message.server
 
             # associate Discord user to member
-            tag2member_id = {v: k for k, v in self.players.items()}
             for member_model in member_models:
-                discord_id = tag2member_id.get(member_model.get('tag'))
-                member_model['discord_member'] = server.get_member(discord_id)
+                tag = clean_tag(member_model.get('tag'))
+                try:
+                    discord_id = self.players[tag]["user_id"]
+                except KeyError:
+                    pass
+                else:
+                    member_model['discord_member'] = server.get_member(discord_id)
 
             if option_debug:
                 for member_model in member_models:
@@ -572,8 +579,11 @@ class RACFAudit:
                 "no_discord": [],
                 "no_clan_role": [],
                 "no_member_role": [],
+                "not_in_our_clans": [],
             }
 
+            # find member_models mismatch
+            discord_members = []
             for member_model in member_models:
                 has_discord = member_model.get('discord_member')
                 if has_discord is None:
@@ -581,6 +591,7 @@ class RACFAudit:
 
                 if has_discord:
                     discord_member = member_model.get('discord_member')
+                    discord_members.append(discord_member)
                     # promotions
                     is_elder = False
                     is_coleader = False
@@ -616,6 +627,13 @@ class RACFAudit:
                     if 'Member' not in discord_role_names:
                         audit_results["no_member_role"].append(discord_member)
 
+            # find discord member with roles
+            for user in server.members:
+                user_roles = [r.name for r in user.roles]
+                if 'Member' in user_roles:
+                    if user not in discord_members:
+                        audit_results['not_in_our_clans'].append(user)
+
             # show results
             def list_member(member_model):
                 """member row"""
@@ -635,6 +653,8 @@ class RACFAudit:
 
             out = []
             for clan in self.config['clans']:
+                await self.bot.type()
+                await asyncio.sleep(0)
                 if clan['type'] == 'Member':
                     out.append("-" * 40)
                     out.append(inline(clan.get('name')))
@@ -671,6 +691,12 @@ class RACFAudit:
                         except KeyError:
                             pass
 
+            # not in our clans
+            out.append("-" * 40)
+            out.append(underline("Discord users not in our clans but with member roles"))
+            for result in audit_results['not_in_our_clans']:
+                out.append('`{}` {}'.format(result, result.id))
+
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
 
@@ -685,6 +711,7 @@ class RACFAudit:
                         for rname in other_clan_role_names:
                             role = discord.utils.get(discord_member.roles, name=rname)
                             if role is not None:
+                                await asyncio.sleep(0)
                                 await self.bot.remove_roles(discord_member, role)
                                 await self.bot.say("Remove {} from {}".format(role, discord_member))
 
@@ -699,11 +726,36 @@ class RACFAudit:
                 visitor_role = discord.utils.get(server.roles, name='Visitor')
                 for discord_member in audit_results["no_member_role"]:
                     try:
+                        await asyncio.sleep(0)
                         await self.bot.add_roles(discord_member, member_role)
                         await self.bot.say("Add {} to {}".format(member_role, discord_member))
                         await self.bot.remove_roles(discord_member, visitor_role)
                     except KeyError:
                         pass
+
+                # remove member roles from people who are not in our clans
+                for result in audit_results['not_in_our_clans']:
+                    result_role_names = [r.name for r in result.roles]
+                    # ignore people with special
+                    if 'Special' in result_role_names:
+                        continue
+                    if 'Keep-Member' in result_role_names:
+                        continue
+                    if 'Leader-Emeritus' in result_role_names:
+                        continue
+
+                    to_remove_role_names = []
+                    for role_name in ['Member', 'Tourney', 'Practice']:
+                        if role_name in result_role_names:
+                            to_remove_role_names.append(role_name)
+                    to_remove_roles = [discord.utils.get(server.roles, name=rname) for rname in to_remove_role_names]
+                    await asyncio.sleep(0)
+                    await self.bot.remove_roles(result, *to_remove_roles)
+                    await self.bot.say("Removed {} from {}".format(
+                        ", ".join(to_remove_role_names), result)
+                    )
+                    await self.bot.add_roles(result, visitor_role)
+                    await self.bot.say("Added Visitor to {}".format(result))
 
             await self.bot.say("Audit finished.")
 

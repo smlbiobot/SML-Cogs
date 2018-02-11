@@ -1048,7 +1048,7 @@ class RACF:
         await self.bot.send_message(channel, msg)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def crsettag(self, ctx, tag, member: discord.Member = None):
+    async def crsettag(self, ctx, tag):
         """Set CR tags for members.
 
         This is the equivalent of running:
@@ -1057,6 +1057,10 @@ class RACF:
 
         If those cogs are not loaded, it will just ignore it.
         """
+        member = ctx.message.author
+
+        server = ctx.message.server
+
         crclan = self.bot.get_cog("CRClan")
         crprofile = self.bot.get_cog("CRProfile")
         racfaudit = self.bot.get_cog("RACFAudit")
@@ -1066,7 +1070,51 @@ class RACF:
         if crprofile is not None:
             await ctx.invoke(crprofile.crprofile_settag, tag, member)
         if racfaudit is not None:
-            await racfaudit.set_player_tag(tag, member)
+            success = await racfaudit.set_player_tag(tag, member)
+            if success:
+                await self.bot.say("RACF Audit: associated player tag with member.")
+            if not success:
+                player = await racfaudit.get_player_tag(tag)
+                await self.bot.say(
+                    "RACF Audit: Tag {} already associated with member {}. Ask a mod to run `!crsettagmod` to overwrite.".format(
+                        player.get('tag'),
+                        server.get_member(player.get('user_id'))
+                    ))
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True, no_pm=True)
+    async def crsettagmod(self, ctx, tag, member:discord.Member=None, force=False):
+        """Set CR tags for members.
+
+        If the bot complains that that player tag is associated with another user
+        You can overwrite by running
+        !crsettagmod [tag] [member] 1
+        """
+        server = ctx.message.server
+
+        if member is None:
+            await self.bot.say("You must specify a member.")
+            return
+
+        crclan = self.bot.get_cog("CRClan")
+        crprofile = self.bot.get_cog("CRProfile")
+        racfaudit = self.bot.get_cog("RACFAudit")
+
+        if crclan is not None:
+            await ctx.invoke(crclan.crclan_settag, tag, member)
+        if crprofile is not None:
+            await ctx.invoke(crprofile.crprofile_settag, tag, member)
+        if racfaudit is not None:
+            success = await racfaudit.set_player_tag(tag, member, force=force)
+            if success:
+                await self.bot.say("RACF Audit: associated player tag with member.")
+            if not success:
+                player = await racfaudit.get_player_tag(tag)
+                await self.bot.say(
+                    "RACF Audit: Tag {} already associated with member {}. Will need admin overwrite.".format(
+                        player.get('tag'),
+                        server.get_member(player.get('user_id'))
+                    ))
 
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     @commands.command(pass_context=True, no_pm=True)
