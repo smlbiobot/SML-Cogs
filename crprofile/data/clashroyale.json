@@ -513,6 +513,16 @@
             "sfid": "lumberjack",
             "tid": "TID_SPELL_INFO_RAGE_BARBARIAN"
         },
+        "magic-archer": {
+            "aka": [
+                "ma"
+            ],
+            "api_id": "Magic Archer",
+            "cpid": "Magic Archer",
+            "elixir": 4,
+            "rarity": "legendary",
+            "sfid": "magic_archer"
+        },
         "mega-knight": {
             "aka": [
                 "mk",
