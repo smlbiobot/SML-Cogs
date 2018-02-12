@@ -1048,7 +1048,7 @@ class RACF:
         await self.bot.send_message(channel, msg)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def crsettag(self, ctx, tag):
+    async def crsettag(self, ctx, tag, member:discord.Member=None):
         """Set CR tags for members.
 
         This is the equivalent of running:
@@ -1057,13 +1057,24 @@ class RACF:
 
         If those cogs are not loaded, it will just ignore it.
         """
-        member = ctx.message.author
-
+        author = ctx.message.author
         server = ctx.message.server
 
         crclan = self.bot.get_cog("CRClan")
         crprofile = self.bot.get_cog("CRProfile")
         racfaudit = self.bot.get_cog("RACFAudit")
+
+        allowed = False
+        if member is None:
+            allowed = True
+        elif member.id == author.id:
+            allowed = True
+        elif author.server_permissions.manage_roles:
+            allowed = True
+
+        if not allowed:
+            await self.bot.say("Only people with manage-roles permissions can set tags for others.")
+            return
 
         if crclan is not None:
             await ctx.invoke(crclan.crclan_settag, tag, member)
