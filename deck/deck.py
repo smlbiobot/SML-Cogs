@@ -219,7 +219,7 @@ class Deck:
     async def card_decklink_to_key(self, decklink):
         """Decklink id to card."""
         for card in self.cards:
-            if decklink == str(card["decklink"]):
+            if decklink == str(card["id"]):
                 return card["key"]
         return None
 
@@ -227,7 +227,7 @@ class Deck:
         """Card key to decklink id."""
         for card in self.cards:
             if key == card["key"]:
-                return str(card["decklink"])
+                return str(card["id"])
         return None
 
     async def decklink_to_cards(self, url):
