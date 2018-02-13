@@ -29,6 +29,7 @@ import itertools
 import os
 from collections import defaultdict
 from random import choice
+import asyncio
 
 import discord
 from __main__ import send_cmd_help
@@ -469,8 +470,10 @@ class MemberManagement:
                 else:
                     try:
                         if role_in_minus:
+                            await asyncio.sleep(0)
                             await self.bot.remove_roles(member, role)
                         if role_in_plus:
+                            await asyncio.sleep(0)
                             await self.bot.add_roles(member, role)
                     except discord.Forbidden:
                         await self.bot.say(
