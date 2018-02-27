@@ -23,15 +23,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-from __main__ import send_cmd_help
+import os
+
 from cogs.utils.chat_formatting import box
+from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from py_expression_eval import Parser
-import wolframalpha
-import os
-from cogs.utils.dataIO import dataIO
-
-
 
 PATH = os.path.join("data", "calc")
 JSON = os.path.join(PATH, "settings.json")
@@ -45,20 +42,11 @@ class Calc:
         self.bot = bot
         self.config = dataIO.load_json(JSON)
 
-    @property
-    def wolframalpha_appid(self):
-        return self.config.get("wolframalpha_appid")
-
-    @wolframalpha_appid.setter
-    def wolframalpha_appid(self, value):
-        self.config["wolframalpha_appid"] = value
-        dataIO.save_json(JSON, self.config)
-
     @commands.group(pass_context=True)
     async def calcset(self, ctx):
         """Settings."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @calcset.command(name="wolframalpha", pass_context=True, no_pm=True)
     async def calcset_wolframalpha(self, ctx, value=None):
@@ -68,7 +56,6 @@ class Calc:
         else:
             self.wolframalpha_appid = value
             await self.bot.say("Settings saved.")
-
 
     @commands.command(name="calc", pass_context=True)
     async def calc(self, ctx, *, input):
@@ -98,7 +85,7 @@ class Calc:
         exp(x)     | exp(2)     | 7.38905609
         """
         if not input:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         await self.bot.say(box(input))
@@ -122,13 +109,13 @@ class Calc:
     async def calcfunc(self, ctx):
         """Calculating functions"""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @calcfunc.command(name="simplify", pass_context=True, no_pm=True)
     async def calcfunc_simplify(self, ctx, *, expression):
         """Simplify an expression"""
         if not expression:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
         try:
             parser = Parser()
@@ -136,25 +123,6 @@ class Calc:
             out = exp.simplify({}).toString()
             await self.bot.say(box(expression))
             await self.bot.say(box(out))
-        except Exception as err:
-            await self.bot.say(':warning:' + str(err))
-
-    @calcfunc.command(name="wolframalpha", aliases=["wa"], pass_context=True)
-    async def calcfunc_wolframalpha(self, ctx, *, expression):
-        """Wolfram Alpha expression."""
-        if not expression:
-            await send_cmd_help(ctx)
-            return
-        if not self.wolframalpha_appid:
-            await self.bot.say("Please set your WolframAlpha AppID")
-            return
-        try:
-            client = wolframalpha.Client(self.wolframalpha_appid)
-            res = client.query(expression)
-            for pod in res.pods:
-                title = pod['@title']
-                if title in ['Input', 'Result', 'Plot']:
-                    await self.bot.say(pod['subpod']['img']['@src'])
         except Exception as err:
             await self.bot.say(':warning:' + str(err))
 
