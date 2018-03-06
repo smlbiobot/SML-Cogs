@@ -110,7 +110,7 @@ class RoyaleRant:
         clean_content = ctx.message.clean_content
         msg = clean_content[clean_content.index(' '):]
         with aiohttp.ClientSession() as session:
-            client = self.peony_client(sessions=session)
+            client = self.peony_client(session=session)
             author = ctx.message.author
             author_initials = "".join(re.findall("[a-zA-Z0-9]+", author.display_name))[:2]
 
