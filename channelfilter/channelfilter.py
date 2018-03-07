@@ -28,7 +28,6 @@ import os
 from collections import defaultdict
 
 import discord
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
@@ -86,7 +85,7 @@ class ChannelFilter:
     async def channelfilter(self, ctx):
         """Filter words by channel."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @checks.mod_or_permissions()
     @channelfilter.command(name="add", pass_context=True, no_pm=True)
@@ -161,7 +160,7 @@ class ChannelFilter:
             if word.lower() in message.content.lower():
                 await self.bot.send_message(
                     channel,
-                    "{} Your message contains words not permitted on this channel. "
+                    "{} We don’t allow friend links on this server. "
                     "Repeat offenders will be kicked/banned".format(
                         author.mention
                     ))
