@@ -49,6 +49,10 @@ class ChannelFilter:
         self.bot = bot
         self.settings = dataIO.load_json(JSON)
 
+    def init_server_settings(self, server):
+        self.settings[server.id] = {}
+        dataIO.save_json(JSON, self.settings)
+
     def get_server_settings(self, server):
         """Return server settings."""
         if server.id not in self.settings:
@@ -60,25 +64,27 @@ class ChannelFilter:
         """Return channel settings."""
         server_settings = self.get_server_settings(server)
         if channel.id not in server_settings:
-            self.settings[server.id][channel.id] = []
+            self.settings[server.id][channel.id] = {}
             dataIO.save_json(JSON, self.settings)
         return self.settings[server.id][channel.id]
 
-    def add_word(self, server, channel, word):
+    def add_word(self, server, channel, word, reason=None):
         """Add word to filter."""
         channel_settings = self.get_channel_settings(server, channel)
-        if word.lower() not in channel_settings:
-            channel_settings.append(word)
-            dataIO.save_json(JSON, self.settings)
+        channel_settings[word.lower()] = {
+            'reason': reason
+        }
+        dataIO.save_json(JSON, self.settings)
 
     def remove_word(self, server, channel, word):
         """Remove word from filter."""
         channel_settings = self.get_channel_settings(server, channel)
-        if word.lower() not in channel_settings:
-            return False
-        channel_settings.remove(word)
+        success = channel_settings.pop(word, None)
         dataIO.save_json(JSON, self.settings)
-        return True
+        if success is None:
+            return False
+        else:
+            return True
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True, aliases=['cf', 'cfilter'])
@@ -87,18 +93,26 @@ class ChannelFilter:
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
+    @checks.is_owner()
+    @channelfilter.command(name="init", pass_context=True)
+    async def channelfilter_init(self, ctx):
+        """Init server settings."""
+        server = ctx.message.server
+        self.init_server_settings(server)
+        await self.bot.say("Settings initialized.")
+
     @checks.mod_or_permissions()
     @channelfilter.command(name="add", pass_context=True, no_pm=True)
-    async def channelfilter_add(self, ctx, *, word):
+    async def channelfilter_add(self, ctx, word, reason=None):
         """Add words."""
         server = ctx.message.server
         channel = ctx.message.channel
-        self.add_word(server, channel, word)
+        self.add_word(server, channel, word, reason=reason)
         await self.bot.say("Added word to filter.")
 
     @checks.mod_or_permissions()
     @channelfilter.command(name="remove", pass_context=True, no_pm=True)
-    async def channelfilter_remove(self, ctx, *, word):
+    async def channelfilter_remove(self, ctx, word):
         """Remove words."""
         server = ctx.message.server
         channel = ctx.message.channel
@@ -115,10 +129,10 @@ class ChannelFilter:
         server = ctx.message.server
         channel = ctx.message.channel
         channel_settings = self.get_channel_settings(server, channel)
-        if len(channel_settings) == 0:
+        if len(channel_settings.keys()) == 0:
             await self.bot.say("No words are filtered here.")
             return
-        await self.bot.say(", ".join(channel_settings))
+        await self.bot.say(", ".join(channel_settings.keys()))
 
     @checks.mod_or_permissions()
     @channelfilter.command(name="listserver", pass_context=True, no_pm=True)
@@ -156,13 +170,15 @@ class ChannelFilter:
             return
 
         channel_settings = self.get_channel_settings(server, channel)
-        for word in channel_settings:
+        for word in channel_settings.keys():
             if word.lower() in message.content.lower():
+                reason = channel_settings[word].get('reason', 'that')
                 await self.bot.send_message(
                     channel,
-                    "{} We don’t allow friend links on this server. "
-                    "Repeat offenders will be kicked/banned".format(
-                        author.mention
+                    "{} {}. "
+                    "Repeat offenders will be kicked/banned.".format(
+                        author.mention,
+                        reason
                     ))
                 await self.bot.delete_message(message)
 
