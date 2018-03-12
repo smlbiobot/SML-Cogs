@@ -38,7 +38,7 @@ from peony.exceptions import PeonyException
 
 PATH = os.path.join("data", "royalerant")
 JSON = os.path.join(PATH, "settings.json")
-ROLES = ['Member', 'Guest']
+ROLES = ['Member', 'Guest', 'SUPERMOD', 'MOD', 'Patron', 'Wrapper', 'Showcase', 'Collaborator']
 
 
 def nested_dict():
