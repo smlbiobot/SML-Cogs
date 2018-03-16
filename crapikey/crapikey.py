@@ -267,8 +267,8 @@ class CRAPIKey:
             channel = discord.utils.get(server.channels, name=self.config.channels.endusers)
             await self.bot.say(
                 "You cannot run this command in this channel. "
-                "Please run this command at {channel}.".format(
-                    channel=channel.mention))
+                "Please run this command at {}.".format(
+                    channel.mention))
             return False
         return True
 
