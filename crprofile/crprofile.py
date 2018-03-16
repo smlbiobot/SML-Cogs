@@ -109,35 +109,35 @@ class Constants:
     @property
     def cards(self):
         if self._cards is None:
-            r = requests.get('https://cr-api.github.io/cr-api-data/json/cards.json')
+            r = requests.get('https://royaleapi.github.io/cr-api-data/json/cards.json')
             self._cards = r.json()
         return self._cards
 
     @property
     def rarities(self):
         if self._rarities is None:
-            r = requests.get('https://cr-api.github.io/cr-api-data/json/rarities.json')
+            r = requests.get('https://royaleapi.github.io/cr-api-data/json/rarities.json')
             self._rarities = r.json()
         return self._rarities
 
     @property
     def alliance_badges(self):
         if self._alliance_badges is None:
-            r = requests.get('https://cr-api.github.io/cr-api-data/json/alliance_badges.json')
+            r = requests.get('https://royaleapi.github.io/cr-api-data/json/alliance_badges.json')
             self._alliance_badges = r.json()
         return self._alliance_badges
 
     @property
     def arenas(self):
         if self._arenas is None:
-            r = requests.get('https://cr-api.github.io/cr-api-data/json/arenas.json')
+            r = requests.get('https://royaleapi.github.io/cr-api-data/json/arenas.json')
             self._arenas = r.json()
         return self._arenas
 
     def badge_id_to_url(self, id):
         for badge in self.alliance_badges:
             if badge['badge_id'] == id:
-                return "https://cr-api.github.io/cr-api-assets/badges/{}.png".format(badge['name'])
+                return "https://royaleapi.github.io/cr-api-assets/badges/{}.png".format(badge['name'])
         return None
 
     def get_card(self, id=None, name=None):
@@ -671,11 +671,11 @@ class CRPlayerModel:
     def arena_url(self):
         """Arena Icon URL."""
         if self.api_provider == 'official':
-            return 'https://cr-api.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena_arena)
+            return 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena_arena)
         if self.league > 0:
-            url = 'https://cr-api.github.io/cr-api-assets/arenas/league{}.png'.format(self.league)
+            url = 'https://royaleapi.github.io/cr-api-assets/arenas/league{}.png'.format(self.league)
         else:
-            url = 'https://cr-api.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena.Arena)
+            url = 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena.Arena)
         return url
 
     def deck_list(self, bot_emoji: BotEmoji):
