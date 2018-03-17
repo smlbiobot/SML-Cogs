@@ -296,7 +296,7 @@ class Clans:
                 if self.api_provider == 'official':
                     for badge in self.badges:
                         if badge.get('id') == clan.get('badgeId'):
-                            badge_url = 'https://cr-api.github.io/cr-api-assets/badges/{}.png'.format(badge.get('name'))
+                            badge_url = 'https://royaleapi.github.io/cr-api-assets/badges/{}.png'.format(badge.get('name'))
                 else:
                     badge_url = clan['badge']['image']
 
