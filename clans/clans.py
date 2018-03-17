@@ -411,7 +411,6 @@ class Clans:
                         results.append(member)
         else:
             results = members
-            print(len(results))
 
         # filter by clan name
         if pargs.clan:
