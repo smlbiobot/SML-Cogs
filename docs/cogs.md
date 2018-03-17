@@ -24,12 +24,12 @@
 
 ## Clash Royale Cogs
 
-* **crclan**: Clash Royale clan using [cr-api](https://github.com/cr-api/cr-api) API
+* **clans**: Clash Royale clans using [RoyaleAPI](https://github.com/RoyaleAPI/cr-api) API
 * **crdata**: Clash Royale Global 200 leaderboard (requires Starfi.re login)
     * [User docs](http://docs.redditalpha.com/#/visitor/crdata)
 * **crdatae**: Clash Royale Global 200 leaderboard using emojis (requires SF Auth)
     * [User docs](http://docs.redditalpha.com/#/visitor/crdata)
-* **crprofile**: Clash Royale profile using [cr-api](https://github.com/cr-api/cr-api) API
+* **crprofile**: Clash Royale profile using [RoyaleAPI](https://github.com/RoyaleAPI/cr-api) API
     * [User docs](http://docs.redditalpha.com/#/visitor/crprofile)
 * **[deck](https://github.com/smlbiobot/SML-Cogs/wiki/Deck)**: Clash Royale deck builder
 
@@ -59,6 +59,7 @@ Some of these might still work, but they are no longer maintained.
 * **activity**: weekly server activity logging
 * **card**: Clash Royale card popularity snapshots
 * **clanbattle**: automatic voice channel creation for clan battles
+* **crclan**: Clash Royale clan using [RoyaleAPI](https://github.com/RoyaleAPI/cr-api) API
 * **ddlog**: datadog logging
 * **ddlogmsg**: datadog logging messages
 * **draftroyale**: Clash Royale drafting bot (active development)
