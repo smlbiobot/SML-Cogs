@@ -111,6 +111,13 @@ class Clans:
     @clansset.command(name="config", pass_context=True, no_pm=True)
     async def clansset_config(self, ctx):
         """Upload config yaml file. See config.example.yml for how to format it."""
+        if len(ctx.message.attachments) == 0:
+            await self.bot.say(
+                "Please attach config yaml with this command. "
+                "See config.example.yml for how to format it."
+            )
+            return
+
         attach = ctx.message.attachments[0]
         url = attach["url"]
 
@@ -302,6 +309,9 @@ class Clans:
 
         if badge_url is not None:
             em.set_thumbnail(url=badge_url)
+
+        if config.get('url'):
+            em.url = config.get('url')
 
         for inf in config.info:
             em.add_field(
