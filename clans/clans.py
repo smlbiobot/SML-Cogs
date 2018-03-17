@@ -177,7 +177,7 @@ class Clans:
                 url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
                 headers = {'Authorization': 'Bearer {}'.format(self.auth)}
             else:
-                url = 'http://api.cr-api.com/clan/{}'.format(tag)
+                url = 'http://api.royaleapi.com/clan/{}'.format(tag)
                 headers = {'auth': self.auth}
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, headers=headers, timeout=30) as resp:
@@ -204,7 +204,7 @@ class Clans:
                             await asyncio.sleep(0)
                             data.append(await resp.json())
             else:
-                url = 'http://api.cr-api.com/clan/{}'.format(",".join(tags))
+                url = 'http://api.royaleapi.com/clan/{}'.format(",".join(tags))
                 headers = {'auth': self.auth}
                 async with aiohttp.ClientSession() as session:
                     async with session.get(url, headers=headers, timeout=30) as resp:
@@ -358,7 +358,7 @@ class Clans:
           -c CLAN, --clan CLAN  Clan name
           -n MIN --min MIN      Min Trophies
           -m MAX --max MAX      Max Trophies
-          -l --link             Display link to cr-api.com
+          -l --link             Display link to royaleapi.com
         """
         parser = self.search_args_parser()
         try:
@@ -439,7 +439,7 @@ class Clans:
                 member_model['role_name'] = roles[member_model['role'].lower()]
                 out.append("**{0.name}** #{0.tag}, {0.clan.name}, {0.role_name}, {0.trophies}".format(member_model))
                 if pargs.link:
-                    out.append('http://cr-api.com/player/{}'.format(member_model.tag))
+                    out.append('http://royaleapi.com/player/{}'.format(member_model.tag))
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
         else:
