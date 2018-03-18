@@ -642,6 +642,11 @@ class CRPlayerModel:
             return self.info_data.get('arena', {}).get('arenaID')
 
     @property
+    def arean_url(self):
+        """Arena image URL"""
+        return 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena_arena)
+
+    @property
     def league(self):
         """League (int)."""
         league = max(self.arena_id - 12, 0)
