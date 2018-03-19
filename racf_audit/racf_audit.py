@@ -859,6 +859,10 @@ class RACFAudit:
 
         out = []
 
+        if len(results) > 0:
+            await self.bot.say("More than 10 results found, showing top 10…")
+            results = results[:10]
+
         for result in results:
             index = result['index']
             member = result['member']
