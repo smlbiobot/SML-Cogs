@@ -829,6 +829,8 @@ class RACFAudit:
     @racfaudit.command(name="rank", pass_context=True)
     async def racfaudit_rank(self, ctx, *names):
         """Look up member rank within the family."""
+        await self.bot.type()
+
         try:
             member_models = await self.family_member_models()
         except ClashRoyaleAPIError as e:
