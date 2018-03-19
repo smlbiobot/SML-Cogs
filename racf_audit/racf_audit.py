@@ -826,6 +826,50 @@ class RACFAudit:
 
             await self.bot.say("Audit finished.")
 
+    @racfaudit.command(name="rank", pass_context=True)
+    async def racfaudit_rank(self, ctx, *names):
+        """Look up member rank within the family."""
+        try:
+            member_models = await self.family_member_models()
+        except ClashRoyaleAPIError as e:
+            await self.bot.say(e.status_message)
+            return
+
+        results = []
+
+        member_models = sorted(member_models, key=lambda x:x['trophies'], reverse=True)
+
+        for index, member_model in enumerate(member_models, 1):
+            # simple search
+            for name in names:
+                add_it = False
+                if name.lower() in member_model.get('name').lower():
+                    add_it = True
+                else:
+                    # unidecode search
+                    s = unidecode.unidecode(member_model.get('name'))
+                    s = ''.join(re.findall(r'\w', s))
+                    if name.lower() in s.lower():
+                        add_it = True
+                if add_it:
+                    results.append({
+                        'index': index,
+                        'member': member_model
+                    })
+
+        out = []
+
+        for result in results:
+            index = result['index']
+            member = result['member']
+            out.append('{:<4} {:>4} {}'.format(
+                index, member['trophies'], member['name']
+            ))
+
+        await self.bot.say(
+            box('\n'.join(out), lang='python')
+        )
+
 
 def check_folder():
     """Check folder."""
