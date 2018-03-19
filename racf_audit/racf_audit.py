@@ -861,9 +861,11 @@ class RACFAudit:
 
         out = []
 
-        if len(results) > 0:
-            await self.bot.say("More than 10 results found, showing top 10…")
-            results = results[:10]
+        limit = 10
+
+        if len(results) > limit:
+            await self.bot.say("More than {0} results found, showing top {0}…".format(limit))
+            results = results[:limit]
 
         for result in results:
             index = result['index']
