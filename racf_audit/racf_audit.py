@@ -300,9 +300,11 @@ class RACFAudit:
         self.settings = dataIO.load_json(JSON)
         self._clan_roles = None
 
-        players_path = os.path.join(PATH, PLAYERS)
+        players_path = PLAYERS
+
         if not os.path.exists(players_path):
             players_path = os.path.join(PATH, "player_db_bak.json")
+
         players = dataIO.load_json(players_path)
         dataIO.save_json(PLAYERS, players)
 
