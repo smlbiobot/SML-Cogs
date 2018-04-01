@@ -170,6 +170,9 @@ class ChannelFilter:
             return
 
         channel_settings = self.get_channel_settings(server, channel)
+        if not isinstance(channel_settings, dict):
+            return
+
         for word in channel_settings.keys():
             if word.lower() in message.content.lower():
                 reason = channel_settings[word].get('reason', 'that')

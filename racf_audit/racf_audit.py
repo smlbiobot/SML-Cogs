@@ -305,8 +305,8 @@ class RACFAudit:
         if not os.path.exists(players_path):
             players_path = os.path.join(PATH, "player_db_bak.json")
 
-        players = dataIO.load_json(players_path)
-        dataIO.save_json(PLAYERS, players)
+        self._players = dataIO.load_json(players_path)
+        dataIO.save_json(PLAYERS, self._players)
 
         with open('data/racf_audit/family_config.yaml') as f:
             self.config = yaml.load(f)
@@ -885,6 +885,7 @@ class RACFAudit:
         """Find top 50 RACF not in Alpha."""
         await self.bot.type()
         server = ctx.message.server
+        author = ctx.message.author
 
         try:
             member_models = await self.family_member_models()
@@ -906,6 +907,7 @@ class RACFAudit:
                     })
 
         out = ['Top 50 RACF not in Alpha']
+        out_members = []
         for result in results:
             index = result['index']
             member = result['member']
@@ -917,14 +919,16 @@ class RACFAudit:
                 member.get('trophies'),
             )
             out.append(line)
+            out_members.append(member)
 
         for page in pagify('\n'.join(out)):
             await self.bot.say(box(page, lang='py'))
 
-        if '-id' in args:
-            out = ['Discord Member ID']
-            for result in results:
-                tag = clean_tag(result.get('tag'))
+        # options for output mentions
+        if 'Bot Commander' in [r.name for r in author.roles]:
+            discord_members = []
+            for member in out_members:
+                tag = clean_tag(member.get('tag'))
                 try:
                     discord_id = self.players[tag]["user_id"]
                 except KeyError:
@@ -932,10 +936,25 @@ class RACFAudit:
                 else:
                     discord_member = server.get_member(discord_id)
                     if discord_member is not None:
-                        out.append(discord_member.id)
+                        discord_members.append(discord_member)
 
-            for page in pagify('\n'.join(out)):
-                await self.bot.say(box(page, lang='py'))
+            if '-id' in args:
+                out = []
+                for discord_member in discord_members:
+                    out.append(discord_member.id)
+                for page in pagify('\n'.join(out)):
+                    await self.bot.say(box(page, lang='py'))
+
+            if '-mention' in args:
+                out = []
+                for discord_member in discord_members:
+                    out.append(discord_member.mention)
+                out.append(
+                    'Congratulations! You are top 50 in the RACF. '
+                    'Please move to Alpha by end of season to help us with the global rank!'
+                )
+                for page in pagify(' '.join(out)):
+                    await self.bot.say(page)
 
 
 def check_folder():
