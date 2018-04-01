@@ -841,7 +841,7 @@ class RACFAudit:
 
         results = []
 
-        member_models = sorted(member_models, key=lambda x:x['trophies'], reverse=True)
+        member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
 
         for index, member_model in enumerate(member_models, 1):
             # simple search
@@ -879,6 +879,63 @@ class RACFAudit:
         await self.bot.say(
             box('\n'.join(out), lang='python')
         )
+
+    @racfaudit.command(name="season", pass_context=True)
+    async def racfaudit_season(self, ctx, *args):
+        """Find top 50 RACF not in Alpha."""
+        await self.bot.type()
+        server = ctx.message.server
+
+        try:
+            member_models = await self.family_member_models()
+        except ClashRoyaleAPIError as e:
+            await self.bot.say(e.status_message)
+            return
+
+        results = []
+
+        member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
+
+        for index, member_model in enumerate(member_models, 1):
+            if index <= 50:
+                clan_tag = member_model.get('clan', {}).get('tag')
+                if clan_tag != '#2CCCP':
+                    results.append({
+                        'index': index,
+                        'member': member_model
+                    })
+
+        out = ['Top 50 RACF not in Alpha']
+        for result in results:
+            index = result['index']
+            member = result['member']
+            clan_name = member.get('clan', {}).get('name').replace('Reddit', '').strip()
+            line = '{:<3} {: <15} {:<8} {:<8}'.format(
+                index,
+                member.get('name')[:15],
+                clan_name,
+                member.get('trophies'),
+            )
+            out.append(line)
+
+        for page in pagify('\n'.join(out)):
+            await self.bot.say(box(page, lang='py'))
+
+        if '-id' in args:
+            out = ['Discord Member ID']
+            for result in results:
+                tag = clean_tag(result.get('tag'))
+                try:
+                    discord_id = self.players[tag]["user_id"]
+                except KeyError:
+                    pass
+                else:
+                    discord_member = server.get_member(discord_id)
+                    if discord_member is not None:
+                        out.append(discord_member.id)
+
+            for page in pagify('\n'.join(out)):
+                await self.bot.say(box(page, lang='py'))
 
 
 def check_folder():
