@@ -74,7 +74,7 @@ messages:
     + No advertisement of any kind,
     e.g. Facebook / Twitter / YouTube / Friend Invite Links
 
-    + Use #bot-commands for bot features, e.g. `!deck` / `!crdata`
+    + Use #bot-commands for bot features, e.g. `!deck` / `!crprofile get` / `!cpg`
 
     + Use #casino for bot commands related to casino,
     e.g. `!payday` / `!slot` / `!heist`
