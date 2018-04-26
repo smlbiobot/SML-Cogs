@@ -215,6 +215,8 @@ class Deck:
             if self.deck_is_valid:
                 em = await self.decklink_embed(member_deck)
                 await self.bot.say(embed=em)
+                em = await self.decklink_embed(member_deck, war=True)
+                await self.bot.say(embed=em)
 
     async def card_decklink_to_key(self, decklink):
         """Decklink id to card."""
@@ -427,17 +429,22 @@ class Deck:
         if decklink_setting == 'embed':
             em = await self.decklink_embed(deck_cards)
             await self.bot.say(embed=em)
+            em = await self.decklink_embed(deck_cards, war=True)
+            await self.bot.say(embed=em)
         elif decklink_setting == 'link':
             url = await self.decklink_url(deck_cards)
             await self.bot.say('<{}>'.format(url))
 
-    async def decklink_embed(self, deck_cards):
+    async def decklink_embed(self, deck_cards, war=False):
         """Decklink embed."""
-        url = await self.decklink_url(deck_cards)
-        em = discord.Embed(title='Copy deck to Clash Royale', url=url)
+        url = await self.decklink_url(deck_cards, war=war)
+        if war:
+            em = discord.Embed(title='Copy deck to war deck', url=url)
+        else:
+            em = discord.Embed(title='Copy deck', url=url)
         return em
 
-    async def decklink_url(self, deck_cards):
+    async def decklink_url(self, deck_cards, war=False):
         """Decklink URL."""
         deck_cards = self.normalize_deck_data(deck_cards)
         ids = []
@@ -446,6 +453,8 @@ class Deck:
             if id is not None:
                 ids.append(await self.card_key_to_decklink(card))
         url = 'https://link.clashroyale.com/deck/en?deck=' + ';'.join(ids)
+        if war:
+            url += '&war=1'
         return url
 
     @deck.command(name="cards", pass_context=True, no_pm=True)
