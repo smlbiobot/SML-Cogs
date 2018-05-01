@@ -151,16 +151,30 @@ permission:
   - {assign_role: true, member: false, role: BS-Charlie, tag: 98VLYJ}
   - {assign_role: true, member: false, role: BS-Delta, tag: Q0YG8V}
   clans:
-  - {assign_role: true, member: true, role: Alpha, tag: 2CCCP}
-  - {assign_role: true, member: true, role: Bravo, tag: 2U2GGQJ}
-  - {assign_role: true, member: true, role: Charlie, tag: 2QUVVVP}
-  - {assign_role: true, member: true, role: Delta, tag: Y8GYCGV}
-  - {assign_role: true, member: true, role: Echo, tag: LGVV2CG}
-  - {assign_role: true, member: true, role: Foxtrot, tag: QUYCYV8}
-  - {assign_role: true, member: true, role: Golf, tag: GUYGVJY}
-  - {assign_role: true, member: true, role: Hotel, tag: UGQ28YU}
+  - {assign_role: true, member: true, role: Alpha, tag: 9PJ82CRC}
+  - {assign_role: true, member: true, role: Bravo, tag: 9UQJUJC9}
+  - {assign_role: true, member: true, role: Charlie, tag: 9G99JQPL}
+  - {assign_role: true, member: true, role: Delta, tag: 9G8VYGL0}
+  - {assign_role: true, member: true, role: Echo, tag: 9CJ0L9RG}
+  - {assign_role: true, member: true, role: Foxtrot, tag: 9UQC2P0V}
+  - {assign_role: true, member: true, role: Golf, tag: 9UG2R2LQ}
+  - {assign_role: true, member: true, role: Hotel, tag: 9Y9VR2JR}
   - {assign_role: true, member: false, role: Mini, tag: 22LR8JJ2}
   - {assign_role: true, member: false, role: Mini2, tag: 2Q09VJC8}
+
+
+
+#  clans:
+#  - {assign_role: true, member: true, role: Alpha, tag: 2CCCP}
+#  - {assign_role: true, member: true, role: Bravo, tag: 2U2GGQJ}
+#  - {assign_role: true, member: true, role: Charlie, tag: 2QUVVVP}
+#  - {assign_role: true, member: true, role: Delta, tag: Y8GYCGV}
+#  - {assign_role: true, member: true, role: Echo, tag: LGVV2CG}
+#  - {assign_role: true, member: true, role: Foxtrot, tag: QUYCYV8}
+#  - {assign_role: true, member: true, role: Golf, tag: GUYGVJY}
+#  - {assign_role: true, member: true, role: Hotel, tag: UGQ28YU}
+#  - {assign_role: true, member: false, role: Mini, tag: 22LR8JJ2}
+#  - {assign_role: true, member: false, role: Mini2, tag: 2Q09VJC8}
 
 
 

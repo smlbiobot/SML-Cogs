@@ -57,58 +57,52 @@ COMPETITIVE_TEAM_ROLES = [
     "CRL", "RPL-NA", "RPL-EU", "RPL-APAC", "MLG",
     "ClashWars", "CRL-Elite", "CRL-Legends", "CRL-Rockets"]
 CLAN_PERMISSION = {
-    '2CCCP': {
-        'tag': '2CCCP',
+    '9PJ82CRC': {
+        'tag': '9PJ82CRC',
         'role': 'Alpha',
         'assign_role': True,
         'member': True
     },
-    '2U2GGQJ': {
-        'tag': '2U2GGQJ',
+    '9UQJUJC9': {
+        'tag': '9UQJUJC9',
         'role': 'Bravo',
         'assign_role': True,
         'member': True
     },
-    '2QUVVVP': {
-        'tag': '2QUVVVP',
+    '9G99JQPL': {
+        'tag': '9G99JQPL',
         'role': 'Charlie',
         'assign_role': True,
         'member': True
     },
-    'Y8GYCGV': {
-        'tag': 'Y8GYCGV',
+    '9G8VYGL0': {
+        'tag': '9G8VYGL0',
         'role': 'Delta',
         'assign_role': True,
         'member': True
     },
-    'LGVV2CG': {
-        'tag': 'LGVV2CG',
+    '9CJ0L9RG': {
+        'tag': '9CJ0L9RG',
         'role': 'Echo',
         'assign_role': True,
         'member': True
     },
-    'QUYCYV8': {
-        'tag': 'QUYCYV8',
+    '9UQC2P0V': {
+        'tag': '9UQC2P0V',
         'role': 'Foxtrot',
         'assign_role': True,
         'member': True
     },
-    'GUYGVJY': {
-        'tag': 'GUYGVJY',
+    '9UG2R2LQ': {
+        'tag': '9UG2R2LQ',
         'role': 'Golf',
         'assign_role': True,
         'member': True
     },
-    'UGQ28YU': {
-        'tag': 'UGQ28YU',
+    '9Y9VR2JR': {
+        'tag': '9Y9VR2JR',
         'role': 'Hotel',
         'assign_role': True,
-        'member': True
-    },
-    'R8PPJQG': {
-        'tag': 'R8PPJQG',
-        'role': 'eSports',
-        'assign_role': False,
         'member': True
     },
     '22LR8JJ2': {
@@ -307,8 +301,8 @@ class RACF:
                 clan_name=data['clan']['name'],
                 clan_tag=data['clan']['tag'],
                 clan_role=data.get('role'),
-                trophies=data.get('trophies'),
-                pb=data.get('bestTrophies')
+                trophies=data.get('trophies', 0),
+                pb=data.get('bestTrophies', 0)
             )
         )
 
