@@ -1,37 +1,37 @@
-name: Reddit Alpha Clan Family
-key: racf
+name: 100 Thieves Clan Family
+key: 100t
 emblem: A_Char_Rocket_02
 clans:
-  - name: Reddit Alpha
-    tag: 2CCCP
+  - name: 100T Alpha
+    tag: 9PJ82CRC
     role_name: Alpha
     type: Member
-  - name: Reddit Bravo
-    tag: 2U2GGQJ
+  - name: 100T Bravo
+    tag: 9UQJUJC9
     role_name: Bravo
     type: Member
-  - name: Reddit Charlie
-    tag: 2QUVVVP
+  - name: 100T Charlie
+    tag: 9G99JQPL
     role_name: Charlie
     type: Member
-  - name: Reddit Delta
-    tag: Y8GYCGV
+  - name: 100T Delta
+    tag: 9G8VYGL0
     role_name: Delta
     type: Member
-  - name: Reddit Echo
-    tag: LGVV2CG
+  - name: 100T Echo
+    tag: 9CJ0L9RG
     role_name: Echo
     type: Member
-  - name: Reddit Foxtrot
-    tag: QUYCYV8
+  - name: 100T Foxtrot
+    tag: 9UQC2P0V
     role_name: Foxtrot
     type: Member
-  - name: Reddit Golf
-    tag: GUYGVJY
+  - name: 100T Golf
+    tag: 9UG2R2LQ
     role_name: Golf
     type: Member
-  - name: Reddit Hotel
-    tag: UGQ28YU
+  - name: 100T Hotel
+    tag: 9Y9VR2JR
     role_name: Hotel
     type: Member
   - name: RACF Mini
