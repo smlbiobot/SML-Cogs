@@ -906,7 +906,7 @@ class RACFAudit:
                         'member': member_model
                     })
 
-        out = ['Top 50 RACF not in Alpha']
+        out = ['Top 50 100T not in Alpha']
         out_members = []
         for result in results:
             index = result['index']
