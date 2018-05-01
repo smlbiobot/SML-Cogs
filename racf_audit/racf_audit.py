@@ -455,7 +455,7 @@ class RACFAudit:
         found = False
         for tag, m in self.players.items():
             if m["user_id"] == member.id:
-                await self.bot.say("RACF Audit database: `{}` is associated to `#{}`".format(member, tag))
+                await self.bot.say("100T Audit database: `{}` is associated to `#{}`".format(member, tag))
                 found = True
 
         if not found:
@@ -603,7 +603,7 @@ class RACFAudit:
             await self.bot.say(e.status_message)
             return
         else:
-            await self.bot.say("**RACF Family Audit**")
+            await self.bot.say("**100T Family Audit**")
             # Show settings
             if pargs.settings:
                 await ctx.invoke(self.racfaudit_config)
@@ -950,7 +950,7 @@ class RACFAudit:
                 for discord_member in discord_members:
                     out.append(discord_member.mention)
                 out.append(
-                    'Congratulations! You are top 50 in the RACF. '
+                    'Congratulations! You are top 50 in the 100T. '
                     'Please move to Alpha by end of season to help us with the global rank!'
                 )
                 for page in pagify(' '.join(out)):
