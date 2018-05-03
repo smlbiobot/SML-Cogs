@@ -1214,7 +1214,7 @@ class RACF:
             if 'Visitor' in member_role_names:
                 for clan_role in clan_roles:
                     if clan_role in member.roles:
-                        await self.bot.remove_roles(clan_role)
+                        await self.bot.remove_roles(member, clan_role)
                         await self.bot.say("Removed {} from {}".format(clan_role, member))
 
 
