@@ -917,7 +917,7 @@ class RACFAudit:
         for index, member_model in enumerate(member_models, 1):
             if index <= 50:
                 clan_tag = member_model.get('clan', {}).get('tag')
-                if clan_tag != '#2CCCP':
+                if clan_tag != '#9PJ82CRC':
                     results.append({
                         'index': index,
                         'member': member_model
