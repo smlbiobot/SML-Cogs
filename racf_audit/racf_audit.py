@@ -465,7 +465,7 @@ class RACFAudit:
         if not found:
             await self.bot.say("100T Audit database: Member is not associated with any tags.")
 
-    @racfaudit.command(name="tag", pass_context=True)
+    @racfaudit.command(name="rmtag", pass_context=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_rm_tag(self, ctx, tag):
         """Remove tag in DB."""
