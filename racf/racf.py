@@ -1090,6 +1090,7 @@ class RACF:
                             server.get_member(player.get('user_id'))
                         ))
 
+    @checks.mod_or_permissions()
     @commands.command(pass_context=True, no_pm=True)
     async def crrmtag(self, ctx, tag):
         """Remove tag from further association.

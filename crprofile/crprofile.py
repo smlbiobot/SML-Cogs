@@ -1192,6 +1192,7 @@ class CRProfile:
         self.model.rm_player_tag(server, member=member)
         await self.bot.say("Removed player tag for {}".format(member))
 
+    @checks.mod_or_permissions()
     @crprofileset.command(name="rmtag", pass_context=True)
     async def crprofileset_rm_tag(self, ctx, tag):
         """Remove player tag of a user."""
