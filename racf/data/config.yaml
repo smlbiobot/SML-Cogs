@@ -159,6 +159,7 @@ permission:
   - {assign_role: true, member: true, role: Foxtrot, tag: 9UQC2P0V}
   - {assign_role: true, member: true, role: Golf, tag: 9UG2R2LQ}
   - {assign_role: true, member: true, role: Hotel, tag: 9Y9VR2JR}
+  - {assign_role: true, member: true, role: Zen, tag: 9LPVG9UC}
   - {assign_role: true, member: false, role: Mini, tag: 22LR8JJ2}
   - {assign_role: true, member: false, role: Mini2, tag: 2Q09VJC8}
 

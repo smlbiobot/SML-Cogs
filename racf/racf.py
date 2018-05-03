@@ -46,7 +46,7 @@ DISALLOWED_ROLES = ["SUPERMOD", "MOD", "AlphaBot"]
 MEMBER_DEFAULT_ROLES = ["Member", "Tourney"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
-    "Echo", "Foxtrot", "Golf", "Hotel"]
+    "Echo", "Foxtrot", "Golf", "Hotel", "Zen"]
 BS_CLANS = [
     "BS-Alpha", "BS-Bravo", "BS-Charlie"]
 BS_CLANS_PREFIX = 'BS-'
@@ -102,6 +102,12 @@ CLAN_PERMISSION = {
     '9Y9VR2JR': {
         'tag': '9Y9VR2JR',
         'role': 'Hotel',
+        'assign_role': True,
+        'member': True
+    },
+    '9LPVG9UC': {
+        'tag': '9LPVG9UC',
+        'role': 'Zen',
         'assign_role': True,
         'member': True
     },
