@@ -1090,6 +1090,21 @@ class RACF:
                             server.get_member(player.get('user_id'))
                         ))
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def crrmtag(self, ctx, tag):
+        """Remove tag from further association.
+
+        Applies to !crprofile and !racfaudit
+        """
+        crprofile = self.bot.get_cog("CRProfile")
+        racfaudit = self.bot.get_cog("RACFAudit")
+
+        if crprofile is not None:
+            await ctx.invoke(crprofile.crprofileset_rm_tag, tag)
+        if racfaudit is not None:
+            await ctx.invoke(racfaudit.racfaudit_rm_tag, tag)
+
+
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, no_pm=True)
     async def crsettagmod(self, ctx, tag, member:discord.Member=None, force=False):

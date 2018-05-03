@@ -866,14 +866,28 @@ class Settings:
         self.settings["servers"][server.id]["players"] = players
         self.save()
 
-    def rm_player_tag(self, server, member):
+    def rm_player_tag(self, server, member=None, tag=None):
         """Remove player tag from settings."""
         self.check_server(server)
-        try:
-            self.settings["servers"][server.id]["players"].pop(member.id, None)
-        except KeyError:
-            pass
-        self.save()
+        if member is not None:
+            try:
+                self.settings["servers"][server.id]["players"].pop(member.id, None)
+            except KeyError:
+                pass
+            self.save()
+        if tag is not None:
+            try:
+                players = self.settings["servers"][server.id]["players"].copy()
+                for member_id, player_tag in players.items():
+                    if player_tag == tag:
+                        self.settings["servers"][server.id]["players"].pop(member_id, None)
+            except KeyError:
+                pass
+            self.save()
+
+
+    def rm_tag(self, server, tag):
+        """Remove player tag from settings by tag"""
 
     def tag2member(self, server, tag):
         """Return Discord member from player tag."""
@@ -1171,12 +1185,19 @@ class CRProfile:
         else:
             await self.bot.say("Not a valid provider.")
 
-    @crprofileset.command(name="rmplayertag", pass_context=True)
-    async def crprofileset_rmplayertag(self, ctx, member: discord.Member):
+    @crprofileset.command(name="rmmembertag", pass_context=True)
+    async def crprofileset_rm_member_tag(self, ctx, member: discord.Member):
         """Remove player tag of a user."""
         server = ctx.message.server
-        self.model.rm_player_tag(server, member)
+        self.model.rm_player_tag(server, member=member)
         await self.bot.say("Removed player tag for {}".format(member))
+
+    @crprofileset.command(name="rmtag", pass_context=True)
+    async def crprofileset_rm_tag(self, ctx, tag):
+        """Remove player tag of a user."""
+        server = ctx.message.server
+        self.model.rm_player_tag(server, tag=tag)
+        await self.bot.say("Removed player tag {} from associated member".format(tag))
 
     @commands.group(pass_context=True, no_pm=True)
     async def crprofile(self, ctx):

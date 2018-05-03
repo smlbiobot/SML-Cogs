@@ -314,8 +314,9 @@ class RACFAudit:
     @property
     def players(self):
         """Player dictionary, userid -> tag"""
-        players = dataIO.load_json(PLAYERS)
-        return players
+        return self._players
+        # players = dataIO.load_json(PLAYERS)
+        # return players
 
     @commands.group(aliases=["racfas"], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
@@ -349,6 +350,9 @@ class RACFAudit:
     async def get_player_tag(self, tag):
         await asyncio.sleep(0)
         return self.players.get(tag)
+
+    async def rm_playr_tag(self, tag):
+        """Remove player tag from settings."""
 
     @racfauditset.command(name="auth", pass_context=True)
     @checks.is_owner()
@@ -459,7 +463,20 @@ class RACFAudit:
                 found = True
 
         if not found:
-            await self.bot.say("RACF Audit database: Member is not associated with any tags.")
+            await self.bot.say("100T Audit database: Member is not associated with any tags.")
+
+    @racfaudit.command(name="tag", pass_context=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def racfaudit_rm_tag(self, ctx, tag):
+        """Remove tag in DB."""
+        tag = clean_tag(tag)
+        try:
+            self.players.pop(tag, None)
+        except KeyError:
+            await self.bot.say("Tag not found in DB.")
+        else:
+            dataIO.save_json(PLAYERS, self.players)
+            await self.bot.say("Removed tag from DB.")
 
     @racfaudit.command(name="search", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
