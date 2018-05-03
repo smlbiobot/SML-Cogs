@@ -1198,6 +1198,25 @@ class RACF:
             member = ctx.message.author
         await self.bot.say(member.top_role.name)
 
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(name="rmvisitorclan", no_pm=True, pass_context=True)
+    async def visitor_remove_clan_roles(self, ctx):
+        """Remove clan roles from visitors without the member role."""
+        server = ctx.message.server
+        clan_role_names = [
+            'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel'
+        ]
+        clan_roles = [discord.utils.get(server.roles, name=name) for name in clan_role_names]
+        for member in server.members:
+            member_role_names = [r.name for r in member.roles]
+            if 'Member' in member_role_names:
+                continue
+            if 'Visitor' in member_role_names:
+                for clan_role in clan_roles:
+                    if clan_role in member.roles:
+                        await self.bot.remove_roles(clan_role)
+                        await self.bot.say("Removed {} from {}".format(clan_role, member))
+
 
 def check_folder():
     """Check folder."""
