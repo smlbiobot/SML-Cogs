@@ -910,25 +910,36 @@ class RACFAudit:
             await self.bot.say(e.status_message)
             return
 
-        results = []
+        top50_results = []
+        non_top50_results = []
+
+        ALPHA_CLAN_TAG = '#9PJ82CRC'
 
         member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
 
         for index, member_model in enumerate(member_models, 1):
+            # non alpha in top 50
+            clan_tag = member_model.get('clan', {}).get('tag')
+
             if index <= 50:
-                clan_tag = member_model.get('clan', {}).get('tag')
-                if clan_tag != '#9PJ82CRC':
-                    results.append({
+                if clan_tag != ALPHA_CLAN_TAG:
+                    top50_results.append({
                         'index': index,
                         'member': member_model
                     })
 
-        out = ['Top 50 100T not in Alpha']
-        out_members = []
-        for result in results:
+            # alphas not in top 50
+            else:
+                if clan_tag == ALPHA_CLAN_TAG:
+                    non_top50_results.append({
+                        'index': index,
+                        'member': member_model
+                    })
+
+        def append_result(result, out, out_members):
             index = result['index']
             member = result['member']
-            clan_name = member.get('clan', {}).get('name').replace('Reddit', '').strip()
+            clan_name = member.get('clan', {}).get('name').replace('100T', '').strip()
             line = '{:<3} {: <15} {:<8} {:<8}'.format(
                 index,
                 member.get('name')[:15],
@@ -938,37 +949,72 @@ class RACFAudit:
             out.append(line)
             out_members.append(member)
 
+
+        # top 50 not in alpha
+
+        out = ['Top 50 not in Alpha']
+        out_members = []
+        for result in top50_results:
+            append_result(result, out, out_members)
+
         for page in pagify('\n'.join(out)):
             await self.bot.say(box(page, lang='py'))
 
+        # alphas not in top 50
+        out_2 = ['Alphas not in top 50']
+        out_2_members = []
+        for result in non_top50_results:
+            append_result(result, out_2, out_2_members)
+
+        for page in pagify('\n'.join(out_2)):
+            await self.bot.say(box(page, lang='py'))
+
+        def append_discord_member(member_list, member):
+            tag = clean_tag(member.get('tag'))
+            try:
+                discord_id = self.players[tag]["user_id"]
+            except KeyError:
+                pass
+            else:
+                discord_member = server.get_member(discord_id)
+                if discord_member is not None:
+                    member_list.append(discord_member)
+
         # options for output mentions
         if 'Bot Commander' in [r.name for r in author.roles]:
-            discord_members = []
+            top50_discord_members = []
+            non_top50_discord_members = []
             for member in out_members:
-                tag = clean_tag(member.get('tag'))
-                try:
-                    discord_id = self.players[tag]["user_id"]
-                except KeyError:
-                    pass
-                else:
-                    discord_member = server.get_member(discord_id)
-                    if discord_member is not None:
-                        discord_members.append(discord_member)
+                append_discord_member(top50_discord_members, member)
+
+            for member in out_2_members:
+                append_discord_member(non_top50_discord_members, member)
 
             if '-id' in args:
-                out = []
-                for discord_member in discord_members:
+                out = ['Top 50 not in tAlpha']
+                for discord_member in top50_discord_members:
+                    out.append(discord_member.id)
+
+                out.append('Alphas not in Top 50')
+                for discord_member in non_top50_discord_members:
                     out.append(discord_member.id)
                 for page in pagify('\n'.join(out)):
                     await self.bot.say(box(page, lang='py'))
 
             if '-mention' in args:
                 out = []
-                for discord_member in discord_members:
+                for discord_member in top50_discord_members:
                     out.append(discord_member.mention)
                 out.append(
                     'Congratulations! You are top 50 in the 100T. '
                     'Please move to Alpha by end of season to help us with the global rank!'
+                )
+
+                for discord_member in non_top50_discord_members:
+                    out.append(discord_member.mention)
+                out.append(
+                    'You are not within top 50 in the 100T right now. '
+                    'Please move to Bravo unless you are certain that you can untilt.'
                 )
                 for page in pagify(' '.join(out)):
                     await self.bot.say(page)
