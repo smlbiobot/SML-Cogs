@@ -31,6 +31,7 @@ import re
 import yaml
 import string
 from concurrent.futures import ThreadPoolExecutor
+from collections import namedtuple
 
 import aiohttp
 import discord
@@ -805,6 +806,23 @@ class Deck:
     def save_settings(self):
         """Save data to settings file."""
         dataIO.save_json(SETTINGS_PATH, self.settings)
+
+    async def on_message(self, msg):
+        """Listen for decklinks, auto create useful image."""
+        card_keys = await self.decklink_to_cards(msg.content)
+        if card_keys is None:
+            return
+
+        CTX = namedtuple("CTX", ['bot', 'message'])
+        ctx = CTX(self.bot, msg)
+        deck = card_keys
+        deck_name = ''
+        member = msg.author
+
+        await self.upload_deck_image(ctx, deck, deck_name, member)
+        await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys))
+        await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys, war=True))
+        await self.bot.delete_message(msg)
 
 
 def check_folder():
