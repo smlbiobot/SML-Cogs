@@ -913,6 +913,8 @@ class RACFAudit:
         top50_results = []
         non_top50_results = []
 
+        trophy_50 = 0
+
         ALPHA_CLAN_TAG = '#9PJ82CRC'
 
         member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
@@ -920,6 +922,9 @@ class RACFAudit:
         for index, member_model in enumerate(member_models, 1):
             # non alpha in top 50
             clan_tag = member_model.get('clan', {}).get('tag')
+
+            if index == 50:
+                trophy_50 = member_model.get('trophies')
 
             if index <= 50:
                 if clan_tag != ALPHA_CLAN_TAG:
@@ -951,6 +956,8 @@ class RACFAudit:
 
 
         # top 50 not in alpha
+
+        await self.bot.say('50th in 100T = {} :trophy: '.format(trophy_50))
 
         out = ['Top 50 not in Alpha']
         out_members = []
@@ -1014,7 +1021,11 @@ class RACFAudit:
                     out.append(discord_member.mention)
                 out.append(
                     'You are not within top 50 in the 100T right now. '
-                    'Please move to Bravo unless you are certain that you can untilt.'
+                    'Please move to Bravo unless you are certain that you can un-tilt.'
+                )
+                out.append(
+                    '\n\nNote: If you are _very_ close to where the 50th is, you can stay put. '
+                    'Just be conscious of that number. Thank you! :heart:'
                 )
                 for page in pagify(' '.join(out)):
                     await self.bot.say(page)
