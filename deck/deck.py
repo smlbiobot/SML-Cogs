@@ -160,6 +160,19 @@ class Deck:
             return default
         return decklink
 
+    @deckset.command(name="autodecklink", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
+    async def deckset_autodecklink(self, ctx, use=None):
+        """Toggle auto transform on server."""
+        server = ctx.message.server
+        if server.id not in self.settings['Servers']:
+            self.settings["Servers"][server.id] = {}
+        auto_deck_link = self.settings["Servers"][server.id].get('auto_deck_link', False)
+        auto_deck_link = not auto_deck_link
+        self.settings["Servers"][server.id]['auto_deck_link'] = auto_deck_link
+        await self.bot.say("Auto deck link: {}".format(auto_deck_link))
+        self.save_settings()
+
     @commands.group(pass_context=True, no_pm=True)
     async def deck(self, ctx):
         """Clash Royale deck builder.
@@ -809,20 +822,24 @@ class Deck:
 
     async def on_message(self, msg):
         """Listen for decklinks, auto create useful image."""
-        card_keys = await self.decklink_to_cards(msg.content)
-        if card_keys is None:
-            return
+        server = msg.server
+        auto_deck_link = self.settings["Servers"][server.id].get('auto_deck_link', False)
 
-        CTX = namedtuple("CTX", ['bot', 'message'])
-        ctx = CTX(self.bot, msg)
-        deck = card_keys
-        deck_name = ''
-        member = msg.author
+        if auto_deck_link:
+            card_keys = await self.decklink_to_cards(msg.content)
+            if card_keys is None:
+                return
 
-        await self.upload_deck_image(ctx, deck, deck_name, member)
-        await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys))
-        await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys, war=True))
-        await self.bot.delete_message(msg)
+            CTX = namedtuple("CTX", ['bot', 'message'])
+            ctx = CTX(self.bot, msg)
+            deck = card_keys
+            deck_name = ''
+            member = msg.author
+
+            await self.upload_deck_image(ctx, deck, deck_name, member)
+            await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys))
+            await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys, war=True))
+            await self.bot.delete_message(msg)
 
 
 def check_folder():
