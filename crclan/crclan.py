@@ -794,7 +794,7 @@ class ClanManager:
     @property
     def clan_api_url(self):
         """Clan API URL."""
-        return 'http://api.cr-api.com/clan/'
+        return 'http://api.royaleapi.com/clan/'
 
     @property
     def data_update_interval(self):
@@ -821,7 +821,7 @@ class ClanManager:
     @property
     def badge_url_base(self):
         """Clan Badge URL."""
-        return 'http://api.cr-api.com'
+        return 'http://api.royaleapi.com'
 
     @property
     def auth(self):

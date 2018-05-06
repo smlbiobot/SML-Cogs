@@ -82,7 +82,7 @@ class API:
     @staticmethod
     def player(tag):
         """Return player URL"""
-        return "http://api.cr-api.com/player/" + tag.upper()
+        return "http://api.royaleapi.com/player/" + tag.upper()
 
 
 class Constants:
@@ -919,8 +919,8 @@ class Settings:
             chest_url = 'https://api.clashroyale.com/v1/players/%23{}/upcomingchests'.format(tag)
             headers = {"Authorization": 'Bearer {}'.format(self.official_auth)}
         else:
-            info_url = 'http://api.cr-api.com/player/{}'.format(tag)
-            chest_url = 'http://api.cr-api.com/player/{}/chests'.format(tag)
+            info_url = 'http://api.royaleapi.com/player/{}'.format(tag)
+            chest_url = 'http://api.royaleapi.com/player/{}/chests'.format(tag)
             headers = {"auth": self.auth}
 
         try:

@@ -504,7 +504,7 @@ class Settings:
             if player['discord_id'] == member2.id:
                 player2 = player
 
-        url = 'http://api.cr-api.com/player/{}?keys=battles'.format(player1['tag'])
+        url = 'http://api.royaleapi.com/player/{}?keys=battles'.format(player1['tag'])
         response = {}
         async with aiohttp.ClientSession() as session:
             async with session.get(url, headers={'auth': self.auth}) as resp:

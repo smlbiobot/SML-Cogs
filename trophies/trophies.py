@@ -163,7 +163,7 @@ class Trophies:
     @trophies.command(name="check", pass_context=True, no_pm=True)
     async def trophies_check(self, ctx, tag, member: discord.Member = None):
         """Grabs trophy info from player and return suitable clans."""
-        url = 'http://api.cr-api.com/profile/' + tag
+        url = 'http://api.royaleapi.com/profile/' + tag
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=10) as resp:

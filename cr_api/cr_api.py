@@ -205,7 +205,7 @@ class CRPlayerModel:
             return "http://smlbiobot.github.io/img/emblems/NoClan.png"
         try:
             url = self.clan['badge']['url']
-            return 'http://api.cr-api.com' + url
+            return 'http://api.royaleapi.com' + url
         except KeyError:
             pass
         return ''
@@ -944,9 +944,9 @@ class ClashRoyaleAPI:
     async def profile_json(self, tag):
         """Get player profile as JSON.
         
-        http://api.cr-api.com/profile/C0G20PR2
+        http://api.royaleapi.com/profile/C0G20PR2
         """
-        url = 'http://api.cr-api.com/profile/{}'.format(SCTag(tag).tag)
+        url = 'http://api.royaleapi.com/profile/{}'.format(SCTag(tag).tag)
         async with aiohttp.ClientSession() as session:
             data = await self.fetch(session, url)
         return data
@@ -959,9 +959,9 @@ class ClashRoyaleAPI:
     async def clan_json(self, tag):
         """Clan as JSON.
         
-        http://api.cr-api.com/clan/2CCCP 
+        http://api.royaleapi.com/clan/2CCCP
         """
-        url = 'http://api.cr-api.com/clan/{}'.format(SCTag(tag).tag)
+        url = 'http://api.royaleapi.com/clan/{}'.format(SCTag(tag).tag)
         async with aiohttp.ClientSession() as session:
             data = await self.fetch(session, url)
         return data
@@ -974,7 +974,7 @@ class ClashRoyaleAPI:
     async def clans_json(self, tags):
         """Clans as JSON."""
         sctags = [SCTag(t).tag for t in tags]
-        url = 'http://api.cr-api.com/clan/{}'.format(','.join(sctags))
+        url = 'http://api.royaleapi.com/clan/{}'.format(','.join(sctags))
         async with aiohttp.ClientSession() as session:
             data = await self.fetch(session, url)
         return data
