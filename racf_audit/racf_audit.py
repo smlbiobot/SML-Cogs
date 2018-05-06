@@ -930,7 +930,7 @@ class RACFAudit:
                 if clan_tag != ALPHA_CLAN_TAG:
                     top50_results.append({
                         'index': index,
-                        'member': member_model
+                        'member': member_model,
                     })
 
             # alphas not in top 50
@@ -945,11 +945,18 @@ class RACFAudit:
             index = result['index']
             member = result['member']
             clan_name = member.get('clan', {}).get('name').replace('100T', '').strip()
-            line = '{:<3} {: <15} {:<8} {:<8}'.format(
+            trophies = member.get('trophies')
+            delta = trophies - trophy_50
+            if delta > 0:
+                delta = '+{}'.format(delta)
+            elif delta == 0:
+                delta = ' {}'.format(delta)
+            line = '{:<3} {: <15} {:<7} {:<4} {:<4}'.format(
                 index,
                 member.get('name')[:15],
                 clan_name,
-                member.get('trophies'),
+                trophies,
+                delta
             )
             out.append(line)
             out_members.append(member)
