@@ -22,6 +22,7 @@ roles:
   member_default:
     - Member
     - Tourney
+    - Content
   bot_comamnder:
     - Bot Commander
   competitive_captain:

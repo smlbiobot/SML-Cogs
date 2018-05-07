@@ -43,7 +43,7 @@ from discord.ext.commands import Context
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 BS_CHANGECLAN_ROLES = ["Member", "Brawl-Stars"]
 DISALLOWED_ROLES = ["SUPERMOD", "MOD", "AlphaBot"]
-MEMBER_DEFAULT_ROLES = ["Member", "Tourney"]
+MEMBER_DEFAULT_ROLES = ["Member", "Tourney" "Content"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
     "Echo", "Foxtrot", "Golf", "Hotel", "Zen"]
@@ -404,7 +404,7 @@ class RACF:
                     ctx.message.server.channels, name="visitors")
                 await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
             else:
-                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', '-Visitor')
+                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', 'Content', '-Visitor')
                 channel = discord.utils.get(
                     ctx.message.server.channels, name="family-chat")
                 await ctx.invoke(self.dmusers, self.config.messages.member, member)
