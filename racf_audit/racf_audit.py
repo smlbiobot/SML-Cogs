@@ -29,6 +29,7 @@ import asyncio
 import json
 import os
 import re
+from collections import OrderedDict
 from collections import defaultdict
 
 import aiohttp
@@ -283,6 +284,12 @@ class ClashRoyaleAPI:
         urls = ['https://api.clashroyale.com/v1/clans/%23{}'.format(tag) for tag in tags]
         results = await self.fetch_multi(urls)
         return results
+
+    async def fetch_clan_leaderboard(self, location=None):
+        """Get clan leaderboard"""
+        url = 'https://api.clashroyale.com/v1/locations/global/rankings/clans'
+        body = await self.fetch(url)
+        return body
 
 
 class RACFAudit:
@@ -897,6 +904,27 @@ class RACFAudit:
             box('\n'.join(out), lang='python')
         )
 
+
+
+    def calculate_clan_trophies(self, trophies):
+        """Add a list of trophies to be calculated."""
+        trophies = sorted(trophies, reverse=True)
+        total = 0
+        factors = OrderedDict({
+            10: 0.5,
+            20: 0.25,
+            30: 0.12,
+            40: 0.1,
+            50: 0.03
+        })
+        for index, t in enumerate(trophies, 1):
+            factor_list = [f for f in factors.keys() if index <= f]
+            if len(factor_list) > 0:
+                factor = min(factor_list)
+                total += t * factors[factor]
+
+        return int(total)
+
     @racfaudit.command(name="season", pass_context=True)
     async def racfaudit_season(self, ctx, *args):
         """Find top 50 RACF not in Alpha."""
@@ -918,6 +946,26 @@ class RACFAudit:
         ALPHA_CLAN_TAG = '#9PJ82CRC'
 
         member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
+
+        alpha_trophies = [m.get('trophies') for m in member_models if m.get('clan', {}).get('tag') == ALPHA_CLAN_TAG]
+        alpha_clan_trophies = self.calculate_clan_trophies(alpha_trophies)
+        top50_trophies = [m.get('trophies') for m in member_models[:50]]
+        top50_clan_trophies = self.calculate_clan_trophies(top50_trophies)
+
+        # Find alpha rank if top 50 in alpha
+        api = ClashRoyaleAPI(self.auth)
+        alpha_global_rank = 0
+        try:
+            lb = await api.fetch_clan_leaderboard()
+        except ClashRoyaleAPIError as e:
+            await self.bot.say("Error: {}".format(e.message))
+        else:
+            for item in lb.get('items', []):
+                if item.get('tag') == ALPHA_CLAN_TAG:
+                    alpha_global_rank = item.get('rank')
+
+
+        # logic calc
 
         for index, member_model in enumerate(member_models, 1):
             # non alpha in top 50
@@ -961,11 +1009,17 @@ class RACFAudit:
             out.append(line)
             out_members.append(member)
 
+        # Summary
+        o = [
+            '50th in 100T = {:,} :trophy: '.format(trophy_50),
+            'Alpha Clan Trophies: {:,} :trophy:'.format(alpha_clan_trophies),
+            'Global Rank: {:,}'.format(alpha_global_rank),
+            'Top 50 Clan Trophies: {:,} :trophy:'.format(top50_clan_trophies)
+        ]
+
+        await self.bot.say('\n'.join(o))
 
         # top 50 not in alpha
-
-        await self.bot.say('50th in 100T = {} :trophy: '.format(trophy_50))
-
         out = ['Top 50 not in Alpha']
         out_members = []
         for result in top50_results:
