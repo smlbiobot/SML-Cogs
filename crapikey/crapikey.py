@@ -240,7 +240,7 @@ class CRAPIKey:
 
     @commands.group(pass_context=True)
     async def crapikey(self, ctx):
-        """cr-api.com developer key"""
+        """royaleapi.com developer key"""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
@@ -299,7 +299,7 @@ class CRAPIKey:
             await self.bot.say("Key found for {member}. Please check your DM.".format(member=author))
             await self.bot.send_message(
                 author,
-                "The cr-api.com developer key for {member} is: ```{token}```".format(
+                "The royaleapi.com developer key for {member} is: ```{token}```".format(
                     member=author, token=token))
         except ServerError as e:
             await self.send_error_message(ctx, e.data)
@@ -318,7 +318,7 @@ class CRAPIKey:
             await self.bot.say("Key found for {member}. Please check your DM.".format(member=member))
             await self.bot.send_message(
                 author,
-                "The cr-api.com developer key for {member} is: ```{token}```".format(
+                "The royaleapi.com developer key for {member} is: ```{token}```".format(
                     member=member, token=token))
         except ServerError as e:
             await self.send_error_message(ctx, e.data)
@@ -337,7 +337,7 @@ class CRAPIKey:
             await self.bot.say("Key renewed for {member}. Please check your DM.".format(member=member))
             await self.bot.send_message(
                 author,
-                "The cr-api.com developer key for {member} is: ```{token}```".format(
+                "The royaleapi.com developer key for {member} is: ```{token}```".format(
                     member=member, token=token))
         except ServerError as e:
             await self.send_error_message(ctx, e.data)
