@@ -955,15 +955,32 @@ class RACFAudit:
         # Find alpha rank if top 50 in alpha
         api = ClashRoyaleAPI(self.auth)
         alpha_global_rank = 0
+        possible_alpha_rank = 0
+        ranks = []
         try:
             lb = await api.fetch_clan_leaderboard()
         except ClashRoyaleAPIError as e:
             await self.bot.say("Error: {}".format(e.message))
         else:
-            for item in lb.get('items', []):
+            items = lb.get('items', [])
+            for item in items:
                 if item.get('tag') == ALPHA_CLAN_TAG:
                     alpha_global_rank = item.get('rank')
+            clan_scores = [item.get('clanScore') for item in items]
 
+            possible_alpha_rank = len([score for score in clan_scores if score > top50_clan_trophies])
+
+
+        # Summary
+        o = [
+            '50th in 100T = {:,} :trophy: '.format(trophy_50),
+            'Alpha Clan Trophies: {:,} :trophy:'.format(alpha_clan_trophies),
+            'Global Rank: {:,}'.format(alpha_global_rank),
+            'Top 50 Clan Trophies: {:,} :trophy:'.format(top50_clan_trophies),
+            'Possible Rank: {:,}'.format(possible_alpha_rank),
+        ]
+
+        await self.bot.say('\n'.join(o))
 
         # logic calc
 
@@ -1008,16 +1025,6 @@ class RACFAudit:
             )
             out.append(line)
             out_members.append(member)
-
-        # Summary
-        o = [
-            '50th in 100T = {:,} :trophy: '.format(trophy_50),
-            'Alpha Clan Trophies: {:,} :trophy:'.format(alpha_clan_trophies),
-            'Global Rank: {:,}'.format(alpha_global_rank),
-            'Top 50 Clan Trophies: {:,} :trophy:'.format(top50_clan_trophies)
-        ]
-
-        await self.bot.say('\n'.join(o))
 
         # top 50 not in alpha
         out = ['Top 50 not in Alpha']
