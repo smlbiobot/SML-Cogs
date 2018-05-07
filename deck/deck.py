@@ -823,23 +823,26 @@ class Deck:
     async def on_message(self, msg):
         """Listen for decklinks, auto create useful image."""
         server = msg.server
-        auto_deck_link = self.settings["Servers"][server.id].get('auto_deck_link', False)
+        try:
+            auto_deck_link = self.settings["Servers"][server.id].get('auto_deck_link', False)
+        except KeyError:
+            self.settings["Servers"][server.id] = {}
+        else:
+            if auto_deck_link:
+                card_keys = await self.decklink_to_cards(msg.content)
+                if card_keys is None:
+                    return
 
-        if auto_deck_link:
-            card_keys = await self.decklink_to_cards(msg.content)
-            if card_keys is None:
-                return
+                CTX = namedtuple("CTX", ['bot', 'message'])
+                ctx = CTX(self.bot, msg)
+                deck = card_keys
+                deck_name = ''
+                member = msg.author
 
-            CTX = namedtuple("CTX", ['bot', 'message'])
-            ctx = CTX(self.bot, msg)
-            deck = card_keys
-            deck_name = ''
-            member = msg.author
-
-            await self.upload_deck_image(ctx, deck, deck_name, member)
-            await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys))
-            await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys, war=True))
-            await self.bot.delete_message(msg)
+                await self.upload_deck_image(ctx, deck, deck_name, member)
+                await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys))
+                await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys, war=True))
+                await self.bot.delete_message(msg)
 
 
 def check_folder():
