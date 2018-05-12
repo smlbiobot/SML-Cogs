@@ -38,6 +38,7 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import box, bold
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
+import asyncio
 import statistics
 
 PATH = os.path.join("data", "crapikey")
@@ -255,6 +256,19 @@ class CRAPIKey:
         """Return true if command can be run on channel."""
         return channel.name == self.config.channels.endusers
 
+    async def say_error_validation_message(self, ctx):
+        """Announce validation message and remove after timeout."""
+        server = ctx.message.server
+        channel = discord.utils.get(server.channels, name=self.config.channels.endusers)
+        announce = await self.bot.say(
+            "You cannot run this command in this channel. "
+            "Please run this command at {}.".format(
+                channel.mention))
+        # sleep for 60 seconds and remove both messages
+        await asyncio.sleep(60)
+        await self.bot.delete_message(ctx.message)
+        await self.bot.delete_message(announce)
+
     async def validate_run_channel(self, ctx):
         """Validate command is run at desired channel."""
         server = ctx.message.server
@@ -264,13 +278,16 @@ class CRAPIKey:
             await self.bot.say("You cannot request a key from this server.")
             return False
         elif not self.valid_channel(channel):
-            channel = discord.utils.get(server.channels, name=self.config.channels.endusers)
-            await self.bot.say(
-                "You cannot run this command in this channel. "
-                "Please run this command at {}.".format(
-                    channel.mention))
+            await self.say_error_validation_message(ctx)
+            # channel = discord.utils.get(server.channels, name=self.config.channels.endusers)
+            # await self.bot.say(
+            #     "You cannot run this command in this channel. "
+            #     "Please run this command at {}.".format(
+            #         channel.mention))
             return False
         return True
+
+
 
     async def server_log(self, ctx, action, data=None):
         """Send server log to designated channel."""
