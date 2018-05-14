@@ -124,12 +124,12 @@ class Activity:
         """Log number of messages."""
         server = message.server
         author = message.author
+        channel = message.channel
 
         self.table_messages.insert({
             'author_id': author.id,
-            'author_name': author.display_name,
             'server_id': server.id,
-            'server_name': server.name,
+            'channel_id': channel.id,
             'message_content': message.content,
             'timestamp': dt.datetime.utcnow()
         })
