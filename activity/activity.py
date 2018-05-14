@@ -24,18 +24,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import os
-
-from tinydb import TinyDB
-from tinydb import Query
-from tinydb.storages import JSONStorage
-from tinydb_serialization import SerializationMiddleware
-
 import datetime as dt
-
-from tinydb_serialization import Serializer
-
-
+import os
 
 import aiohttp
 import discord
@@ -43,6 +33,11 @@ from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import Context
+from tinydb import Query
+from tinydb import TinyDB
+from tinydb.storages import JSONStorage
+from tinydb_serialization import SerializationMiddleware
+from tinydb_serialization import Serializer
 
 PATH_LIST = ['data', 'activity']
 PATH = os.path.join(*PATH_LIST)
@@ -50,6 +45,7 @@ JSON = os.path.join(*PATH_LIST, "settings.json")
 DB = os.path.join(*PATH_LIST, "db.json")
 HOST = '127.0.0.1'
 INTERVAL = 5
+
 
 class DateTimeSerializer(Serializer):
     OBJ_CLASS = dt.datetime  # The class this serializer handles
@@ -61,7 +57,7 @@ class DateTimeSerializer(Serializer):
         return dt.datetime.strptime(s, '%Y-%m-%dT%H:%M:%S')
 
 
-serialization = SerializationMiddleware()
+serialization = SerializationMiddleware(JSONStorage)
 serialization.register_serializer(DateTimeSerializer(), 'TinyDate')
 
 
@@ -107,16 +103,36 @@ class Activity:
         dataIO.save_json(JSON, self.settings)
 
     @commands.group(pass_context=True)
-    @checks.is_owner()
+    @checks.mod_or_permissions()
     async def activityset(self, ctx: Context):
         """Change activity logging settings."""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
+    @activityset.command(name="toggle", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
+    async def as_toggle(self, ctx):
+        """Toggle server monitoring."""
+        server_id = ctx.message.server.id
+
+        Settings = Query()
+        db = self.db.table('settings')
+        results = db.search(Settings.server_id == server_id)
+
+        if len(results) == 0:
+            on_off = True
+        else:
+            r = results[0]
+            on_off = not r['on_off']
+
+        db.upsert({'server_id': server_id, 'on_off': on_off}, Settings.server_id == server_id)
+
+        await self.bot.say("Monitor server activity: {}".format(on_off))
+
     @commands.group(pass_context=True)
     @checks.is_owner()
-    async def activityset(self, ctx: Context):
-        """Change activity logging settings."""
+    async def activity(self, ctx: Context):
+        """Activity."""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
@@ -126,6 +142,14 @@ class Activity:
         author = message.author
         channel = message.channel
 
+        Settings = Query()
+        db = self.table_settings
+        r = db.get(Settings.server_id == server.id)
+
+        if r is not None:
+            if not r['on_off']:
+                return
+
         self.table_messages.insert({
             'author_id': author.id,
             'server_id': server.id,
@@ -133,7 +157,6 @@ class Activity:
             'message_content': message.content,
             'timestamp': dt.datetime.utcnow()
         })
-
 
 
 def check_folders():
