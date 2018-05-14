@@ -151,7 +151,7 @@ class Activity:
             })
         channel_counts = sorted(channel_counts, key=lambda x: x['count'], reverse=True)
 
-        out = ['{}: {}'.format(c['name'], c['count']) for c in channel_counts]
+        out = ['{}: {}'.format(c['name'], c['count']) for c in channel_counts if c['count'] > 0]
         await self.bot.say('\n'.join(out))
 
     async def on_message(self, message: discord.Message):
