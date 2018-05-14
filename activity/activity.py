@@ -127,6 +127,7 @@ class Activity:
 
         self.table_messages.insert({
             'author_id': author.id,
+            'author_name': author.display_name,
             'server_id': server.id,
             'server_name': server.name,
             'message_content': message.content,
