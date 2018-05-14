@@ -131,6 +131,7 @@ class Activity:
             'server_id': server.id,
             'server_name': server.name,
             'message_content': message.content,
+            'timestamp': dt.datetime.utcnow()
         })
 
 
