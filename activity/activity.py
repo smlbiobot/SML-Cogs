@@ -158,6 +158,25 @@ class Activity:
         out.extend(['{}: {}'.format(c['name'], c['count']) for c in channel_counts if c['count'] > 0])
         await self.bot.say('\n'.join(out))
 
+    @activity.command(name="server", aliases=['s'], pass_context=True, no_pm=True)
+    async def a_user(self, ctx, member: discord.Member = None):
+        """Show my activity."""
+        await self.bot.type()
+        server = ctx.message.server
+        Msg = Query()
+        counts = []
+        for member in server.members:
+            counts.append({
+                'id': member.id,
+                'name': member.display_name,
+                'count': self.db.count((Msg.server_id == server.id) & (Msg.author_id == member.id))
+            })
+            counts = sorted(counts, key=lambda x: x['count'], reverse=True)
+
+        out = ['Server activity for {}'.format(server)]
+        out.extend(['{}: {}'.format(c['name'], c['count']) for c in counts if c['count'] > 0][:10])
+        await self.bot.say('\n'.join(out))
+
     async def on_message(self, message: discord.Message):
         """Log number of messages."""
         server = message.server
