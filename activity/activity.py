@@ -137,7 +137,7 @@ class Activity:
 
     @activity.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
     async def a_user(self, ctx, member: discord.Member=None):
-        """Show my activity."""
+        """User activity."""
         server = ctx.message.server
         author = ctx.message.author
 
@@ -159,8 +159,8 @@ class Activity:
         await self.bot.say('\n'.join(out))
 
     @activity.command(name="server", aliases=['s'], pass_context=True, no_pm=True)
-    async def a_user(self, ctx, member: discord.Member = None):
-        """Show my activity."""
+    async def a_server(self, ctx):
+        """Server activity."""
         await self.bot.type()
         server = ctx.message.server
         Msg = Query()
