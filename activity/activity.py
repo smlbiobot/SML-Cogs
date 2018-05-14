@@ -129,17 +129,20 @@ class Activity:
 
         await self.bot.say("Monitor server activity: {}".format(on_off))
 
-    @commands.group(pass_context=True)
+    @commands.group(pass_context=True, aliases=['act'])
     async def activity(self, ctx):
         """Activity."""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
-    @activity.command(name="me", pass_context=True, no_pm=True)
-    async def a_me(self, ctx):
+    @activity.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
+    async def a_user(self, ctx, member: discord.Member=None):
         """Show my activity."""
         server = ctx.message.server
         author = ctx.message.author
+
+        if member is None:
+            member = author
 
         M = Query()
         channel_counts = []
@@ -147,11 +150,12 @@ class Activity:
             channel_counts.append({
                 'id': channel.id,
                 'name': channel.name,
-                'count': self.db.count((M.channel_id == channel.id) & (M.author_id == author.id))
+                'count': self.db.count((M.channel_id == channel.id) & (M.author_id == member.id))
             })
         channel_counts = sorted(channel_counts, key=lambda x: x['count'], reverse=True)
 
-        out = ['{}: {}'.format(c['name'], c['count']) for c in channel_counts if c['count'] > 0]
+        out = ['Channel activity for {}'.format(member)]
+        out.extend(['{}: {}'.format(c['name'], c['count']) for c in channel_counts if c['count'] > 0])
         await self.bot.say('\n'.join(out))
 
     async def on_message(self, message: discord.Message):
