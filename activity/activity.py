@@ -130,11 +130,29 @@ class Activity:
         await self.bot.say("Monitor server activity: {}".format(on_off))
 
     @commands.group(pass_context=True)
-    @checks.is_owner()
-    async def activity(self, ctx: Context):
+    async def activity(self, ctx):
         """Activity."""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
+
+    @activity.command(name="me", pass_context=True, no_pm=True)
+    async def a_me(self, ctx):
+        """Show my activity."""
+        server = ctx.message.server
+        author = ctx.message.author
+
+        M = Query()
+        channel_counts = []
+        for channel in server.channels:
+            channel_counts.append({
+                'id': channel.id,
+                'name': channel.name,
+                'count': self.db.count((M.channel_id == channel.id) & (M.author_id == author.id))
+            })
+        channel_counts = sorted(channel_counts, key=lambda x: x['count'], reverse=True)
+
+        out = ['{}: {}'.format(c['name'], c['count']) for c in channel_counts]
+        await self.bot.say('\n'.join(out))
 
     async def on_message(self, message: discord.Message):
         """Log number of messages."""
