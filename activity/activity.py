@@ -183,7 +183,7 @@ class Activity:
 
         mc_authors = Counter(authors).most_common(10)
 
-        out = ['Server activity for {}'.format(server)]
+        out = ['Server activity for {}, last {} days'.format(server, days)]
         for c in mc_authors:
             member = server.get_member(c[0])
             name = member.display_name if member else 'User {}'.format(c[0])
