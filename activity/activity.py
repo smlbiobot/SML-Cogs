@@ -199,7 +199,8 @@ class Activity:
             'server_id': server.id,
             'channel_id': channel.id,
             'message_content': message.content,
-            'timestamp': dt.datetime.utcnow()
+            'timestamp': dt.datetime.utcnow(),
+            'bot': author.bot
         })
 
 
