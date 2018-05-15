@@ -534,7 +534,7 @@ class RACFAudit:
 
         # filter by clan name
         if pargs.clan:
-            results = [m for m in results if pargs.clan.lower() in m.get('clan_name').lower()]
+            results = [m for m in results if pargs.clan.lower() in m.get('clan', {}).get('name', '').lower()]
 
         # filter by trophies
         results = [m for m in results if pargs.min <= m.get('trophies') <= pargs.max]
