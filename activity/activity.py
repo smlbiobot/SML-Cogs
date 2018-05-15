@@ -38,6 +38,7 @@ from tinydb import TinyDB
 from tinydb.storages import JSONStorage
 from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization import Serializer
+from collections import Counter
 
 PATH_LIST = ['data', 'activity']
 PATH = os.path.join(*PATH_LIST)
@@ -164,17 +165,19 @@ class Activity:
         await self.bot.type()
         server = ctx.message.server
         Msg = Query()
-        counts = []
-        for member in server.members:
-            counts.append({
-                'id': member.id,
-                'name': member.display_name,
-                'count': self.db.count((Msg.server_id == server.id) & (Msg.author_id == member.id))
-            })
-            counts = sorted(counts, key=lambda x: x['count'], reverse=True)
+        results = self.db.search(Msg.server_id == server.id)
+        authors = []
+        for r in results:
+            authors.append(r['author_id'])
+
+        mc_authors = Counter(authors).most_common(10)
 
         out = ['Server activity for {}'.format(server)]
-        out.extend(['{}: {}'.format(c['name'], c['count']) for c in counts if c['count'] > 0][:10])
+        for c in mc_authors:
+            member = server.get_member(c[0])
+            name = member.display_name if member else 'User {}'.format(c[0])
+            out.append('{}: {}'.format(name, c[1]))
+
         await self.bot.say('\n'.join(out))
 
     async def on_message(self, message: discord.Message):
