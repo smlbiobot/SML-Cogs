@@ -137,7 +137,7 @@ class Activity:
             await self.bot.send_cmd_help(ctx)
 
     @activity.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def a_user(self, ctx, member: discord.Member=None):
+    async def a_user(self, ctx, member: discord.Member=None, days=7):
         """User activity."""
         server = ctx.message.server
         author = ctx.message.author
@@ -145,27 +145,38 @@ class Activity:
         if member is None:
             member = author
 
+        from_date = dt.datetime.utcnow() - dt.timedelta(days=days)
+
         M = Query()
         channel_counts = []
         for channel in server.channels:
             channel_counts.append({
                 'id': channel.id,
                 'name': channel.name,
-                'count': self.db.count((M.channel_id == channel.id) & (M.author_id == member.id))
+                'count': self.db.count(
+                    (M.channel_id == channel.id)
+                    & (M.author_id == member.id)
+                    & (M.timestamp >= from_date)
+                )
             })
         channel_counts = sorted(channel_counts, key=lambda x: x['count'], reverse=True)
 
-        out = ['Channel activity for {}'.format(member)]
+        out = ['Server activity for {}, last {} days'.format(member, days)]
         out.extend(['{}: {}'.format(c['name'], c['count']) for c in channel_counts if c['count'] > 0])
         await self.bot.say('\n'.join(out))
 
     @activity.command(name="server", aliases=['s'], pass_context=True, no_pm=True)
-    async def a_server(self, ctx):
+    async def a_server(self, ctx, days=7):
         """Server activity."""
         await self.bot.type()
         server = ctx.message.server
+        from_date = dt.datetime.utcnow() - dt.timedelta(days=days)
+
         Msg = Query()
-        results = self.db.search(Msg.server_id == server.id)
+        results = self.db.search(
+            (Msg.server_id == server.id)
+            & (Msg.timestamp >= from_date)
+        )
         authors = []
         for r in results:
             authors.append(r['author_id'])
