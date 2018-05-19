@@ -266,10 +266,14 @@ class Activity:
         if pargs.roles:
             for author_id, count in author_id_mc.copy():
                 member = server.get_member(author_id)
-                for role_name in pargs.roles:
-                    if role_name.lower() in [r.name.lower() for r in member.roles]:
-                        mc.append((author_id, count))
-                        break
+                if member is not None:
+                    for role_name in pargs.roles:
+                        if role_name.lower() in [r.name.lower() for r in member.roles]:
+                            mc.append((author_id, count))
+                            break
+                # break out of loop if over required limit
+                if len(mc) > limit:
+                    break
         else:
             mc = author_id_mc.copy()
 
