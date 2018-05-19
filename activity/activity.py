@@ -139,6 +139,7 @@ class Activity:
     @activity.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
     async def a_user(self, ctx, member: discord.Member=None, days=7):
         """User activity."""
+        await self.bot.type()
         server = ctx.message.server
         author = ctx.message.author
 
@@ -147,22 +148,21 @@ class Activity:
 
         from_date = dt.datetime.utcnow() - dt.timedelta(days=days)
 
-        M = Query()
-        channel_counts = []
-        for channel in server.channels:
-            channel_counts.append({
-                'id': channel.id,
-                'name': channel.name,
-                'count': self.db.count(
-                    (M.channel_id == channel.id)
-                    & (M.author_id == member.id)
-                    & (M.timestamp >= from_date)
-                )
-            })
-        channel_counts = sorted(channel_counts, key=lambda x: x['count'], reverse=True)
+        Msg = Query()
 
-        out = ['Server activity for {}, last {} days'.format(member, days)]
-        out.extend(['{}: {}'.format(c['name'], c['count']) for c in channel_counts if c['count'] > 0])
+        results = self.db.search(
+            (Msg.server_id == server.id)
+            & (Msg.author_id == member.id)
+            & (Msg.timestamp >= from_date)
+        )
+        channel_ids = [r['channel_id'] for r in results]
+        channel_id_mc = Counter(channel_ids).most_common()
+
+        out = ['Channel activity for {}, last {} days'.format(author, days)]
+        for c in channel_id_mc:
+            channel = server.get_channel(c[0])
+            out.append('{}: {}'.format(channel, c[1]))
+
         await self.bot.say('\n'.join(out))
 
     @activity.command(name="server", aliases=['s'], pass_context=True, no_pm=True)
