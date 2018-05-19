@@ -137,7 +137,7 @@ class Activity:
             await self.bot.send_cmd_help(ctx)
 
     @activity.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def a_user(self, ctx, member: discord.Member=None, days=7):
+    async def a_user(self, ctx, member: discord.Member=None, limit=10, days=7):
         """User activity."""
         await self.bot.type()
         server = ctx.message.server
@@ -158,15 +158,15 @@ class Activity:
         channel_ids = [r['channel_id'] for r in results]
         channel_id_mc = Counter(channel_ids).most_common()
 
-        out = ['Channel activity for {}, last {} days'.format(author, days)]
-        for c in channel_id_mc:
+        out = ['Channel activity for {}, top {}, last {} days'.format(author, limit, days)]
+        for c in channel_id_mc[:limit]:
             channel = server.get_channel(c[0])
             out.append('{}: {}'.format(channel, c[1]))
 
         await self.bot.say('\n'.join(out))
 
     @activity.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
-    async def a_channel(self, ctx, channel: discord.Channel = None, days=7):
+    async def a_channel(self, ctx, channel: discord.Channel = None, limit=10, days=7):
         """Channel activity."""
         await self.bot.type()
         server = ctx.message.server
@@ -184,15 +184,15 @@ class Activity:
         author_ids = [r['author_id'] for r in results]
         author_id_mc = Counter(author_ids).most_common()
 
-        out = ['User activity for {}, last {} days'.format(channel.mention, days)]
-        for c in author_id_mc:
+        out = ['User activity for {}, top {},  last {} days'.format(channel.mention, limit, days)]
+        for c in author_id_mc[:limit]:
             member = server.get_member(c[0])
             out.append('{}: {}'.format(member, c[1]))
 
         await self.bot.say('\n'.join(out))
 
     @activity.command(name="server", aliases=['s'], pass_context=True, no_pm=True)
-    async def a_server(self, ctx, days=7):
+    async def a_server(self, ctx, limit=10, days=7):
         """Server activity."""
         await self.bot.type()
         server = ctx.message.server
@@ -209,8 +209,8 @@ class Activity:
 
         mc_authors = Counter(authors).most_common(10)
 
-        out = ['Server activity for {}, last {} days'.format(server, days)]
-        for c in mc_authors:
+        out = ['Server activity for {}, top {}, last {} days'.format(server, limit, days)]
+        for c in mc_authors[:limit]:
             member = server.get_member(c[0])
             name = member.display_name if member else 'User {}'.format(c[0])
             out.append('{}: {}'.format(name, c[1]))
