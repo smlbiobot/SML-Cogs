@@ -26,10 +26,12 @@ DEALINGS IN THE SOFTWARE.
 
 import datetime as dt
 import os
+from collections import Counter
 
 import aiohttp
 import discord
 from cogs.utils import checks
+from cogs.utils.chat_formatting import box
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import Context
@@ -38,7 +40,6 @@ from tinydb import TinyDB
 from tinydb.storages import JSONStorage
 from tinydb_serialization import SerializationMiddleware
 from tinydb_serialization import Serializer
-from collections import Counter
 
 PATH_LIST = ['data', 'activity']
 PATH = os.path.join(*PATH_LIST)
@@ -136,8 +137,37 @@ class Activity:
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
+    def output_str(self, title, mc_list, server=None, limit=10, prop=None):
+        """
+        output str
+        :param title:
+        :param mc_list:
+        :param prop:
+        :return:
+        """
+        if prop is None:
+            return ''
+        if server is None:
+            return ''
+
+        out = []
+        for c in mc_list[:limit]:
+            name = ''
+            if prop == 'channel':
+                name = server.get_channel(c[0]).name
+            elif prop == 'member':
+                member = server.get_member(c[0])
+                if member is None:
+                    name = 'User {}'.format(c[0])
+                else:
+                    name = member.display_name
+            out.append('{:<20.20}: {:>3}'.format(name, c[1]))
+
+        s = '\n'.join([title, box('\n'.join(out), lang='py')])
+        return s
+
     @activity.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def a_user(self, ctx, member: discord.Member=None, limit=10, days=7):
+    async def a_user(self, ctx, member: discord.Member = None, limit=10, days=7):
         """User activity."""
         await self.bot.type()
         server = ctx.message.server
@@ -158,12 +188,15 @@ class Activity:
         channel_ids = [r['channel_id'] for r in results]
         channel_id_mc = Counter(channel_ids).most_common()
 
-        out = ['Channel activity for {}, top {}, last {} days'.format(author, limit, days)]
-        for c in channel_id_mc[:limit]:
-            channel = server.get_channel(c[0])
-            out.append('{}: {}'.format(channel, c[1]))
-
-        await self.bot.say('\n'.join(out))
+        await self.bot.say(
+            self.output_str(
+                'Channel activity for {}, top {}, last {} days'.format(author, limit, days),
+                channel_id_mc,
+                server=server,
+                limit=limit,
+                prop='channel'
+            )
+        )
 
     @activity.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
     async def a_channel(self, ctx, channel: discord.Channel = None, limit=10, days=7):
@@ -184,12 +217,15 @@ class Activity:
         author_ids = [r['author_id'] for r in results]
         author_id_mc = Counter(author_ids).most_common()
 
-        out = ['User activity for {}, top {},  last {} days'.format(channel.mention, limit, days)]
-        for c in author_id_mc[:limit]:
-            member = server.get_member(c[0])
-            out.append('{}: {}'.format(member, c[1]))
-
-        await self.bot.say('\n'.join(out))
+        await self.bot.say(
+            self.output_str(
+                'User activity for {}, top {},  last {} days'.format(channel.mention, limit, days),
+                author_id_mc,
+                server=server,
+                limit=limit,
+                prop='member'
+            )
+        )
 
     @activity.command(name="server", aliases=['s'], pass_context=True, no_pm=True)
     async def a_server(self, ctx, limit=10, days=7):
@@ -207,15 +243,17 @@ class Activity:
         for r in results:
             authors.append(r['author_id'])
 
-        mc_authors = Counter(authors).most_common(10)
+        mc_authors = Counter(authors).most_common(limit)
 
-        out = ['Server activity for {}, top {}, last {} days'.format(server, limit, days)]
-        for c in mc_authors[:limit]:
-            member = server.get_member(c[0])
-            name = member.display_name if member else 'User {}'.format(c[0])
-            out.append('{}: {}'.format(name, c[1]))
-
-        await self.bot.say('\n'.join(out))
+        await self.bot.say(
+            self.output_str(
+                'Server activity for {}, top {}, last {} days'.format(server, limit, days),
+                mc_authors,
+                server=server,
+                limit=limit,
+                prop='member'
+            )
+        )
 
     async def on_message(self, message: discord.Message):
         """Log number of messages."""
