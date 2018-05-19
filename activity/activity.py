@@ -161,7 +161,7 @@ class Activity:
                     name = 'User {}'.format(c[0])
                 else:
                     name = member.display_name
-            out.append('{:<20.20}: {:>3}'.format(name, c[1]))
+            out.append('{:<20.20}: {:>5}'.format(name, c[1]))
 
         s = '\n'.join([title, box('\n'.join(out), lang='py')])
         return s
