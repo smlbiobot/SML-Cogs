@@ -165,6 +165,32 @@ class Activity:
 
         await self.bot.say('\n'.join(out))
 
+    @activity.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
+    async def a_channel(self, ctx, channel: discord.Channel = None, days=7):
+        """Channel activity."""
+        await self.bot.type()
+        server = ctx.message.server
+
+        if channel is None:
+            channel = ctx.message.channel
+
+        from_date = dt.datetime.utcnow() - dt.timedelta(days=days)
+
+        Msg = Query()
+        results = self.db.search(
+            (Msg.channel_id == channel.id)
+            & (Msg.timestamp >= from_date)
+        )
+        author_ids = [r['author_id'] for r in results]
+        author_id_mc = Counter(author_ids).most_common()
+
+        out = ['User activity for {}, last {} days'.format(channel.mention, days)]
+        for c in author_id_mc:
+            member = server.get_member(c[0])
+            out.append('{}: {}'.format(member, c[1]))
+
+        await self.bot.say('\n'.join(out))
+
     @activity.command(name="server", aliases=['s'], pass_context=True, no_pm=True)
     async def a_server(self, ctx, days=7):
         """Server activity."""
