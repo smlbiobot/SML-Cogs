@@ -24,6 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import argparse
 import datetime as dt
 import os
 from collections import Counter
@@ -131,11 +132,30 @@ class Activity:
 
         await self.bot.say("Monitor server activity: {}".format(on_off))
 
-    @commands.group(pass_context=True, aliases=['act'])
-    async def activity(self, ctx):
-        """Activity."""
-        if ctx.invoked_subcommand is None:
-            await self.bot.send_cmd_help(ctx)
+
+
+    def parser(self, cat):
+        """Argument parser."""
+        parser = argparse.ArgumentParser(prog='[p]activity')
+        parser.add_argument(
+            '-r', '--roles',
+            nargs='+',
+            help='Include roles')
+        parser.add_argument(
+            '-t', '--top',
+            nargs=1,
+            help='Top N results',
+            type=int,
+            default=10
+        )
+        parser.add_argument(
+            '-d', '--days',
+            nargs=1,
+            help='Last N days',
+            type=int,
+            default=7
+        )
+        return parser
 
     def output_str(self, title, mc_list, server=None, limit=10, prop=None):
         """
@@ -166,10 +186,26 @@ class Activity:
         s = '\n'.join([title, box('\n'.join(out), lang='py')])
         return s
 
+    @commands.group(pass_context=True, aliases=['act'])
+    async def activity(self, ctx):
+        """Activity."""
+        if ctx.invoked_subcommand is None:
+            await self.bot.send_cmd_help(ctx)
+
     @activity.command(name="user", aliases=['u'], pass_context=True, no_pm=True)
-    async def a_user(self, ctx, member: discord.Member = None, limit=10, days=7):
+    async def a_user(self, ctx, member: discord.Member = None, *args):
         """User activity."""
         await self.bot.type()
+
+        parser = self.parser('channel')
+        try:
+            pargs = parser.parse_args(args)
+        except SystemExit:
+            await self.bot.send_cmd_help(ctx)
+            return
+        limit = pargs.top
+        days = pargs.days
+
         server = ctx.message.server
         author = ctx.message.author
 
@@ -192,16 +228,24 @@ class Activity:
             self.output_str(
                 'Channel activity for {}, top {}, last {} days'.format(author, limit, days),
                 channel_id_mc,
-                server=server,
-                limit=limit,
-                prop='channel'
+                server=server, limit=limit, prop='channel'
             )
         )
 
     @activity.command(name="channel", aliases=['c'], pass_context=True, no_pm=True)
-    async def a_channel(self, ctx, channel: discord.Channel = None, limit=10, days=7):
+    async def a_channel(self, ctx, channel: discord.Channel = None, *args):
         """Channel activity."""
         await self.bot.type()
+
+        parser = self.parser('channel')
+        try:
+            pargs = parser.parse_args(args)
+        except SystemExit:
+            await self.bot.send_cmd_help(ctx)
+            return
+        limit = pargs.top
+        days = pargs.days
+
         server = ctx.message.server
 
         if channel is None:
@@ -217,20 +261,41 @@ class Activity:
         author_ids = [r['author_id'] for r in results]
         author_id_mc = Counter(author_ids).most_common()
 
+        # Limit members by roles
+        mc = []
+        if pargs.roles:
+            for author_id, count in author_id_mc.copy():
+                member = server.get_member(author_id)
+                for role_name in pargs.roles:
+                    if role_name.lower() in [r.name.lower() for r in member.roles]:
+                        mc.append((author_id, count))
+                        break
+        else:
+            mc = author_id_mc.copy()
+
+
         await self.bot.say(
             self.output_str(
                 'User activity for {}, top {},  last {} days'.format(channel.mention, limit, days),
-                author_id_mc,
-                server=server,
-                limit=limit,
-                prop='member'
+                mc,
+                server=server, limit=limit, prop='member'
             )
         )
 
     @activity.command(name="server", aliases=['s'], pass_context=True, no_pm=True)
-    async def a_server(self, ctx, limit=10, days=7):
+    async def a_server(self, ctx, *args):
         """Server activity."""
         await self.bot.type()
+
+        parser = self.parser('server')
+        try:
+            pargs = parser.parse_args(args)
+        except SystemExit:
+            await self.bot.send_cmd_help(ctx)
+            return
+        limit = pargs.top
+        days = pargs.days
+
         server = ctx.message.server
         from_date = dt.datetime.utcnow() - dt.timedelta(days=days)
 
@@ -249,9 +314,7 @@ class Activity:
             self.output_str(
                 'Server activity for {}, top {}, last {} days'.format(server, limit, days),
                 mc_authors,
-                server=server,
-                limit=limit,
-                prop='member'
+                server=server, limit=limit, prop='member'
             )
         )
 
