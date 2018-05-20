@@ -559,13 +559,11 @@ class RACFAudit:
                     tag=member_model.get('tag'),
                     clan_name=clan_name,
                     role=get_role_name(member_model.get('role')),
-                    trophies=member_model.get('trophies')
+                    trophies=member_model.get('trophies'),
                 ))
                 if pargs.link:
                     out.append('<http://royaleapi.com/player/{}>'.format(member_model.get('tag')))
                     out.append('<http://royaleapi.com/player/{}/battles>'.format(member_model.get('tag')))
-                    out.append('<http://royaleapi.com/player/{}/decks>'.format(member_model.get('tag')))
-                    out.append('<http://royaleapi.com/player/{}/cards>'.format(member_model.get('tag')))
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
         else:
