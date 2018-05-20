@@ -562,7 +562,7 @@ class RACFAudit:
                     trophies=member_model.get('trophies')
                 ))
                 if pargs.link:
-                    out.append('<http://cr-api.com/player/{}>'.format(member_model.get('tag')))
+                    out.append('<http://royaleapi.com/player/{}>'.format(member_model.get('tag')))
             for page in pagify('\n'.join(out)):
                 await self.bot.say(page)
         else:
