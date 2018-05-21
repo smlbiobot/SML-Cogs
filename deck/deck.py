@@ -816,7 +816,13 @@ class Deck:
                 "ServerName": str(server),
                 "ServerID": str(server.id),
                 "Members": {}}
-            self.save_settings()
+        if "Members" not in self.settings["Servers"][server.id]:
+            self.settings["Servers"][server.id]["Members"] = {}
+        if "ServerName" not in self.settings["Servers"][server.id]:
+            self.settings["Servers"][server.id]["ServerName"] = str(server)
+        if "ServerID" not in self.settings["Servers"][server.id]:
+            self.settings["Servers"][server.id]["ServerID"] = str(server.id)
+        self.save_settings()
 
     def save_settings(self):
         """Save data to settings file."""
