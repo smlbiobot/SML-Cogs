@@ -186,6 +186,7 @@ class Deck:
         Full help
         !deck help
         """
+        self.check_server_settings(ctx.message.server)
 
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
