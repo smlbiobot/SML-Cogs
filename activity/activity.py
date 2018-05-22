@@ -328,6 +328,12 @@ class Activity:
         author = message.author
         channel = message.channel
 
+        if server is None:
+            return
+
+        if channel is None:
+            return
+
         Settings = Query()
         db = self.table_settings
         r = db.get(Settings.server_id == server.id)
