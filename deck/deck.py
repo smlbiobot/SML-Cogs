@@ -831,10 +831,13 @@ class Deck:
     async def on_message(self, msg):
         """Listen for decklinks, auto create useful image."""
         server = msg.server
+        if server is None:
+            return
+        self.check_server_settings(server)
         try:
             auto_deck_link = self.settings["Servers"][server.id].get('auto_deck_link', False)
         except KeyError:
-            self.settings["Servers"][server.id] = {}
+            pass
         else:
             if auto_deck_link:
                 card_keys = await self.decklink_to_cards(msg.content)
