@@ -1239,6 +1239,14 @@ class RACF:
                         await self.bot.remove_roles(member, clan_role)
                         await self.bot.say("Removed {} from {}".format(clan_role, member))
 
+    @checks.mod_or_permissions()
+    @commands.command(name="fadmin", no_pm=True, pass_context=True)
+    async def fadmin(self, ctx, arg):
+        """Return hash used on fadmin."""
+        arg = arg.upper()
+        hash = int(arg[::-1], 36)
+        await self.bot.say("fadmin: {}".format(hash))
+
 
 def check_folder():
     """Check folder."""
