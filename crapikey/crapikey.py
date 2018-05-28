@@ -24,22 +24,21 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import aiohttp
+import asyncio
 import datetime as dt
+import discord
 import json
+import logging
 import os
 import pprint
-from random import choice
-
-import aiohttp
-import discord
 import yaml
 from box import Box
 from cogs.utils import checks
 from cogs.utils.chat_formatting import box, bold
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-import asyncio
-import statistics
+from random import choice
 
 PATH = os.path.join("data", "crapikey")
 JSON = os.path.join(PATH, "settings.json")
@@ -91,7 +90,7 @@ class KeyRemoveFailed(CRAPIKeyError):
 
 
 class CRAPIKey:
-    """Getting a developer key for cr-api.com"""
+    """Getting a developer key for RoyaleAPI.com"""
 
     def __init__(self, bot):
         """Init."""
@@ -287,8 +286,6 @@ class CRAPIKey:
             return False
         return True
 
-
-
     async def server_log(self, ctx, action, data=None):
         """Send server log to designated channel."""
         if data is None:
@@ -320,6 +317,7 @@ class CRAPIKey:
                     member=author, token=token))
         except ServerError as e:
             await self.send_error_message(ctx, e.data)
+            logging.exception(e)
 
         await self.server_log(ctx, "Get Key", data)
 
@@ -441,7 +439,8 @@ class CRAPIKey:
         request_count = key.get('requestCount', default)
         request_count_str = ''
         if isinstance(request_count, dict):
-            request_count_str = box('\n'.join(["{} : {:>10,}".format(k, v) for k, v in request_count.items()]), lang='python')
+            request_count_str = box('\n'.join(["{} : {:>10,}".format(k, v) for k, v in request_count.items()]),
+                                    lang='python')
 
         out.append('Request Count: {}'.format(request_count_str))
 
@@ -481,7 +480,6 @@ class CRAPIKey:
 
         author = ctx.message.author
         await self.crapikey_stats_member(ctx, author)
-
 
     @checks.serverowner_or_permissions(manage_server=True)
     @crapikey.command(name="adminstats", pass_context=True, no_pm=False)
