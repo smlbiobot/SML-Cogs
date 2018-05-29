@@ -512,7 +512,7 @@ class Clans:
         em = discord.Embed(
             title=config.name,
             color=discord.Color(int(config.color, 16)),
-            description='Member list shows battles remaining. Results are truncated.'
+            description='Member list shows battles played. Results are truncated.'
         )
 
         # Badge
