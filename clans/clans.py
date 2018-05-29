@@ -30,6 +30,7 @@ import aiohttp
 import argparse
 import arrow
 import asyncio
+import datetime as dt
 import discord
 import humanfriendly
 import json
@@ -37,7 +38,6 @@ import os
 import re
 import unidecode
 import yaml
-import datetime as dt
 from box import Box
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
@@ -98,6 +98,13 @@ def format_timespan(seconds, short=False, pad=False):
         h = re.sub('(\D)(\d)(\D)', r'\g<1>0\2\3', h)
         h = h.strip()
     return h
+
+
+def smart_truncate(content, length=100, suffix='...'):
+    if len(content) <= length:
+        return content
+    else:
+        return ' '.join(content[:length + 1].split(' ')[0:-1]) + suffix
 
 
 class APIError(Exception):
@@ -195,7 +202,7 @@ class Clans:
     def clans_config(self):
         if os.path.exists(CONFIG_YAML):
             with open(CONFIG_YAML) as f:
-                config = Box(yaml.load(f))
+                config = Box(yaml.load(f), default_box=True)
             return config
         return None
 
@@ -274,7 +281,7 @@ class Clans:
         """
         await self.bot.type()
         config = self.clans_config
-        clan_tags = [clan.tag for clan in config.clans]
+        clan_tags = [clan.tag for clan in config.clans if not clan.hide]
 
         use_cache = False
         clans = []
@@ -504,7 +511,8 @@ class Clans:
         config = self.clans_config
         em = discord.Embed(
             title=config.name,
-            color=discord.Color(int(config.color, 16))
+            color=discord.Color(int(config.color, 16)),
+            description='Member list shows battles remaining. Results are truncated.'
         )
 
         # Badge
@@ -519,36 +527,71 @@ class Clans:
 
         # clan list
         STATES = {
-            'collectionDay': 'Collection Day',
-            'warDay': 'War Day',
-            'notInWar': 'Not in War',
+            'collectionDay': 'Coll',
+            'warDay': 'War',
+            'notInWar': 'N/A',
         }
 
-        for clan in clans:
-            state = clan.get('state')
+        for c in clans:
+            clan = Box(c, default_box=True)
+            state = clan.state
             timespan = None
+            wins = clan.clan.wins
+            crowns = clan.clan.crowns
+            battles_played = clan.clan.battlesPlayed
+
             if state == 'collectionDay':
                 end_time = clan.get('collectionEndTime')
             elif state == 'warDay':
                 end_time = clan.get('warEndTime')
             else:
                 end_time = None
+
             if end_time is not None:
                 dt = arrow.get(end_time, 'YYYYMMDDTHHmmss.SSS').datetime
                 now = arrow.utcnow().datetime
                 span = dt - now
                 timespan = format_timespan(int(span.total_seconds()), short=True, pad=True)
-            lines = []
-            lines.append(STATES.get(clan.get('state'), 'Unknown State'))
-            if timespan is not None:
-                lines.append(timespan)
 
-            name = clan.get('clan', {}).get('name')
-            value = '\n'.join(['`{}`'.format(line) for line in lines])
+            clan_name = clan.clan.name
+            clan_score = clan.clan.clanScore
+            name = '{}'.format(clan_name, clan_score)
+            box_value = (
+                "`{state:<5}{timespan: >11}`"
+                "<:cwwarwin:450890799312404483> {wins} "
+                "<:crownblue:337975460405444608> {crowns} "
+                "<:cwbattle:450889588215513089> {battles_played}"
+                "<:cwtrophy:450878327880941589> {trophies:,}").format(
+                state=STATES.get(clan.get('state'), 'ERR'),
+                timespan=timespan or '',
+                wins=wins,
+                crowns=crowns,
+                battles_played=battles_played,
+                trophies=clan_score
+            )
+
+            if state == 'collectionDay':
+                p_value = ' '.join([
+                    '<:cwbattle:450889588215513089>{}: {} '.format(p.name, p.wins, 3 - p.battlesPlayed) for p in
+                    clan.participants
+                    if p.battlesPlayed < 3
+                ])
+            elif state == 'warDay':
+                p_value = ' '.join([
+                    '<:cwbattle:450889588215513089>{}: {} '.format(p.name, p.wins, 3 - p.battlesPlayed) for p in
+                    clan.participants
+                    if p.battlesPlayed < 1
+                ])
+            else:
+                p_value = ''
+
+            p_value = smart_truncate(p_value, length=400)
+
+            value = '\n'.join([box_value, p_value])
             em.add_field(name=name, value=value, inline=False)
 
         return em
-    
+
     @property
     def clanwars_settings(self):
         return self.settings.get('clan_wars')
@@ -567,7 +610,6 @@ class Clans:
 
     async def update_clanwars(self, message):
         await self.set_clanwars_message_id(message)
-
 
     def save_settings(self):
         dataIO.save_json(JSON, self.settings)
@@ -610,8 +652,15 @@ class Clans:
                         await self.bot.say("Error fetching for clan tag {}".format(tag))
         return clans
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def clanwars(self, ctx, *args):
+    @commands.group(pass_context=True, aliases=['cw'])
+    async def clanwars(self, ctx):
+        """Settings"""
+        if ctx.invoked_subcommand is None:
+            # await self.bot.send_cmd_help(ctx)
+            await ctx.invoke(self.clanwars_default)
+
+    @clanwars.command(name='default', pass_context=True, no_pm=True)
+    async def clanwars_default(self, ctx):
         """Display clan war info.
 
         MOD arguments:
@@ -627,13 +676,35 @@ class Clans:
         em = self.clanwars_embed(clans)
         message = await self.bot.say(embed=em)
 
-        # auto update
-        if 'auto' in args:
-            author = ctx.message.author
-            perms = author.server_permissions
-            if perms.manage_messages:
-                await self.set_clanwars_message_id(message)
-                self.task = self.bot.loop.create_task(self.update_cw_message(message))
+    @checks.mod_or_permissions()
+    @clanwars.command(name='auto', pass_context=True, no_pm=True)
+    async def clanwars_auto(self, ctx):
+        """Auto display clan war info."""
+        if self.api_provider != 'official':
+            await self.bot.say("This command is not supported  for the API provider you have selected.")
+            return
+
+        await self.bot.type()
+
+        clans = await self.get_clanwars()
+        em = self.clanwars_embed(clans)
+        message = await self.bot.say(embed=em)
+
+        await self.set_clanwars_message_id(message)
+        self.task = self.bot.loop.create_task(self.update_cw_message(message))
+
+    @checks.mod_or_permissions()
+    @clanwars.command(name='stop', pass_context=True, no_pm=True)
+    async def clanwars_stop(self, ctx):
+        """Stop auto display"""
+        server = ctx.message.server
+        try:
+            self.settings['clan_wars'][server.id]["message_id"] = None
+            self.save_settings()
+        except KeyError:
+            pass
+
+        await self.bot.say("Auto clan wars update stopped.")
 
 
 def check_folder():
