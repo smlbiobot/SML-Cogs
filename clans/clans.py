@@ -24,17 +24,19 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
-import asyncio
-import json
-import os
-import re
 from collections import defaultdict
 
 import aiohttp
+import argparse
+import arrow
+import asyncio
 import discord
+import json
+import os
+import re
 import unidecode
 import yaml
+import humanfriendly
 from box import Box
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
@@ -54,6 +56,7 @@ def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
 
+
 def clean_tag(tag):
     """clean up tag."""
     if tag is None:
@@ -64,6 +67,32 @@ def clean_tag(tag):
     t = t.strip()
     t = t.upper()
     return t
+
+
+def format_timespan(seconds, short=False):
+    """Wrapper for human friendly, shorten words."""
+    h = humanfriendly.format_timespan(int(seconds))
+    if short:
+        h = h.replace(' weeks', 'w')
+        h = h.replace(' week', 'w')
+        h = h.replace(' days', 'd')
+        h = h.replace(' day', 'd')
+        h = h.replace(' hours', 'h')
+        h = h.replace(' hour', 'h')
+        h = h.replace(' minutes', 'm')
+        h = h.replace(' minute', 'm')
+        h = h.replace(' seconds', 's')
+        h = h.replace(' second', 's')
+        h = h.replace(',', '')
+        h = h.replace(' and', '')
+        h = h.replace('  ', ' ')
+    else:
+        h = h.replace('week', 'wk')
+        h = h.replace('hour', 'hr')
+        h = h.replace('minute', 'min')
+        h = h.replace('second', 'sec')
+    return h
+
 
 class APIError(Exception):
     def __init__(self, message):
@@ -303,7 +332,8 @@ class Clans:
                 if self.api_provider == 'official':
                     for badge in self.badges:
                         if badge.get('id') == clan.get('badgeId'):
-                            badge_url = 'https://royaleapi.github.io/cr-api-assets/badges/{}.png'.format(badge.get('name'))
+                            badge_url = 'https://royaleapi.github.io/cr-api-assets/badges/{}.png'.format(
+                                badge.get('name'))
                 else:
                     badge_url = clan['badge']['image']
 
@@ -454,6 +484,86 @@ class Clans:
                 await self.bot.say(page)
         else:
             await self.bot.say("No results found.")
+
+    def clanwars_embed(self, clans):
+        """Clan wars info embed.
+
+        This allows us to update status easily by supplying new data.
+        """
+        config = self.clans_config
+        em = discord.Embed(
+            title=config.name,
+            color=discord.Color(int(config.color, 16))
+        )
+
+        # Badge
+        badge_url = None
+        for clan in clans:
+            for badge in self.badges:
+                if badge.get('id') == clan.get('clan', {}).get('badgeId'):
+                    badge_url = 'https://royaleapi.github.io/cr-api-assets/badges/{}.png'.format(badge.get('name'))
+
+        if badge_url is not None:
+            em.set_thumbnail(url=badge_url)
+
+        # clan list
+        STATES = {
+            'collectionDay': 'Collection Day',
+            'warDay': 'War Day',
+            'notInWar': 'Not in War',
+        }
+
+        for clan in clans:
+            state = clan.get('state')
+            timespan = None
+            if state == 'collectionDay':
+                end_time = clan.get('collectionEndTime')
+            elif state == 'warDay':
+                end_time = clan.get('warEndTime')
+            else:
+                end_time = None
+            if end_time is not None:
+                dt = arrow.get(end_time, 'YYYYMMDDTHHmmss.SSS').datetime
+                now = arrow.utcnow().datetime
+                span = dt - now
+                timespan = format_timespan(int(span.total_seconds()), short=True)
+            lines = []
+            lines.append(STATES.get(clan.get('state'), 'Unknown State'))
+            if timespan is not None:
+                lines.append(timespan)
+
+            name = clan.get('clan', {}).get('name')
+            value = '\n'.join(['`{}`'.format(line) for line in lines])
+            em.add_field(name=name, value=value, inline=False)
+
+        return em
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def clanwars(self, ctx, *args):
+        """Display clan war info."""
+        if self.api_provider != 'official':
+            await self.bot.say("This command is not supported  for the API provider you have selected.")
+            return
+
+        # official
+        config = self.clans_config
+        clan_tags = [c.tag for c in config.clans]
+        url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}/currentwar'
+
+        clans = []
+        headers = {'Authorization': 'Bearer {}'.format(self.auth)}
+
+        async with aiohttp.ClientSession() as session:
+            for tag in clan_tags:
+                url = url_fmt.format(tag=tag)
+                async with session.get(url, headers=headers) as resp:
+                    if resp.status == 200:
+                        clans.append(await resp.json())
+                    else:
+                        await self.bot.say("Error fetching for clan tag {}".format(tag))
+
+        em = self.clanwars_embed(clans)
+        await self.bot.say(embed=em)
 
 
 def check_folder():

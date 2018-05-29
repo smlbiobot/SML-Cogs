@@ -4,7 +4,7 @@
 	"DESCRIPTION": "Parse trophy requirements from clans",
 	"DISABLED": false,
 	"NAME": "Clans",
-	"REQUIREMENTS": ["crapipy", "python-box", "aiohttp", "unidecode"],
+	"REQUIREMENTS": ["python-box", "aiohttp", "unidecode", "arrow"],
 	"TAGS": ["Clash Royale"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
 }
