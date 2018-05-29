@@ -31,12 +31,13 @@ import argparse
 import arrow
 import asyncio
 import discord
+import humanfriendly
 import json
 import os
 import re
 import unidecode
 import yaml
-import humanfriendly
+import datetime as dt
 from box import Box
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
@@ -50,6 +51,7 @@ SAVE_CACHE = os.path.join(PATH, "save_cache.json")
 CONFIG_YAML = os.path.join(PATH, "config.yml")
 AUTH_YAML = os.path.join(PATH, "auth.yml")
 BADGES = os.path.join(PATH, "alliance_badges.json")
+CLAN_WARS_INTERVAL = dt.timedelta(minutes=1).total_seconds()
 
 
 def nested_dict():
@@ -69,7 +71,7 @@ def clean_tag(tag):
     return t
 
 
-def format_timespan(seconds, short=False):
+def format_timespan(seconds, short=False, pad=False):
     """Wrapper for human friendly, shorten words."""
     h = humanfriendly.format_timespan(int(seconds))
     if short:
@@ -91,6 +93,10 @@ def format_timespan(seconds, short=False):
         h = h.replace('hour', 'hr')
         h = h.replace('minute', 'min')
         h = h.replace('second', 'sec')
+    if pad:
+        h = ' ' + h
+        h = re.sub('(\D)(\d)(\D)', r'\g<1>0\2\3', h)
+        h = h.strip()
     return h
 
 
@@ -109,10 +115,15 @@ class Clans:
         self.settings.update(dataIO.load_json(JSON))
         self.badges = dataIO.load_json(BADGES)
         self._auth = None
+        self.task = None
 
         provider = self.settings.get('provider')
         if provider is None:
             provider = 'cr-api'
+
+    def __unload(self):
+        """Remove task when unloaded."""
+        self.task.cancel()
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
@@ -526,7 +537,7 @@ class Clans:
                 dt = arrow.get(end_time, 'YYYYMMDDTHHmmss.SSS').datetime
                 now = arrow.utcnow().datetime
                 span = dt - now
-                timespan = format_timespan(int(span.total_seconds()), short=True)
+                timespan = format_timespan(int(span.total_seconds()), short=True, pad=True)
             lines = []
             lines.append(STATES.get(clan.get('state'), 'Unknown State'))
             if timespan is not None:
@@ -537,14 +548,50 @@ class Clans:
             em.add_field(name=name, value=value, inline=False)
 
         return em
+    
+    @property
+    def clanwars_settings(self):
+        return self.settings.get('clan_wars')
 
-    @commands.command(pass_context=True, no_pm=True)
-    async def clanwars(self, ctx, *args):
-        """Display clan war info."""
-        if self.api_provider != 'official':
-            await self.bot.say("This command is not supported  for the API provider you have selected.")
+    @clanwars_settings.setter
+    def clanwars_settings(self, value):
+        self.settings['clan_wars'] = value
+        self.save_settings()
+
+    async def set_clanwars_message_id(self, message):
+        server = message.server
+        s = nested_dict()
+        s['clan_wars'][server.id]['message_id'] = message.id
+        self.settings.update(s)
+        self.save_settings()
+
+    async def update_clanwars(self, message):
+        await self.set_clanwars_message_id(message)
+
+
+    def save_settings(self):
+        dataIO.save_json(JSON, self.settings)
+
+    async def update_cw_message(self, message):
+        await asyncio.sleep(CLAN_WARS_INTERVAL)
+
+        # Only update if in settings
+        try:
+            server = message.server
+            message_id = self.settings['clan_wars'][server.id]["message_id"]
+        except KeyError:
             return
+        else:
+            if message_id != message.id:
+                return
 
+        clans = await self.get_clanwars()
+        em = self.clanwars_embed(clans)
+        await self.bot.edit_message(message, embed=em)
+
+        self.task = self.bot.loop.create_task(self.update_cw_message(message))
+
+    async def get_clanwars(self):
         # official
         config = self.clans_config
         clan_tags = [c.tag for c in config.clans]
@@ -561,9 +608,32 @@ class Clans:
                         clans.append(await resp.json())
                     else:
                         await self.bot.say("Error fetching for clan tag {}".format(tag))
+        return clans
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def clanwars(self, ctx, *args):
+        """Display clan war info.
+
+        MOD arguments:
+        auto: auto-update message with latest data.
+        """
+        if self.api_provider != 'official':
+            await self.bot.say("This command is not supported  for the API provider you have selected.")
+            return
+
+        await self.bot.type()
+
+        clans = await self.get_clanwars()
         em = self.clanwars_embed(clans)
-        await self.bot.say(embed=em)
+        message = await self.bot.say(embed=em)
+
+        # auto update
+        if 'auto' in args:
+            author = ctx.message.author
+            perms = author.server_permissions
+            if perms.manage_messages:
+                await self.set_clanwars_message_id(message)
+                self.task = self.bot.loop.create_task(self.update_cw_message(message))
 
 
 def check_folder():
