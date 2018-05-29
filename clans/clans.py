@@ -51,8 +51,8 @@ SAVE_CACHE = os.path.join(PATH, "save_cache.json")
 CONFIG_YAML = os.path.join(PATH, "config.yml")
 AUTH_YAML = os.path.join(PATH, "auth.yml")
 BADGES = os.path.join(PATH, "alliance_badges.json")
-CLAN_WARS_INTERVAL = dt.timedelta(minutes=1).total_seconds()
-
+CLAN_WARS_INTERVAL = dt.timedelta(minutes=5).total_seconds()
+CLAN_WARS_CACHE = os.path.join(PATH, "clan_wars_cache.json")
 
 def nested_dict():
     """Recursively nested defaultdict."""
@@ -614,8 +614,28 @@ class Clans:
     def save_settings(self):
         dataIO.save_json(JSON, self.settings)
 
-    async def update_cw_message(self, message):
-        await asyncio.sleep(CLAN_WARS_INTERVAL)
+    async def update_cw_message_time(self, message):
+        await asyncio.sleep(1)
+        # Only update if in settings
+        try:
+            server = message.server
+            message_id = self.settings['clan_wars'][server.id]["message_id"]
+        except KeyError:
+            return
+        else:
+            if message_id != message.id:
+                return
+
+        if os.path.exists(CLAN_WARS_CACHE):
+            clans = dataIO.load_json(CLAN_WARS_CACHE)
+            em = self.clanwars_embed(clans)
+            await self.bot.edit_message(message, embed=em)
+
+            self.task = self.bot.loop.create_task(self.update_cw_message(message))
+
+
+    async def update_cw_message(self, message, count_down=0):
+        await asyncio.sleep(10)
 
         # Only update if in settings
         try:
@@ -627,11 +647,20 @@ class Clans:
             if message_id != message.id:
                 return
 
-        clans = await self.get_clanwars()
+        if count_down == 0:
+            clans = await self.get_clanwars()
+        elif os.path.exists(CLAN_WARS_CACHE):
+            clans = dataIO.load_json(CLAN_WARS_CACHE)
+        else:
+            clans = await self.get_clanwars()
+
+        count_down += 1
+        count_down %= CLAN_WARS_INTERVAL
+
         em = self.clanwars_embed(clans)
         await self.bot.edit_message(message, embed=em)
 
-        self.task = self.bot.loop.create_task(self.update_cw_message(message))
+        self.task = self.bot.loop.create_task(self.update_cw_message(message, count_down=count_down))
 
     async def get_clanwars(self):
         # official
@@ -650,6 +679,9 @@ class Clans:
                         clans.append(await resp.json())
                     else:
                         await self.bot.say("Error fetching for clan tag {}".format(tag))
+
+        if clans:
+            dataIO.save_json(CLAN_WARS_CACHE, clans)
         return clans
 
     @commands.group(pass_context=True, aliases=['cw'])
