@@ -51,8 +51,10 @@ SAVE_CACHE = os.path.join(PATH, "save_cache.json")
 CONFIG_YAML = os.path.join(PATH, "config.yml")
 AUTH_YAML = os.path.join(PATH, "auth.yml")
 BADGES = os.path.join(PATH, "alliance_badges.json")
-CLAN_WARS_INTERVAL = dt.timedelta(minutes=5).total_seconds()
+CLAN_WARS_INTERVAL = dt.timedelta(minutes=5)
+CLAN_WARS_SLEEP = 10
 CLAN_WARS_CACHE = os.path.join(PATH, "clan_wars_cache.json")
+
 
 def nested_dict():
     """Recursively nested defaultdict."""
@@ -615,7 +617,7 @@ class Clans:
         dataIO.save_json(JSON, self.settings)
 
     async def update_cw_message_time(self, message):
-        await asyncio.sleep(1)
+        await asyncio.sleep(CLAN_WARS_SLEEP)
         # Only update if in settings
         try:
             server = message.server
@@ -633,8 +635,7 @@ class Clans:
 
             self.task = self.bot.loop.create_task(self.update_cw_message(message))
 
-
-    async def update_cw_message(self, message, count_down=0):
+    async def update_cw_message(self, message, count_down=None):
         await asyncio.sleep(10)
 
         # Only update if in settings
@@ -647,18 +648,26 @@ class Clans:
             if message_id != message.id:
                 return
 
-        if count_down == 0:
+        new_message = False
+
+        if count_down is None or dt.datetime.utcnow() > count_down:
+            count_down = dt.datetime.utcnow() + CLAN_WARS_INTERVAL
             clans = await self.get_clanwars()
+            new_message = True
         elif os.path.exists(CLAN_WARS_CACHE):
             clans = dataIO.load_json(CLAN_WARS_CACHE)
         else:
             clans = await self.get_clanwars()
 
-        count_down += 1
-        count_down %= CLAN_WARS_INTERVAL
-
         em = self.clanwars_embed(clans)
-        await self.bot.edit_message(message, embed=em)
+
+        if new_message:
+            channel = message.channel
+            await self.bot.delete_message(message)
+            message = await self.bot.send_message(channel, embed=em)
+            await self.set_clanwars_message_id(message)
+        else:
+            await self.bot.edit_message(message, embed=em)
 
         self.task = self.bot.loop.create_task(self.update_cw_message(message, count_down=count_down))
 
