@@ -851,6 +851,7 @@ class RACF:
             for page in pagify("\n".join(out), shorten_by=12):
                 await self.bot.say(page)
 
+
     @commands.command(pass_context=True, no_pm=True, aliases=["k5", "pleb", "m5"])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def kick5050(self, ctx, member: discord.Member):
