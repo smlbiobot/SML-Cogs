@@ -536,6 +536,7 @@ class Clans:
             'collectionDay': 'Coll',
             'warDay': 'War',
             'notInWar': 'N/A',
+            'matchMaking': 'MM',
         }
 
         for c in clans:
