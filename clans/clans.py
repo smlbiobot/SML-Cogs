@@ -510,11 +510,15 @@ class Clans:
 
         This allows us to update status easily by supplying new data.
         """
+        import datetime as dt
         config = self.clans_config
         em = discord.Embed(
             title=config.name,
             color=discord.Color(int(config.color, 16)),
-            description='Member list shows battles played. Results are truncated.'
+            description=(
+                "Truncated list of members with battles remaining."
+                "\nLast updated: {}".format(dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
+            )
         )
 
         # Badge
