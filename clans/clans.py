@@ -109,6 +109,25 @@ def smart_truncate(content, length=100, suffix='...'):
         return ' '.join(content[:length + 1].split(' ')[0:-1]) + suffix
 
 
+def emoji_value(emoji, value):
+    emojis = {
+        'win': '<:cwwarwin:450890799312404483>',
+        'crown': '<:crownblue:337975460405444608>',
+        'battle': '<:cwbattle:450889588215513089>',
+        'trophy': '<:cwtrophy:450878327880941589>'
+    }
+    if isinstance(value, int):
+        s_value = '{:,}'.format(value)
+    else:
+        s_value = value
+
+    if emoji in emojis.keys():
+        s = "{} {}".format(emojis[emoji], s_value)
+    else:
+        s = s_value
+    return s
+
+
 class APIError(Exception):
     def __init__(self, message):
         self.message = message
@@ -512,12 +531,23 @@ class Clans:
         """
         import datetime as dt
         config = self.clans_config
+        legend = ("\n{wins} "
+                  "{crowns} "
+                  "{battles_played}"
+                  "{trophies}").format(
+
+            wins=emoji_value('win', 'Wins'),
+            crowns=emoji_value('crown', 'Crowns'),
+            battles_played=emoji_value('battle', 'Battles Played'),
+            trophies=emoji_value('trophy', 'CW Trophies')
+        )
         em = discord.Embed(
             title=config.name,
             color=discord.Color(int(config.color, 16)),
             description=(
                 "Truncated list of members with battles remaining."
                 "\nLast updated: {}".format(dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
+                + legend
             )
         )
 
@@ -565,16 +595,16 @@ class Clans:
             name = '{}'.format(clan_name, clan_score)
             box_value = (
                 "`{state:<5}{timespan: >11}`"
-                "<:cwwarwin:450890799312404483> {wins} "
-                "<:crownblue:337975460405444608> {crowns} "
-                "<:cwbattle:450889588215513089> {battles_played}"
-                "<:cwtrophy:450878327880941589> {trophies:,}").format(
+                "{wins} "
+                "{crowns} "
+                "{battles_played}"
+                "{trophies}").format(
                 state=STATES.get(clan.get('state'), 'ERR'),
                 timespan=timespan or '',
-                wins=wins,
-                crowns=crowns,
-                battles_played=battles_played,
-                trophies=clan_score
+                wins=emoji_value('win', wins),
+                crowns=emoji_value('crown', crowns),
+                battles_played=emoji_value('battle', battles_played),
+                trophies=emoji_value('trophy', clan_score)
             )
 
             if state == 'collectionDay':
