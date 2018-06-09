@@ -1388,8 +1388,8 @@ class CRProfile:
         if member is not None:
             mention = member.mention
 
-        profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag)
-        clan_url = 'http://RoyaleAPI.com/clan/{}'.format(player.clan_tag)
+        profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag.lstrip('#'))
+        clan_url = 'http://RoyaleAPI.com/clan/{}'.format(player.clan_tag.lstrip('#'))
 
         # header
         title = player.name
@@ -1476,7 +1476,7 @@ class CRProfile:
 
     def embed_profile_cards(self, player: CRPlayerModel, color=None):
         """Card Collection."""
-        profile_url = 'http://RoyaleAPI.com/player/{}/cards'.format(player.tag)
+        profile_url = 'http://RoyaleAPI.com/player/{}/cards'.format(player.tag.lstrip('#'))
         em = discord.Embed(
             title="{} #{}".format(player.name, player.tag),
             color=color,
@@ -1500,7 +1500,7 @@ class CRProfile:
 
     def embed_profile_chests(self, player: CRPlayerModel, color=None):
         """Upcoming chests"""
-        profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag)
+        profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag.lstrip('#'))
         em = discord.Embed(
             title="{} #{}: Chest Cycle".format(player.name, player.tag),
             color=color,
@@ -1514,7 +1514,7 @@ class CRProfile:
     def embed_profile_deck(self, player: CRPlayerModel, color=None):
         """Current deck."""
         decklink_url = player.decklink
-        profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag)
+        profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag.lstrip('#'))
         em = discord.Embed(
             title="{} #{}".format(player.name, player.tag),
             color=color,
