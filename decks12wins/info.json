@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "12-win Grand Challenge Decks",
+	"DESCRIPTION": "12-win Grand Challenge Decks from RoyaleAPI",
+	"DISABLED": false,
+	"NAME": "GCDecks",
+	"REQUIREMENTS": ["elasticsearch"],
+	"TAGS": ["Clash Royale"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
