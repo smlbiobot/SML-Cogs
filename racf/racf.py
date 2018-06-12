@@ -301,14 +301,17 @@ class RACF:
             "Clan Name: {clan_name}\n"
             "Clan Tag: {clan_tag}\n"
             "Clan Role: {clan_role}\n"
-            "Trophies: {trophies:,} / {pb:,} PB".format(
+            "Trophies: {trophies:,} / {pb:,} PB\n"
+            "CW: {cards:,} cards / {war_wins:,} war wins".format(
                 tag=data.get('tag'),
                 name=data.get('name'),
                 clan_name=data['clan']['name'],
                 clan_tag=data['clan']['tag'],
                 clan_role=data.get('role'),
                 trophies=data.get('trophies', 0),
-                pb=data.get('bestTrophies', 0)
+                pb=data.get('bestTrophies', 0),
+                cards=data.get('clanCardsCollected', 0),
+                war_wins=data.get('warDayWins', 0),
             )
         )
 

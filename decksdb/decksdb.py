@@ -24,34 +24,31 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
-import itertools
-import os
 from collections import defaultdict
-from random import choice
-import aiohttp
 
-import discord
+import aiohttp
+import os
 from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from discord.ext.commands import Context
+import aiofiles
+from ruamel.yaml import YAML
+from elasticsearch_async import AsyncElasticsearch
 
-PATH = os.path.join("data", "decks12wins")
+PATH = os.path.join("data", "decksdb")
 JSON = os.path.join(PATH, "settings.json")
 
 CONFIG_YAML = os.path.join(PATH, "config.yml")
 
+yaml=YAML(typ='safe')
 
 def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
 
 
-class GCDecks:
-    """Clash Royale GC 12-wins Decks."""
+class DecksDB:
+    """Clash Royale Decks database. Mostly for 12-win GC Decks search."""
 
     def __init__(self, bot):
         """Init."""
@@ -59,15 +56,22 @@ class GCDecks:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
 
+    async def es(self):
+        """Return ES instance based on config"""
+        async with aiofiles.open(CONFIG_YAML, mode="r") as f:
+            doc = await f.read()
+            data = yaml.load(doc)
+        return AsyncElasticsearch(hosts=data.get('es_hosts', []))
+
     @commands.group(pass_context=True)
-    async def gcdeckset(self, ctx):
+    async def decksdbset(self, ctx):
         """GC Decks Settings"""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
     @checks.mod_or_permissions()
-    @gcdeckset.command(name="config", pass_context=True, no_pm=True)
-    async def clansset_config(self, ctx):
+    @decksdbset.command(name="config", pass_context=True, no_pm=True)
+    async def decksdbset_config(self, ctx):
         """Upload config yaml file. See config.example.yml for how to format it."""
         if len(ctx.message.attachments) == 0:
             await self.bot.say(
@@ -92,6 +96,20 @@ class GCDecks:
 
         await self.bot.delete_message(ctx.message)
 
+    @commands.group(pass_context=True)
+    async def decksdb(self, ctx):
+        """GC Decks"""
+        if ctx.invoked_subcommand is None:
+            await self.bot.send_cmd_help(ctx)
+
+    @decksdb.command(name="gc12wins", aliases=[], pass_context=True, no_pm=True)
+    async def decksdb_gc12wins(self, ctx):
+        """GC Decks."""
+        es = await self.es()
+        await self.bot.say(await es.info())
+
+
+
 
 
 
@@ -111,5 +129,5 @@ def setup(bot):
     """Setup."""
     check_folder()
     check_file()
-    n = (bot)
+    n = DecksDB(bot)
     bot.add_cog(n)
