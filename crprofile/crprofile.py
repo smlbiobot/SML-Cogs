@@ -1061,7 +1061,7 @@ class Settings:
     def auth(self, value):
         """Set authentication token."""
         self.settings["auth"] = value
-        self.save()\
+        self.save()
 
     @property
     def official_auth(self):
