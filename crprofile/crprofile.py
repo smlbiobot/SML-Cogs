@@ -82,7 +82,7 @@ class API:
     @staticmethod
     def player(tag):
         """Return player URL"""
-        return "http://api.royaleapi.com/player/" + tag.upper()
+        return "https://api.royaleapi.com/player/" + tag.upper()
 
 
 class Constants:
@@ -919,9 +919,9 @@ class Settings:
             chest_url = 'https://api.clashroyale.com/v1/players/%23{}/upcomingchests'.format(tag)
             headers = {"Authorization": 'Bearer {}'.format(self.official_auth)}
         else:
-            info_url = 'http://api.royaleapi.com/player/{}'.format(tag)
-            chest_url = 'http://api.royaleapi.com/player/{}/chests'.format(tag)
-            headers = {"auth": self.auth}
+            info_url = 'https://api.royaleapi.com/player/{}'.format(tag)
+            chest_url = 'https://api.royaleapi.com/player/{}/chests'.format(tag)
+            headers = {"Authorization": 'Bearer {}'.format(self.auth)}
 
         try:
             async with aiohttp.ClientSession() as session:
@@ -1134,7 +1134,7 @@ class CRProfile:
         await self.bot.delete_message(ctx.message)
 
     @crprofileset.command(name="official_auth", pass_context=True)
-    async def crprofileset_auth(self, ctx, token):
+    async def crprofileset_official_auth(self, ctx, token):
         """Set auth header"""
         self.model.official_auth = token
         await self.bot.say("Auth updated.")
