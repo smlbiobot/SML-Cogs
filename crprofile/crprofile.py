@@ -32,6 +32,7 @@ import os
 from collections import defaultdict, OrderedDict
 from datetime import timedelta
 from random import choice
+import socket
 
 import aiohttp
 import discord
@@ -923,10 +924,15 @@ class Settings:
             chest_url = 'https://api.royaleapi.com/player/{}/chests'.format(tag)
             headers = {"Authorization": 'Bearer {}'.format(self.auth)}
 
+        conn = aiohttp.TCPConnector(
+            family=socket.AF_INET,
+            verify_ssl=False,
+        )
+
         try:
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession(connector=conn) as session:
                 for url in [info_url, chest_url]:
-                    async with session.get(url, timeout=API_FETCH_TIMEOUT, headers=headers) as resp:
+                    async with session.get(url, headers=headers) as resp:
                         if resp.status != 200:
                             error = True
                         else:
