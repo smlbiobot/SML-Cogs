@@ -76,6 +76,14 @@ class ChannelFilter:
         }
         dataIO.save_json(JSON, self.settings)
 
+    def edit_word(self, server, channel, word, reason=None):
+        """Add word to filter."""
+        channel_settings = self.get_channel_settings(server, channel)
+        channel_settings[word.lower()] = {
+            'reason': reason
+        }
+        dataIO.save_json(JSON, self.settings)
+
     def remove_word(self, server, channel, word):
         """Remove word from filter."""
         channel_settings = self.get_channel_settings(server, channel)
@@ -109,6 +117,15 @@ class ChannelFilter:
         channel = ctx.message.channel
         self.add_word(server, channel, word, reason=reason)
         await self.bot.say("Added word to filter.")
+
+    @checks.mod_or_permissions()
+    @channelfilter.command(name="edit", pass_context=True, no_pm=True)
+    async def channelfilter_edit(self, ctx, word, reason=None):
+        """Add words."""
+        server = ctx.message.server
+        channel = ctx.message.channel
+        self.edit_word(server, channel, word, reason=reason)
+        await self.bot.say("Filter updated.")
 
     @checks.mod_or_permissions()
     @channelfilter.command(name="remove", pass_context=True, no_pm=True)
@@ -165,8 +182,8 @@ class ChannelFilter:
         if not valid_user:
             return
 
-        # Ignore people with manage messages perms
-        if author.server_permissions.manage_messages:
+        # Ignore people with manage server perms
+        if author.server_permissions.manage_server:
             return
 
         channel_settings = self.get_channel_settings(server, channel)
