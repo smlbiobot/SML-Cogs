@@ -24,23 +24,24 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
-import asyncio
-import json
-import os
-import re
 from collections import OrderedDict
 from collections import defaultdict
 
 import aiohttp
+import argparse
+import asyncio
 import discord
+import json
+import os
+import re
 import unidecode
 import yaml
+from discord.ext import commands
+from tabulate import tabulate
+
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify, box, inline, underline
 from cogs.utils.dataIO import dataIO
-from discord.ext import commands
-from tabulate import tabulate
 
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
@@ -905,7 +906,31 @@ class RACFAudit:
             box('\n'.join(out), lang='python')
         )
 
+    @checks.mod_or_permissions()
+    @commands.command(name="racfaudit_top", aliases=["rtop"], pass_context=True)
+    async def racfaudit_top(self, ctx, count: int):
+        """Show top N members in family."""
+        await self.bot.type()
 
+        try:
+            member_models = await self.family_member_models()
+        except ClashRoyaleAPIError as e:
+            await self.bot.say(e.status_message)
+            return
+
+        member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
+        results = member_models[:count]
+
+        out = []
+
+        for index, member in enumerate(results, 1):
+            out.append('{:<4} {:>4} {:<8} {}'.format(
+                index, member['trophies'], member['clan']['name'][5:], member['name']
+            ))
+
+        await self.bot.say(
+            box('\n'.join(out), lang='python')
+        )
 
     def calculate_clan_trophies(self, trophies):
         """Add a list of trophies to be calculated."""
@@ -970,7 +995,6 @@ class RACFAudit:
             clan_scores = [item.get('clanScore') for item in items]
 
             possible_alpha_rank = len([score for score in clan_scores if score > top50_clan_trophies])
-
 
         # Summary
         o = [
