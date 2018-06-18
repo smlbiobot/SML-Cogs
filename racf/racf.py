@@ -870,6 +870,21 @@ class RACF:
         else:
             await self.bot.say("Member has no clan roles to remove.")
 
+    @commands.command(pass_context=True, no_pm=True, aliases=["k5a"])
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def k5alpha(self, ctx, member: discord.Member):
+        """Notify member that they were kicked clan war performance.
+
+        Remove clan tags in the process.
+        """
+        await ctx.invoke(self.dmusers, self.config.messages.k5alpha, member)
+        member_clan = [
+            '-{}'.format(r.name) for r in member.roles if r.name in CLANS]
+        if len(member_clan):
+            await self.changerole(ctx, member, *member_clan)
+        else:
+            await self.bot.say("Member has no clan roles to remove.")
+
     @commands.command(pass_context=True, no_pm=True, aliases=["bsk5", "bk5"])
     @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
     async def bskick5050(self, ctx, member: discord.Member):
