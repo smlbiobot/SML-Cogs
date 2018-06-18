@@ -164,6 +164,23 @@ def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
+def clean_tag(tag):
+    """clean up tag."""
+    if tag is None:
+        return None
+    t = tag
+    if isinstance(t, list):
+        t = t[0]
+    if isinstance(t, tuple):
+        t = t[0]
+    if t.startswith('#'):
+        t = t[1:]
+    t = t.strip()
+    t = t.upper()
+    t = t.replace('O', '0')
+    t = t.replace('B', '8')
+    return t
+
 
 class SCTag:
     """SuperCell tags."""
@@ -1228,6 +1245,14 @@ class RACF:
                         await self.bot.say(
                             "I am not allowed to remove {} from {}.".format(
                                 role, member))
+
+    @commands.command(pass_context=True, no_pm=True, aliases=['pt'])
+    async def playertag(self, ctx, player_tag):
+        """Link to RoyaleAPI player profile
+        """
+        tag = clean_tag(player_tag)
+        await self.bot.say("https://royaleapi.com/player/{}".format(tag))
+
 
     @commands.command(pass_context=True, no_pm=True)
     async def toprole(self, ctx, member: discord.Member = None):
