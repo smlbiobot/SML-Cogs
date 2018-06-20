@@ -424,7 +424,7 @@ class RACF:
                     ctx.message.server.channels, name="visitors")
                 await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
             else:
-                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', 'Content', '-Visitor')
+                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', 'Content', '-Visitor', '-Recruit')
                 channel = discord.utils.get(
                     ctx.message.server.channels, name="family-chat")
                 await ctx.invoke(self.dmusers, self.config.messages.member, member)
@@ -781,7 +781,7 @@ class RACF:
         server = ctx.message.server
         roles_param = self.config.roles.member_default.copy()
         roles_param.extend(roles)
-        roles_param.append("-Visitor")
+        roles_param.extend(["-Visitor", "-Recruit"])
         channel = discord.utils.get(
             ctx.message.server.channels, name="family-chat")
         # print(roles_param)
@@ -1263,6 +1263,18 @@ class RACF:
             "Our leaders will review your profile and let you know if you have been accepted."
             "".format(member=member, channel=recruit_channel)
         )
+
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=['rmre'])
+    async def rmrecruit(self, ctx, member: discord.Member = None):
+        """Remove recruit."""
+        if member is None:
+            await self.bot.send_cmd_help()
+            return
+        recruit_role = discord.utils.get(ctx.message.server.roles, name='Recruit')
+        await self.bot.remove_roles(member, recruit_role)
+        await self.bot.say("Removed Recruit from {}".format(member))
+
 
     @commands.command(pass_context=True, no_pm=True, aliases=['pt'])
     async def playertag(self, ctx, player_tag):
