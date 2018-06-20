@@ -1253,6 +1253,11 @@ class RACF:
         if member is None:
             await self.bot.send_cmd_help()
             return
+        # Send visitor rule if in welcome
+        channel = ctx.message.channel
+        if channel.name == 'welcome':
+            await ctx.invoke(self.visitor, member)
+
         recruit_role = discord.utils.get(ctx.message.server.roles, name='Recruit')
         recruit_channel = discord.utils.get(ctx.message.server.channels, name='recruit')
         await self.bot.add_roles(member, recruit_role)
