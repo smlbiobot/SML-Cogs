@@ -1246,6 +1246,24 @@ class RACF:
                             "I am not allowed to remove {} from {}.".format(
                                 role, member))
 
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=['re'])
+    async def recruit(self, ctx, member: discord.Member = None):
+        """Add recruit tag."""
+        if member is None:
+            await self.bot.send_cmd_help()
+            return
+        recruit_role = discord.utils.get(ctx.message.server.roles, name='Recruit')
+        recruit_channel = discord.utils.get(ctx.message.server.channels, name='recruit')
+        await self.bot.add_roles(member, recruit_role)
+        await self.bot.say("Added Recruit to {}".format(member))
+        await self.bot.say(
+            "{member.mention} Thank you for your interest! Please go to {channel.mention} and type "
+            "`!pt PlayerTag` — for example, type `!pt C0G20PR2` if that’s your tag. "
+            "Our leaders will review your profile and let you know if you have been accepted."
+            "".format(member=member, channel=recruit_channel)
+        )
+
     @commands.command(pass_context=True, no_pm=True, aliases=['pt'])
     async def playertag(self, ctx, player_tag):
         """Link to RoyaleAPI player profile
