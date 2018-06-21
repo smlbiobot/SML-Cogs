@@ -1248,14 +1248,20 @@ class RACF:
 
     @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['re'])
-    async def recruit(self, ctx, member: discord.Member = None):
+    async def recruit(self, ctx, member: discord.Member = None, tag=None):
         """Add recruit tag."""
         if member is None:
             await self.bot.send_cmd_help()
             return
-        # Send visitor rule if in welcome
+
         channel = ctx.message.channel
-        if channel.name == 'welcome':
+
+        # run verify if tag is provided
+        if tag is not None:
+            await ctx.invoke(self.racf_verify, member, tag)
+
+        # Send visitor rule if in welcome
+        elif channel.name == 'welcome':
             await ctx.invoke(self.visitor, member)
 
         recruit_role = discord.utils.get(ctx.message.server.roles, name='Recruit')
