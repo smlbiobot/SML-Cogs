@@ -1256,6 +1256,8 @@ class RACF:
 
         channel = ctx.message.channel
 
+        tag = clean_tag(tag)
+
         # run verify if tag is provided
         if tag is not None:
             await ctx.invoke(self.racf_verify, member, tag)
@@ -1268,12 +1270,21 @@ class RACF:
         recruit_channel = discord.utils.get(ctx.message.server.channels, name='recruit')
         await self.bot.add_roles(member, recruit_role)
         await self.bot.say("Added Recruit to {}".format(member))
-        await self.bot.say(
-            "{member.mention} Thank you for your interest! Please go to {channel.mention} and type "
-            "`!pt PlayerTag` — for example, type `!pt C0G20PR2` if that’s your tag. "
-            "Our leaders will review your profile and let you know if you have been accepted."
-            "".format(member=member, channel=recruit_channel)
-        )
+
+        # Add player profile to recruit channel automatically
+        if tag is not None:
+            await self.bot.send_message(
+                recruit_channel,
+                "{member.mention} https://royaleapi.com/player/{tag}".format(member=member, tag=tag)
+            )
+        else:
+            await self.bot.say(
+                "{member.mention} Thank you for your interest! Please go to {channel.mention} and type "
+                "`!pt PlayerTag` — for example, type `!pt C0G20PR2` if that’s your tag. "
+                "Our leaders will review your profile and let you know if you have been accepted."
+                "".format(member=member, channel=recruit_channel)
+            )
+
 
     @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['rmre'])
