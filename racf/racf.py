@@ -1275,12 +1275,15 @@ class RACF:
         if tag is not None:
             await self.bot.send_message(
                 recruit_channel,
-                "{member.mention} https://royaleapi.com/player/{tag}".format(member=member, tag=tag)
+                "{member.mention} Thank you for your interest! "
+                "Our leaders will review your profile and let you know if you have been accepted. "
+                "https://royaleapi.com/player/{tag}".format(member=member, tag=tag)
             )
         else:
-            await self.bot.say(
-                "{member.mention} Thank you for your interest! Please go to {channel.mention} and type "
-                "`!pt PlayerTag` — for example, type `!pt C0G20PR2` if that’s your tag. "
+            await self.bot.send_message(
+                recruit_channel,
+                "{member.mention} Thank you for your interest! Please type "
+                "`!pt PlayerTag` at {channel.mention} — for example, type `!pt C0G20PR2` if that’s your tag. "
                 "Our leaders will review your profile and let you know if you have been accepted."
                 "".format(member=member, channel=recruit_channel)
             )
