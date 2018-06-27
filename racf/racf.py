@@ -1331,7 +1331,7 @@ class RACF:
             async with session.get(url) as resp:
                 data = await resp.json()
 
-                # print(data)
+                print(data)
 
         em = discord.Embed(
             title="{name} #{tag}".format(name=data.get('name'), tag=data.get('tag')),
