@@ -1331,7 +1331,7 @@ class RACF:
             async with session.get(url) as resp:
                 data = await resp.json()
 
-                print(data)
+                # print(data)
 
         em = discord.Embed(
             title="{name} #{tag}".format(name=data.get('name'), tag=data.get('tag')),
@@ -1394,7 +1394,7 @@ class RACF:
 
         if tag is None:
             await self.bot.say("Cannot find associated tag in DB. Please use `cwreadytag` or `cwrt` to fetch by tag")
-            await self.bot.send_cmd_help()
+            await self.bot.send_cmd_help(ctx)
             return
 
         tag = clean_tag(tag)
