@@ -1327,6 +1327,7 @@ class RACF:
             family=socket.AF_INET,
             verify_ssl=False,
         )
+        print(url)
         async with aiohttp.ClientSession(connector=conn) as session:
             async with session.get(url) as resp:
                 txt = await resp.text()
