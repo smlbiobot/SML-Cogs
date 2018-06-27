@@ -23,22 +23,29 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-import asyncio
 import itertools
-import json
-import os
-from random import choice
+from itertools import zip_longest
 
 import aiohttp
-import cogs
+import asyncio
 import discord
+import json
+import logging
+import os
+import socket
 import yaml
 from box import Box
+from discord.ext import commands
+from discord.ext.commands import Context
+from random import choice
+
+import cogs
+from cogs.utils import dataIO
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
-from discord.ext import commands
-from discord.ext.commands import Context
+
+logger = logging.getLogger(__name__)
 
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
 BS_CHANGECLAN_ROLES = ["Member", "Brawl-Stars"]
@@ -171,6 +178,7 @@ def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
+
 def clean_tag(tag):
     """clean up tag."""
     if tag is None:
@@ -187,6 +195,20 @@ def clean_tag(tag):
     t = t.replace('O', '0')
     t = t.replace('B', '8')
     return t
+
+
+def get_emoji(bot, name):
+    for emoji in bot.get_all_emojis():
+        if emoji.name == name:
+            return '<:{}:{}>'.format(emoji.name, emoji.id)
+    return name
+
+
+def grouper(iterable, n, fillvalue=None):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
 
 
 class SCTag:
@@ -431,7 +453,8 @@ class RACF:
                     ctx.message.server.channels, name="visitors")
                 await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
             else:
-                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', 'Content', '-Visitor', '-Recruit')
+                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', 'Content', '-Visitor',
+                                 '-Recruit')
                 channel = discord.utils.get(
                     ctx.message.server.channels, name="family-chat")
                 await ctx.invoke(self.dmusers, self.config.messages.member, member)
@@ -878,7 +901,6 @@ class RACF:
             for page in pagify("\n".join(out), shorten_by=12):
                 await self.bot.say(page)
 
-
     @commands.command(pass_context=True, no_pm=True, aliases=["k5", "pleb", "m5"])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def kick5050(self, ctx, member: discord.Member):
@@ -1091,7 +1113,7 @@ class RACF:
         await self.bot.send_message(channel, msg)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def crsettag(self, ctx, tag, member:discord.Member=None):
+    async def crsettag(self, ctx, tag, member: discord.Member = None):
         """Set CR tags for members.
 
         This is the equivalent of running:
@@ -1154,10 +1176,9 @@ class RACF:
         if racfaudit is not None:
             await ctx.invoke(racfaudit.racfaudit_rm_tag, tag)
 
-
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, no_pm=True)
-    async def crsettagmod(self, ctx, tag, member:discord.Member=None, force=False):
+    async def crsettagmod(self, ctx, tag, member: discord.Member = None, force=False):
         """Set CR tags for members.
 
         If the bot complains that that player tag is associated with another user
@@ -1286,6 +1307,10 @@ class RACF:
                 "Our leaders will review your profile and let you know if you have been accepted. "
                 "https://royaleapi.com/player/{tag}".format(member=member, tag=tag)
             )
+            await self.bot.send_message(
+                recruit_channel,
+                embed=await self.cwready_embed(tag)
+            )
         else:
             await self.bot.send_message(
                 recruit_channel,
@@ -1295,6 +1320,104 @@ class RACF:
                 "".format(member=member, channel=recruit_channel)
             )
 
+    async def cwready_embed(self, tag):
+        url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
+        player_url = "https://royaleapi.com/player/{}".format(tag)
+        conn = aiohttp.TCPConnector(
+            family=socket.AF_INET,
+            verify_ssl=False,
+        )
+        async with aiohttp.ClientSession(connector=conn) as session:
+            async with session.get(url) as resp:
+                data = await resp.json()
+
+        em = discord.Embed(
+            title="{name} #{tag}".format(name=data.get('name'), tag=data.get('tag')),
+            description="Clan War Readiness",
+            url=player_url
+        )
+        # em.url = player_url
+        # stats
+        em.add_field(
+            name='Trophies',
+            value="{trophies} / {pb} PB :trophy:".format(
+                trophies=data.get('trophies', 0),
+                pb=data.get('trophies_best', 0)
+            ))
+        em.add_field(name='War Wins', value=data.get('war_day_wins', 0))
+        em.add_field(name='War Cards', value=data.get('clan_cards_collected', 0))
+        em.add_field(name='Challenge Max Wins', value=data.get('challenge_max_wins', 0))
+        em.add_field(name='Challenge Cards Won', value=data.get('challenge_cards_won', 0))
+
+
+        # leagues
+        for league in data.get('leagues'):
+            name = league.get('name')
+            total = league.get('total', 0)
+            percent = league.get('total_percent', 0)
+            f_name = "{name} Total: {total} - {percent:.0%}".format(
+                name=name, total=total, percent=percent
+            )
+            cards = league.get('cards', [])
+
+            groups = grouper(cards, 20)
+            for index, crds in enumerate(groups):
+                value = ""
+                for card in crds:
+                    if card is not None:
+                        value += get_emoji(self.bot, card.get('key', None).replace('-', ''))
+                        if card.get('overlevel'):
+                            value += '+'
+                em.add_field(name=f_name if index == 0 else '.', value=value, inline=False)
+
+        em.set_footer(text=player_url, icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
+
+        return em
+
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
+    async def cwready(self, ctx, member:discord.Member=None):
+        """Return clan war readiness."""
+        if member is None:
+            member = ctx.message.author
+
+        tag = None
+
+        # if tag is none, attempt to load from racf_audit
+        db = os.path.join("data", "racf_audit", "player_db.json")
+        players = dataIO.load_json(db)
+        for k, v in players.items():
+            if v.get('user_id') == member.id:
+                tag = v.get('tag')
+
+        if tag is None:
+            await self.bot.say("Cannot find associated tag in DB. Please use `cwreadytag` or `cwrt` to fetch by tag")
+            await self.bot.send_cmd_help()
+            return
+
+        tag = clean_tag(tag)
+
+        try:
+            em = await self.cwready_embed(tag)
+        except Exception as e:
+            logger.exception("Unknown exception", e)
+            await self.bot.say("Server error: {}".format(e))
+        else:
+            await self.bot.say(embed=em)
+
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=['cwrt'])
+    async def cwreadytag(self, ctx, tag):
+        """Return clan war readiness."""
+        tag = clean_tag(tag)
+
+        try:
+            em = await self.cwready_embed(tag)
+        except Exception as e:
+            logger.exception("Unknown exception", e)
+            await self.bot.say("Server error: {}".format(e))
+        else:
+            await self.bot.say(embed=em)
 
     @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['rmre'])
@@ -1321,14 +1444,13 @@ class RACF:
             except:
                 pass
 
-
     @commands.command(pass_context=True, no_pm=True, aliases=['pt'])
     async def playertag(self, ctx, player_tag):
         """Link to RoyaleAPI player profile
         """
         tag = clean_tag(player_tag)
         await self.bot.say("https://royaleapi.com/player/{}".format(tag))
-
+        await self.bot.say(embed=await self.cwready_embed(tag))
 
     @commands.command(pass_context=True, no_pm=True)
     async def toprole(self, ctx, member: discord.Member = None):
