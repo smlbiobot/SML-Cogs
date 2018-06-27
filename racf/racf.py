@@ -40,8 +40,8 @@ from discord.ext.commands import Context
 from random import choice
 
 import cogs
-from cogs.utils import dataIO
 from cogs.utils import checks
+from cogs.utils import dataIO
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 
@@ -1327,13 +1327,9 @@ class RACF:
             family=socket.AF_INET,
             verify_ssl=False,
         )
-        print(url)
         async with aiohttp.ClientSession(connector=conn) as session:
             async with session.get(url) as resp:
-                txt = await resp.text()
-                print(txt)
-                data = json.loads(txt)
-
+                data = await resp.json()
 
         em = discord.Embed(
             title="{name} #{tag}".format(name=data.get('name'), tag=data.get('tag')),
@@ -1352,7 +1348,6 @@ class RACF:
         em.add_field(name='War Cards', value=data.get('clan_cards_collected', 0))
         em.add_field(name='Challenge Max Wins', value=data.get('challenge_max_wins', 0))
         em.add_field(name='Challenge Cards Won', value=data.get('challenge_cards_won', 0))
-
 
         # leagues
         for league in data.get('leagues'):
@@ -1380,7 +1375,7 @@ class RACF:
 
     @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
-    async def cwready(self, ctx, member:discord.Member=None):
+    async def cwready(self, ctx, member: discord.Member = None):
         """Return clan war readiness."""
         if member is None:
             member = ctx.message.author
