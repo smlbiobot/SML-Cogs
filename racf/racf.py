@@ -1329,9 +1329,10 @@ class RACF:
         )
         async with aiohttp.ClientSession(connector=conn) as session:
             async with session.get(url) as resp:
-                data = await resp.json()
+                txt = await resp.text()
+                print(txt)
+                data = json.loads(txt)
 
-                print(data)
 
         em = discord.Embed(
             title="{name} #{tag}".format(name=data.get('name'), tag=data.get('tag')),
