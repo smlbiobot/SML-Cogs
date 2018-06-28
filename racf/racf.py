@@ -1373,7 +1373,7 @@ class RACF:
 
         return em
 
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
     async def cwready(self, ctx, member: discord.Member = None):
         """Return clan war readiness."""
@@ -1404,7 +1404,7 @@ class RACF:
         else:
             await self.bot.say(embed=em)
 
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['cwrt'])
     async def cwreadytag(self, ctx, tag):
         """Return clan war readiness."""
