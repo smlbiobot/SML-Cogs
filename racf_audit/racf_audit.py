@@ -24,6 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import itertools
 from collections import OrderedDict
 from collections import defaultdict
 
@@ -62,6 +63,14 @@ def member_has_role(server, member, role_name):
     """Return True if member has specific role."""
     role = discord.utils.get(server.roles, name=role_name)
     return role in member.roles
+
+
+def grouper(n, iterable, fillvalue=None):
+    """Group lists into lists of items.
+
+    grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
+    args = [iter(iterable)] * n
+    return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
 class RACFAuditException(Exception):
@@ -928,9 +937,8 @@ class RACFAudit:
                 index, member['trophies'], member['clan']['name'][5:], member['name']
             ))
 
-        await self.bot.say(
-            box('\n'.join(out), lang='python')
-        )
+        for page in pagify('\n'.join(out)):
+            await self.bot.say(box(page, lang='py'))
 
     def calculate_clan_trophies(self, trophies):
         """Add a list of trophies to be calculated."""
