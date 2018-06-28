@@ -382,6 +382,11 @@ class RACF:
     async def racf_verify(self, ctx, member: discord.Member, tag):
         """Verify CR members by player tag."""
 
+        # verify for RoyaleAPI server
+        if ctx.message.server.name == 'RoyaleAPI':
+            await self.royaleapi_verify(ctx, member, tag)
+            return
+
         sctag = SCTag(tag)
         if not sctag.valid:
             await self.bot.say(sctag.invalid_error_msg)
@@ -458,6 +463,77 @@ class RACF:
                 channel = discord.utils.get(
                     ctx.message.server.channels, name="family-chat")
                 await ctx.invoke(self.dmusers, self.config.messages.member, member)
+
+            if channel is not None:
+                await self.bot.say(
+                    "{} Welcome! You may now chat at {} — enjoy!".format(
+                        member.mention, channel.mention))
+
+        else:
+            await ctx.invoke(self.visitor, member)
+
+    async def royaleapi_verify(self, ctx, member: discord.Member, tag):
+        """Verify CR members by player tag."""
+        sctag = SCTag(tag)
+        if not sctag.valid:
+            await self.bot.say(sctag.invalid_error_msg)
+            return
+
+        tag = sctag.tag
+
+        # - Set their tags
+        await ctx.invoke(self.crsettagmod, tag, member)
+
+        # - Lookup profile
+        try:
+            player = await self.fetch_player_profile(tag)
+        except json.decoder.JSONDecodeError:
+            await self.bot.send_message(
+                ctx.message.channel,
+                "Error getting data from API. "
+                "Aborting…")
+            return
+        except asyncio.TimeoutError:
+            await self.bot.send_message(
+                ctx.message.channel,
+                "Getting profile info resulted in a timeout. "
+                "API may be down or player tag cannot be found. "
+                "Aborting…")
+            return
+
+        # - Show player info
+        await self.bot.say(self.player_info(player))
+
+        # - Change nickname to IGN
+        ign = player.get('name')
+        if ign is None:
+            await self.bot.say("Cannot find IGN.")
+        else:
+            try:
+                await self.bot.change_nickname(member, ign)
+            except discord.HTTPException:
+                await self.bot.say(
+                    "I don’t have permission to change nick for this user.")
+            else:
+                await self.bot.say("{} changed to {}.".format(member.mention, ign))
+
+        # - Check clan
+        player_clan_tag = None
+        try:
+            player_clan = player.get("clan", None)
+            if player_clan is not None:
+                player_clan_tag = player_clan.get("tag")
+        except KeyError:
+            await self.bot.say("Cannot find clan tag in API. Aborting…")
+            return
+
+        player_clan_tag = SCTag(player_clan_tag).tag
+
+        if player_clan_tag in ['9R8G9290']:
+            mm = self.bot.get_cog("MemberManagement")
+            await ctx.invoke(mm.changerole, member, 'Member')
+            channel = discord.utils.get(
+                ctx.message.server.channels, name="clan")
 
             if channel is not None:
                 await self.bot.say(
