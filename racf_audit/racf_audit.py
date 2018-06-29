@@ -72,6 +72,31 @@ def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
+async def check_manage_roles(ctx, bot):
+    """Check for permissions to run command since no one has manage roles anymore."""
+    server = ctx.message.server
+    author = ctx.message.author
+    channel = ctx.message.channel
+    # For 100T server, only allow command to run if user has the "Bot Comamnder" role
+    if server.name == '100 Thieves Clash Royale':
+        bc_role = discord.utils.get(server.roles, name="Bot Commander")
+        if bc_role not in author.roles:
+            await bot.send_message(
+                channel,
+                "Only Bot Commanders on this server can run this command.")
+            return False
+        else:
+            return True
+
+    # For other servers, only allow to run if user has manage role permissions
+    if not author.server_permissions.manage_roles:
+        await bot.send_message(
+            channel,
+            "You don’t have the manage roles permission.")
+        return False
+
+    return True
+
 
 class RACFAuditException(Exception):
     pass
@@ -336,9 +361,13 @@ class RACFAudit:
         # return players
 
     @commands.group(aliases=["racfas"], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     async def racfauditset(self, ctx):
         """RACF Audit Settings."""
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
+
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
@@ -470,9 +499,13 @@ class RACFAudit:
         return members
 
     @racfaudit.command(name="tag", pass_context=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_tag(self, ctx, member: discord.Member):
         """Find member tag in DB."""
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
+
         found = False
         for tag, m in self.players.items():
             if m["user_id"] == member.id:
@@ -483,9 +516,13 @@ class RACFAudit:
             await self.bot.say("100T Audit database: Member is not associated with any tags.")
 
     @racfaudit.command(name="rmtag", pass_context=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_rm_tag(self, ctx, tag):
         """Remove tag in DB."""
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
+
         tag = clean_tag(tag)
         try:
             self.players.pop(tag, None)
@@ -496,7 +533,7 @@ class RACFAudit:
             await self.bot.say("Removed tag from DB.")
 
     @racfaudit.command(name="search", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_search(self, ctx, *args):
         """Search for member.
 
@@ -512,6 +549,10 @@ class RACFAudit:
           -m MAX --max MAX      Max Trophies
           -l --link             Display link to cr-api.com
         """
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
+
         parser = self.search_args_parser()
         try:
             pargs = parser.parse_args(args)
@@ -607,7 +648,7 @@ class RACFAudit:
         return parser
 
     @racfaudit.command(name="run", pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_run(self, ctx, *args):
         """Audit the entire RACF family.
 
@@ -620,6 +661,11 @@ class RACFAudit:
           -c CLAN [CLAN ...], --clan CLAN [CLAN ...]
                                 Clan(s) to show
         """
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
+
+
         parser = self.run_args_parser()
         try:
             pargs = parser.parse_args(args)
