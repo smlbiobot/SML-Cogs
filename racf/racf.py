@@ -210,6 +210,28 @@ def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
+async def check_manage_roles(ctx, bot):
+    """Check for permissions to run command since no one has manage roles anymore."""
+    server = ctx.message.server
+    author = ctx.message.author
+    channel = ctx.message.channel
+    # For 100T server, only allow command to run if user has the "Bot Comamnder" role
+    if server.name == '100 Thieves Clash Royale':
+        bc_role = discord.utils.get(server.roles, name="Bot Commander")
+        if bc_role not in author.roles:
+            await bot.send_message(
+                channel,
+                "Only Bot Commanders on this server can run this command.")
+            return False
+
+    # For other servers, only allow to run if user has manage role permissions
+    if not author.server_permissions.manage_roles:
+        await bot.send_message(
+            "You don’t have the manage roles permission.")
+        return False
+
+    return True
+
 
 class SCTag:
     """SuperCell tags."""
@@ -378,13 +400,18 @@ class RACF:
         return data
 
     @racf.command(name="verify", aliases=['v'], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     async def racf_verify(self, ctx, member: discord.Member, tag):
         """Verify CR members by player tag."""
 
         # verify for RoyaleAPI server
         if ctx.message.server.name == 'RoyaleAPI':
             await self.royaleapi_verify(ctx, member, tag)
+            return
+
+        # verify permissions on 100T server
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
             return
 
         sctag = SCTag(tag)
@@ -566,9 +593,14 @@ class RACF:
             raise
 
     @racf.command(name="bsverify", aliases=['bv'], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     async def racf_bsveify(self, ctx, member: discord.Member, tag):
         """Verify BS members by player tag."""
+
+        # verify permissions on 100T server
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
 
         # - Set tags
         bsdata = self.bot.get_cog("BSData")
@@ -636,9 +668,14 @@ class RACF:
         server = ctx.message.server
         if member is not None:
             if author != member:
-                if not author.server_permissions.manage_roles:
-                    await self.bot.say("You do not have permissions to edit other people’s roles.")
+                # verify permissions on 100T server
+                verified = await check_manage_roles(ctx, self.bot)
+                if not verified:
                     return
+
+                # if not author.server_permissions.manage_roles:
+                #     await self.bot.say("You do not have permissions to edit other people’s roles.")
+                #     return
         else:
             member = author
 
@@ -1205,11 +1242,16 @@ class RACF:
         crprofile = self.bot.get_cog("CRProfile")
         racfaudit = self.bot.get_cog("RACFAudit")
 
+        # verify permissions on 100T server
+        verified = await check_manage_roles(ctx, self.bot)
+
         allowed = False
         if member is None:
             member = author
             allowed = True
         elif member.id == author.id:
+            allowed = True
+        elif verified:
             allowed = True
         elif author.server_permissions.manage_roles:
             allowed = True
@@ -1350,12 +1392,16 @@ class RACF:
                             "I am not allowed to remove {} from {}.".format(
                                 role, member))
 
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['re'])
     async def recruit(self, ctx, member: discord.Member = None, tag=None):
         """Add recruit tag."""
         if member is None:
             await self.bot.send_cmd_help()
+            return
+
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
             return
 
         channel = ctx.message.channel
@@ -1494,10 +1540,14 @@ class RACF:
         else:
             await self.bot.say(embed=em)
 
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['rmre'])
     async def rmrecruit(self, ctx, member: discord.Member = None):
         """Remove recruit."""
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
+
         if member is None:
             await self.bot.send_cmd_help()
             return
@@ -1537,10 +1587,14 @@ class RACF:
             member = ctx.message.author
         await self.bot.say(member.top_role.name)
 
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     @commands.command(name="rmvisitorclan", no_pm=True, pass_context=True)
     async def visitor_remove_clan_roles(self, ctx):
         """Remove clan roles from visitors without the member role."""
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
+
         server = ctx.message.server
         clan_role_names = [
             'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel'
