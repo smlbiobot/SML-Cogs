@@ -24,21 +24,21 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
 import itertools
-import os
 from collections import defaultdict
-from random import choice
-import asyncio
 
+import argparse
+import asyncio
 import discord
-from __main__ import send_cmd_help
+import os
+from discord.ext import commands
+from discord.ext.commands import Context
+from random import choice
+
 from cogs.utils import checks
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
-from discord.ext import commands
-from discord.ext.commands import Context
 
 BOT_COMMANDER_ROLES = ["Bot Commander", "High-Elder"]
 PATH = os.path.join("data", "mm")
@@ -76,7 +76,7 @@ class MemberManagement:
     async def mmset(self, ctx):
         """Member management settings."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @mmset.group(name="role", pass_context=True, no_pm=True)
     async def mmset_role(self, ctx):
@@ -87,7 +87,7 @@ class MemberManagement:
         """
         if ctx.invoked_subcommand is None or \
                 isinstance(ctx.invoked_subcommand, commands.Group):
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @mmset_role.command(name="add", pass_context=True, no_pm=True)
     async def mmset_role_add(self, ctx, role_name):
@@ -109,7 +109,7 @@ class MemberManagement:
         """Add / remove macro."""
         if ctx.invoked_subcommand is None or \
                 isinstance(ctx.invoked_subcommand, commands.Group):
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @mmset_macro.command(name="add", pass_context=True, no_pm=True)
     async def mmset_macro_add(self, ctx, name, *, args):
@@ -206,7 +206,7 @@ class MemberManagement:
         try:
             pargs = parser.parse_args(args)
         except SystemExit:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         option_output_mentions = (pargs.output == 'mention')
@@ -238,12 +238,12 @@ class MemberManagement:
                 'Syntax Error: You must include at '
                 'least one role to display results.')
             await self.bot.say(help_str)
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         out = ["**Member Management**"]
         out.append("Listing members who have these roles: {}".format(
-                ', '.join(plus_out)))
+            ', '.join(plus_out)))
         if len(minus):
             out.append("but not these roles: {}".format(
                 ', '.join(minus)))
@@ -504,7 +504,7 @@ class MemberManagement:
     async def searchmember(self, ctx, name=None):
         """Search member on server by name."""
         if name is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         server = ctx.message.server
@@ -595,7 +595,12 @@ class MemberManagement:
             'read_message_history': 'read history',
             'send_messages': 'send msg',
             'manage_messages': 'manage msg',
-            'add_reactions': 'react'
+            'add_reactions': 'react',
+            'kick_members': 'kick',
+            'ban_members': 'ban',
+            'manage_channels': 'manage_channels',
+            'manage_server': 'manage_server',
+
         }
 
         out = []
