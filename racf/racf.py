@@ -227,6 +227,7 @@ async def check_manage_roles(ctx, bot):
     # For other servers, only allow to run if user has manage role permissions
     if not author.server_permissions.manage_roles:
         await bot.send_message(
+            channel,
             "You don’t have the manage roles permission.")
         return False
 
