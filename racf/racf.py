@@ -223,6 +223,8 @@ async def check_manage_roles(ctx, bot):
                 channel,
                 "Only Bot Commanders on this server can run this command.")
             return False
+        else:
+            return True
 
     # For other servers, only allow to run if user has manage role permissions
     if not author.server_permissions.manage_roles:
