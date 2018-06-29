@@ -421,7 +421,7 @@ class MemberManagement:
             await self.bot.say(page)
 
     @commands.command(pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    # @checks.mod_or_permissions(manage_roles=True)
     async def changerole(self, ctx, member: discord.Member = None, *roles: str):
         """Change roles of a user.
 
@@ -440,6 +440,19 @@ class MemberManagement:
         elif roles is None or not roles:
             await self.bot.say("You must specify a role.")
             return
+
+        # For 100T server, only allow command to run if user has the "Bot Comamnder" role
+        if server.name == '100 Thieves Clash Royale':
+            bc_role = discord.utils.get(server.roles, name="Bot Commander")
+            if bc_role not in author.roles:
+                await self.bot.say("Only Bot Commanders on this server can run this command.")
+                return
+
+        # For other servers, only allow to run if user has manage role permissions
+        if not author.server_permissions.manage_roles:
+            await self.bot.say("You don’t have the manage roles permission.")
+            return
+
 
         server_role_names = [r.name for r in server.roles]
         role_args = []
