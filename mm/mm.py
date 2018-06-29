@@ -449,9 +449,10 @@ class MemberManagement:
                 return
 
         # For other servers, only allow to run if user has manage role permissions
-        if not author.server_permissions.manage_roles:
-            await self.bot.say("You don’t have the manage roles permission.")
-            return
+        else:
+            if not author.server_permissions.manage_roles:
+                await self.bot.say("You don’t have the manage roles permission.")
+                return
 
 
         server_role_names = [r.name for r in server.roles]

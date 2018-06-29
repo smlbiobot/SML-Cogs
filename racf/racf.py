@@ -210,30 +210,32 @@ def grouper(iterable, n, fillvalue=None):
     args = [iter(iterable)] * n
     return zip_longest(*args, fillvalue=fillvalue)
 
+
 async def check_manage_roles(ctx, bot):
     """Check for permissions to run command since no one has manage roles anymore."""
+    ret = False
     server = ctx.message.server
     author = ctx.message.author
     channel = ctx.message.channel
     # For 100T server, only allow command to run if user has the "Bot Comamnder" role
-    if server.name == '100 Thieves Clash Royale':
+    if server.id == '218534373169954816':
         bc_role = discord.utils.get(server.roles, name="Bot Commander")
         if bc_role not in author.roles:
             await bot.send_message(
                 channel,
                 "Only Bot Commanders on this server can run this command.")
-            return False
+            ret = False
         else:
-            return True
+            ret = True
 
     # For other servers, only allow to run if user has manage role permissions
-    if not author.server_permissions.manage_roles:
+    elif not author.server_permissions.manage_roles:
         await bot.send_message(
             channel,
             "You don’t have the manage roles permission.")
-        return False
+        ret = False
 
-    return True
+    return ret
 
 
 class SCTag:
