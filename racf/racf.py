@@ -1465,6 +1465,9 @@ class RACF:
         )
         # em.url = player_url
         # stats
+        clan_name = data.get('clan', {}).get('name', '')
+        clan_tag = data.get('clan', {}).get('tag', '')
+        em.add_field(name='Clan', value="{} #{}".format(clan_name, clan_tag))
         em.add_field(
             name='Trophies',
             value="{trophies} / {pb} PB :trophy:".format(
@@ -1481,8 +1484,9 @@ class RACF:
             name = league.get('name')
             total = league.get('total', 0)
             percent = league.get('total_percent', 0)
-            f_name = "{name} Total: {total} - {percent:.0%}".format(
-                name=name, total=total, percent=percent
+            levels = league.get('levels', 0)
+            f_name = "{name} League .. {percent:.0%} .. {levels}".format(
+                name=name, total=total, percent=percent, levels=levels
             )
             cards = league.get('cards', [])
 
