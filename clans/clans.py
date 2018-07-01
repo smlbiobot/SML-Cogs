@@ -565,8 +565,8 @@ class Clans:
         STATES = {
             'collectionDay': 'Coll',
             'warDay': 'War',
-            'notInWar': 'N/A',
-            'matchMaking': 'MM',
+            'notInWar': 'Not in War',
+            'matchMaking': 'Matchmaking',
         }
 
         for c in clans:
@@ -593,19 +593,23 @@ class Clans:
             clan_name = clan.clan.name
             clan_score = clan.clan.clanScore
             name = '{}'.format(clan_name, clan_score)
-            box_value = (
-                "`{state:<5}{timespan: >11}`"
-                "{wins} "
-                "{crowns} "
-                "{battles_played}"
-                "{trophies}").format(
-                state=STATES.get(clan.get('state'), 'ERR'),
-                timespan=timespan or '',
-                wins=emoji_value('win', wins),
-                crowns=emoji_value('crown', crowns),
-                battles_played=emoji_value('battle', battles_played),
-                trophies=emoji_value('trophy', clan_score)
-            )
+            state = clan.get('state', 'ERR')
+            if state in ['collectionDay', 'warDay']:
+                box_value = (
+                    "`{state:<5}{timespan: >11}`"
+                    "{wins} "
+                    "{crowns} "
+                    "{battles_played}"
+                    "{trophies}").format(
+                    state=STATES.get(state, 'ERR'),
+                    timespan=timespan or '',
+                    wins=emoji_value('win', wins),
+                    crowns=emoji_value('crown', crowns),
+                    battles_played=emoji_value('battle', battles_played),
+                    trophies=emoji_value('trophy', clan_score)
+                )
+            else:
+                box_value = STATES.get(state, 'ERR')
 
             if state == 'collectionDay':
                 p_value = ' '.join([
@@ -706,23 +710,33 @@ class Clans:
 
         self.task = self.bot.loop.create_task(self.update_cw_message(message, count_down=count_down))
 
+    async def fetch(self, session, url):
+        with aiohttp.Timeout(10):
+            async with session.get(url) as response:
+                if response.status != 200:
+                    response.raise_for_status()
+                return await response.json()
+
     async def get_clanwars(self):
         # official
         config = self.clans_config
         clan_tags = [c.tag for c in config.clans]
-        url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}/currentwar'
+        war_url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}/currentwar'
+        info_url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}'
 
         clans = []
         headers = {'Authorization': 'Bearer {}'.format(self.auth)}
 
-        async with aiohttp.ClientSession() as session:
-            for tag in clan_tags:
-                url = url_fmt.format(tag=tag)
-                async with session.get(url, headers=headers) as resp:
-                    if resp.status == 200:
-                        clans.append(await resp.json())
-                    else:
-                        await self.bot.say("Error fetching for clan tag {}".format(tag))
+        urls = []
+        for tag in clan_tags:
+            url = war_url_fmt.format(tag=tag)
+            urls.append(url)
+
+        with aiohttp.ClientSession(loop=self.bot.loop, headers=headers) as session:
+            clans = await asyncio.gather(
+                *[self.bot.loop.create_task(
+                    self.fetch(session, url)
+                ) for url in urls])
 
         if clans:
             dataIO.save_json(CLAN_WARS_CACHE, clans)
