@@ -1627,6 +1627,40 @@ class RACF:
         hash = int(arg[::-1], 36)
         await self.bot.say("fadmin: {}".format(hash))
 
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(no_pm=True, pass_context=True)
+    async def rmnonmemberclanroles(self, ctx):
+        """Remove clan roles for people without member roles."""
+        server = ctx.message.server
+        users = []
+        for member in server.members:
+            member_role_names = set([r.name for r in member.roles])
+            allowed_role_names = {'Member', 'Keep-Member', 'Special'}
+            # find set intersection
+            inter = member_role_names & allowed_role_names
+            if len(inter) == 0:
+                users.append(member)
+
+        clan_roles = {'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'Zen'}
+        users_with_clan_roles = []
+        for user in users:
+            user_role_names = set([r.name for r in user.roles])
+            inter = user_role_names & clan_roles
+            if len(inter):
+                users_with_clan_roles.append(user)
+
+        for user in users_with_clan_roles:
+            to_remove_roles = []
+            for role in user.roles:
+                if role.name in clan_roles:
+                    to_remove_roles.append(role)
+            if len(to_remove_roles) > 0:
+                await self.bot.remove_roles(user, *to_remove_roles)
+                await self.bot.say("Remove {} from {}".format(
+                    ", ".join([r.name for r in to_remove_roles]),
+                    user
+                ))
+
 
 def check_folder():
     """Check folder."""
