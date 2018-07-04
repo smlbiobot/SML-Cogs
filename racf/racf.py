@@ -118,13 +118,6 @@ CLAN_PERMISSION = {
         'assign_role': True,
         'member': True
     },
-    # RoyaleAPI
-    '9R8G9290': {
-        'tag': '9R8G9290',
-        'role': 'Zen',
-        'assign_role': True,
-        'member': True
-    },
     '22LR8JJ2': {
         'tag': '22LR8JJ2',
         'role': 'Mini',
