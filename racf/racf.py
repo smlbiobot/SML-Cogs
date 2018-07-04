@@ -1606,7 +1606,7 @@ class RACF:
 
         server = ctx.message.server
         clan_role_names = [
-            'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel'
+            'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'Zen'
         ]
         clan_roles = [discord.utils.get(server.roles, name=name) for name in clan_role_names]
         for member in server.members:
