@@ -1602,6 +1602,7 @@ class RACF:
         """Remove clan roles from visitors without the member role."""
         verified = await check_manage_roles(ctx, self.bot)
         if not verified:
+            await self.bot.say("Not verified")
             return
 
         server = ctx.message.server
@@ -1618,6 +1619,8 @@ class RACF:
                     if clan_role in member.roles:
                         await self.bot.remove_roles(member, clan_role)
                         await self.bot.say("Removed {} from {}".format(clan_role, member))
+
+        await self.bot.say("Completed.")
 
     @checks.mod_or_permissions()
     @commands.command(name="fadmin", no_pm=True, pass_context=True)
