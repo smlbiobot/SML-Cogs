@@ -112,6 +112,12 @@ CLAN_PERMISSION = {
         'assign_role': True,
         'member': True
     },
+    '9R8GUC0L': {
+        'tag': '9R8GUC0L',
+        'role': 'YOLO',
+        'assign_role': True,
+        'member': True
+    },
     '9LPVG9UC': {
         'tag': '9LPVG9UC',
         'role': 'Zen',
@@ -1600,7 +1606,7 @@ class RACF:
 
         server = ctx.message.server
         clan_role_names = [
-            'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'Zen'
+            'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen'
         ]
         clan_roles = [discord.utils.get(server.roles, name=name) for name in clan_role_names]
         for member in server.members:
@@ -1637,7 +1643,7 @@ class RACF:
             if len(inter) == 0:
                 users.append(member)
 
-        clan_roles = {'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'Zen'}
+        clan_roles = {'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen'}
         users_with_clan_roles = []
         for user in users:
             user_role_names = set([r.name for r in user.roles])
