@@ -30,6 +30,7 @@ import discord
 import os
 from discord import InvalidArgument, Forbidden, HTTPException
 from discord.ext import commands
+import argparse
 
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
@@ -41,6 +42,28 @@ JSON = os.path.join(PATH, "settings.json")
 def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
+
+def channel_edit_parser():
+    """Process edit channel arguments."""
+    # Process arguments
+    parser = argparse.ArgumentParser(prog='[p]chm edit')
+    # parser.add_argument('key')
+    parser.add_argument(
+        '-r', '--roles',
+        nargs='+',
+        help='Roles to apply permissions to')
+    parser.add_argument(
+        '-c', '--channels',
+        nargs='+',
+        help='List of channels separated by space'
+    )
+    parser.add_argument(
+        '-p', '--permissions',
+        nargs='+',
+        help='List of permitted permissions'
+    )
+
+    return parser
 
 
 class ChannelManager:
@@ -93,7 +116,7 @@ class ChannelManager:
             type=discord.ChannelType.text
         )
 
-        await self.bot.say("Channel created.")
+        await self.bot.say("Channel created: {}".format(channel))
 
     @channelman.group(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_channels=True)
@@ -111,6 +134,74 @@ class ChannelManager:
             await self.bot.say("Channel moved.")
         except (InvalidArgument, Forbidden, HTTPException) as err:
             await self.bot.say("Move channel failed. " + str(err))
+
+    @channelman.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_channel=True)
+    async def edit(self, ctx, *args):
+        """Edit channel permissions.
+
+        -r role
+        -c channels to apply to, separated by space
+        -p permissions to apply
+
+        Permissions:
+        read_messages=1
+        send_messages=0
+        manage_messages=1
+        read_message_history
+        """
+        parser = channel_edit_parser()
+        try:
+            pargs = parser.parse_args(args)
+        except SystemExit:
+            await self.bot.send_cmd_help(ctx)
+            return
+
+        channels = pargs.channels
+        roles = pargs.roles
+        permissions = pargs.permissions
+
+        server = ctx.message.server
+
+        overwrite = discord.PermissionOverwrite()
+        for perm in permissions:
+            p = perm.split('=')
+            name = p[0]
+            value = p[1] == '1'
+            setattr(overwrite, name, value)
+
+        c_list = []
+        r_list = []
+
+        for role in roles:
+            r = discord.utils.get(server.roles, name=role)
+            if r:
+                r_list.append(r)
+
+        for channel in channels:
+            c = discord.utils.get(server.channels, name=channel)
+            if c:
+                c_list.append(c)
+
+        for c in c_list:
+            for r in r_list:
+                await self.bot.edit_channel_permissions(c, r, overwrite)
+
+        await self.bot.say(
+            "Permissions updated for {} for {}".format(
+                ", ".join([c.name for c in c_list]),
+                ", ".join([r.name for r in r_list])
+            )
+        )
+
+        await self.bot.say(
+            "{}\n{}\n{}".format(
+                ", ".join(channels),
+                ", ".join(roles),
+                ", ".join(permissions)
+            )
+        )
+
 
 
 def check_folder():
