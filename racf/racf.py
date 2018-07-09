@@ -1559,10 +1559,16 @@ class RACF:
         if member is None:
             await self.bot.send_cmd_help()
             return
-        # remove role
-        recruit_role = discord.utils.get(ctx.message.server.roles, name='Recruit')
-        await self.bot.remove_roles(member, recruit_role)
-        await self.bot.say("Removed Recruit from {}".format(member))
+
+        # remove roles
+        server = ctx.message.server
+        clans = ['', 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'Yolo', 'Zen']
+        role_names = ['{}Recruit'.format(clan) for clan in clans]
+        roles = [discord.utils.get(server.roles, name=role_name) for role_name in role_names]
+        roles = [r for r in roles if r]
+        await self.bot.remove_roles(member, *roles)
+        await self.bot.say("Removed {} from {}".format(", ".join(role_names), member))
+
         # delete messages from recruit channel
         recruit_channel = discord.utils.get(ctx.message.server.channels, name='recruit')
         tmp = ctx.message
