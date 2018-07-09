@@ -24,15 +24,15 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import os
 from collections import defaultdict
 
 import discord
-from __main__ import send_cmd_help
-from cogs.utils.dataIO import dataIO
-from cogs.utils import checks
+import os
 from discord import InvalidArgument, Forbidden, HTTPException
 from discord.ext import commands
+
+from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "channelmanager")
 JSON = os.path.join(PATH, "settings.json")
@@ -57,14 +57,14 @@ class ChannelManager:
     async def channelman(self, ctx):
         """Channel Manager."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @channelman.group(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_channels=True)
     async def create(self, ctx):
         """Create Channel."""
         if ctx.invoked_subcommand is None or isinstance(ctx.invoked_subcommand, commands.Group):
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @create.command(name="user", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_channels=True)
@@ -100,7 +100,7 @@ class ChannelManager:
     async def move(self, ctx):
         """Move channel."""
         if ctx.invoked_subcommand is None or isinstance(ctx.invoked_subcommand, commands.Group):
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @move.command(name="after", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_channels=True)
