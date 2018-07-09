@@ -1577,6 +1577,16 @@ class RACF:
             except:
                 pass
 
+    @commands.command(pass_context=True, no_pm=True)
+    async def reject(self, ctx, member: discord.Member):
+        """Remove recruit."""
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
+        await ctx.invoke(self.dmusers, self.config.messages.reject, member)
+        await ctx.invoke(self.rmrecruit, member)
+
+
     @commands.command(pass_context=True, no_pm=True, aliases=['pt'])
     async def playertag(self, ctx, player_tag):
         """Link to RoyaleAPI player profile

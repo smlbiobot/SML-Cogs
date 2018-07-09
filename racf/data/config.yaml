@@ -168,6 +168,19 @@ messages:
 
 
     Please consult http://docs.redditalpha.com/#/racf/roles for more information.
+  reject: >
+    Thank you for your interest in joining 100 Thieves.
+    Unfortunately, your request to join our clan family wasn’t approved at this time.
+    This is generally due to low war wins and/or low card levels.
+
+
+    Most of our clans require anywhere from 30-50% of your cards to be upgraded to
+    gold league standard levels (tournament standard +2) — we call this your “gold readiness percentage”.
+    You can check your ”gold readiness’ at any time by viewing your profile on https://www.royaleapi.com/.
+
+
+    Please feel free to hang around in our <#277425134862860288> channel and connect with us later
+    after you’ve had a chance to upgrade your cards and/or improve your war wins.
 permission:
   bands:
   - {assign_role: true, member: false, role: BS-Alpha, tag: LQQ}
