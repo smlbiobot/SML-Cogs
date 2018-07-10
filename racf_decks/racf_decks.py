@@ -37,6 +37,8 @@ from cogs.utils.dataIO import dataIO
 PATH = os.path.join("data", "racf_decks")
 JSON = os.path.join(PATH, "settings.json")
 
+DELAY = dt.timedelta(minutes=30).total_seconds()
+
 
 def nested_dict():
     """Recursively nested defaultdict."""
@@ -107,8 +109,6 @@ class RACFDecks:
         if len(decks) == 0 and show_empty:
             await self.bot.say("No more decks found.")
 
-
-
         for deck in decks:
             cards = deck.get('deck_name').split(',')
             player_name = deck.get('player_name', '')
@@ -135,10 +135,9 @@ class RACFDecks:
             self.settings["timestamp"] = max_time
             dataIO.save_json(JSON, self.settings)
 
-        await asyncio.sleep(1)
         if self.settings["auto"]:
-            await self.post_decks(ctx, show_empty=True)
-
+            await asyncio.sleep(DELAY)
+            await self.post_decks(ctx, show_empty=False)
 
     @checks.mod_or_permissions()
     @commands.command(aliases=['rdecks', 'rdeck'], no_pm=True, pass_context=True)
