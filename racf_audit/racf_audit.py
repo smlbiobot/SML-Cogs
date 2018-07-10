@@ -72,6 +72,8 @@ def grouper(n, iterable, fillvalue=None):
     args = [iter(iterable)] * n
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
+
+
 async def check_manage_roles(ctx, bot):
     """Check for permissions to run command since no one has manage roles anymore."""
     server = ctx.message.server
@@ -185,13 +187,17 @@ class DiscordUsers:
 
 def clean_tag(tag):
     """clean up tag."""
-    if tag is None:
-        return None
-    t = tag
-    if t.startswith('#'):
-        t = t[1:]
-    t = t.strip()
-    t = t.upper()
+    # if tag is None:
+    #     return None
+    # t = tag
+    # if t.startswith('#'):
+    #     t = t[1:]
+    # t = t.strip()
+    # t = t.upper()
+    # return t
+    t = tag.upper()
+    t = t.replace('B', '8').replace('O', '0')
+    t = re.sub(r'[^0289CGJLPQRUVY]+', '', t)
     return t
 
 
@@ -382,11 +388,41 @@ class RACFAudit:
         """Allow external programs to set player tags. (RACF)"""
         await asyncio.sleep(0)
         players = self.players
+        # clean tags
+        tag = clean_tag(tag)
+
+        # ensure unique tag
+        tag_in_db = False
         if tag in players.keys():
+            tag_in_db = True
             if not force:
                 return False
+
+        # ensure unique user ids
+        user_id_in_db = False
+        for k, v in players.items():
+            if v.get('user_id') == member.id:
+                user_id_in_db = True
+                if not force:
+                    return False
+
+        # if force override, remove the entries
+        if tag_in_db:
+            players.pop(tag, None)
+
+        if user_id_in_db:
+            _ks = None
+            for k, v in players.items():
+                if v.get('user_id') == member.id:
+                    if _ks is None:
+                        _ks = []
+                    _ks.append(k)
+            if _ks is not None:
+                for k in _ks:
+                    players.pop(k, None)
+
         players[tag] = {
-            "tag": clean_tag(tag),
+            "tag": tag,
             "user_id": member.id,
             "user_name": member.display_name
         }
