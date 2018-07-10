@@ -195,6 +195,12 @@ def clean_tag(tag):
     t = t.replace('B', '8')
     return t
 
+class TagNotFound(Exception):
+    pass
+
+class UnknownServerError(Exception):
+    pass
+
 
 def get_emoji(bot, name):
     for emoji in bot.get_all_emojis():
@@ -1455,7 +1461,13 @@ class RACF:
         )
         async with aiohttp.ClientSession(connector=conn) as session:
             async with session.get(url) as resp:
-                data = await resp.json()
+                if resp.status == 200:
+                    data = await resp.json()
+                elif resp.status == 404:
+                    raise TagNotFound()
+                else:
+                    raise UnknownServerError()
+
 
         em = discord.Embed(
             title="{name} #{tag}".format(name=data.get('name'), tag=data.get('tag')),
@@ -1528,6 +1540,12 @@ class RACF:
 
         try:
             em = await self.cwready_embed(tag)
+        except TagNotFound:
+            await self.bot.say("Invalid tag #{}. Please verify that tag is set correctly.".format(tag))
+            return
+        except UnknownServerError:
+            await self.bot.say("Unknown server error from API")
+            return
         except Exception as e:
             logger.exception("Unknown exception", e)
             await self.bot.say("Server error: {}".format(e))
