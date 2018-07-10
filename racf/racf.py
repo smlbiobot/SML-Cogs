@@ -195,8 +195,10 @@ def clean_tag(tag):
     t = t.replace('B', '8')
     return t
 
+
 class TagNotFound(Exception):
     pass
+
 
 class UnknownServerError(Exception):
     pass
@@ -413,8 +415,6 @@ class RACF:
     async def racf_verify(self, ctx, member: discord.Member, tag):
         """Verify CR members by player tag."""
 
-        print("racf verify")
-
         # verify for RoyaleAPI server
         if ctx.message.server.name == 'RoyaleAPI':
             await self.royaleapi_verify(ctx, member, tag)
@@ -422,7 +422,6 @@ class RACF:
 
         # verify permissions on 100T server
         verified = await check_manage_roles(ctx, self.bot)
-        print("verified", verified)
         if not verified:
             return
 
@@ -430,8 +429,6 @@ class RACF:
         if not sctag.valid:
             await self.bot.say(sctag.invalid_error_msg)
             return
-
-
 
         tag = sctag.tag
 
@@ -1310,7 +1307,7 @@ class RACF:
 
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, no_pm=True)
-    async def crsettagmod(self, ctx, tag, member: discord.Member = None, force=False):
+    async def crsettagmod(self, ctx, tag, member: discord.Member = None, force=True):
         """Set CR tags for members.
 
         If the bot complains that that player tag is associated with another user
@@ -1337,6 +1334,7 @@ class RACF:
                 await self.bot.say("RACF Audit: associated player tag with member.")
             if not success:
                 player = await racfaudit.get_player_tag(tag)
+                print(player)
                 if str(player.get('user_id')) == str(member.id):
                     await self.bot.say("RACF Audit: associated player tag with member. (already set)")
                 else:
@@ -1471,7 +1469,6 @@ class RACF:
                     raise TagNotFound()
                 else:
                     raise UnknownServerError()
-
 
         em = discord.Embed(
             title="{name} #{tag}".format(name=data.get('name'), tag=data.get('tag')),
@@ -1613,7 +1610,6 @@ class RACF:
             return
         await ctx.invoke(self.dmusers, self.config.messages.reject, member)
         await ctx.invoke(self.rmrecruit, member)
-
 
     @commands.command(pass_context=True, no_pm=True, aliases=['pt'])
     async def playertag(self, ctx, player_tag):
