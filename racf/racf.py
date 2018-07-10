@@ -218,7 +218,6 @@ def grouper(iterable, n, fillvalue=None):
 
 async def check_manage_roles(ctx, bot):
     """Check for permissions to run command since no one has manage roles anymore."""
-    ret = False
     server = ctx.message.server
     author = ctx.message.author
     channel = ctx.message.channel
@@ -229,18 +228,18 @@ async def check_manage_roles(ctx, bot):
             await bot.send_message(
                 channel,
                 "Only Bot Commanders on this server can run this command.")
-            ret = False
+            return False
         else:
-            ret = True
+            return True
 
     # For other servers, only allow to run if user has manage role permissions
-    elif not author.server_permissions.manage_roles:
+    if not author.server_permissions.manage_roles:
         await bot.send_message(
             channel,
             "You don’t have the manage roles permission.")
-        ret = False
+        return False
 
-    return ret
+    return True
 
 
 class SCTag:
@@ -414,6 +413,8 @@ class RACF:
     async def racf_verify(self, ctx, member: discord.Member, tag):
         """Verify CR members by player tag."""
 
+        print("racf verify")
+
         # verify for RoyaleAPI server
         if ctx.message.server.name == 'RoyaleAPI':
             await self.royaleapi_verify(ctx, member, tag)
@@ -421,6 +422,7 @@ class RACF:
 
         # verify permissions on 100T server
         verified = await check_manage_roles(ctx, self.bot)
+        print("verified", verified)
         if not verified:
             return
 
@@ -428,6 +430,8 @@ class RACF:
         if not sctag.valid:
             await self.bot.say(sctag.invalid_error_msg)
             return
+
+
 
         tag = sctag.tag
 
