@@ -37,7 +37,7 @@ from cogs.utils.dataIO import dataIO
 PATH = os.path.join("data", "racf_decks")
 JSON = os.path.join(PATH, "settings.json")
 
-DELAY = dt.timedelta(minutes=30).total_seconds()
+DELAY = dt.timedelta(minutes=15).total_seconds()
 
 
 def nested_dict():
