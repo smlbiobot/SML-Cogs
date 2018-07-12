@@ -2,7 +2,7 @@ url:
   rules: https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/
   roles: https://www.reddit.com/r/CRRedditAlpha/wiki/roles
   discord: http://discord.gg/100t
-  docs: http://docs.redditalpha.com
+  docs: http://docs.100talpha.com
 messages:
   welcome:
 roles:
@@ -111,7 +111,7 @@ messages:
     you may use this Discord invite: <http://discord.gg/100t>
 
 
-    Additional help and information: http://docs.redditalpha.com/
+    Additional help and information: http://docs.100talpha.com/
 
 
     Thanks + enjoy!
@@ -119,7 +119,7 @@ messages:
     Welcome to the **100 Thieves Clan Family** (100T) Discord server.
 
 
-    Please check out http://docs.redditalpha.com/ for an overview of our family rules,
+    Please check out http://docs.100talpha.com/ for an overview of our family rules,
     together with help documentation on a plethora of bot commands for you to use and enjoy.
 
 
@@ -130,7 +130,7 @@ messages:
     That’s all this means. Don’t touch a damn thing. We’re serious.
 
 
-    Please consult http://docs.redditalpha.com/#/racf/roles
+    Please consult http://docs.100talpha.com/#/racf/roles
     to learn what to do, and if you eventually rise to the role of Co-Leader
     where we care about you because you’re doing important things.
   elder_refresh: >
@@ -142,7 +142,7 @@ messages:
     That’s all this means. Don’t touch a damn thing. We’re serious.
 
 
-    Please consult http://docs.redditalpha.com/#/racf/roles
+    Please consult http://docs.100talpha.com/#/racf/roles
     to learn what to do, and if you eventually rise to the role of Co-Leader
     where we care about you because you’re doing important things.
   reject: >
