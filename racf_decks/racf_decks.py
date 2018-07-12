@@ -57,7 +57,7 @@ async def fetch_decks(time=None, fam=True, auth=None):
         url = 'https://royaleapi.com/bot/gc?auth={}'.format(auth)
 
     if time is not None:
-        url = '{}?t={}'.format(url, time)
+        url = '{}&t={}'.format(url, time)
 
     data = None
 
@@ -160,7 +160,8 @@ class RACFDecks:
         """Auto-fetch 12-win GC decks in channel."""
         self.settings["family_auto"] = True
         dataIO.save_json(JSON, self.settings)
-        await self.post_decks(ctx, fam=True)
+        await self.bot.say("Automatically sending 12-win 100T decks to this channel.")
+        await self.post_decks(ctx, fam=True, show_empty=True)
 
     @checks.mod_or_permissions()
     @commands.command(no_pm=True, pass_context=True)
@@ -184,7 +185,8 @@ class RACFDecks:
         """Auto-fetch 12-win GC decks in channel."""
         self.settings["gc_auto"] = True
         dataIO.save_json(JSON, self.settings)
-        await self.post_decks(ctx, fam=False)
+        await self.bot.say("Automatically sending 12-win GC decks to this channel.")
+        await self.post_decks(ctx, fam=False, show_empty=True)
 
     @checks.mod_or_permissions()
     @commands.command(no_pm=True, pass_context=True)
