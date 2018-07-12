@@ -170,6 +170,13 @@ PATH = os.path.join("data", "racf")
 JSON = os.path.join(PATH, "settings.json")
 
 
+CLAN_ROLES = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen']
+MEMBER_ROLES = ['Content', 'Tourney', 'Member']
+VISITOR_ROLES = ['Visitor']
+RECRUIT_ROLES = ['{}Recruit'.format(r) for r in CLAN_ROLES]
+RECRUIT_ROLES.append('Recruit')
+
+
 def grouper(n, iterable, fillvalue=None):
     """Group lists into lists of items.
 
@@ -317,6 +324,24 @@ class RACF:
     def auth(self, value):
         self.settings["auth"] = value
         dataIO.save_json(JSON, self.settings)
+
+    async def add_roles(self, server: discord.Server, member: discord.Member, role_names):
+        """Add roles by name"""
+        roles = [discord.utils.get(server.roles, name=role_name) for role_name in role_names]
+        roles = [r for r in roles if r]
+        await self.bot.add_roles(member, *roles)
+
+    async def remove_roles(self, server: discord.Server, member: discord.Member, role_names):
+        """Remove roles by name.
+
+        Return list of roles removed.
+        """
+        roles = [discord.utils.get(member.roles, name=role_name) for role_name in role_names]
+        roles = [r for r in roles if r]
+        if len(roles):
+            print([r.name for r in roles])
+            await self.bot.remove_roles(member, *roles)
+        return [r.name for r in roles]
 
     @commands.group(pass_context=True, no_pm=True)
     async def racfset(self, ctx):
@@ -479,6 +504,7 @@ class RACF:
             return
 
         player_clan_tag = SCTag(player_clan_tag).tag
+        channels = ctx.message.server.channels
 
         if player_clan_tag in CLAN_PERMISSION.keys():
             # - Check allow role assignment
@@ -490,16 +516,28 @@ class RACF:
             # - Assign role - not members
             mm = self.bot.get_cog("MemberManagement")
             if not perm['member']:
-
                 await ctx.invoke(mm.changerole, member, perm['role'], 'Visitor')
-                channel = discord.utils.get(
-                    ctx.message.server.channels, name="visitors")
+                channel = discord.utils.get(channels, name="visitors")
                 await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
             else:
-                await ctx.invoke(mm.changerole, member, perm['role'], 'Member', 'Tourney', 'Content', '-Visitor',
-                                 '-Recruit')
-                channel = discord.utils.get(
-                    ctx.message.server.channels, name="family-chat")
+                # remove all clan roles
+                to_remove = CLAN_ROLES.copy()
+                to_remove.extend(VISITOR_ROLES)
+                to_remove.extend(RECRUIT_ROLES)
+                to_add = MEMBER_ROLES.copy()
+                to_add.append(perm['role'])
+                server = ctx.message.server
+                removed_roles = await self.remove_roles(server, member, to_remove)
+                await self.add_roles(server, member, to_add)
+                await self.bot.say(
+                    "Removed {} and added {} to {}".format(
+                        ", ".join(removed_roles) if len(removed_roles) else 'nothing',
+                        ", ".join(to_add),
+                        member
+                    )
+                )
+
+                channel = discord.utils.get(channels, name="family-chat")
                 await ctx.invoke(self.dmusers, self.config.messages.member, member)
 
             if channel is not None:
