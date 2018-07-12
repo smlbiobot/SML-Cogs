@@ -45,13 +45,16 @@ def nested_dict():
     return defaultdict(nested_dict)
 
 
-async def fetch_decks(time=None):
+async def fetch_decks(time=None, fam=True, auth=None):
     conn = aiohttp.TCPConnector(
         family=socket.AF_INET,
         verify_ssl=False,
     )
 
-    url = 'https://royaleapi.com/bot/100t/gc'
+    if fam:
+        url = 'https://royaleapi.com/bot/100t/gc?auth={}'.format(auth)
+    else:
+        url = 'https://royaleapi.com/bot/gc?auth={}'.format(auth)
 
     if time is not None:
         url = '{}?t={}'.format(url, time)
@@ -99,9 +102,13 @@ class RACFDecks:
         self.settings.update(dataIO.load_json(JSON))
         self.task = None
 
-    async def post_decks(self, ctx, show_empty=True):
-        time = self.settings.get('timestamp')
-        decks = await fetch_decks(time=time)
+    async def post_decks(self, ctx, show_empty=True, fam=True):
+        if fam:
+            time = self.settings.get('family_timestamp')
+        else:
+            time = self.settings.get('gc_timestamp')
+
+        decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'])
 
         deck_cog = self.bot.get_cog("Deck")
         timestamps = []
@@ -132,29 +139,60 @@ class RACFDecks:
         # store latest timestamp
         if len(decks) != 0:
             max_time = max(timestamps)
-            self.settings["timestamp"] = max_time
+            if fam:
+                self.settings["family_timestamp"] = max_time
+            else:
+                self.settings["gc_timestamp"] = max_time
             dataIO.save_json(JSON, self.settings)
 
-        if self.settings["auto"]:
+        if fam:
+            auto = self.settings["family_auto"]
+        else:
+            auto = self.settings["gc_auto"]
+
+        if auto:
             await asyncio.sleep(DELAY)
-            await self.post_decks(ctx, show_empty=False)
+            await self.post_decks(ctx, show_empty=False, fam=fam)
 
     @checks.mod_or_permissions()
     @commands.command(aliases=['rdecks', 'rdeck'], no_pm=True, pass_context=True)
     async def racf_decks(self, ctx):
         """Auto-fetch 12-win GC decks in channel."""
-        self.settings["auto"] = True
+        self.settings["family_auto"] = True
         dataIO.save_json(JSON, self.settings)
-        await self.post_decks(ctx)
+        await self.post_decks(ctx, fam=True)
 
     @checks.mod_or_permissions()
     @commands.command(no_pm=True, pass_context=True)
     async def stoprdecks(self, ctx):
         """Stop auto fetch"""
-        self.settings["auto"] = False
+        self.settings["family_auto"] = False
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Stopped automatic deck fetch.")
 
+    @checks.admin()
+    @commands.command(aliases=['rdeckauth'], no_pm=True, pass_context=True)
+    async def rdeck_auth(self, ctx, token):
+        """Auto-fetch 12-win GC decks in channel."""
+        self.settings["auth"] = token
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Saved token")
+
+    @checks.mod_or_permissions()
+    @commands.command(aliases=['gcdecks'], no_pm=True, pass_context=True)
+    async def gc_decks(self, ctx):
+        """Auto-fetch 12-win GC decks in channel."""
+        self.settings["gc_auto"] = True
+        dataIO.save_json(JSON, self.settings)
+        await self.post_decks(ctx, fam=False)
+
+    @checks.mod_or_permissions()
+    @commands.command(no_pm=True, pass_context=True)
+    async def stopgcdecks(self, ctx):
+        """Stop auto fetch"""
+        self.settings["gc_auto"] = False
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Stopped automatic deck fetch.")
 
 def check_folder():
     """Check folder."""
