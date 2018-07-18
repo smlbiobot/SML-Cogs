@@ -340,9 +340,9 @@ class Clans:
                 trophies = match.group(0)
                 trophies = trophies.replace(',', '')
                 trophies = trophies.replace('O', '0')
-                trophies = '{:,}'.format(int(trophies))
             else:
                 trophies = clan.get('requiredTrophies')
+            trophies = '{:,}'.format(int(trophies))
             pb = ''
             if pb_match is not None:
                 pb = ' PB'
