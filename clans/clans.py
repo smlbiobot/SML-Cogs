@@ -330,6 +330,8 @@ class Clans:
 
         for clan in clans:
             desc = clan.get('description')
+
+            # trophies, pb, psf
             match = re.search('[\d,O]{4,}', desc)
             pb_match = re.search('PB', desc)
             psf_match = re.search('PSF', desc)
@@ -347,6 +349,8 @@ class Clans:
             psf = ''
             if psf_match is not None:
                 psf = ' PSF'
+
+            # member count
             member_count = ''
             if show_member_count:
                 if self.api_provider == 'official':
@@ -356,15 +360,36 @@ class Clans:
 
                 member_count = ', {} / 50'.format(member_count)
 
+            # clan tag
             clan_tag = ''
             if show_clan_tag:
                 clan_tag = ', {}'.format(clan.get('tag'))
-            value = '`{trophies}{pb}{psf}{member_count}{clan_tag}`'.format(
+
+            # cw coverage
+            cw = ""
+            match = re.search('(\d+)L(\d+)G', desc)
+            if match is not None:
+                cw = "\nCWR: {}% Legendary, {}% Gold".format(
+                    match.group(1),
+                    match.group(2)
+                )
+
+            # aux requirements
+            aux = ""
+            for c in config.clans:
+                if c.tag in clan.get('tag'):
+                    if c.get('aux'):
+                        aux = '\n{}'.format(c.get('aux'))
+
+            # embed value
+            value = '`{trophies}{pb}{psf}{member_count}{clan_tag}`{cw}{aux}'.format(
                 clan_tag=clan_tag,
                 member_count=member_count,
                 trophies=trophies,
                 pb=pb,
-                psf=psf)
+                psf=psf,
+                cw=cw,
+                aux=aux)
             em.add_field(name=name, value=value, inline=False)
 
             if badge_url is None:
