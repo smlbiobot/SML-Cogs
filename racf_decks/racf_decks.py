@@ -27,8 +27,11 @@ from collections import defaultdict
 import aiohttp
 import asyncio
 import datetime as dt
+import discord
+import io
 import os
 import socket
+from concurrent.futures import ThreadPoolExecutor
 from discord.ext import commands
 
 from cogs.utils import checks
@@ -37,7 +40,7 @@ from cogs.utils.dataIO import dataIO
 PATH = os.path.join("data", "racf_decks")
 JSON = os.path.join(PATH, "settings.json")
 
-DELAY = dt.timedelta(minutes=15).total_seconds()
+DELAY = dt.timedelta(minutes=5).total_seconds()
 
 
 def nested_dict():
@@ -101,67 +104,18 @@ class RACFDecks:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
         self.task = None
-
-    async def post_decks(self, ctx, show_empty=True, fam=True):
-        if fam:
-            time = self.settings.get('family_timestamp')
-        else:
-            time = self.settings.get('gc_timestamp')
-
-        decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'])
-
-        deck_cog = self.bot.get_cog("Deck")
-        timestamps = []
-
-        if len(decks) == 0 and show_empty:
-            await self.bot.say("No more decks found.")
-
-        for deck in decks:
-            cards = deck.get('deck_name').split(',')
-            player_name = deck.get('player_name', '')
-            clan_name = deck.get('clan_name', '')
-            ts = deck.get('timestamp_epoch_millis')
-            timestamps.append(ts)
-            ts_dt = dt.datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M UTC")
-            message = "**12-win GC deck by {}**, {}\n{}".format(player_name, clan_name, ts_dt)
-            deck_img_name = player_name
-            await self.bot.send_message(
-                ctx.message.channel,
-                message
-            )
-            await ctx.invoke(
-                deck_cog.deck_get,
-                card1=cards[0], card2=cards[1], card3=cards[2], card4=cards[3],
-                card5=cards[4], card6=cards[5], card7=cards[6], card8=cards[7],
-                deck_name=deck_img_name, author=self.bot.user
-            )
-
-        # store latest timestamp
-        if len(decks) != 0:
-            max_time = max(timestamps)
-            if fam:
-                self.settings["family_timestamp"] = max_time
-            else:
-                self.settings["gc_timestamp"] = max_time
-            dataIO.save_json(JSON, self.settings)
-
-        if fam:
-            auto = self.settings["family_auto"]
-        else:
-            auto = self.settings["gc_auto"]
-
-        if auto:
-            await asyncio.sleep(DELAY)
-            await self.post_decks(ctx, show_empty=False, fam=fam)
+        self.threadex = ThreadPoolExecutor(max_workers=2)
 
     @checks.mod_or_permissions()
     @commands.command(aliases=['rdecks', 'rdeck'], no_pm=True, pass_context=True)
     async def racf_decks(self, ctx):
         """Auto-fetch 12-win GC decks in channel."""
+        self.settings["server_id"] = ctx.message.server.id
         self.settings["family_auto"] = True
+        self.settings["family_channel_id"] = ctx.message.channel.id
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Automatically sending 12-win 100T decks to this channel.")
-        await self.post_decks(ctx, fam=True, show_empty=True)
+        # await self.post_decks(ctx, fam=True, show_empty=True)
 
     @checks.mod_or_permissions()
     @commands.command(no_pm=True, pass_context=True)
@@ -183,10 +137,12 @@ class RACFDecks:
     @commands.command(aliases=['gcdecks'], no_pm=True, pass_context=True)
     async def gc_decks(self, ctx):
         """Auto-fetch 12-win GC decks in channel."""
+        self.settings["server_id"] = ctx.message.server.id
         self.settings["gc_auto"] = True
+        self.settings["gc_channel_id"] = ctx.message.channel.id
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Automatically sending 12-win GC decks to this channel.")
-        await self.post_decks(ctx, fam=False, show_empty=True)
+        # await self.post_decks(ctx, fam=False, show_empty=True)
 
     @checks.mod_or_permissions()
     @commands.command(no_pm=True, pass_context=True)
@@ -195,6 +151,82 @@ class RACFDecks:
         self.settings["gc_auto"] = False
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Stopped automatic deck fetch.")
+
+    async def post_decks(self, channel: discord.Channel, show_empty=True, fam=True):
+        if fam:
+            time = self.settings.get('family_timestamp')
+        else:
+            time = self.settings.get('gc_timestamp')
+
+        decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'])
+
+        deck_cog = self.bot.get_cog("Deck")
+        timestamps = []
+
+        if len(decks) == 0 and show_empty:
+            await self.bot.send_message(channel, "No more decks found.")
+
+        for deck in decks:
+            cards = deck.get('deck_name').split(',')
+            player_name = deck.get('player_name', '')
+            clan_name = deck.get('clan_name', '')
+            ts = deck.get('timestamp_epoch_millis')
+            timestamps.append(ts)
+            ts_dt = dt.datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M UTC")
+            message = "**12-win GC deck by {}**, {}\n{}".format(player_name, clan_name, ts_dt)
+            deck_img_name = player_name
+            await self.bot.send_message(
+                channel,
+                message
+            )
+
+            deck_image = await self.bot.loop.run_in_executor(
+                self.threadex,
+                deck_cog.get_deck_image,
+                cards, deck_img_name, self.bot.user
+            )
+
+            # construct a filename using first three letters of each card
+            filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
+
+            with io.BytesIO() as f:
+                deck_image.save(f, "PNG")
+                f.seek(0)
+                await self.bot.send_file(
+                    channel, f,
+                    filename=filename, content="")
+
+        # store latest timestamp
+        if len(decks) != 0:
+            max_time = max(timestamps)
+            if fam:
+                self.settings["family_timestamp"] = max_time
+            else:
+                self.settings["gc_timestamp"] = max_time
+            dataIO.save_json(JSON, self.settings)
+
+    async def update_decks(self):
+        while self == self.bot.get_cog("RACFDecks"):
+            server = None
+            server_id = self.settings.get("server_id")
+            if server_id:
+                server = self.bot.get_server(server_id)
+            if server:
+                family_auto = self.settings.get('family_auto')
+                family_channel_id = self.settings.get('family_channel_id')
+                if family_auto and family_channel_id:
+                    channel = discord.utils.get(server.channels, id=family_channel_id)
+                    if channel:
+                        await self.post_decks(channel, fam=True, show_empty=False)
+
+                gc_auto = self.settings.get('gc_auto')
+                gc_channel_id = self.settings.get('gc_channel_id')
+                if gc_auto and gc_channel_id:
+                    channel = discord.utils.get(server.channels, id=gc_channel_id)
+                    if channel:
+                        await self.post_decks(channel, fam=False, show_empty=False)
+            await asyncio.sleep(DELAY)
+
 
 def check_folder():
     """Check folder."""
@@ -213,3 +245,4 @@ def setup(bot):
     check_file()
     n = RACFDecks(bot)
     bot.add_cog(n)
+    bot.loop.create_task(n.update_decks())
