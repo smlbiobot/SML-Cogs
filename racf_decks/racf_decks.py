@@ -41,6 +41,7 @@ PATH = os.path.join("data", "racf_decks")
 JSON = os.path.join(PATH, "settings.json")
 
 DELAY = dt.timedelta(minutes=5).total_seconds()
+# DELAY = dt.timedelta(seconds=1).total_seconds()
 
 
 def nested_dict():
@@ -153,6 +154,7 @@ class RACFDecks:
         await self.bot.say("Stopped automatic deck fetch.")
 
     async def post_decks(self, channel: discord.Channel, show_empty=True, fam=True):
+        print("post_decks")
         if fam:
             time = self.settings.get('family_timestamp')
         else:
@@ -196,6 +198,8 @@ class RACFDecks:
                     channel, f,
                     filename=filename, content="")
 
+            await self.bot.send_message(channel, embed=await deck_cog.decklink_embed(cards))
+
         # store latest timestamp
         if len(decks) != 0:
             max_time = max(timestamps)
@@ -225,6 +229,7 @@ class RACFDecks:
                     channel = discord.utils.get(server.channels, id=gc_channel_id)
                     if channel:
                         await self.post_decks(channel, fam=False, show_empty=False)
+
             await asyncio.sleep(DELAY)
 
 
