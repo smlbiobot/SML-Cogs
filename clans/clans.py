@@ -39,10 +39,11 @@ import re
 import unidecode
 import yaml
 from box import Box
+from discord.ext import commands
+
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
-from discord.ext import commands
 
 PATH = os.path.join("data", "clans")
 JSON = os.path.join(PATH, "settings.json")
@@ -569,9 +570,9 @@ class Clans:
             title=config.name,
             color=discord.Color(int(config.color, 16)),
             description=(
-                "Truncated list of members with battles remaining."
-                "\nLast updated: {}".format(dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
-                + legend
+                    "Truncated list of members with battles remaining."
+                    "\nLast updated: {}".format(dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
+                    + legend
             )
         )
 
@@ -790,6 +791,37 @@ class Clans:
         em = self.clanwars_embed(clans)
         message = await self.bot.say(embed=em)
 
+    def check_settings(self, server=None):
+        """Init server with defaults"""
+        if "clan_wars" not in self.settings:
+            self.settings['clan_wars'] = {}
+        if "servers" not in self.settings["clan_wars"]:
+            self.settings['clan_wars']['servers'] = {}
+
+        if server is not None:
+            if server.id not in self.settings["clan_wars"]['servers']:
+                self.settings["clan_wars"]['servers'][server.id] = dict(
+                    clan_wars_channel_id=None,
+                    auto=False
+                )
+        dataIO.save_json(JSON, self.settings)
+
+    def enable_clanwars(self, server, channel):
+        self.check_settings(server)
+        self.settings["clan_wars"]["servers"][server.id].update(dict(
+            channel_id=channel.id,
+            auto=True
+        ))
+        self.save_settings()
+
+    def disable_clanwars(self, server, channel):
+        self.check_settings(server)
+        self.settings["clan_wars"]["servers"][server.id].update(dict(
+            channel_id=None,
+            auto=False
+        ))
+        self.save_settings()
+
     @checks.mod_or_permissions()
     @clanwars.command(name='auto', pass_context=True, no_pm=True)
     async def clanwars_auto(self, ctx):
@@ -800,25 +832,38 @@ class Clans:
 
         await self.bot.type()
 
-        clans = await self.get_clanwars()
-        em = self.clanwars_embed(clans)
-        message = await self.bot.say(embed=em)
-
-        await self.set_clanwars_message_id(message)
-        self.task = self.bot.loop.create_task(self.update_cw_message(message))
+        server = ctx.message.server
+        channel = ctx.message.channel
+        self.enable_clanwars(server, channel)
+        await self.post_clanwars()
 
     @checks.mod_or_permissions()
     @clanwars.command(name='stop', pass_context=True, no_pm=True)
     async def clanwars_stop(self, ctx):
         """Stop auto display"""
         server = ctx.message.server
-        try:
-            self.settings['clan_wars'][server.id]["message_id"] = None
-            self.save_settings()
-        except KeyError:
-            pass
+        channel = ctx.message.channel
+        self.disable_clanwars(server, channel)
 
         await self.bot.say("Auto clan wars update stopped.")
+
+    async def post_clanwars(self):
+        """Post embed to channel."""
+        while self == self.bot.get_cog("Clans"):
+            self.check_settings()
+            for server_id, v in self.settings['clan_wars']['servers'].items():
+                if v.get('auto'):
+                    channel_id = v.get('channel_id')
+                    channel = self.bot.get_channel(channel_id)
+                    if channel is not None:
+                        # post clan wars status
+                        clans = await self.get_clanwars()
+                        em = self.clanwars_embed(clans)
+                        message = await self.bot.send_message(channel, embed=em)
+
+                        # delete channel messages
+                        await self.bot.purge_from(channel, limit=5, before=message)
+            await asyncio.sleep(57)
 
 
 def check_folder():
@@ -838,3 +883,4 @@ def setup(bot):
     check_file()
     n = Clans(bot)
     bot.add_cog(n)
+    bot.loop.create_task(n.post_clanwars())
