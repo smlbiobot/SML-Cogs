@@ -454,7 +454,6 @@ class MemberManagement:
                 await self.bot.say("You don’t have the manage roles permission.")
                 return
 
-
         server_role_names = [r.name for r in server.roles]
         role_args = []
         flags = ['+', '-']
@@ -633,6 +632,61 @@ class MemberManagement:
 
         for page in pagify('\n'.join(out)):
             await self.bot.say(page)
+
+    @commands.command(name="moverole", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def move_role(self, ctx, role_name, *args):
+        """Move a role."""
+        parser = argparse.ArgumentParser(prog='[p]moverole')
+        # parser.add_argument('key')
+        parser.add_argument(
+            '--above', '-a',
+            help='Above this role')
+        parser.add_argument(
+            '--below', '-b',
+            help='Below this role')
+
+        try:
+            pargs = parser.parse_args(args)
+        except SystemExit:
+            await self.bot.send_cmd_help(ctx)
+            return
+
+        server = ctx.message.server
+        role = discord.utils.get(server.roles, name=role_name)
+        if role is None:
+            await self.bot.say("Cannot find {} on this server.".format(role_name))
+            return
+
+        # move role above this role
+        if pargs.above:
+            above_role = discord.utils.get(server.roles, name=pargs.above)
+            if above_role is None:
+                await self.bot.say("Cannot find {} on this server.".format(pargs.above))
+                return
+
+            delta_pos = 0
+            if above_role.position < role.position:
+                delta_pos += 1
+
+            await self.bot.move_role(server, role, above_role.position + delta_pos)
+            await self.bot.say("Moved {} above {}".format(role, above_role))
+            return
+
+        # move role below this role
+        if pargs.below:
+            below_role = discord.utils.get(server.roles, name=pargs.below)
+            if below_role is None:
+                await self.bot.say("Cannot find {} on this server.".format(pargs.below))
+                return
+
+            delta_pos = 1
+            if below_role.position < role.position:
+                delta_pos += 1
+
+            await self.bot.move_role(server, role, below_role.position + delta_pos)
+            await self.bot.say("Moved {} below {}".format(role, below_role))
+            return
 
 
 def check_folder():
