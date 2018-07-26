@@ -636,7 +636,12 @@ class MemberManagement:
     @commands.command(name="moverole", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def move_role(self, ctx, role_name, *args):
-        """Move a role."""
+        """Move a role.
+
+        [p]moverole A --above C
+        [p]moverole A --below B
+
+        """
         parser = argparse.ArgumentParser(prog='[p]moverole')
         # parser.add_argument('key')
         parser.add_argument(
