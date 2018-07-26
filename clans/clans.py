@@ -847,23 +847,27 @@ class Clans:
 
         await self.bot.say("Auto clan wars update stopped.")
 
-    async def post_clanwars(self):
-        """Post embed to channel."""
+    async def post_clanwars_task(self, ):
+        """Task: post embed to channel."""
         while self == self.bot.get_cog("Clans"):
-            self.check_settings()
-            for server_id, v in self.settings['clan_wars']['servers'].items():
-                if v.get('auto'):
-                    channel_id = v.get('channel_id')
-                    channel = self.bot.get_channel(channel_id)
-                    if channel is not None:
-                        # post clan wars status
-                        clans = await self.get_clanwars()
-                        em = self.clanwars_embed(clans)
-                        message = await self.bot.send_message(channel, embed=em)
-
-                        # delete channel messages
-                        await self.bot.purge_from(channel, limit=5, before=message)
+            await self.post_clanwars()
             await asyncio.sleep(57)
+
+    async def post_clanwars(self):
+        """Post embbed to channel."""
+        self.check_settings()
+        for server_id, v in self.settings['clan_wars']['servers'].items():
+            if v.get('auto'):
+                channel_id = v.get('channel_id')
+                channel = self.bot.get_channel(channel_id)
+                if channel is not None:
+                    # post clan wars status
+                    clans = await self.get_clanwars()
+                    em = self.clanwars_embed(clans)
+                    message = await self.bot.send_message(channel, embed=em)
+
+                    # delete channel messages
+                    await self.bot.purge_from(channel, limit=5, before=message)
 
 
 def check_folder():
@@ -883,4 +887,4 @@ def setup(bot):
     check_file()
     n = Clans(bot)
     bot.add_cog(n)
-    bot.loop.create_task(n.post_clanwars())
+    bot.loop.create_task(n.post_clanwars_task())
