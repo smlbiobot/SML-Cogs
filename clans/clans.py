@@ -346,8 +346,12 @@ class Clans:
     async def post_auto_clans_task(self):
         """Task: post embed to channel."""
         while self == self.bot.get_cog("Clans"):
-            await self.post_auto_clans()
-            await asyncio.sleep(57)
+            try:
+                await self.post_auto_clans()
+            except Exception:
+                pass
+            finally:
+                await asyncio.sleep(57)
 
     async def post_auto_clans(self):
         self.check_settings()
@@ -928,8 +932,12 @@ class Clans:
     async def post_clanwars_task(self, ):
         """Task: post embed to channel."""
         while self == self.bot.get_cog("Clans"):
-            await self.post_clanwars()
-            await asyncio.sleep(57)
+            try:
+                await self.post_clanwars()
+            except Exception:
+                pass
+            finally:
+                await asyncio.sleep(57)
 
     async def post_clanwars(self):
         """Post embbed to channel."""
