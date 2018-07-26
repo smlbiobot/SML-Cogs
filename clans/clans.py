@@ -302,6 +302,68 @@ class Clans:
         [p]clans -t   Disable clan tag
         """
         await self.bot.type()
+        channel = ctx.message.channel
+        await self.post_clans(channel, *args)
+
+    def enable_auto_clan(self, server, channel):
+        self.check_settings(server)
+        self.settings["auto_clan"]["servers"][server.id].update(dict(
+            channel_id=channel.id,
+            auto=True
+        ))
+        self.save_settings()
+
+    def disable_auto_clan(self, server, channel):
+        self.check_settings(server)
+        self.settings["auto_clan"]["servers"][server.id].update(dict(
+            channel_id=None,
+            auto=False
+        ))
+        self.save_settings()
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True, no_pm=True)
+    async def auto_clan(self, ctx):
+        """Auto display clan info."""
+        await self.bot.type()
+
+        server = ctx.message.server
+        channel = ctx.message.channel
+        self.enable_auto_clan(server, channel)
+        message = await self.post_clans(channel)
+        await self.bot.purge_from(channel, limit=5, before=message)
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True, no_pm=True)
+    async def auto_clan_stop(self, ctx):
+        """Stop auto display"""
+        server = ctx.message.server
+        channel = ctx.message.channel
+        self.disable_clanwars(server, channel)
+
+        await self.bot.say("Auto clan update stopped.")
+
+    async def post_auto_clans_task(self):
+        """Task: post embed to channel."""
+        while self == self.bot.get_cog("Clans"):
+            await self.post_auto_clans()
+            await asyncio.sleep(57)
+
+    async def post_auto_clans(self):
+        self.check_settings()
+        for server_id, v in self.settings['auto_clan']['servers'].items():
+            if v.get('auto'):
+                channel_id = v.get('channel_id')
+                channel = self.bot.get_channel(channel_id)
+                if channel is not None:
+                    message = await self.post_clans(channel)
+
+                    # delete channel messages
+                    await self.bot.purge_from(channel, limit=5, before=message)
+
+
+    async def post_clans(self, channel, *args):
+        """Post clans to channel."""
         config = self.clans_config
         clan_tags = [clan.tag for clan in config.clans if not clan.hide]
 
@@ -412,7 +474,9 @@ class Clans:
                 name=inf.name,
                 value=inf.value
             )
-        await self.bot.say(embed=em)
+
+        message = await self.bot.send_message(channel, embed=em)
+        return message
 
     def search_args_parser(self):
         """Search arguments parser."""
@@ -793,6 +857,20 @@ class Clans:
 
     def check_settings(self, server=None):
         """Init server with defaults"""
+        # auto clan
+        if "auto_clan" not in self.settings:
+            self.settings["auto_clan"] = {}
+        if "servers" not in self.settings["auto_clan"]:
+            self.settings["auto_clan"]["servers"] = {}
+
+        if server is not None:
+            if server.id not in self.settings["auto_clan"]['servers']:
+                self.settings["auto_clan"]['servers'][server.id] = dict(
+                    clans_channel_id=None,
+                    auto=False
+                )
+
+        # auto clan wars
         if "clan_wars" not in self.settings:
             self.settings['clan_wars'] = {}
         if "servers" not in self.settings["clan_wars"]:
@@ -888,3 +966,4 @@ def setup(bot):
     n = Clans(bot)
     bot.add_cog(n)
     bot.loop.create_task(n.post_clanwars_task())
+    bot.loop.create_task(n.post_auto_clans_task())
