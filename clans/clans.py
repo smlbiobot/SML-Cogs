@@ -870,7 +870,7 @@ class Clans:
         if server is not None:
             if server.id not in self.settings["auto_clan"]['servers']:
                 self.settings["auto_clan"]['servers'][server.id] = dict(
-                    clans_channel_id=None,
+                    channel_id=None,
                     auto=False
                 )
 
@@ -883,7 +883,7 @@ class Clans:
         if server is not None:
             if server.id not in self.settings["clan_wars"]['servers']:
                 self.settings["clan_wars"]['servers'][server.id] = dict(
-                    clan_wars_channel_id=None,
+                    channel_id=None,
                     auto=False
                 )
         dataIO.save_json(JSON, self.settings)
@@ -929,7 +929,7 @@ class Clans:
 
         await self.bot.say("Auto clan wars update stopped.")
 
-    async def post_clanwars_task(self, ):
+    async def post_clanwars_task(self):
         """Task: post embed to channel."""
         while self == self.bot.get_cog("Clans"):
             try:
