@@ -1,7 +1,8 @@
 auth: supercell_developer_key
+min_challenge_wins: 12
 clans:
-  - name: 100T Alpha
-    tag: 9PJ82CRC
+#  - name: 100T Alpha
+#    tag: 9PJ82CRC
   - name: 100T Bravo
     tag: 9UQJUJC9
   - name: 100T Charlie

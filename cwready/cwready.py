@@ -9,6 +9,7 @@ import aiohttp
 import discord
 import logging
 import os
+import re
 import socket
 from discord.ext import commands
 from ruamel.yaml import YAML
@@ -67,6 +68,7 @@ def get_emoji(bot, name):
 def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
+
 
 class CWReady:
     """Clan War Readinesx"""
@@ -138,8 +140,14 @@ class CWReady:
             await self.bot.say("Server error: {}".format(e))
         else:
             await self.bot.say(embed=self.cwready_embed(data))
+            clans = await self.test_cwr_requirements(data)
+            await self.bot.say("Qualified clans: {}".format(
+                ", ".join([clan.get('name') for clan in clans])
+            ))
+
 
     async def fetch_cwready(self, tag):
+        """Fetch clan war readinesss."""
         url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
         conn = aiohttp.TCPConnector(
             family=socket.AF_INET,
@@ -156,6 +164,77 @@ class CWReady:
                     raise UnknownServerError()
 
         return data
+
+    async def fetch_clans(self, tags):
+        """Fetch clan info by tags."""
+        conn = aiohttp.TCPConnector(
+            family=socket.AF_INET,
+            verify_ssl=False,
+        )
+        data_list = []
+        headers = dict(Authorization="Bearer {}".format(self.config.get('auth')))
+        async with aiohttp.ClientSession(connector=conn) as session:
+            for tag in tags:
+                url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
+                async with session.get(url, headers=headers) as resp:
+                    if resp.status == 200:
+                        data = await resp.json()
+                        data_list.append(data)
+                    elif resp.status == 404:
+                        raise TagNotFound()
+                    else:
+                        raise UnknownServerError()
+
+        return data_list
+
+    async def fetch_cwr_requirements(self, tags):
+        """Fetch CWR requirements by clan."""
+        data_list = await self.fetch_clans(tags)
+        req = []
+
+        for data in data_list:
+            tag = clean_tag(data.get('tag', ''))
+            name = data.get('name', '')
+            desc = data.get('description', '')
+            # cw coverage
+            legendary = 0
+            gold = 0
+            match = re.search('(\d+)L(\d+)G', desc)
+            if match is not None:
+                legendary = match.group(1)
+                gold = match.group(2)
+
+            req.append(dict(
+                tag=tag,
+                name=name,
+                legendary=int(legendary),
+                gold=int(gold)
+            ))
+
+        return req
+
+    async def test_cwr_requirements(self, cwr_data):
+        """Find which clan candidate meets requirements for."""
+        tags = [clan.get('tag') for clan in self.config.get('clans', [])]
+        reqs = await self.fetch_cwr_requirements(tags)
+        qual = []
+        for req in reqs:
+            legendary = False
+            gold = False
+            for league in cwr_data.get('leagues', []):
+                if league.get('key') == 'legendary':
+                    if league.get('total_percent', 0) * 100 >= req.get('legendary'):
+                        legendary = True
+                elif league.get('key') == 'gold':
+                    if league.get('total_percent', 0) * 100 >= req.get('gold'):
+                        gold = True
+
+            if legendary and gold:
+                qual.append(req)
+
+        return qual
+
+
 
     def cwready_embed(self, data):
 
