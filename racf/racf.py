@@ -1477,11 +1477,24 @@ class RACF:
                 "Our leaders will review your profile and let you know if you have been accepted. "
                 "https://royaleapi.com/player/{tag}".format(member=member, tag=tag)
             )
-            cwreadiness = self.bot.get_cog("CWReady")
+            cwready = self.bot.get_cog("CWReady")
+            data = await cwready.fetch_cwready(tag)
             await self.bot.send_message(
                 recruit_channel,
-                embed=await cwreadiness.cwready_embed(tag)
+                embed=cwready.cwready_embed(data)
             )
+
+            clans = await cwready.test_cwr_requirements(data)
+            if len(clans) == 0:
+                await self.bot.send_message(recruit_channel, "User does not meet requirements for any of our clans.")
+            else:
+                await self.bot.send_message(
+                    recruit_channel,
+                    "Qualified clans: {}. {}".format(
+                        ", ".join([clan.get('name') for clan in clans]),
+                        self.config.get('addendum', '')
+                    ))
+
         else:
             await self.bot.send_message(
                 recruit_channel,
@@ -1537,10 +1550,8 @@ class RACF:
     async def playertag(self, ctx, player_tag):
         """Link to RoyaleAPI player profile
         """
-        tag = clean_tag(player_tag)
-        await self.bot.say("https://royaleapi.com/player/{}".format(tag))
         cwready = self.bot.get_cog("CWReady")
-        await self.bot.say(embed=await cwready.cwready_embed(tag))
+        await ctx.invoke(cwready.cwreadytag, player_tag)
 
     @commands.command(pass_context=True, no_pm=True)
     async def toprole(self, ctx, member: discord.Member = None):
