@@ -1483,17 +1483,10 @@ class RACF:
                 recruit_channel,
                 embed=cwready.cwready_embed(data)
             )
-
-            clans = await cwready.test_cwr_requirements(data)
-            if len(clans) == 0:
-                await self.bot.send_message(recruit_channel, "User does not meet requirements for any of our clans.")
-            else:
-                await self.bot.send_message(
-                    recruit_channel,
-                    "Qualified clans: {}. {}".format(
-                        ", ".join([clan.get('name') for clan in clans]),
-                        self.config.get('addendum', '')
-                    ))
+            await cwready.send_cwr_req_results_channel(
+                recruit_channel,
+                data
+            )
 
         else:
             await self.bot.send_message(
