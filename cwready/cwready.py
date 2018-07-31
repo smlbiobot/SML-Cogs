@@ -68,7 +68,6 @@ def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
 
-
 class CWReady:
     """Clan War Readinesx"""
 
@@ -102,7 +101,6 @@ class CWReady:
         else:
             await self.bot.say(embed=em)
 
-    # @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
     async def cwready(self, ctx, member: discord.Member = None):
         """Return clan war readiness."""
@@ -127,8 +125,8 @@ class CWReady:
         tag = clean_tag(tag)
 
         try:
-            # em, txt = await self.cwready_embed2(tag)
-            em = await self.cwready_embed(tag)
+            data = await self.fetch_cwready(tag)
+
         except TagNotFound:
             await self.bot.say("Invalid tag #{}. Please verify that tag is set correctly.".format(tag))
             return
@@ -139,15 +137,15 @@ class CWReady:
             logger.exception("Unknown exception", e)
             await self.bot.say("Server error: {}".format(e))
         else:
-            await self.bot.say(embed=em)
+            await self.bot.say(embed=self.cwready_embed(data))
 
-    async def cwready_text(self, tag):
+    async def fetch_cwready(self, tag):
         url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
-        player_url = "https://royaleapi.com/player/{}".format(tag)
         conn = aiohttp.TCPConnector(
             family=socket.AF_INET,
             verify_ssl=False,
         )
+        data = dict()
         async with aiohttp.ClientSession(connector=conn) as session:
             async with session.get(url) as resp:
                 if resp.status == 200:
@@ -157,67 +155,13 @@ class CWReady:
                 else:
                     raise UnknownServerError()
 
-        out = [
-            "{name} #{tag}".format(name=data.get('name'), tag=data.get('tag')),
-            "Clan War Readiness",
-            player_url
-        ]
+        return data
 
-        clan_name = data.get('clan', {}).get('name', '')
-        clan_tag = data.get('clan', {}).get('tag', '')
-        out += [
-            "{} #{}".format(clan_name, clan_tag),
-            "{trophies} / {pb} PB :trophy:".format(
-                trophies=data.get('trophies', 0),
-                pb=data.get('trophies_best', 0)
-            )
-        ]
-        out += [
-            "War Wins: {}".format(data.get('war_day_wins', 0)),
-            "War Cards: {}".format(data.get('clan_cards_collected', 0)),
-            "Challenge Max Wins: {}".format(data.get('challenge_max_wins', 0)),
-            "Challenge Cards Won: {}".format(data.get('challenge_cards_won', 0))
-        ]
+    def cwready_embed(self, data):
 
-        # leagues
-        for league in data.get('leagues'):
-            name = league.get('name')
-            total = league.get('total', 0)
-            percent = league.get('total_percent', 0)
-            levels = league.get('levels', 0)
-            f_name = "{name} League .. {percent:.0%} .. {levels}".format(
-                name=name, total=total, percent=percent, levels=levels
-            )
-
-            out += [f_name]
-
-            cards = league.get('cards', [])
-
-            value = ""
-            for card in cards:
-                if card is not None:
-                    value += get_emoji(self.bot, card.get('key', None).replace('-', ''))
-                    if card.get('overlevel'):
-                        value += '+'
-            out += [value]
-
-        return out
-
-    async def cwready_embed(self, tag):
+        tag = data.get('tag')
         url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
         player_url = "https://royaleapi.com/player/{}".format(tag)
-        conn = aiohttp.TCPConnector(
-            family=socket.AF_INET,
-            verify_ssl=False,
-        )
-        async with aiohttp.ClientSession(connector=conn) as session:
-            async with session.get(url) as resp:
-                if resp.status == 200:
-                    data = await resp.json()
-                elif resp.status == 404:
-                    raise TagNotFound()
-                else:
-                    raise UnknownServerError()
 
         em = discord.Embed(
             title="{name} #{tag}".format(name=data.get('name'), tag=data.get('tag')),
