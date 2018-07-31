@@ -6,6 +6,7 @@ import itertools
 from collections import defaultdict
 
 import aiohttp
+import asyncio
 import discord
 import logging
 import os
@@ -96,12 +97,13 @@ class CWReady:
         tag = clean_tag(tag)
 
         try:
-            em = await self.cwready_embed(tag)
+            data = await self.fetch_cwready(tag)
         except Exception as e:
             logger.exception("Unknown exception", e)
             await self.bot.say("Server error: {}".format(e))
         else:
-            await self.bot.say(embed=em)
+            await self.bot.say(embed=self.cwready_embed(data))
+            await self.test_cwr_requirements_results(ctx, data)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
     async def cwready(self, ctx, member: discord.Member = None):
@@ -140,11 +142,17 @@ class CWReady:
             await self.bot.say("Server error: {}".format(e))
         else:
             await self.bot.say(embed=self.cwready_embed(data))
-            clans = await self.test_cwr_requirements(data)
-            await self.bot.say("Qualified clans: {}".format(
-                ", ".join([clan.get('name') for clan in clans])
-            ))
+            await self.test_cwr_requirements_results(ctx, data)
 
+    async def test_cwr_requirements_results(self, ctx, data):
+        clans = await self.test_cwr_requirements(data)
+        if len(clans) == 0:
+            await self.bot.say("User does not meet requirements for any of our clans.")
+        else:
+            await self.bot.say("Qualified clans: {}. {}".format(
+                ", ".join([clan.get('name') for clan in clans]),
+                self.config.get('addendum', '')
+            ))
 
     async def fetch_cwready(self, tag):
         """Fetch clan war readinesss."""
@@ -165,25 +173,29 @@ class CWReady:
 
         return data
 
+    async def fetch_clan(self, tag, session):
+        headers = dict(Authorization="Bearer {}".format(self.config.get('auth')))
+        url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
+        data = dict()
+        async with session.get(url, headers=headers) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+            elif resp.status == 404:
+                raise TagNotFound()
+            else:
+                raise UnknownServerError()
+
+        return data
+
     async def fetch_clans(self, tags):
         """Fetch clan info by tags."""
         conn = aiohttp.TCPConnector(
             family=socket.AF_INET,
             verify_ssl=False,
         )
-        data_list = []
-        headers = dict(Authorization="Bearer {}".format(self.config.get('auth')))
+
         async with aiohttp.ClientSession(connector=conn) as session:
-            for tag in tags:
-                url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
-                async with session.get(url, headers=headers) as resp:
-                    if resp.status == 200:
-                        data = await resp.json()
-                        data_list.append(data)
-                    elif resp.status == 404:
-                        raise TagNotFound()
-                    else:
-                        raise UnknownServerError()
+            data_list = await asyncio.gather(*[self.fetch_clan(tag, session) for tag in tags])
 
         return data_list
 
@@ -215,9 +227,15 @@ class CWReady:
 
     async def test_cwr_requirements(self, cwr_data):
         """Find which clan candidate meets requirements for."""
+        qual = []
+
+        # test minimum challenge wins
+        if cwr_data.get('challenge_max_wins', 0) < self.config.get('min_challenge_wins', 0):
+            return qual
+
         tags = [clan.get('tag') for clan in self.config.get('clans', [])]
         reqs = await self.fetch_cwr_requirements(tags)
-        qual = []
+
         for req in reqs:
             legendary = False
             gold = False
@@ -233,8 +251,6 @@ class CWReady:
                 qual.append(req)
 
         return qual
-
-
 
     def cwready_embed(self, data):
 
