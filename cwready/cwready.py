@@ -2,27 +2,23 @@
 Clan War Readiness
 """
 
-import argparse
 import itertools
-import os
 from collections import defaultdict
-from random import choice
 
-import discord
-from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
-from cogs.utils.dataIO import dataIO
-from discord.ext import commands
-from discord.ext.commands import Context
 import aiohttp
+import discord
 import logging
+import os
 import socket
+from discord.ext import commands
+
+from cogs.utils.dataIO import dataIO
 
 logger = logging.getLogger(__name__)
 
 PATH = os.path.join("data", "cwready")
 JSON = os.path.join(PATH, "settings.json")
+
 
 class TagNotFound(Exception):
     pass
@@ -31,7 +27,8 @@ class TagNotFound(Exception):
 class UnknownServerError(Exception):
     pass
 
-def grouper(n, iterable, fillvalue=None):
+
+def grouper(iterable, n, fillvalue=None):
     """Group lists into lists of items.
 
     grouper(3, 'ABCDEFG', 'x') --> ABC DEF Gxx"""
@@ -56,15 +53,12 @@ def clean_tag(tag):
     t = t.replace('B', '8')
     return t
 
+
 def get_emoji(bot, name):
     for emoji in bot.get_all_emojis():
         if emoji.name == name:
             return '<:{}:{}>'.format(emoji.name, emoji.id)
     return name
-
-
-
-
 
 
 def nested_dict():
@@ -100,8 +94,6 @@ class CWReady:
             #     if len(page):
             #         await self.bot.say(page)
 
-
-
     # @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
     async def cwready(self, ctx, member: discord.Member = None):
@@ -135,9 +127,9 @@ class CWReady:
         except UnknownServerError:
             await self.bot.say("Unknown server error from API")
             return
-        except Exception as e:
-            logger.exception("Unknown exception", e)
-            await self.bot.say("Server error: {}".format(e))
+        # except Exception as e:
+        #     logger.exception("Unknown exception", e)
+        #     await self.bot.say("Server error: {}".format(e))
         else:
             await self.bot.say(embed=em)
             # for page in pagify("\n".join(txt)):
@@ -164,7 +156,6 @@ class CWReady:
             "Clan War Readiness",
             player_url
         ]
-
 
         clan_name = data.get('clan', {}).get('name', '')
         clan_tag = data.get('clan', {}).get('tag', '')
@@ -196,7 +187,6 @@ class CWReady:
 
             cards = league.get('cards', [])
 
-
             value = ""
             for card in cards:
                 if card is not None:
@@ -206,7 +196,6 @@ class CWReady:
             out += [value]
 
         return out
-
 
     async def cwready_embed(self, tag):
         url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
@@ -266,10 +255,11 @@ class CWReady:
                             value += '+'
                 em.add_field(name=f_name if index == 0 else '.', value=value, inline=False)
 
+
+
         em.set_footer(text=player_url, icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
 
         return em
-
 
 
 def check_folder():
