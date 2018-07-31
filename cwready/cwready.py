@@ -13,7 +13,8 @@ import os
 import re
 import socket
 from discord.ext import commands
-from ruamel.yaml import YAML
+
+import yaml
 
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
@@ -86,7 +87,6 @@ class CWReady:
         if self._config is None:
             if not os.path.exists(CONFIG_YAML):
                 return {}
-            yaml = YAML()
             with open(CONFIG_YAML) as f:
                 self._config = yaml.load(f)
         return self._config
