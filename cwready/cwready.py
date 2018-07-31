@@ -75,7 +75,6 @@ class CWReady:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
 
-    # @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['cwrt'])
     async def cwreadytag(self, ctx, tag):
         """Return clan war readiness."""
@@ -83,16 +82,11 @@ class CWReady:
 
         try:
             em = await self.cwready_embed(tag)
-            # em, txt = await self.cwready_embed2(tag)
         except Exception as e:
             logger.exception("Unknown exception", e)
             await self.bot.say("Server error: {}".format(e))
         else:
             await self.bot.say(embed=em)
-            # await self.bot.say(embed=em)
-            # for page in pagify("\n".join(txt)):
-            #     if len(page):
-            #         await self.bot.say(page)
 
     # @checks.mod_or_permissions(manage_roles=True)
     @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
@@ -127,13 +121,11 @@ class CWReady:
         except UnknownServerError:
             await self.bot.say("Unknown server error from API")
             return
-        # except Exception as e:
-        #     logger.exception("Unknown exception", e)
-        #     await self.bot.say("Server error: {}".format(e))
+        except Exception as e:
+            logger.exception("Unknown exception", e)
+            await self.bot.say("Server error: {}".format(e))
         else:
             await self.bot.say(embed=em)
-            # for page in pagify("\n".join(txt)):
-            #     await self.bot.say(page)
 
     async def cwready_text(self, tag):
         url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
@@ -254,8 +246,6 @@ class CWReady:
                         if card.get('overlevel'):
                             value += '+'
                 em.add_field(name=f_name if index == 0 else '.', value=value, inline=False)
-
-
 
         em.set_footer(text=player_url, icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
 
