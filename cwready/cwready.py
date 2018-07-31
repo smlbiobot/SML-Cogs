@@ -102,7 +102,7 @@ class CWReady:
             await self.bot.say("Server error: {}".format(e))
         else:
             await self.bot.say(embed=self.cwready_embed(data))
-            await self.test_cwr_requirements_results(ctx, data)
+            await self.send_cwr_req_results(ctx, data)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
     async def cwready(self, ctx, member: discord.Member = None):
@@ -141,17 +141,25 @@ class CWReady:
             await self.bot.say("Server error: {}".format(e))
         else:
             await self.bot.say(embed=self.cwready_embed(data))
-            await self.test_cwr_requirements_results(ctx, data)
+            await self.send_cwr_req_results(ctx, data)
 
-    async def test_cwr_requirements_results(self, ctx, data):
+    async def send_cwr_req_results(self, ctx, data):
+        await self.send_cwr_req_results_channel(ctx.message.channel, data)
+
+    async def send_cwr_req_results_channel(self, channel, data):
         clans = await self.test_cwr_requirements(data)
         if len(clans) == 0:
-            await self.bot.say("User does not meet requirements for any of our clans.")
+            await self.bot.send_message(
+                channel,
+                "User does not meet requirements for any of our clans."
+            )
         else:
-            await self.bot.say("Qualified clans: {}. {}".format(
-                ", ".join([clan.get('name') for clan in clans]),
-                self.config.get('addendum', '')
-            ))
+            await self.bot.send_message(
+                channel,
+                "Qualified clans: {}. {}".format(
+                    ", ".join([clan.get('name') for clan in clans]),
+                    self.config.get('addendum', '')
+                ))
 
     async def fetch_cwready(self, tag):
         """Fetch clan war readinesss."""
@@ -235,18 +243,16 @@ class CWReady:
         tags = [clan.get('tag') for clan in self.config.get('clans', [])]
         reqs = await self.fetch_cwr_requirements(tags)
 
-        for req in reqs:
-            legendary = False
-            gold = False
-            for league in cwr_data.get('leagues', []):
-                if league.get('key') == 'legendary':
-                    if league.get('total_percent', 0) * 100 >= req.get('legendary'):
-                        legendary = True
-                elif league.get('key') == 'gold':
-                    if league.get('total_percent', 0) * 100 >= req.get('gold'):
-                        gold = True
+        cwr_legendary = 0
+        cwr_gold = 0
+        for league in cwr_data.get('leagues', []):
+            if league.get('key') == 'legendary':
+                cwr_legendary = round(league.get('total_percent', 0) * 100)
+            if league.get('key') == 'gold':
+                cwr_gold = round(league.get('total_percent', 0) * 100)
 
-            if legendary and gold:
+        for req in reqs:
+            if cwr_legendary >= req.get('legendary') and cwr_gold >= req.get('gold'):
                 qual.append(req)
 
         return qual
