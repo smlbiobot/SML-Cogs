@@ -12,9 +12,8 @@ import logging
 import os
 import re
 import socket
-from discord.ext import commands
-
 import yaml
+from discord.ext import commands
 
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
