@@ -1,0 +1,36 @@
+name: 100 Thieves Clan Family
+description: >
+  Trophies and clan war readinesss (CWR) requirements.
+  Please type `!q cwr` to see the definition for CWR.
+  Coverage must include at least 5 win-cons.
+  All of our clans require minimum 12 challege wins.
+color: ff0f37
+clans:
+  - name: 100T Alpha
+    tag: 9PJ82CRC
+    aux: >
+      All viable epics at minimum level 7.
+      Golem, Pekka, Dark Prince, Prince, Balloon, Executioner, Poison, Lightning
+  - name: 100T Bravo
+    tag: 9UQJUJC9
+  - name: 100T Charlie
+    tag: 9G99JQPL
+  - name: 100T Delta
+    tag: 9G8VYGL0
+  - name: 100T Echo
+    tag: 9CJ0L9RG
+  - name: 100T Foxtrot
+    tag: 9UQC2P0V
+  - name: 100T Golf
+    tag: 9UG2R2LQ
+  - name: 100T Hotel
+    tag: 9Y9VR2JR
+  - name: 100T Zen
+    tag: 9LPVG9UC
+    hide: true
+info:
+  - name: How to join
+    value: >
+      Let a co-leader on Discord that you are interested,
+      and provide them with your player tag.
+url: https://royaleapi.com/f/100t/

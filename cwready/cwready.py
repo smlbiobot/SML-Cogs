@@ -11,14 +11,16 @@ import logging
 import os
 import socket
 from discord.ext import commands
+from ruamel.yaml import YAML
 
 from cogs.utils.dataIO import dataIO
+from cogs.utils import checks
 
 logger = logging.getLogger(__name__)
 
 PATH = os.path.join("data", "cwready")
 JSON = os.path.join(PATH, "settings.json")
-
+CONFIG_YAML = os.path.join(PATH, "config.yml")
 
 class TagNotFound(Exception):
     pass
@@ -74,6 +76,16 @@ class CWReady:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
+        self._config = None
+
+    @property
+    def config(self):
+        if self._config is None:
+            if not os.path.exists(CONFIG_YAML):
+                return {}
+            yaml = YAML()
+            self._config = yaml.load(CONFIG_YAML)
+        return self._config
 
     @commands.command(pass_context=True, no_pm=True, aliases=['cwrt'])
     async def cwreadytag(self, ctx, tag):
@@ -126,6 +138,20 @@ class CWReady:
             await self.bot.say("Server error: {}".format(e))
         else:
             await self.bot.say(embed=em)
+
+
+        # if config, attempt to fetch requirements
+        if self.config is not None:
+            tags = []
+            clans = self.config.get('clans', [])
+            for clan in clans:
+                tags.append(clan.get('tag'))
+
+            if len(tags) == 0:
+                return
+
+
+
 
     async def cwready_text(self, tag):
         url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
@@ -250,6 +276,36 @@ class CWReady:
         em.set_footer(text=player_url, icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
 
         return em
+
+    @checks.mod_or_permissions()
+    @commands.command(name="cwrconfig", pass_context=True, no_pm=True)
+    async def cwr_config(self, ctx):
+        """Upload config yaml file. See config.example.yml for how to format it."""
+        if len(ctx.message.attachments) == 0:
+            await self.bot.say(
+                "Please attach config yaml with this command. "
+                "See config.example.yml for how to format it."
+            )
+            return
+
+        attach = ctx.message.attachments[0]
+        url = attach["url"]
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                with open(CONFIG_YAML, "wb") as f:
+                    f.write(await resp.read())
+
+        await self.bot.say(
+            "Attachment received and saved as {}".format(CONFIG_YAML))
+
+        self.settings['config'] = CONFIG_YAML
+        dataIO.save_json(JSON, self.settings)
+
+        # reset config so it will reload
+        self._config = None
+
+        await self.bot.delete_message(ctx.message)
 
 
 def check_folder():
