@@ -13,14 +13,15 @@ import socket
 from discord.ext import commands
 from ruamel.yaml import YAML
 
-from cogs.utils.dataIO import dataIO
 from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
 
 logger = logging.getLogger(__name__)
 
 PATH = os.path.join("data", "cwready")
 JSON = os.path.join(PATH, "settings.json")
 CONFIG_YAML = os.path.join(PATH, "config.yml")
+
 
 class TagNotFound(Exception):
     pass
@@ -84,7 +85,8 @@ class CWReady:
             if not os.path.exists(CONFIG_YAML):
                 return {}
             yaml = YAML()
-            self._config = yaml.load(CONFIG_YAML)
+            with open(CONFIG_YAML) as f:
+                self._config = yaml.load(f)
         return self._config
 
     @commands.command(pass_context=True, no_pm=True, aliases=['cwrt'])
@@ -138,20 +140,6 @@ class CWReady:
             await self.bot.say("Server error: {}".format(e))
         else:
             await self.bot.say(embed=em)
-
-
-        # if config, attempt to fetch requirements
-        if self.config is not None:
-            tags = []
-            clans = self.config.get('clans', [])
-            for clan in clans:
-                tags.append(clan.get('tag'))
-
-            if len(tags) == 0:
-                return
-
-
-
 
     async def cwready_text(self, tag):
         url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
