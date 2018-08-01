@@ -328,6 +328,7 @@ class RACF:
         roles = [discord.utils.get(server.roles, name=role_name) for role_name in role_names]
         roles = [r for r in roles if r]
         await self.bot.add_roles(member, *roles)
+        return [r.name for r in roles]
 
     async def remove_roles(self, server: discord.Server, member: discord.Member, role_names):
         """Remove roles by name.
@@ -337,7 +338,6 @@ class RACF:
         roles = [discord.utils.get(member.roles, name=role_name) for role_name in role_names]
         roles = [r for r in roles if r]
         if len(roles):
-            print([r.name for r in roles])
             await self.bot.remove_roles(member, *roles)
         return [r.name for r in roles]
 
@@ -519,18 +519,15 @@ class RACF:
                 await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
             else:
                 # remove all clan roles
-                to_remove = CLAN_ROLES.copy()
-                to_remove.extend(VISITOR_ROLES)
-                to_remove.extend(RECRUIT_ROLES)
-                to_add = MEMBER_ROLES.copy()
-                to_add.append(perm['role'])
+                to_remove = CLAN_ROLES + VISITOR_ROLES + RECRUIT_ROLES
+                to_add = MEMBER_ROLES + [perm['role']]
                 server = ctx.message.server
                 removed_roles = await self.remove_roles(server, member, to_remove)
-                await self.add_roles(server, member, to_add)
+                added_roles = await self.add_roles(server, member, to_add)
                 await self.bot.say(
                     "Removed {} and added {} to {}".format(
                         ", ".join(removed_roles) if len(removed_roles) else 'nothing',
-                        ", ".join(to_add),
+                        ", ".join(added_roles),
                         member
                     )
                 )
