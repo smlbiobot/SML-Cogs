@@ -568,26 +568,54 @@ class MemberManagement:
                     except:
                         pass
 
+    def get_server_role(self, server, role_name):
+        """Find server role by name."""
+        for r in server.roles:
+            if r.name.lower() == role_name.lower():
+                return r
+        return None
+
+    async def add_role(self, member: discord.Member, role: discord.Role, channel=None):
+        await self.bot.add_roles(member, role)
+        if channel is not None:
+            await self.bot.send_message(channel, "Added {} to {}".format(role, member))
+
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
-    async def multiaddrole(self, ctx, role, *members: discord.Member):
+    async def multiaddrole(self, ctx, role_name, *members: discord.Member):
         """Add a role to multiple users.
 
         !multiaddrole rolename User1 User2 User3
         """
-        for member in members:
-            await ctx.invoke(self.changerole, member, role)
+        role = self.get_server_role(ctx.message.server, role_name)
+        if role is None:
+            await self.bot.say("Role not found.")
+            return
+        tasks = [self.add_role(member, role, channel=ctx.message.channel) for member in members]
+        await self.bot.type()
+        await asyncio.gather(*tasks)
+        await self.bot.say("Task completed.")
+
+    async def remove_role(self, member: discord.Member, role: discord.Role, channel=None):
+        await self.bot.remove_roles(member, role)
+        if channel is not None:
+            await self.bot.send_message(channel, "Removed {} from {}".format(role, member))
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
-    async def multiremoverole(self, ctx, role, *members: discord.Member):
+    async def multiremoverole(self, ctx, role_name, *members: discord.Member):
         """Remove a role from multiple users.
 
         !multiremoverole rolename User1 User2 User3
         """
-        role = '-{}'.format(role)
-        for member in members:
-            await ctx.invoke(self.changerole, member, role)
+        role = self.get_server_role(ctx.message.server, role_name)
+        if role is None:
+            await self.bot.say("Role not found.")
+            return
+        tasks = [self.remove_role(member, role, channel=ctx.message.channel) for member in members]
+        await self.bot.type()
+        await asyncio.gather(*tasks)
+        await self.bot.say("Task completed.")
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
