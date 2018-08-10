@@ -28,7 +28,6 @@ import os
 from collections import defaultdict
 
 import discord
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify, bold
 from cogs.utils.dataIO import dataIO
@@ -63,7 +62,7 @@ class ToggleRole:
     async def toggleroleset(self, ctx):
         """Settings."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @toggleroleset.command(name="add", pass_context=True, no_pm=True)
     @checks.mod_or_permissions()
@@ -122,17 +121,21 @@ class ToggleRole:
         server = ctx.message.server
         out = []
         out.append('Toggleable roles on {}'.format(server.name))
+        em = discord.Embed(
+            title="Toggleable Roles"
+        )
         for actor_role, v in self.settings[server.id].items():
             toggleable_roles = v.keys()
             toggleable_roles = sorted(toggleable_roles, key=lambda x: x.lower())
             if len(toggleable_roles):
                 toggleable_roles_str = ', '.join(toggleable_roles)
+                em.add_field(name=actor_role, value=toggleable_roles_str)
             else:
                 toggleable_roles_str = 'None'
-            out.append('{}: {}'.format(bold(actor_role), toggleable_roles_str))
 
-        for page in pagify('\n'.join(out)):
-            await self.bot.say(page)
+            # out.append('{}: {}'.format(bold(actor_role), toggleable_roles_str))
+
+        await self.bot.say(embed=em)
 
     def toggleable_roles(self, server, user):
         """Return a list of roles toggleable by user."""
@@ -161,12 +164,20 @@ class ToggleRole:
 
     @commands.command(pass_context=True, no_pm=True)
     async def togglerole(self, ctx, role=None):
-        """Toggle a role."""
+        """Toggle a role.
+        !togglerole list   - show toggleable roles"""
         author = ctx.message.author
         server = ctx.message.server
         if role is None:
             await self.bot.say(self.toggleable_role_list(server, author))
             return
+
+        # list roles
+        if role == 'list':
+            await ctx.invoke(self.toggleroleset_list)
+            return
+
+        role_obj = None
         toggleable_roles = self.toggleable_roles(server, author)
         if role.lower() not in [r.lower() for r in toggleable_roles]:
             await self.bot.say("{} is not a toggleable role for you.".format(role))
@@ -175,6 +186,11 @@ class ToggleRole:
         for r in server.roles:
             if r.name.lower() == role.lower():
                 role_obj = r
+
+        if role_obj is None:
+            await self.bot.say("{} not found on this server.".format(role))
+            return
+
         if role_obj in author.roles:
             await self.bot.remove_roles(author, role_obj)
             await self.bot.say(
@@ -185,6 +201,10 @@ class ToggleRole:
             await self.bot.say(
                 "Added {} role for {}.".format(
                     role_obj.name, author.display_name))
+
+    @checks.mod_or_permissions(manage_roles=True)
+    async def togglerolereact(self, ctx):
+        """Create embeds for user to self-toggle via reactions."""
 
 
 def check_folder():

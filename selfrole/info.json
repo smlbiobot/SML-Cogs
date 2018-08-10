@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "SelfRole",
+	"DESCRIPTION": "Add role to self through reactions",
+	"DISABLED": false,
+	"NAME": "SelfRole",
+	"REQUIREMENTS": [],
+	"TAGS": ["role", "util", "utility"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
