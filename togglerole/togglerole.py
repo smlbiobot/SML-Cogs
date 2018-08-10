@@ -360,6 +360,7 @@ class ToggleRole:
                 remove = True
             else:
                 tasks.append(self.bot.remove_reaction(message, reaction.emoji, user))
+                continue
 
             # must be on embed
             if len(message.embeds) == 0:
