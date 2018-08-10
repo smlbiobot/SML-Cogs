@@ -137,6 +137,12 @@ class ToggleRole:
 
         await self.bot.say(embed=em)
 
+    def check_server_settings(self, server:discord.Server):
+        """Check server setttings"""
+        if server.id not in self.settings:
+            self.settings[server.id] = dict()
+        dataIO.save_json(SETTINGS_JSON, self.settings)
+
     def toggleable_roles(self, server, user):
         """Return a list of roles toggleable by user."""
         o = []
@@ -203,8 +209,18 @@ class ToggleRole:
                     role_obj.name, author.display_name))
 
     @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=["trr"])
     async def togglerolereact(self, ctx):
         """Create embeds for user to self-toggle via reactions."""
+        channel = ctx.message.channel
+        server = ctx.message.server
+
+        self.check_server_settings(server)
+
+        # delete channel messages
+        if channel is not None:
+            await self.bot.purge_from(channel, limit=10, before=ctx.message)
+
 
 
 def check_folder():
