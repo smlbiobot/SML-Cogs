@@ -27,6 +27,7 @@ DEALINGS IN THE SOFTWARE.
 from collections import defaultdict
 
 import asyncio
+import datetime as dt
 import discord
 import os
 from discord.ext import commands
@@ -36,6 +37,8 @@ from cogs.utils.dataIO import dataIO
 
 DATA_PATH = os.path.join("data", "SML-Cogs", "togglerole")
 SETTINGS_JSON = os.path.join(DATA_PATH, "settings.json")
+
+TASK_DELAY = dt.timedelta(minutes=30).total_seconds()
 
 server_defaults = {
     "_everyone": []
@@ -311,7 +314,7 @@ class ToggleRole:
             except Exception:
                 pass
             finally:
-                await asyncio.sleep(57)
+                await asyncio.sleep(TASK_DELAY)
 
     async def on_reaction_add(self, reaction: discord.Reaction, user):
         await self.on_reaction(reaction, user)
@@ -423,7 +426,6 @@ class ToggleRole:
         if channel is not None:
             txt = "Added {} to {}".format(role, user)
             await self.delay_message(channel, txt)
-
 
     async def remove_role(self, server, user, role_name, channel=None):
         role = discord.utils.get(server.roles, name=role_name)
