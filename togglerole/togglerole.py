@@ -243,6 +243,7 @@ class ToggleRole:
         )
 
         # list members
+        """
         r_role_o = discord.utils.get(server.roles, name=t_role)
         m_with_role = []
         for member in server.members:
@@ -256,6 +257,7 @@ class ToggleRole:
         if len(m_with_role) == 0:
             value = 'None'
         em.add_field(name=name, value=value)
+        """
         return em
 
     async def post_togglerole_embeds(self, server, channel):
@@ -275,6 +277,10 @@ class ToggleRole:
                     toggleables[t_role] = []
                 toggleables[t_role].append(actor_role)
 
+        # delete channel messages
+        if channel is not None:
+            await self.bot.purge_from(channel, limit=100)
+
         message = None
         for t_role, actor_roles in toggleables.items():
             em = self.role_embed(server, t_role, actor_roles)
@@ -290,9 +296,7 @@ class ToggleRole:
             if message is None:
                 message = msg
 
-        # delete channel messages
-        if channel is not None:
-            await self.bot.purge_from(channel, limit=100, before=message)
+
 
     async def post_togglerole_task(self):
         """Auto post tasks."""
@@ -406,8 +410,9 @@ class ToggleRole:
             tasks.append(self.bot.remove_reaction(message, reaction.emoji, user))
 
             # update messages
-            if update_messages:
-                update_tasks.append(self.post_togglerole_embeds(server, channel))
+            # no need to update messages anymore since members are not displayed
+            # if update_messages:
+            #     update_tasks.append(self.post_togglerole_embeds(server, channel))
 
         if len(tasks):
             await asyncio.gather(*tasks)
