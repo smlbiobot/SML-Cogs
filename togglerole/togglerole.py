@@ -390,30 +390,21 @@ class ToggleRole:
                 if u_role.name == role_name:
                     user_has_role = True
 
-            update_messages = False
-
             if add:
                 if user_has_role:
-                    txt = "User already has the role."
-                    tasks.append(self.delay_message(channel, txt))
+                    txt = "{} already has the {} role".format(user, role_name)
+                    tasks.append(self.delay_message(txt, message=message))
                 else:
-                    tasks.append(self.add_role(server, user, role_name, channel=channel))
-                    update_messages = True
+                    tasks.append(self.add_role(server, user, role_name, channel=channel, message=message, embed_dict=em))
             elif remove:
                 if not user_has_role:
-                    txt = "User does not have the role."
-                    tasks.append(self.delay_message(channel, txt))
+                    txt = "{} does not have the {} role".format(user, role_name)
+                    tasks.append(self.delay_message(txt, message=message))
                 else:
-                    tasks.append(self.remove_role(server, user, role_name, channel=channel))
-                    update_messages = True
+                    tasks.append(self.remove_role(server, user, role_name, channel=channel, message=message, embed_dict=em))
 
             # remove reaction
             tasks.append(self.bot.remove_reaction(message, reaction.emoji, user))
-
-            # update messages
-            # no need to update messages anymore since members are not displayed
-            # if update_messages:
-            #     update_tasks.append(self.post_togglerole_embeds(server, channel))
 
         if len(tasks):
             await asyncio.gather(*tasks)
@@ -421,24 +412,38 @@ class ToggleRole:
         if len(update_tasks):
             await asyncio.gather(*update_tasks)
 
-    async def delay_message(self, channel, txt, wait=5):
-        msg = await self.bot.send_message(channel, txt)
-        await asyncio.sleep(wait)
-        await self.bot.delete_message(msg)
+    async def delay_message(self, txt, message=None, channel=None, wait=5):
+        """Update status."""
+        if len(message.embeds) > 0:
+            embeds = message.embeds
+            em = discord.Embed(**embeds[0])
 
-    async def add_role(self, server, user, role_name, channel=None):
+            await self.bot.edit_message(message, txt, embed=em)
+            await asyncio.sleep(wait)
+            await self.bot.edit_message(message, "…", embed=em)
+
+        else:
+            await self.bot.edit_message(message, txt)
+            await asyncio.sleep(wait)
+            await self.bot.edit_message(message, "…")
+
+    async def add_role(self, server, user, role_name, channel=None, message=None, embed_dict=None):
         role = discord.utils.get(server.roles, name=role_name)
         await self.bot.add_roles(user, role)
         if channel is not None:
             txt = "Added {} to {}".format(role, user)
-            await self.delay_message(channel, txt)
+            await self.bot.edit_message(message, txt, embed=discord.Embed(**embed_dict))
+            await asyncio.sleep(5)
+            await self.bot.edit_message(message, "…", embed=discord.Embed(**embed_dict))
 
-    async def remove_role(self, server, user, role_name, channel=None):
+    async def remove_role(self, server, user, role_name, channel=None, message=None, embed_dict=None):
         role = discord.utils.get(server.roles, name=role_name)
         await self.bot.remove_roles(user, role)
         if channel is not None:
             txt = "Removed {} from {}".format(role, user)
-            await self.delay_message(channel, txt)
+            await self.bot.edit_message(message, txt, embed=discord.Embed(**embed_dict))
+            await asyncio.sleep(5)
+            await self.bot.edit_message(message, "…", embed=discord.Embed(**embed_dict))
 
 
 def check_folder():
