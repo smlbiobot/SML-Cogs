@@ -359,7 +359,7 @@ class ToggleRole:
             elif reaction.emoji == '❌':
                 remove = True
             else:
-                await self.bot.remove_reaction(message, reaction.emoji, user)
+                tasks.append(self.bot.remove_reaction(message, reaction.emoji, user))
 
             # must be on embed
             if len(message.embeds) == 0:
