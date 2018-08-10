@@ -38,7 +38,7 @@ from cogs.utils.dataIO import dataIO
 DATA_PATH = os.path.join("data", "SML-Cogs", "togglerole")
 SETTINGS_JSON = os.path.join(DATA_PATH, "settings.json")
 
-TASK_DELAY = dt.timedelta(minutes=30).total_seconds()
+TASK_DELAY = dt.timedelta(hours=2).total_seconds()
 
 server_defaults = {
     "_everyone": []
