@@ -1537,7 +1537,7 @@ class RACF:
         await ctx.invoke(self.rmrecruit, member)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['are'])
-    async def academyrecruit(self, ctx, member:discord.Member):
+    async def academyrecruit(self, ctx, member:discord.Member, tag=None):
         """Assign academy recruits.
 
         - Add as visitor
@@ -1547,7 +1547,13 @@ class RACF:
         if not verified:
             return
 
-        await ctx.invoke(self.visitor, member)
+        if tag is None:
+            # assign visitor role if None
+            await ctx.invoke(self.visitor, member)
+        else:
+            # run racf verify if not None
+            await ctx.invoke(self.racf_verify, member, tag)
+
         server = ctx.message.server
         apoc = discord.utils.get(server.members, id='199161841874763776')
         blaze = discord.utils.get(server.members, id='256436503884988417')
