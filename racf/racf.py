@@ -862,7 +862,8 @@ class RACF:
 
         if member is None:
             member = author
-        await self.bot.say(member.avatar_url)
+        url = member.avatar_url.replace('.webp', '.png')
+        await self.bot.say(url)
 
     @commands.command(pass_context=True, no_pm=True)
     async def serverinfo2(self, ctx: Context):
