@@ -398,20 +398,20 @@ class RACF:
                 "role": "N/A"
             }
         return (
-            "Player Tag: {tag}\n"
-            "IGN: {name}\n"
-            "Clan Name: {clan_name}\n"
-            "Clan Tag: {clan_tag}\n"
+            "{name} {tag}\n"
+            "Clan: {clan_name} {clan_tag}\n"
             "Clan Role: {clan_role}\n"
             "Trophies: {trophies:,} / {pb:,} PB\n"
-            "CW: {cards:,} cards / {war_wins:,} war wins".format(
+            "Challenge Max Wins: {challenge_max_wins}\n"
+            "CW: {cards:,} cards / {war_wins:,} war wins\n".format(
                 tag=data.get('tag'),
                 name=data.get('name'),
                 clan_name=data['clan']['name'],
                 clan_tag=data['clan']['tag'],
-                clan_role=data.get('role'),
+                clan_role=data.get('role', '').title(),
                 trophies=data.get('trophies', 0),
                 pb=data.get('bestTrophies', 0),
+                challenge_max_wins=data.get('challengeMaxWins', 0),
                 cards=data.get('clanCardsCollected', 0),
                 war_wins=data.get('warDayWins', 0),
             )
@@ -448,12 +448,12 @@ class RACF:
         if not verified:
             return
 
-        sctag = SCTag(tag)
-        if not sctag.valid:
-            await self.bot.say(sctag.invalid_error_msg)
-            return
+        cleaned_tag = clean_tag(tag)
 
-        tag = sctag.tag
+        if cleaned_tag.replace('#', '') != tag:
+            await self.bot.say("Tag: {}".format(cleaned_tag))
+
+        tag = cleaned_tag
 
         # - Set their tags
         await ctx.invoke(self.crsettagmod, tag, member)
