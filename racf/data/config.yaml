@@ -98,10 +98,8 @@ messages:
     + No advertisement of any kind,
     e.g. Facebook / Twitter / YouTube / Friend Invite Links
 
-    + Use #bot-commands for bot features, e.g. `!deck` / `!crprofile get` / `!cpg`
+    + Use <#275624978781569024> for bot features, e.g. `!deck` / `!crprofile get` / `!cpg` / `!cwr`
 
-    + Use #casino for bot commands related to casino,
-    e.g. `!payday` / `!slot` / `!heist`
 
     Failure to follow these rules will get you kicked from the server.
     Repeat offenders will be banned.
