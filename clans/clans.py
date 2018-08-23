@@ -435,9 +435,15 @@ class Clans:
             cw = ""
             match = re.search('(\d+)L(\d+)G', desc)
             if match is not None:
+                legendary = match.group(1)
+                gold = match.group(2)
+                if len(gold) == 1:
+                    gold = "{}0".format(gold)
+                if len(legendary) == 1:
+                    legendary = "{}0".format(legendary)
                 cw = "\nCWR: {}% Legendary, {}% Gold".format(
-                    match.group(1),
-                    match.group(2)
+                    legendary,
+                    gold
                 )
 
             # aux requirements
