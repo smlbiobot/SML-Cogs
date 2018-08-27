@@ -24,13 +24,13 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import os
-import discord
-import datetime as dt
 from collections import defaultdict
+
+import discord
+import os
+from __main__ import send_cmd_help
 from discord.ext import commands
 
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify, bold, escape_mass_mentions
 from cogs.utils.dataIO import dataIO
@@ -136,19 +136,24 @@ class ReactionManager:
 
     @reactionmanager.command(name="get", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_messages=True)
-    async def rm_get(self, ctx, channel: discord.Channel, message_id, exclude_self=True):
-        """Display list of reactions added by users."""
+    async def rm_get(self, ctx, channel: discord.Channel, message_id, *, args):
+        """Display list of reactions added by users.
+
+        Options:
+        -id output ids
+        """
         message = await self.bot.get_message(channel, message_id)
 
         if message is None:
             await self.bot.say("Cannot find that message id.")
             return
 
-        out = await self.get_reactions(message, exclude_self=exclude_self)
+        output_id = '-id' in args
+
+        out = await self.get_reactions(message, exclude_self=True, output_id=output_id)
 
         for page in pagify('\n'.join(out), shorten_by=24):
             await self.bot.say(page)
-
 
     @reactionmanager.command(name="getserver", pass_context=True, no_pm=True)
     @checks.is_owner()
@@ -167,7 +172,7 @@ class ReactionManager:
         for page in pagify('\n'.join(out), shorten_by=24):
             await self.bot.say(page)
 
-    async def get_reactions(self, message, exclude_self=True):
+    async def get_reactions(self, message, exclude_self=True, output_id=False):
         title = message.channel.name
         description = message.content
 
@@ -207,11 +212,15 @@ class ReactionManager:
                     members.append(member)
                     total_count += 1
             users_str = ', '.join([m.display_name for m in members])
+            users_ids = ''
+            if output_id:
+                users_ids = ', '.join([m.id for m in members])
             count = len(valid_users)
             reaction_votes.append({
                 "emoji": emoji,
                 "count": count,
-                "users_str": users_str
+                "users_str": users_str,
+                'users_ids': users_ids
             })
 
         for v in reaction_votes:
@@ -219,9 +228,11 @@ class ReactionManager:
             count = v['count']
             ratio = count / total_count
             users_str = v['users_str']
+            users_ids = v['users_ids']
             value = '{}: **{}** ({:.2%}): {}'.format(emoji, count, ratio, users_str)
+            if output_id:
+                value += '| {}'.format(users_ids)
             out.append(value)
-
 
         return out
 
