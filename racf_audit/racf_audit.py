@@ -1017,7 +1017,6 @@ class RACFAudit:
             box('\n'.join(out), lang='python')
         )
 
-    @checks.mod_or_permissions()
     @commands.command(name="racfaudit_top", aliases=["rtop"], pass_context=True)
     async def racfaudit_top(self, ctx, count: int):
         """Show top N members in family."""
@@ -1028,6 +1027,10 @@ class RACFAudit:
         except ClashRoyaleAPIError as e:
             await self.bot.say(e.status_message)
             return
+
+        author = ctx.message.author
+        if not author.server_permissions.manage_roles:
+            count = min(count, 10)
 
         member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
         results = member_models[:count]
