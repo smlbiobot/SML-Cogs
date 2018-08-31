@@ -441,6 +441,8 @@ class Clans:
                     gold = "{}0".format(gold)
                 if len(legendary) == 1:
                     legendary = "{}0".format(legendary)
+                gold = int(gold)
+                legendary = int(legendary)
                 cw = "\nCWR: {}% Legendary, {}% Gold".format(
                     legendary,
                     gold
