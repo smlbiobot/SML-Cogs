@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Punish",
+	"DESCRIPTION": "Punish people with annoyance",
+	"DISABLED": false,
+	"NAME": "Punish",
+	"REQUIREMENTS": [],
+	"TAGS": ["fun", "punish", "mention"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
