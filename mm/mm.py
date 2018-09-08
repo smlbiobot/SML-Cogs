@@ -721,6 +721,50 @@ class MemberManagement:
             await self.bot.say("Moved {} below {}".format(role, below_role))
             return
 
+    @commands.command(name="createrole", aliases=['crole'], pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def create_role(self, ctx, *, role_names):
+        """Add list of roles to server. separated by commas"""
+        server = ctx.message.server
+        author = ctx.message.author
+        r_names = [rn.strip() for rn in role_names.split(',')]
+        await self.bot.say(
+            "Roles to be created:\n{} \nContinue? (y/n)".format(
+                "\n".join(["+ {}".format(n) for n in r_names])))
+        msg = await self.bot.wait_for_message(author=author, timeout=10)
+        if msg is None:
+            await self.bot.say("Operation aborted.")
+            return
+        if msg.content.lower() == 'y':
+            await self.bot.say("Creating roles…")
+            await self.bot.type()
+            tasks = [self.bot.create_role(server, name=name) for name in r_names]
+            roles = await asyncio.gather(*tasks)
+            await self.bot.say("Roles created.")
+        else:
+            await self.bot.say("Operation aborted.")
+
+    @commands.command(name="purgeroles", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def purge_roles(self, ctx, position):
+        server = ctx.message.server
+        author = ctx.message.author
+        position = int(position)
+        roles = [role for role in server.roles if role.position < position and not role.is_everyone]
+        await self.bot.say("Roles to be deleted: {}. Continue? (y/n)".format(", ".join([r.name for r in roles])))
+        msg = await self.bot.wait_for_message(author=author, timeout=10)
+        if msg is None:
+            await self.bot.say("Operation aborted.")
+            return
+        if msg.content.lower() == 'y':
+            await self.bot.say("Deleting roles…")
+            await self.bot.type()
+            tasks = [self.bot.delete_role(server, role) for role in roles]
+            roles = await asyncio.gather(*tasks)
+            await self.bot.say("Roles deleted.")
+        else:
+            await self.bot.say("Operation aborted.")
+
 
 def check_folder():
     """Check folder."""
