@@ -801,6 +801,20 @@ class MemberManagement:
         await asyncio.gather(*tasks)
         await self.bot.say("Role colors updated.")
 
+    @commands.command(name="searchrole", aliases=['searchroles'], pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def search_roles(self, ctx, *, query):
+        """Search for roles matching a query."""
+        server = ctx.message.server
+        matches = []
+        for role in server.roles:
+            if query.lower() in role.name.lower():
+                matches.append(role)
+        if len(matches) == 0:
+            await self.bot.say("No match found.")
+        else:
+            await self.bot.say(", ".join([r.name for r in matches]))
+
 
 
 def check_folder():
