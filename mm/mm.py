@@ -31,7 +31,6 @@ import argparse
 import asyncio
 import discord
 import os
-import re
 from discord.ext import commands
 from discord.ext.commands import Context
 from random import choice
@@ -766,14 +765,14 @@ class MemberManagement:
             await self.bot.say("Deleting roles…")
             await self.bot.type()
             tasks = [self.bot.delete_role(server, role) for role in roles]
-            roles = await asyncio.gather(*tasks)
+            roles = await asyncio.gather(*tasks, return_exceptions=True)
             await self.bot.say("Roles deleted.")
         else:
             await self.bot.say("Operation aborted.")
 
     @commands.command(name="editrolecolor", aliases=['editrolecolors'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
-    async def edit_role_color(self, ctx, hex:discord.Color, *, role_names):
+    async def edit_role_color(self, ctx, hex: discord.Color, *, role_names):
         """Edit color of role(s)
 
         Separate each role with a comma. Multi-word roles do not require quotes.
@@ -798,7 +797,11 @@ class MemberManagement:
 
         tasks = [self.bot.edit_role(server, role, color=hex) for role in valid_roles]
         await self.bot.type()
-        await asyncio.gather(*tasks)
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for index, result in enumerate(results):
+            if isinstance(result, Exception):
+                await self.bot.say("Unexpected exception: {} when editing {}".format(result, valid_roles[index]))
+
         await self.bot.say("Role colors updated.")
 
     @commands.command(name="searchrole", aliases=['searchroles'], pass_context=True, no_pm=True)
@@ -814,7 +817,6 @@ class MemberManagement:
             await self.bot.say("No match found.")
         else:
             await self.bot.say(", ".join([r.name for r in matches]))
-
 
 
 def check_folder():
