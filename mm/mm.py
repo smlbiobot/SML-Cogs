@@ -31,6 +31,7 @@ import argparse
 import asyncio
 import discord
 import os
+import re
 from discord.ext import commands
 from discord.ext.commands import Context
 from random import choice
@@ -724,7 +725,11 @@ class MemberManagement:
     @commands.command(name="createrole", aliases=['crole'], pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def create_role(self, ctx, *, role_names):
-        """Add list of roles to server. separated by commas"""
+        """Add list of roles to server.
+
+        Separate each role with a comma. Multi-word roles do not require quotes.
+        [p]createrole Name for new role, AnotherRole, Yet Another Role
+        """
         server = ctx.message.server
         author = ctx.message.author
         r_names = [rn.strip() for rn in role_names.split(',')]
@@ -747,6 +752,7 @@ class MemberManagement:
     @commands.command(name="purgeroles", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
     async def purge_roles(self, ctx, position):
+        """Delete server roles by position."""
         server = ctx.message.server
         author = ctx.message.author
         position = int(position)
@@ -764,6 +770,37 @@ class MemberManagement:
             await self.bot.say("Roles deleted.")
         else:
             await self.bot.say("Operation aborted.")
+
+    @commands.command(name="editrolecolor", aliases=['editrolecolors'], pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def edit_role_color(self, ctx, hex:discord.Color, *, role_names):
+        """Edit color of role(s)
+
+        Separate each role with a comma. Multi-word roles do not require quotes.
+        Use 000000 to change to default color.
+        [p]editrolecolor 4286f4 Name of role to edit, Yet another role
+        """
+        # get list of valid roles
+        server = ctx.message.server
+        valid_roles = []
+        r_names = [rn.strip() for rn in role_names.split(',')]
+        for role_name in r_names:
+            role = self.get_server_role(server, role_name)
+            if role is None:
+                await self.bot.say("{} is not a valid role.".format(role_name))
+            else:
+                valid_roles.append(role)
+
+        # process valid roles
+        if len(valid_roles) == 0:
+            await self.bot.say("No valid roles left to process")
+            return
+
+        tasks = [self.bot.edit_role(server, role, color=hex) for role in valid_roles]
+        await self.bot.type()
+        await asyncio.gather(*tasks)
+        await self.bot.say("Role colors updated.")
+
 
 
 def check_folder():
