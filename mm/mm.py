@@ -818,6 +818,21 @@ class MemberManagement:
         else:
             await self.bot.say(", ".join([r.name for r in matches]))
 
+    @commands.command(no_pm=True, pass_context=True)
+    @checks.admin_or_permissions(kick_members=True)
+    async def multikick(self, ctx, *members: discord.Member):
+        """Kick multiple users at once."""
+        mod_cog = self.bot.get_cog("Mod")
+        tasks = [
+            ctx.invoke(mod_cog.kick, member) for member in members
+        ]
+        await self.bot.type()
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for r in results:
+            if isinstance(r, Exception):
+                print(r)
+
+        await self.bot.say("Task completed.")
 
 def check_folder():
     """Check folder."""
