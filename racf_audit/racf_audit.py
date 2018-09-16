@@ -73,7 +73,6 @@ def grouper(n, iterable, fillvalue=None):
     return itertools.zip_longest(*args, fillvalue=fillvalue)
 
 
-
 async def check_manage_roles(ctx, bot):
     """Check for permissions to run command since no one has manage roles anymore."""
     server = ctx.message.server
@@ -534,6 +533,31 @@ class RACFAudit:
                 members.append(member_model)
         return members
 
+    @racfaudit.command(name="tag2member", pass_context=True, aliases=['t2m'])
+    async def racfaudit_tag2member(self, ctx, tag):
+        """Find member by tag in DB."""
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            return
+
+        tag = clean_tag(tag)
+        user_id = None
+        for _key, m in self.players.items():
+            m_tag = m.get('tag')
+            if m_tag is not None and m_tag == tag:
+                user_id = m['user_id']
+                break
+
+        if user_id is None:
+            await self.bot.say("Member not found.")
+        else:
+            server = ctx.message.server
+            member = server.get_member(user_id)
+            await self.bot.say("{} ({}) is associated with #{}".format(
+                member.mention if member is not None else 'Unknown user',
+                user_id, tag)
+            )
+
     @racfaudit.command(name="tag", pass_context=True)
     # @checks.mod_or_permissions(manage_roles=True)
     async def racfaudit_tag(self, ctx, member: discord.Member):
@@ -727,8 +751,6 @@ class RACFAudit:
             if pargs.settings:
                 await ctx.invoke(self.racfaudit_config)
 
-
-
             # associate Discord user to member
             for member_model in member_models:
                 tag = clean_tag(member_model.get('tag'))
@@ -897,14 +919,17 @@ class RACFAudit:
                     # await asyncio.sleep(0)
                     await self.bot.add_roles(d_member, *roles)
                     if channel is not None:
-                        await self.bot.send_message(channel, "Add {} to {}".format(", ".join([r.name for r in roles]), d_member))
+                        await self.bot.send_message(channel,
+                                                    "Add {} to {}".format(", ".join([r.name for r in roles]), d_member))
 
                 async def exec_remove_roles(d_member, roles, channel=None):
                     # print("remove roles", d_member, [r.name for r in roles])
                     # await asyncio.sleep(0)
                     await self.bot.remove_roles(d_member, *roles)
                     if channel is not None:
-                        await self.bot.send_message(channel, "Remove {} from {}".format(", ".join([r.name for r in roles]), d_member))
+                        await self.bot.send_message(channel,
+                                                    "Remove {} from {}".format(", ".join([r.name for r in roles]),
+                                                                               d_member))
 
                 # change clan roles
                 for result in audit_results["no_clan_role"]:
@@ -949,7 +974,8 @@ class RACFAudit:
                         continue
 
                     to_remove_role_names = []
-                    for role_name in ['Member', 'Tourney', 'Practice', 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen']:
+                    for role_name in ['Member', 'Tourney', 'Practice', 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo',
+                                      'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen']:
                         if role_name in result_role_names:
                             to_remove_role_names.append(role_name)
                     to_remove_roles = [discord.utils.get(server.roles, name=rname) for rname in to_remove_role_names]
