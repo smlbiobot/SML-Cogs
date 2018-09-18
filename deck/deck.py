@@ -250,7 +250,7 @@ class Deck:
 
     async def decklink_to_cards(self, url):
         """Convert decklink to cards."""
-        m = re.search('(http|ftp|https)://link.clashroyale.com/deck/en\?deck=[\d\;]+', url)
+        m = re.search('(http|ftp|https)://link.clashroyale.com/deck/..\?deck=[\d\;]+', url)
         if not m:
             return None
         url = m.group()
