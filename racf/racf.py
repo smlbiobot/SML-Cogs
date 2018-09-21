@@ -52,7 +52,7 @@ DISALLOWED_ROLES = ["SUPERMOD", "MOD", "AlphaBot"]
 MEMBER_DEFAULT_ROLES = ["Member", "Tourney" "Content"]
 CLANS = [
     "Alpha", "Bravo", "Charlie", "Delta",
-    "Echo", "Foxtrot", "Golf", "Hotel"]
+    "Echo", "Foxtrot", "Golf", "Hotel", "Zen", "YOLO", "Trade"]
 BS_CLANS = [
     "BS-Alpha", "BS-Bravo", "BS-Charlie"]
 BS_CLANS_PREFIX = 'BS-'
