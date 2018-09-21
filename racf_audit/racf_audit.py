@@ -975,7 +975,7 @@ class RACFAudit:
 
                     to_remove_role_names = []
                     for role_name in ['Member', 'Tourney', 'Practice', 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo',
-                                      'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen']:
+                                      'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen', 'Trade']:
                         if role_name in result_role_names:
                             to_remove_role_names.append(role_name)
                     to_remove_roles = [discord.utils.get(server.roles, name=rname) for rname in to_remove_role_names]
