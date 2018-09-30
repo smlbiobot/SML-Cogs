@@ -321,8 +321,11 @@ class ClashRoyaleAPI:
     async def fetch_clan_list(self, tags):
         """Get multiple clans."""
         tags = [clean_tag(tag) for tag in tags]
-        urls = ['https://api.clashroyale.com/v1/clans/%23{}'.format(tag) for tag in tags]
-        results = await self.fetch_multi(urls)
+        tasks = [self.fetch_clan(tag) for tag in tags]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for r in results:
+            if isinstance(r, Exception):
+                r = {}
         return results
 
     async def fetch_clan_leaderboard(self, location=None):
