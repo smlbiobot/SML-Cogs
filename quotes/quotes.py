@@ -27,7 +27,7 @@ DEALINGS IN THE SOFTWARE.
 import os
 from collections import defaultdict
 
-from __main__ import send_cmd_help
+
 from discord.ext import commands
 
 from cogs.utils import checks
@@ -36,6 +36,8 @@ from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "quotes")
 JSON = os.path.join(PATH, "settings.json")
+
+BOTCOMMANDER_ROLES = ["Bot Commander", "MOD", "AlphaFamilyLead"]
 
 
 def nested_dict():
@@ -56,10 +58,10 @@ class Quotes:
     async def quoteset(self, ctx):
         """Quotes."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await await self.bot.send_cmd_help(ctx)
 
     @quoteset.command(name="add", aliases=['a'], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     async def quoteset_add(self, ctx, name, *, quote):
         """Add a quote."""
         server = ctx.message.server
@@ -79,7 +81,7 @@ class Quotes:
         await self.bot.say("Quote saved.")
 
     @quoteset.command(name="edit", aliases=['e'], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     async def quoteset_edit(self, ctx, name, *, quote):
         """Edit a quote."""
         server = ctx.message.server
