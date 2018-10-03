@@ -58,7 +58,7 @@ class Quotes:
     async def quoteset(self, ctx):
         """Quotes."""
         if ctx.invoked_subcommand is None:
-            await await self.bot.send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @quoteset.command(name="add", aliases=['a'], pass_context=True, no_pm=True)
     @commands.has_any_role(*BOTCOMMANDER_ROLES)
