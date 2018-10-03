@@ -1104,19 +1104,40 @@ class RACF:
         else:
             await self.bot.say("Member has no clan roles to remove.")
 
+    async def assign_visitor(self, ctx, member: discord.Member, status_channel=None):
+        visitor_roles = ["Visitor"]
+        channel = discord.utils.get(
+            ctx.message.server.channels, name="visitors")
+
+        await self.changerole(ctx, member, *visitor_roles)
+        if channel is not None:
+            dest_channel = status_channel or ctx.message.channel
+            if dest_channel is not None:
+                await self.bot.send_message(
+                    dest_channel,
+                    "{} You can now chat in {} — enjoy!".format(
+                        member.mention, channel.mention))
+        await ctx.invoke(self.visitorrules, member)
+
     @commands.command(pass_context=True, no_pm=True, aliases=['v'])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def visitor(self, ctx, member: discord.Member):
         """Assign member with visitor roles and give them info."""
-        visitor_roles = ["Visitor"]
-        channel = discord.utils.get(
-            ctx.message.server.channels, name="visitors")
-        await self.changerole(ctx, member, *visitor_roles)
-        if channel is not None:
-            await self.bot.say(
-                "{} You can now chat in {} — enjoy!".format(
-                    member.mention, channel.mention))
-        await ctx.invoke(self.visitorrules, member)
+        await self.assign_visitor(ctx, member)
+
+
+    @commands.command(pass_context=True, no_pm=True, aliases=['vs'])
+    @commands.has_any_role(*BOTCOMMANDER_ROLE)
+    async def visitors(self, ctx, *members: discord.Member):
+        """Assign member with visitor roles and give them info."""
+        pass
+        # temp remove
+        # tasks = [self.assign_visitor(ctx, member, status_channel=ctx.message.channel) for member in members]
+        # results = await asyncio.gather(*tasks, return_exceptions=True)
+        # for member, r in zip(members, results):
+        #     print(r)
+        #     if isinstance(r, Exception):
+        #         await self.bot.say("Error assigning visitor to {}".format(member.mention))
 
     @commands.command(pass_context=True, no_pm=True, aliases=['bs'])
     @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
@@ -1538,7 +1559,7 @@ class RACF:
         await ctx.invoke(self.rmrecruit, member)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['are'])
-    async def academyrecruit(self, ctx, member:discord.Member, tag=None):
+    async def academyrecruit(self, ctx, member: discord.Member, tag=None):
         """Assign academy recruits.
 
         - Add as visitor
@@ -1558,9 +1579,10 @@ class RACF:
         server = ctx.message.server
         apoc = discord.utils.get(server.members, id='199161841874763776')
         blaze = discord.utils.get(server.members, id='256436503884988417')
-        await self.bot.say("{apoc.mention} {blaze.mention} Please verify {member.mention} as an Academy Recruit.".format(
-            apoc=apoc, blaze=blaze, member=member
-        ))
+        await self.bot.say(
+            "{apoc.mention} {blaze.mention} Please verify {member.mention} as an Academy Recruit.".format(
+                apoc=apoc, blaze=blaze, member=member
+            ))
 
     @commands.command(pass_context=True, no_pm=True, aliases=['pt'])
     async def playertag(self, ctx, player_tag):
