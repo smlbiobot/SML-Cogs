@@ -24,10 +24,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import os
 from collections import defaultdict
 
-
+import os
 from discord.ext import commands
 
 from cogs.utils import checks
