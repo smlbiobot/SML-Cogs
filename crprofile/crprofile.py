@@ -76,6 +76,16 @@ def random_discord_color():
     color = int(color, 16)
     return discord.Color(value=color)
 
+def normalized_card_level(card):
+    """Card common levels (september update)."""
+    rarity2level = dict(
+        Common=0,
+        Rare=2,
+        Epic=5,
+        Legendary=8
+    )
+    return card['level'] + rarity2level[card['rarity']]
+
 
 class API:
     """Clash Royale official API."""
@@ -684,6 +694,8 @@ class CRPlayerModel:
             url = 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena.Arena)
         return url
 
+
+
     def deck_list(self, bot_emoji: BotEmoji):
         """Deck with emoji"""
         if self.api_provider == 'official':
@@ -692,7 +704,7 @@ class CRPlayerModel:
         else:
             cards = [card.get('key') for card in self.info_data.get("currentDeck")]
         cards = [bot_emoji.name(key.replace('-', '')) for key in cards]
-        levels = [card["level"] for card in self.info_data.get("currentDeck")]
+        levels = [normalized_card_level(card) for card in self.info_data.get("currentDeck")]
         deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
         return ' '.join(deck)
 
@@ -1495,7 +1507,7 @@ class CRProfile:
                     if card['rarity'] == rarity:
                         value.append(
                             "{}{}".format(
-                                card['emoji'], card['level']))
+                                card['emoji'], normalized_card_level(card)))
             em.add_field(name=rarity, value=' '.join(value))
 
         em.set_footer(
