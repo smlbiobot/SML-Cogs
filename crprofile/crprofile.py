@@ -84,7 +84,8 @@ def normalized_card_level(card):
         Epic=5,
         Legendary=8
     )
-    return card['level'] + rarity2level[card['rarity']]
+    print(card)
+    return card['level'] + rarity2level.get(card.get('rarity'), 0)
 
 
 class API:
