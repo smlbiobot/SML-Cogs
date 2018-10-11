@@ -24,24 +24,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import datetime
-import io
-import os
-import re
-import yaml
-import string
-from concurrent.futures import ThreadPoolExecutor
 from collections import namedtuple
 
 import aiohttp
+import datetime
 import discord
+import io
+import os
+import re
+import string
+import yaml
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
+from concurrent.futures import ThreadPoolExecutor
+from discord.ext import commands
+
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
-from discord.ext import commands
 
 SETTINGS_PATH = os.path.join("data", "deck", "settings.json")
 AKA_PATH = os.path.join("data", "deck", "cards_aka.yaml")
@@ -230,8 +231,6 @@ class Deck:
             # generate link
             if self.deck_is_valid:
                 em = await self.decklink_embed(member_deck)
-                await self.bot.say(embed=em)
-                em = await self.decklink_embed(member_deck, war=True)
                 await self.bot.say(embed=em)
 
     async def card_decklink_to_key(self, decklink):
@@ -445,8 +444,6 @@ class Deck:
         if decklink_setting == 'embed':
             em = await self.decklink_embed(deck_cards)
             await self.bot.say(embed=em)
-            em = await self.decklink_embed(deck_cards, war=True)
-            await self.bot.say(embed=em)
         elif decklink_setting == 'link':
             url = await self.decklink_url(deck_cards)
             await self.bot.say('<{}>'.format(url))
@@ -523,7 +520,8 @@ class Deck:
                             "Deck": member_deck["Deck"],
                             "DeckName": member_deck["DeckName"],
                             "Member": member,
-                            "MemberDisplayName": member_display_name})
+                            "MemberDisplayName": member_display_name
+                        })
             found_decks = sorted(
                 found_decks, key=lambda x: x["UTC"], reverse=True)
 
@@ -806,7 +804,8 @@ class Deck:
             self.settings["Servers"][server.id]["Members"][member.id] = {
                 "MemberID": member.id,
                 "MemberDisplayName": member.display_name,
-                "Decks": {}}
+                "Decks": {}
+            }
             self.save_settings()
 
     def check_server_settings(self, server):
@@ -815,7 +814,8 @@ class Deck:
             self.settings["Servers"][server.id] = {
                 "ServerName": str(server),
                 "ServerID": str(server.id),
-                "Members": {}}
+                "Members": {}
+            }
         if "Members" not in self.settings["Servers"][server.id]:
             self.settings["Servers"][server.id]["Members"] = {}
         if "ServerName" not in self.settings["Servers"][server.id]:
@@ -852,7 +852,6 @@ class Deck:
 
                 await self.upload_deck_image(ctx, deck, deck_name, member)
                 await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys))
-                await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys, war=True))
                 await self.bot.delete_message(msg)
 
 
