@@ -24,23 +24,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import asyncio
-import datetime as dt
 import itertools
-import json
-import os
-from collections import defaultdict, OrderedDict
-from datetime import timedelta
-from random import choice
-import socket
+from collections import OrderedDict, defaultdict
 
 import aiohttp
+import asyncio
+import datetime as dt
 import discord
 import inflect
+import json
+import os
 import requests
+import socket
+import urllib.request
+from datetime import timedelta
+from discord.ext import commands
+from random import choice
+
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
-from discord.ext import commands
 
 PATH = os.path.join("data", "crprofile")
 PATH_PLAYERS = os.path.join(PATH, "players")
@@ -55,6 +57,8 @@ API_FETCH_TIMEOUT = 10
 BOTCOMMANDER_ROLES = ["Bot Commander"]
 
 CREDITS = 'Selfish + SML'
+
+CARDS = None
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -76,6 +80,21 @@ def random_discord_color():
     color = int(color, 16)
     return discord.Color(value=color)
 
+
+def get_card_rarity(card):
+    rarity = card.get('rarity')
+    if rarity is not None:
+        return rarity
+    global CARDS
+    if CARDS is None:
+        with urllib.request.urlopen("https://royaleapi.github.io/cr-api-data/json/cards.json") as r:
+            CARDS = json.loads(r.read().decode())
+    for c in CARDS:
+        if c.get('name') == card.get('name'):
+            return c.get('rarity')
+    return None
+
+
 def normalized_card_level(card):
     """Card common levels (september update)."""
     rarity2level = dict(
@@ -84,7 +103,7 @@ def normalized_card_level(card):
         Epic=5,
         Legendary=8
     )
-    return card.get('level', 0) + rarity2level.get(card.get('rarity'), 0)
+    return card.get('level', 0) + rarity2level.get(get_card_rarity(card), 0)
 
 
 class API:
@@ -575,8 +594,6 @@ class CRPlayerModel:
         if chest_cycle is None:
             return ""
 
-
-
         if self.api_provider == 'official':
             out = []
             for c in chest_cycle.get('items'):
@@ -693,8 +710,6 @@ class CRPlayerModel:
         else:
             url = 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena.Arena)
         return url
-
-
 
     def deck_list(self, bot_emoji: BotEmoji):
         """Deck with emoji"""
@@ -897,7 +912,6 @@ class Settings:
             except KeyError:
                 pass
             self.save()
-
 
     def rm_tag(self, server, tag):
         """Remove player tag from settings by tag"""
@@ -1537,7 +1551,7 @@ class CRProfile:
             title="{} #{}".format(player.name, player.tag),
             color=color,
             url=decklink_url)
-        cards = player.card_collection(self.bot_emoji)
+        # cards = player.card_collection(self.bot_emoji)
         em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
         em.set_footer(
             text=profile_url,
