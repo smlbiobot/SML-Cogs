@@ -4,7 +4,7 @@
 	"DESCRIPTION": "Brawl Stars profile and clans",
 	"DISABLED": false,
 	"NAME": "BrawlStars",
-	"REQUIREMENTS": ["python-box"],
+	"REQUIREMENTS": ["python-box", "stringcase"],
 	"TAGS": ["brawlstars"],
 	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
 }

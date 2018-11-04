@@ -22,20 +22,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
-import itertools
-import socket
-import os
 from collections import defaultdict
+
+import aiohttp
+import discord
+import os
+import socket
+from discord.ext import commands
 from random import choice
 
-import discord
 from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
-from discord.ext import commands
-import aiohttp
 
 PATH = os.path.join("data", "brawlstars")
 JSON = os.path.join(PATH, "settings.json")
@@ -47,6 +44,7 @@ def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
 
+
 def clean_tag(tag):
     """Clean supercell tag"""
     t = tag
@@ -57,16 +55,25 @@ def clean_tag(tag):
     return t
 
 
-
 class BSPlayer(Box):
     """Player model"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
 
 class BSClan(Box):
     """Player model"""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+
+def random_discord_color():
+    """Return random color as an integer."""
+    color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+    color = int(color, 16)
+    return discord.Color(value=color)
 
 
 async def api_fetch(url=None, auth=None):
@@ -88,7 +95,6 @@ async def api_fetch_player(tag=None, auth=None):
     return BSPlayer(data)
 
 
-
 class BrawlStars:
     """Brawl Stars API"""
 
@@ -101,6 +107,41 @@ class BrawlStars:
     def _save_settings(self):
         dataIO.save_json(JSON, self.settings)
         return True
+
+    def get_emoji(self, name):
+        for emoji in self.bot.get_all_emojis():
+            if emoji.name == str(name):
+                return '<:{}:{}>'.format(emoji.name, emoji.id)
+        return ''
+
+    def _player_embed(self, player: BSPlayer):
+        avatar = self.get_emoji(player.avatarId)
+        em = discord.Embed(
+            title=player.name,
+            description='{} #{}'.format(avatar, player.tag)
+        )
+
+        # band
+        em.add_field(name=player.band.name, value=player.band.role, inline=False)
+
+        # fields
+        em.add_field(name='Trophies', value="{} / {} PB".format(player.trophies, player.highestTrophies))
+        em.add_field(name='Boss', value="{}".format(player.bestTimeAsBoss or ''))
+        em.add_field(name='Robo Rumble', value="{}".format(player.bestRoboRumbleTime or ''))
+        em.add_field(name='XP', value="{}".format(player.totalExp or ''))
+        em.add_field(name='Victories', value="{}".format(player.victories or ''))
+        em.add_field(name='Solo SD', value="{}".format(player.soloShowdownVictories or ''))
+        em.add_field(name='Duo SD', value="{}".format(player.duoShowdownVictories or ''))
+
+        # brawlers
+        em.add_field(name="Brawlers Unlocked", value=player.brawlersUnlocked, inline=False)
+
+        for b in player.brawlers or []:
+            em.add_field(
+                name="{} {}".format(self.get_emoji(b.name.lower()), b.name),
+                value="{} / {} Lvl {}".format(b.trophies, b.highestTrophies, b.level)
+            )
+        return em
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
@@ -144,7 +185,6 @@ class BrawlStars:
         if self._save_settings():
             await self.bot.say("Tag saved.")
 
-
     @bs.command(name="profile", aliases=['p'], pass_context=True)
     async def bs_profile(self, ctx, tag=None):
         """BS Profile."""
@@ -157,7 +197,7 @@ class BrawlStars:
 
         await self.bot.say(tag)
         player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
-        await self.bot.say(player.name)
+        await self.bot.say(embed=self._player_embed(player))
 
 
 def check_folder():
