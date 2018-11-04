@@ -139,7 +139,7 @@ class BrawlStars:
 
         for b in player.brawlers or []:
             em.add_field(
-                name="{} {}".format(self.get_emoji(b.name.lower()), b.name),
+                name="{} {}".format(self.get_emoji(b.name.lower().replace(' ', '')), b.name),
                 value="{} / {} Lvl {}".format(b.trophies, b.highestTrophies, b.level)
             )
 
