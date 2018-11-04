@@ -5,9 +5,11 @@ servers:
       - name: Reddit Alpha
         tag: LQQ
         roles:
-          - BS-Member
           - BS-Alpha
-          - Brawl-Stars
+    everyone_roles:
+      - Brawl-Stars
+    member_roles:
+      - BS-Member
     visitor_roles:
       - Visitor
   - name: SML
@@ -16,8 +18,10 @@ servers:
       - name: Reddit Alpha
         tag: LQQ
         roles:
-          - BS-Member
           - BS-Alpha
-          - Brawl-Stars
+    everyone_roles:
+      - Brawl-Stars
+    member_roles:
+      - BS-Member
     visitor_roles:
       - Visitor
