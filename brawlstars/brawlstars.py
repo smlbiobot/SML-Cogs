@@ -330,8 +330,11 @@ class BrawlStars:
 
         await self.bot.say(self._player_mini_str(player))
 
+        add_visitor_roles = True
         for b in server.bands:
             if b.tag == player.band.tag:
+                add_visitor_roles = False
+
                 # add roles
                 try:
                     roles = [r for r in ctx_server.roles if r.name in b.roles]
@@ -346,6 +349,16 @@ class BrawlStars:
                     await self.bot.say("Change {member} to {nick} to match IGN".format(member=member.mention, nick=player.name))
                 except discord.errors.Forbidden:
                     await self.bot.say("Error: I don’t have permission to change nick for this user.")
+
+        # add visitor roles if member not in band
+        if add_visitor_roles:
+            roles = [r for r in ctx_server.roles if r.name in server.visitor_roles]
+            # add roles
+            try:
+                await self.bot.add_roles(member, *roles)
+                await self.bot.say("Added {roles} to {member}".format(roles=", ".join(b.roles), member=member))
+            except discord.errors.Forbidden:
+                await self.bot.say("Error: I don’t have permission to add roles.")
 
 
 

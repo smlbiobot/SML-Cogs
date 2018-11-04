@@ -8,6 +8,8 @@ servers:
           - BS-Member
           - BS-Alpha
           - Brawl-Stars
+    visitor_roles:
+      - Visitor
   - name: SML
     id: 275395656955330560
     bands:
@@ -17,3 +19,5 @@ servers:
           - BS-Member
           - BS-Alpha
           - Brawl-Stars
+    visitor_roles:
+      - Visitor
