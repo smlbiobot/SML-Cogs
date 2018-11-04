@@ -1,0 +1,19 @@
+servers:
+  - name: 100 Thieves Clash Royale
+    id: 218534373169954816
+    bands:
+      - name: Reddit Alpha
+        tag: LQQ
+        roles:
+          - BS-Member
+          - BS-Alpha
+          - Brawl-Stars
+  - name: SML
+    id: 275395656955330560
+    bands:
+      - name: Reddit Alpha
+        tag: LQQ
+        roles:
+          - BS-Member
+          - BS-Alpha
+          - Brawl-Stars

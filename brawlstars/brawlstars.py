@@ -28,16 +28,21 @@ import aiohttp
 import discord
 import os
 import socket
+import yaml
 from discord.ext import commands
 from random import choice
 
 from cogs.utils import checks
-from cogs.utils.dataIO import dataIO
 from cogs.utils.chat_formatting import bold
 from cogs.utils.chat_formatting import inline
+from cogs.utils.dataIO import dataIO
+import aiofiles
 
 PATH = os.path.join("data", "brawlstars")
 JSON = os.path.join(PATH, "settings.json")
+BAND_CONFIG_YML = os.path.join(PATH, "band.config.yml")
+
+MANAGE_ROLE_ROLES = ['Bot Commander']
 
 from box import Box
 
@@ -105,6 +110,7 @@ class BrawlStars:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
+        self._band_config = None
 
     def _save_settings(self):
         dataIO.save_json(JSON, self.settings)
@@ -150,6 +156,17 @@ class BrawlStars:
             text="Data by BrawlAPI https://brawlapi.cf"
         )
         return em
+
+    def _player_mini_str(self, player:BSPlayer):
+        """Minimal player profile for verification."""
+        avatar = self.get_emoji(player.avatarId)
+        o = [
+            '{}'.format(avatar),
+            '{} #{}'.format(bold(player.name), player.tag),
+            '{}, {} #{}'.format(player.band.role, player.band.name, player.band.tag),
+            '{} {} / {}'.format(self.get_emoji('bstrophy'), player.trophies, player.highestTrophies),
+        ]
+        return "\n".join(o)
 
     def _player_str(self, player: BSPlayer):
         """Player profile as plain text."""
@@ -198,8 +215,15 @@ class BrawlStars:
                 )
             )
 
-
         return '\n'.join(o)
+
+    async def _get_band_config(self, force_update=False):
+        if force_update or self._band_config is None:
+            async with aiofiles.open(BAND_CONFIG_YML) as f:
+                contents = await f.read()
+                self._band_config = yaml.load(contents)
+        print(self._band_config)
+        return self._band_config
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
@@ -212,7 +236,7 @@ class BrawlStars:
             await self.bot.send_cmd_help(ctx)
 
     @bsset.command(name="init", pass_context=True)
-    async def bsset_init(self, ctx):
+    async def _bsset_init(self, ctx):
         """Init BS Band settings."""
         server = ctx.message.server
         self.settings[server.id] = {}
@@ -220,11 +244,37 @@ class BrawlStars:
             await self.bot.say("Server settings initialized.")
 
     @bsset.command(name="auth", pass_context=True)
-    async def bsset_auth(self, ctx, token):
+    async def _bsset_auth(self, ctx, token):
         """Authorization (token)."""
         self.settings['brawlapi_token'] = token
         if self._save_settings():
             await self.bot.say("Authorization (token) updated.")
+        await self.bot.delete_message(ctx.message)
+
+    @bsset.command(name="config", pass_context=True)
+    async def _bsset_config(self, ctx):
+        """Band config"""
+        if len(ctx.message.attachments) == 0:
+            await self.bot.say(
+                "Please attach config yaml with this command. "
+                "See config.example.yml for how to format it."
+            )
+            return
+
+        attach = ctx.message.attachments[0]
+        url = attach["url"]
+
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                with open(BAND_CONFIG_YML, "wb") as f:
+                    f.write(await resp.read())
+
+        await self.bot.say(
+            "Attachment received and saved as {}".format(BAND_CONFIG_YML))
+
+        self.settings['config'] = BAND_CONFIG_YML
+        dataIO.save_json(JSON, self.settings)
+
         await self.bot.delete_message(ctx.message)
 
     @commands.group(pass_context=True, no_pm=True)
@@ -256,6 +306,36 @@ class BrawlStars:
         player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
         # await self.bot.say(embed=self._player_embed(player))
         await self.bot.say(self._player_str(player))
+
+    @bs.command(name="verify", aliases=['v'], pass_context=True)
+    @commands.has_any_role(*MANAGE_ROLE_ROLES)
+    async def bs_verify(self, ctx, member: discord.Member, tag=None):
+        cfg = Box(await self._get_band_config())
+        server = None
+        ctx_server = ctx.message.server
+        for s in cfg.servers:
+            if str(s.id) == str(ctx.message.server.id):
+                server = s
+                break
+
+        if server is None:
+            await self.bot.say("No config for this server found.")
+            return
+
+        tag = clean_tag(tag)
+        self.settings[server.id][member.id] = tag
+        await self.bot.say("Associated {tag} with {member}".format(tag=tag, member=member))
+
+        player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
+
+        await self.bot.say(self._player_mini_str(player))
+
+        for b in server.bands:
+            if b.tag == player.band.tag:
+                roles = [r for r in ctx_server.roles if r.name in b.roles]
+                await self.bot.add_roles(member, *roles)
+                await self.bot.say("Added {roles} to {member}".format(roles=", ".join(b.roles), member=member))
+
 
 def check_folder():
     """Check folder."""
