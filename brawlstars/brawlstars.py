@@ -118,7 +118,8 @@ class BrawlStars:
         avatar = self.get_emoji(player.avatarId)
         em = discord.Embed(
             title=player.name,
-            description='{} #{}'.format(avatar, player.tag)
+            description='{} #{}'.format(avatar, player.tag).capitalize(),
+            color=random_discord_color()
         )
 
         # band
@@ -141,6 +142,11 @@ class BrawlStars:
                 name="{} {}".format(self.get_emoji(b.name.lower()), b.name),
                 value="{} / {} Lvl {}".format(b.trophies, b.highestTrophies, b.level)
             )
+
+        # footer
+        em.set_footer(
+            text="Data by BrawlAPI https://brawlapi.cf"
+        )
         return em
 
     @commands.group(pass_context=True, no_pm=True)
@@ -195,7 +201,6 @@ class BrawlStars:
             if tag is None:
                 await self.bot.say("Can’t find tag associated with user.")
 
-        await self.bot.say(tag)
         player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
         await self.bot.say(embed=self._player_embed(player))
 
