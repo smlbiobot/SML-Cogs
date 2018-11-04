@@ -1139,7 +1139,7 @@ class RACF:
         #     if isinstance(r, Exception):
         #         await self.bot.say("Error assigning visitor to {}".format(member.mention))
 
-    @commands.command(pass_context=True, no_pm=True, aliases=['bs'])
+    @commands.command(pass_context=True, no_pm=True)
     @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
     async def brawlstars(self, ctx, member: discord.Member, *roles):
         """Assign member with visitor and brawl-stars roles."""
