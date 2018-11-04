@@ -161,32 +161,35 @@ class BrawlStars:
             '{} {} / {}'.format(self.get_emoji('bstrophy'), player.trophies, player.highestTrophies),
             '{emoji} {time} Best time as Boss'.format(
                 emoji=self.get_emoji('bossfight'),
-                time=player.bestTimeAsBoss),
-            '{emoji} {time} Best time in Robo Rumble'.format(
+                time=inline(player.bestTimeAsBoss)),
+            '{emoji} {time} Best Robo Rumble time'.format(
                 emoji=self.get_emoji('roborumble'),
-                time=player.bestRoboRumbleTime),
+                time=inline(player.bestRoboRumbleTime)),
             # victories
-            '{emoji} {value} {name}'.format(
-                emoji=self.get_emoji('battlelog'),
-                value=player.victories,
-                name='Victories'
-            ),
-            '{emoji} {value} {name}'.format(
-                emoji=self.get_emoji('showdown'),
-                value=player.soloShowdownVictories,
-                name='Solo Showdown Victories'
-            ),
-            '{emoji} {value} {name}'.format(
-                emoji=self.get_emoji('duoshowdown'),
-                value=player.duoShowdownVictories,
-                name='Duo Showdown Victories'
-            ),
+            '{normal} {solo} {duo}'.format(
+                normal='{emoji} {value} {name}'.format(
+                    emoji=self.get_emoji('battlelog'),
+                    value=inline(player.victories),
+                    name='Victories'
+                ),
+                solo='{emoji} {value} {name}'.format(
+                    emoji=self.get_emoji('showdown'),
+                    value=inline(player.soloShowdownVictories),
+                    name='Solo SD'
+                ),
+                duo='{emoji} {value} {name}'.format(
+                    emoji=self.get_emoji('duoshowdown'),
+                    value=inline(player.duoShowdownVictories),
+                    name='Duo SD'
+                ),
+            )
+
         ]
 
         # brawlers
         for b in player.brawlers or []:
             o.append(
-                '{emoji} `{trophies} / {pb} Lvl {level:.>2}` {name}'.format(
+                '{emoji} `{trophies: >3} / {pb: >3} Lvl {level: >2}\u2800` {name}'.format(
                     emoji=self.get_emoji(b.name.lower().replace(' ', '')),
                     trophies=b.trophies,
                     pb=b.highestTrophies,
