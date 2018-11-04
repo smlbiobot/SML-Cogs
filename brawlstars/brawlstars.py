@@ -332,9 +332,21 @@ class BrawlStars:
 
         for b in server.bands:
             if b.tag == player.band.tag:
-                roles = [r for r in ctx_server.roles if r.name in b.roles]
-                await self.bot.add_roles(member, *roles)
-                await self.bot.say("Added {roles} to {member}".format(roles=", ".join(b.roles), member=member))
+                # add roles
+                try:
+                    roles = [r for r in ctx_server.roles if r.name in b.roles]
+                    await self.bot.add_roles(member, *roles)
+                    await self.bot.say("Added {roles} to {member}".format(roles=", ".join(b.roles), member=member))
+                except discord.errors.Forbidden:
+                    await self.bot.say("Error: I don’t have permission to add roles.")
+
+                # changenick
+                try:
+                    await self.bot.change_nickname(member, player.name)
+                    await self.bot.say("Change {member} to {nick} to match IGN".format(member=member.mention, nick=player.name))
+                except discord.errors.Forbidden:
+                    await self.bot.say("Error: I don’t have permission to change nick for this user.")
+
 
 
 def check_folder():
