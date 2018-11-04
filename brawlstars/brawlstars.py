@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 from collections import defaultdict
 
+import aiofiles
 import aiohttp
 import discord
 import os
@@ -36,7 +37,6 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import bold
 from cogs.utils.chat_formatting import inline
 from cogs.utils.dataIO import dataIO
-import aiofiles
 
 PATH = os.path.join("data", "brawlstars")
 JSON = os.path.join(PATH, "settings.json")
@@ -157,7 +157,7 @@ class BrawlStars:
         )
         return em
 
-    def _player_mini_str(self, player:BSPlayer):
+    def _player_mini_str(self, player: BSPlayer):
         """Minimal player profile for verification."""
         avatar = self.get_emoji(player.avatarId)
         o = [
@@ -222,7 +222,6 @@ class BrawlStars:
             async with aiofiles.open(BAND_CONFIG_YML) as f:
                 contents = await f.read()
                 self._band_config = yaml.load(contents)
-        print(self._band_config)
         return self._band_config
 
     @commands.group(pass_context=True, no_pm=True)
@@ -323,43 +322,60 @@ class BrawlStars:
             return
 
         tag = clean_tag(tag)
-        self.settings[server.id][member.id] = tag
+        self.settings[ctx_server.id][member.id] = tag
+        self._save_settings()
         await self.bot.say("Associated {tag} with {member}".format(tag=tag, member=member))
 
         player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
 
         await self.bot.say(self._player_mini_str(player))
 
-        add_visitor_roles = True
-        for b in server.bands:
-            if b.tag == player.band.tag:
-                add_visitor_roles = False
+        band_tags = [b.tag for b in server.bands]
 
-                # add roles
-                try:
-                    roles = [r for r in ctx_server.roles if r.name in b.roles]
-                    await self.bot.add_roles(member, *roles)
-                    await self.bot.say("Added {roles} to {member}".format(roles=", ".join(b.roles), member=member))
-                except discord.errors.Forbidden:
-                    await self.bot.say("Error: I don’t have permission to add roles.")
+        to_add_roles = []
+        to_remove_roles = []
 
-                # changenick
-                try:
-                    await self.bot.change_nickname(member, player.name)
-                    await self.bot.say("Change {member} to {nick} to match IGN".format(member=member.mention, nick=player.name))
-                except discord.errors.Forbidden:
-                    await self.bot.say("Error: I don’t have permission to change nick for this user.")
+        to_add_roles += server.everyone_roles
+
+        # if member in bands, add member roles and remove visitor roles
+        if player.band.tag in band_tags:
+            to_remove_roles += server.visitor_roles
+            to_add_roles += server.member_roles
+
+            for b in server.bands:
+                if b.tag == player.band.tag:
+                    to_add_roles += b.roles
 
         # add visitor roles if member not in band
-        if add_visitor_roles:
-            roles = [r for r in ctx_server.roles if r.name in server.visitor_roles]
-            # add roles
-            try:
-                await self.bot.add_roles(member, *roles)
-                await self.bot.say("Added {roles} to {member}".format(roles=", ".join(b.roles), member=member))
-            except discord.errors.Forbidden:
-                await self.bot.say("Error: I don’t have permission to add roles.")
+        else:
+            to_remove_roles += server.member_roles
+            to_add_roles += server.visitor_roles
 
+        # change nickname to match IGN
+        try:
+            await self.bot.change_nickname(member, player.name)
+            await self.bot.say(
+                "Change {member} to {nick} to match IGN".format(member=member.mention, nick=player.name))
+        except discord.errors.Forbidden:
+            await self.bot.say("Error: I don’t have permission to change nick for this user.")
+
+        # add roles
+        try:
+            roles = [r for r in ctx_server.roles if r.name in to_add_roles]
+            await self.bot.add_roles(member, *roles)
+            await self.bot.say(
+                "Added {roles} to {member}".format(roles=", ".join(to_add_roles), member=member))
+        except discord.errors.Forbidden:
+            await self.bot.say("Error: I don’t have permission to add roles.")
+
+        # remove roles
+        try:
+            roles = [r for r in ctx_server.roles if r.name in to_remove_roles]
+            await self.bot.remove_roles(member, *roles)
+            await self.bot.say(
+                "Removed {roles} from {member}".format(roles=", ".join(to_remove_roles), member=member))
+        except discord.errors.Forbidden:
+            await self.bot.say("Error: I don’t have permission to add roles.")
 
 
 def check_folder():
