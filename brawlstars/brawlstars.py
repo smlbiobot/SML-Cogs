@@ -33,6 +33,8 @@ from random import choice
 
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from cogs.utils.chat_formatting import bold
+from cogs.utils.chat_formatting import inline
 
 PATH = os.path.join("data", "brawlstars")
 JSON = os.path.join(PATH, "settings.json")
@@ -149,6 +151,53 @@ class BrawlStars:
         )
         return em
 
+    def _player_str(self, player: BSPlayer):
+        """Player profile as plain text."""
+        avatar = self.get_emoji(player.avatarId)
+        o = [
+            '{}'.format(avatar),
+            '{} #{}'.format(bold(player.name), player.tag),
+            '{}, {} #{}'.format(player.band.role, player.band.name, player.band.tag),
+            '{} {} / {}'.format(self.get_emoji('bstrophy'), player.trophies, player.highestTrophies),
+            '{emoji} {time} Best time as Boss'.format(
+                emoji=self.get_emoji('bossfight'),
+                time=player.bestTimeAsBoss),
+            '{emoji} {time} Best time in Robo Rumble'.format(
+                emoji=self.get_emoji('roborumble'),
+                time=player.bestRoboRumbleTime),
+            # victories
+            '{emoji} {value} {name}'.format(
+                emoji=self.get_emoji('battlelog'),
+                value=player.victories,
+                name='Victories'
+            ),
+            '{emoji} {value} {name}'.format(
+                emoji=self.get_emoji('showdown'),
+                value=player.soloShowdownVictories,
+                name='Solo Showdown Victories'
+            ),
+            '{emoji} {value} {name}'.format(
+                emoji=self.get_emoji('duoshowdown'),
+                value=player.duoShowdownVictories,
+                name='Duo Showdown Victories'
+            ),
+        ]
+
+        # brawlers
+        for b in player.brawlers or []:
+            o.append(
+                '{emoji} `{trophies} / {pb} Lvl {level:.>2}` {name}'.format(
+                    emoji=self.get_emoji(b.name.lower().replace(' ', '')),
+                    trophies=b.trophies,
+                    pb=b.highestTrophies,
+                    level=b.level,
+                    name=b.name
+                )
+            )
+
+
+        return '\n'.join(o)
+
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
     async def bsset(self, ctx):
@@ -202,8 +251,8 @@ class BrawlStars:
                 await self.bot.say("Can’t find tag associated with user.")
 
         player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
-        await self.bot.say(embed=self._player_embed(player))
-
+        # await self.bot.say(embed=self._player_embed(player))
+        await self.bot.say(self._player_str(player))
 
 def check_folder():
     """Check folder."""
