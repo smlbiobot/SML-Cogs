@@ -1,37 +1,44 @@
-name: Reddit Alpha Clan Family
+name: 100 Thieves Clan Family
 description: >
-  Minimum trophies to join our Clash Royale clans.
-  Current trophies required unless PB (personal best) is specified.
+  Trophies and clan war readinesss (CWR) requirements.
+  Please type `!q cwr` to see the definition for CWR.
+  Coverage must include at least 5 win-cons.
+  All of our clans require minimum 12 challenge wins.
 color: ff0f37
+badge_url: https://royaleapi.github.io/cr-api-assets/badges/A_Char_Rocket_02.png
 clans:
-  - name: Reddit Alpha
-    tag: 2CCCP
-    key: alpha
-  - name: Reddit Bravo
-    tag: 2U2GGQJ
-    key: bravo
-  - name: Reddit Charlie
-    tag: 2QUVVVP
-    key: charlie
-  - name: Reddit Delta
-    tag: Y8GYCGV
-    key: delta
-  - name: Reddit Echo
-    tag: LGVV2CG
-    key: echo
-  - name: Reddit Foxtrot
-    tag: QUYCYV8
-    key: foxtrot
-  - name: Reddit Golf
-    tag: GUYGVJY
-    key: golf
-  - name: Reddit Hotel
-    tag: UGQ28YU
-    key: hotel
+  - name: 100T Alpha
+    tag: 9PJ82CRC
+    aux: >
+      All viable epics at minimum level 7.
+      Golem, Pekka, Dark Prince, Prince, Balloon, Executioner, Poison, Lightning
+  - name: 100T Bravo
+    tag: 9UQJUJC9
+  - name: 100T Charlie
+    tag: 9G99JQPL
+  - name: 100T Delta
+    tag: 9G8VYGL0
+  - name: 100T Echo
+    tag: 9CJ0L9RG
+  - name: 100T Foxtrot
+    tag: 9UQC2P0V
+  - name: 100T Golf
+    tag: 9UG2R2LQ
+  - name: 100T Hotel
+    tag: 9Y9VR2JR
+  - name: 100T YOLO
+    tag: 9R8GUC0L
+    hide: true
+  - name: 100T Zen
+    tag: 9LPVG9UC
+    hide: true
+  - name: RoyaleAPI
+    tag: 9R8G9290
+    hide: true
 info:
   - name: How to join
     value: >
-      If you meet requirements, please request to join in-app.
-      Let us know after you have been accepted.
-url: http://royaleapi.com/clan/family/racf/
+      Let a co-leader on Discord that you are interested,
+      and provide them with your player tag.
+url: https://royaleapi.com/f/100t/
 auth: Put_you_auth_key_here

@@ -653,11 +653,7 @@ class Clans:
         )
 
         # Badge
-        badge_url = None
-        for clan in clans:
-            for badge in self.badges:
-                if badge.get('id') == clan.get('clan', {}).get('badgeId'):
-                    badge_url = 'https://royaleapi.github.io/cr-api-assets/badges/{}.png'.format(badge.get('name'))
+        badge_url = config.badge_url
 
         if badge_url is not None:
             em.set_thumbnail(url=badge_url)
