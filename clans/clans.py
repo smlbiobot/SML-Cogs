@@ -43,6 +43,7 @@ from discord.ext import commands
 
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
+from cogs.utils.chat_formatting import bold
 from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "clans")
@@ -110,17 +111,22 @@ def smart_truncate(content, length=100, suffix='...'):
         return ' '.join(content[:length + 1].split(' ')[0:-1]) + suffix
 
 
-def emoji_value(emoji, value, pad=5):
+def emoji_value(emoji, value, pad=5, inline=True, truncate=True):
     emojis = {
         'win': '<:cwwarwin:450890799312404483>',
         'crown': '<:crownblue:337975460405444608>',
         'battle': '<:cwbattle:450889588215513089>',
         'trophy': '<:cwtrophy:450878327880941589>'
     }
-    if isinstance(value, int):
-        s_value = wrap_inline('{: >{width}}'.format(value, width=pad))
-    else:
-        s_value = wrap_inline('{: >{width}}'.format(value, width=pad))
+    value = str(value)
+
+    if truncate:
+        value = value[:pad]
+
+    s_value = '{: >{width}}'.format(value, width=pad)
+
+    if inline:
+        s_value = wrap_inline(s_value)
 
     if emoji in emojis.keys():
         s = "{} {}".format(s_value, emojis[emoji])
@@ -644,16 +650,16 @@ class Clans:
                   "{battles_played}"
                   "{trophies}").format(
 
-            wins=emoji_value('win', 'Wins'),
-            crowns=emoji_value('crown', 'Crowns'),
-            battles_played=emoji_value('battle', 'Battles Played'),
-            trophies=emoji_value('trophy', 'CW Trophies')
+            wins=emoji_value('win', 'Wins', inline=False, truncate=False),
+            crowns=emoji_value('crown', 'Crowns', inline=False, truncate=False),
+            battles_played=emoji_value('battle', 'Battles Played', inline=False, truncate=False),
+            trophies=emoji_value('trophy', 'CW Trophies', inline=False, truncate=False)
         )
 
         o += [
-            config.name,
-            "\nLast updated: {}".format(dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
-            + legend
+            bold(config.name),
+            "Last updated: {}".format(dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC')),
+            legend
         ]
 
         # Badge
@@ -663,8 +669,8 @@ class Clans:
         STATES = {
             'collectionDay': 'Coll',
             'warDay': 'War',
-            'notInWar': 'Not in War',
-            'matchMaking': 'Matchmaking',
+            'notInWar': 'N/A',
+            'matchMaking': 'MM',
         }
 
         for c in clans:
@@ -692,13 +698,13 @@ class Clans:
 
             clan_name = clan.clan.name
             clan_score = clan.clan.clanScore
-            name = '{}'.format(clan_name, clan_score)
             state = clan.get('state', 'ERR')
+
             if state in ['collectionDay', 'warDay']:
                 o += [
-                    wrap_inline(" "),
+                    "\u2800",
                     (
-                            wrap_inline("{clan_name: <10} {state: <5} {timespan: >12}") +
+                            wrap_inline("{clan_name: <12} {state: <4} {timespan: >11}") +
                             "\n{wins} "
                             "{crowns} "
                             "{battles_played}"
@@ -715,32 +721,12 @@ class Clans:
                 ]
             else:
                 o += [
-                    "{clan_name:<15} {state:<5}".format(
-                        clan_name=clan_name,
-                        state=STATES.get(state, 'ERR')
+                    wrap_inline(
+                        "---\nNot in war"
                     )
                 ]
 
-            # participants
 
-            # if state == 'collectionDay':
-            #     p_value = ' '.join([
-            #         '<:cwbattle:450889588215513089>{}: {} '.format(p.name, p.wins, 3 - p.battlesPlayed) for p in
-            #         clan.participants
-            #         if p.battlesPlayed < 3
-            #     ])
-            # elif state == 'warDay':
-            #     p_value = ' '.join([
-            #         '<:cwbattle:450889588215513089>{}: {} '.format(p.name, p.wins, 3 - p.battlesPlayed) for p in
-            #         clan.participants
-            #         if p.battlesPlayed < 1
-            #     ])
-            # else:
-            #     p_value = ''
-            #
-            # p_value = smart_truncate(p_value, length=400)
-            #
-            # o += [p_value]
 
         return '\n'.join(o)
 
@@ -871,28 +857,6 @@ class Clans:
 
     def save_settings(self):
         dataIO.save_json(JSON, self.settings)
-
-    async def update_cw_message_time(self, message):
-        await asyncio.sleep(CLAN_WARS_SLEEP)
-        # Only update if in settings
-        try:
-            server = message.server
-            message_id = self.settings['clan_wars'][server.id]["message_id"]
-        except KeyError:
-            return
-        else:
-            if message_id != message.id:
-                return
-
-        if os.path.exists(CLAN_WARS_CACHE):
-            clans = dataIO.load_json(CLAN_WARS_CACHE)
-            # em = self.clanwars_embed(clans)
-            # await self.bot.edit_message(message, embed=em)
-
-            s = self.clanwars_str(clans)
-            await self.bot.edit_message(message, s)
-
-            self.task = self.bot.loop.create_task(self.update_cw_message(message))
 
     async def update_cw_message(self, message, count_down=None):
         await asyncio.sleep(10)
