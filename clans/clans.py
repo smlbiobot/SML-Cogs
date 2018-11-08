@@ -110,7 +110,7 @@ def smart_truncate(content, length=100, suffix='...'):
         return ' '.join(content[:length + 1].split(' ')[0:-1]) + suffix
 
 
-def emoji_value(emoji, value):
+def emoji_value(emoji, value, pad=5):
     emojis = {
         'win': '<:cwwarwin:450890799312404483>',
         'crown': '<:crownblue:337975460405444608>',
@@ -118,15 +118,19 @@ def emoji_value(emoji, value):
         'trophy': '<:cwtrophy:450878327880941589>'
     }
     if isinstance(value, int):
-        s_value = '{:,}'.format(value)
+        s_value = wrap_inline('{: >{width}}'.format(value, width=pad))
     else:
-        s_value = value
+        s_value = wrap_inline('{: >{width}}'.format(value, width=pad))
 
     if emoji in emojis.keys():
-        s = "{} {}".format(emojis[emoji], s_value)
+        s = "{} {}".format(s_value, emojis[emoji])
     else:
         s = s_value
     return s
+
+
+def wrap_inline(str):
+    return '`\u2800{}\u2800`'.format(str)
 
 
 class APIError(Exception):
@@ -262,8 +266,8 @@ class Clans:
             raise APIError('json.decoder.JSONDecodeError')
         except asyncio.TimeoutError:
             raise APIError('asyncio.TimeoutError')
-        except aiohttp.client_exceptions.ContentTypeError:
-            raise APIError('aiohttp.client_exceptions.ContentTypeError')
+        except Exception as e:
+            raise APIError('Unknown errors')
         else:
             return data
 
@@ -364,7 +368,6 @@ class Clans:
 
                     # delete channel messages
                     await self.bot.purge_from(channel, limit=5, before=message)
-
 
     async def post_clans(self, channel, *args):
         """Post clans to channel."""
@@ -625,12 +628,129 @@ class Clans:
         else:
             await self.bot.say("No results found.")
 
+    def clanwars_str(self, clans):
+        """
+        Clan Wars info as a str output (save space)
+        :param clans: list of clans
+        :return: str
+        """
+        import datetime as dt  # somehow dt not registered from global import
+
+        o = []
+
+        config = self.clans_config
+        legend = ("\n{wins} "
+                  "{crowns} "
+                  "{battles_played}"
+                  "{trophies}").format(
+
+            wins=emoji_value('win', 'Wins'),
+            crowns=emoji_value('crown', 'Crowns'),
+            battles_played=emoji_value('battle', 'Battles Played'),
+            trophies=emoji_value('trophy', 'CW Trophies')
+        )
+
+        o += [
+            config.name,
+            "\nLast updated: {}".format(dt.datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S UTC'))
+            + legend
+        ]
+
+        # Badge
+        badge_url = config.badge_url
+
+        # clan list
+        STATES = {
+            'collectionDay': 'Coll',
+            'warDay': 'War',
+            'notInWar': 'Not in War',
+            'matchMaking': 'Matchmaking',
+        }
+
+        for c in clans:
+            clan = Box(c, default_box=True)
+            state = clan.state
+            timespan = None
+            wins = clan.clan.wins
+            crowns = clan.clan.crowns
+            battles_played = clan.clan.battlesPlayed
+
+            if state == 'collectionDay':
+                end_time = clan.get('collectionEndTime')
+            elif state == 'warDay':
+                end_time = clan.get('warEndTime')
+            else:
+                end_time = None
+
+            if end_time is not None:
+                dt = arrow.get(end_time, 'YYYYMMDDTHHmmss.SSS').datetime
+                now = arrow.utcnow().datetime
+                span = dt - now
+                hours, remainder = divmod(span.total_seconds(), 3600)
+                minutes, seconds = divmod(remainder, 60)
+                timespan = '{: 2}h{: 2}m{: 2}s'.format(int(hours), int(minutes), int(seconds))
+
+            clan_name = clan.clan.name
+            clan_score = clan.clan.clanScore
+            name = '{}'.format(clan_name, clan_score)
+            state = clan.get('state', 'ERR')
+            if state in ['collectionDay', 'warDay']:
+                o += [
+                    wrap_inline(" "),
+                    (
+                            wrap_inline("{clan_name: <10} {state: <5} {timespan: >12}") +
+                            "\n{wins} "
+                            "{crowns} "
+                            "{battles_played}"
+                            "{trophies}"
+                    ).format(
+                        clan_name=clan_name,
+                        state=STATES.get(state, 'ERR'),
+                        timespan=timespan or '',
+                        wins=emoji_value('win', wins, 2),
+                        crowns=emoji_value('crown', crowns, 2),
+                        battles_played=emoji_value('battle', battles_played, 3),
+                        trophies=emoji_value('trophy', clan_score, 5)
+                    )
+                ]
+            else:
+                o += [
+                    "{clan_name:<15} {state:<5}".format(
+                        clan_name=clan_name,
+                        state=STATES.get(state, 'ERR')
+                    )
+                ]
+
+            # participants
+
+            # if state == 'collectionDay':
+            #     p_value = ' '.join([
+            #         '<:cwbattle:450889588215513089>{}: {} '.format(p.name, p.wins, 3 - p.battlesPlayed) for p in
+            #         clan.participants
+            #         if p.battlesPlayed < 3
+            #     ])
+            # elif state == 'warDay':
+            #     p_value = ' '.join([
+            #         '<:cwbattle:450889588215513089>{}: {} '.format(p.name, p.wins, 3 - p.battlesPlayed) for p in
+            #         clan.participants
+            #         if p.battlesPlayed < 1
+            #     ])
+            # else:
+            #     p_value = ''
+            #
+            # p_value = smart_truncate(p_value, length=400)
+            #
+            # o += [p_value]
+
+        return '\n'.join(o)
+
     def clanwars_embed(self, clans):
         """Clan wars info embed.
 
         This allows us to update status easily by supplying new data.
         """
-        import datetime as dt
+        import datetime as dt  # somehow dt not registered from global import
+
         config = self.clans_config
         legend = ("\n{wins} "
                   "{crowns} "
@@ -766,8 +886,11 @@ class Clans:
 
         if os.path.exists(CLAN_WARS_CACHE):
             clans = dataIO.load_json(CLAN_WARS_CACHE)
-            em = self.clanwars_embed(clans)
-            await self.bot.edit_message(message, embed=em)
+            # em = self.clanwars_embed(clans)
+            # await self.bot.edit_message(message, embed=em)
+
+            s = self.clanwars_str(clans)
+            await self.bot.edit_message(message, s)
 
             self.task = self.bot.loop.create_task(self.update_cw_message(message))
 
@@ -795,15 +918,25 @@ class Clans:
         else:
             clans = await self.get_clanwars()
 
-        em = self.clanwars_embed(clans)
+        # em = self.clanwars_embed(clans)
+        #
+        # if new_message:
+        #     channel = message.channel
+        #     await self.bot.delete_message(message)
+        #     message = await self.bot.send_message(channel, embed=em)
+        #     await self.set_clanwars_message_id(message)
+        # else:
+        #     await self.bot.edit_message(message, embed=em)
+
+        s = self.clanwars_str(clans)
 
         if new_message:
             channel = message.channel
             await self.bot.delete_message(message)
-            message = await self.bot.send_message(channel, embed=em)
+            message = await self.bot.send_message(channel, s)
             await self.set_clanwars_message_id(message)
         else:
-            await self.bot.edit_message(message, embed=em)
+            await self.bot.edit_message(message, s)
 
         self.task = self.bot.loop.create_task(self.update_cw_message(message, count_down=count_down))
 
@@ -860,8 +993,13 @@ class Clans:
         await self.bot.type()
 
         clans = await self.get_clanwars()
-        em = self.clanwars_embed(clans)
-        message = await self.bot.say(embed=em)
+        # em = self.clanwars_embed(clans)
+        # message = await self.bot.say(embed=em)
+
+        s = self.clanwars_str(clans)
+        for page in pagify(s):
+            await self.bot.say(page)
+        # message = await self.bot.say(s)
 
     def check_settings(self, server=None):
         """Init server with defaults"""
@@ -953,8 +1091,17 @@ class Clans:
                 if channel is not None:
                     # post clan wars status
                     clans = await self.get_clanwars()
-                    em = self.clanwars_embed(clans)
-                    message = await self.bot.send_message(channel, embed=em)
+                    # em = self.clanwars_embed(clans)
+                    # message = await self.bot.send_message(channel, embed=em)
+
+                    s = self.clanwars_str(clans)
+                    messages = []
+                    for page in pagify(s):
+                        messages.append(
+                            await self.bot.send_message(channel, page)
+                        )
+
+                    message = messages[0]
 
                     # delete channel messages
                     await self.bot.purge_from(channel, limit=5, before=message)
