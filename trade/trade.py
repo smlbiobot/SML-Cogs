@@ -153,18 +153,18 @@ class Trade:
 
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
-                data = await resp.read()
+                data = await resp.text()
 
         reader = csv.DictReader(io.StringIO(data))
 
-        def get_field(row, field, is_card=False, is_clan_tag=False):
+        async def get_field(row, field, is_card=False, is_clan_tag=False):
             s = row.get(field)
             v = None
             if s is None:
                 return None
             if is_card:
                 s = s.lower().replace(' ', '-')
-                v = self.aka_to_card(s)
+                v = await self.aka_to_card(s)
             elif is_clan_tag:
                 v = clean_tag(s)
             return v
@@ -173,9 +173,9 @@ class Trade:
 
         for row in reader:
             # normalize string
-            give_card = get_field(row, 'give', is_card=True)
-            get_card = get_field(row, 'get', is_card=True)
-            clan_tag = get_field(row, 'clan_tag', is_clan_tag=True)
+            give_card = await get_field(row, 'give', is_card=True)
+            get_card = await get_field(row, 'get', is_card=True)
+            clan_tag = await get_field(row, 'clan_tag', is_clan_tag=True)
             dicts.append(dict(
                 give_card=give_card,
                 get_card=get_card,
