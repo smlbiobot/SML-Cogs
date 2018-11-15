@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Trade",
+	"DESCRIPTION": "Clash Royale Trading Helper",
+	"DISABLED": false,
+	"NAME": "Trade",
+	"REQUIREMENTS": ["addict", "pyyaml"],
+	"TAGS": ["Trade"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}
