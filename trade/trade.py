@@ -35,6 +35,7 @@ import yaml
 from addict import Dict
 from discord.ext import commands
 
+from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 
@@ -59,6 +60,20 @@ def clean_tag(tag):
     t = t.strip()
     t = t.upper()
     return t
+
+
+TagValidation = namedtuple("TagValidation", "valid invalid_chars")
+
+
+def validate_tag(tag) -> TagValidation:
+    invalid_chars = []
+    for letter in tag:
+        if letter not in '0289CGJLPQRUVY':
+            invalid_chars.append(letter)
+
+    if len(invalid_chars):
+        return TagValidation(False, invalid_chars)
+    return TagValidation(True, [])
 
 
 def get_now_timestamp():
@@ -99,12 +114,16 @@ class Settings(Dict):
         if not self[server_id].trades:
             self[server_id].trades = dict()
 
+    def reset_server(self, server_id):
+        self[server_id].trades = dict()
+        self.save()
+
     def remove_old_trades(self, server_id):
         """Look for trade items that’s older than 24 hours and remove them."""
         now = get_now_timestamp()
         day = dt.timedelta(days=1).total_seconds() * 1000
         for k, v in self[server_id].trades.copy().items():
-            if abs(now - v.timestamp) > day:
+            if abs(now - v.get('timestamp')) > day:
                 self.pop(k)
 
     def add_trade_item(self, item: TradeItem):
@@ -193,6 +212,14 @@ class Trade:
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
+    @checks.serverowner_or_permissions(manage_server=True)
+    @trade.command(name="reset", pass_context=True)
+    async def reset_server_trades(self, ctx):
+        """Reset all trades on server."""
+        server = ctx.message.server
+        self.settings.reset_server(server.id)
+        await self.bot.say("Server trades reset: all trades removed.")
+
     @trade.command(name="add", aliases=['a'], pass_context=True)
     async def add_trade(self, ctx, give: str, get: str, clan_tag: str):
         """Add a trade. Can use card shorthand"""
@@ -202,6 +229,21 @@ class Trade:
         give_card = await self.aka_to_card(give)
         get_card = await self.aka_to_card(get)
         clan_tag = clean_tag(clan_tag)
+
+        # validate clan tag
+        valid = validate_tag(clan_tag)
+        if not valid.valid:
+            await self.bot.say("Your clan tags include invalid characters: {}".format(', '.join(valid.invalid_chars)))
+            return
+
+        # validate cards
+        if give_card is None:
+            await self.bot.say("Unknown card: {}".format(give))
+            return
+
+        if get_card is None:
+            await self.bot.say("Unknown card: {}".format(get))
+            return
 
         rarities = []
         for c in [give_card, get_card]:
