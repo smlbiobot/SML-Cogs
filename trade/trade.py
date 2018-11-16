@@ -476,6 +476,16 @@ class Trade:
 
     async def send_trade_list(self, channel, items):
         o = []
+        def sort_items(item):
+            R = dict(
+                Common=1,
+                Rare=2,
+                Epic=3,
+                Legendary=4
+            )
+            return R.get(item.rarity), item.get_card, item.give_card
+
+        items = sorted(items, key=sort_items)
         for item in items:
             time = dt.datetime.utcfromtimestamp(item.timestamp)
             d = item._asdict()
