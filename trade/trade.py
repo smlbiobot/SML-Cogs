@@ -100,6 +100,7 @@ TradeItem = namedtuple(
         "timestamp"
     ]
 )
+TradeItem.__new__.__defaults__ = (None,) * len(TradeItem._fields)
 
 
 class Settings(Dict):
@@ -135,6 +136,25 @@ class Settings(Dict):
             self.save()
             return True
         return False
+
+    def remove_trade_item(self, item: TradeItem):
+        self.check_server(item.server_id)
+
+        removed = False
+
+        trades = self[item.server_id].trades
+        for k, v in trades.copy().items():
+            if all([
+                v.get('get_card') == item.get_card,
+                v.get('give_card') == item.give_card,
+                v.get('clan_tag') == item.clan_tag,
+            ]):
+                trades.pop(k)
+                removed = True
+
+        self.save()
+
+        return removed
 
     def get_trades(self, server_id):
         """Return list of trades"""
@@ -272,6 +292,26 @@ class Trade:
             )
         )
 
+    @trade.command(name="remove", aliases=['rm', 'r'], pass_context=True)
+    async def remove_trade(self, ctx, give: str, get: str, clan_tag: str):
+        """Remove a trade. Can use card shorthand"""
+        server = ctx.message.server
+
+        give_card = await self.aka_to_card(give)
+        get_card = await self.aka_to_card(get)
+        clan_tag = clean_tag(clan_tag)
+
+        trade_item = TradeItem(
+            server_id=server.id,
+            give_card=give_card,
+            get_card=get_card,
+            clan_tag=clan_tag
+        )
+        if self.settings.remove_trade_item(trade_item):
+            await self.bot.say('Trade removed')
+        else:
+            await self.bot.say("Cannot find your trade.")
+
     @trade.command(name="import", aliases=['i'], pass_context=True)
     async def import_trade(self, ctx):
         """Import list of trades from CSV file.
@@ -373,6 +413,8 @@ class Trade:
 
         o = []
 
+        included_items = []
+
         for item in items:
             # skip invalid items
             if not all([item.give_card, item.get_card, item.rarity]):
@@ -395,6 +437,14 @@ class Trade:
                 if item.get_card != card:
                     continue
 
+            included_items.append(item)
+
+        channel = ctx.message.channel
+        await self.send_trade_list(channel, included_items)
+
+    async def send_trade_list(self, channel, items):
+        o = []
+        for item in items:
             time = dt.datetime.utcfromtimestamp(item.timestamp)
             d = item._asdict()
             d.update(dict(
@@ -410,11 +460,11 @@ class Trade:
             )
 
         if not len(o):
-            await self.bot.say("No items found matching your request.")
+            await self.bot.send_message(channel, "No items found matching your request.")
             return
 
         for page in pagify("\n".join(o)):
-            await self.bot.say(page)
+            await self.bot.send_message(channel, page)
 
 
 def check_folder():
