@@ -336,6 +336,11 @@ class Trade:
             if not all([item.give_card, item.get_card, item.rarity]):
                 continue
 
+            # filter rarities
+            if pa.rarity:
+                if item.rarity[0].lower() != pa.rarity[0].lower():
+                    continue
+
             time = dt.datetime.utcfromtimestamp(item.timestamp)
             d = item._asdict()
             d.update(dict(
@@ -349,6 +354,10 @@ class Trade:
             o.append(
                 "Give: {give_card_emoji} Get: {get_card_emoji} `{s}{r} #{clan_tag:<9} {time_span}{s}`".format(**d)
             )
+
+        if not len(o):
+            await self.bot.say("No items found matching your request.")
+            return
 
         for page in pagify("\n".join(o)):
             await self.bot.say(page)
