@@ -40,6 +40,7 @@ import unidecode
 import yaml
 from discord.ext import commands
 from tabulate import tabulate
+import datetime as dt
 
 from cogs.utils import checks
 from cogs.utils.chat_formatting import box, inline, pagify, underline
@@ -48,6 +49,9 @@ from cogs.utils.dataIO import dataIO
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
 PLAYERS = os.path.join("data", "racf_audit", "player_db.json")
+
+RACF_SERVER_ID = '218534373169954816'
+SML_SERVER_ID = '275395656955330560'
 
 
 def nested_dict():
@@ -190,14 +194,6 @@ class DiscordUsers:
 
 def clean_tag(tag):
     """clean up tag."""
-    # if tag is None:
-    #     return None
-    # t = tag
-    # if t.startswith('#'):
-    #     t = t[1:]
-    # t = t.strip()
-    # t = t.upper()
-    # return t
     t = tag.upper()
     t = t.replace('B', '8').replace('O', '0')
     t = re.sub(r'[^0289CGJLPQRUVY]+', '', t)
@@ -759,7 +755,7 @@ class RACFAudit:
         if pargs.exec:
             channel = ctx.message.channel
             await self.bot.type()
-            await self.racfaudit_exec(channel=channel, audit_results=result.audit_results, server=server)
+            await self.exec_racf_audit(channel=channel, audit_results=result.audit_results, server=server)
 
         await self.bot.say("Audit finished.")
 
@@ -929,8 +925,9 @@ class RACFAudit:
             error=error
         )
 
-    async def racfaudit_exec(self, channel: discord.Channel = None, audit_results=None, server=None):
+    async def exec_racf_audit(self, channel: discord.Channel = None, audit_results=None, server=None):
         """Execute audit and output to specific channel."""
+
         async def exec_add_roles(d_member, roles, channel=None):
             # print("add roles", d_member, [r.name for r in roles])
             # await asyncio.sleep(0)
@@ -1273,6 +1270,50 @@ class RACFAudit:
                 for page in pagify(' '.join(out)):
                     await self.bot.say(page)
 
+    @racfaudit.command(name="auto", pass_context=True, no_pm=True)
+    @checks.admin_or_permissions(manager_server=True)
+    async def racfaudit_auto(self, ctx, channel: discord.Channel = None):
+        """Auto audit server"""
+        server = ctx.message.server
+        enabled = channel is not None
+        channel_id = None
+        if channel is not None:
+            channel_id = channel.id
+
+        if not self.settings.get('auto_audit_servers'):
+            self.settings['auto_audit_servers'] = dict()
+
+        self.settings['auto_audit_servers'][server.id] = dict(
+            enabled=enabled,
+            channel_id=channel_id
+        )
+        dataIO.save_json(JSON, self.settings)
+
+        if enabled:
+            await self.bot.say("Auto audit enabled")
+        else:
+            await self.bot.say("Auto audit disabled")
+
+    async def run_audit_task(self):
+        """Auto run audit."""
+        while self == self.bot.get_cog("RACFAudit"):
+            try:
+                for server_id, v in self.settings.get('auto_audit_servers', {}).items():
+                    if server_id in [RACF_SERVER_ID, SML_SERVER_ID]:
+                        channel_id = v.get('channel_id')
+                        enabled = v.get('enabled')
+                        if enabled:
+                            channel = self.bot.get_channel(channel_id)
+                            server = self.bot.get_server(server_id)
+                            if channel is not None:
+                                result = await self.run_racfaudit(server)
+                                await self.exec_racf_audit(channel, audit_results=result.audit_results, server=server)
+            except Exception:
+                pass
+            finally:
+                interval = int(dt.timedelta(days=1).total_seconds())
+                await asyncio.sleep(interval)
+
 
 def check_folder():
     """Check folder."""
@@ -1292,3 +1333,4 @@ def setup(bot):
     check_file()
     n = RACFAudit(bot)
     bot.add_cog(n)
+    bot.loop.create_task(n.run_audit_task())
