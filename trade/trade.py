@@ -330,7 +330,7 @@ class Trade:
         items = self.settings.get_trades(server.id)
 
         o = []
-        now = dt.datetime.utcnow()
+
         for item in items:
             # skip invalid items
             if not all([item.give_card, item.get_card, item.rarity]):
@@ -339,6 +339,18 @@ class Trade:
             # filter rarities
             if pa.rarity:
                 if item.rarity[0].lower() != pa.rarity[0].lower():
+                    continue
+
+            # filter give
+            if pa.give:
+                card = await self.aka_to_card(pa.give)
+                if item.give_card != card:
+                    continue
+
+            # filter get
+            if pa.get:
+                card = await self.aka_to_card(pa.get)
+                if item.get_card != card:
                     continue
 
             time = dt.datetime.utcfromtimestamp(item.timestamp)
