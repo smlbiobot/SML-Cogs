@@ -27,8 +27,10 @@ from collections import namedtuple
 
 import aiohttp
 import argparse
+import asyncio
 import csv
 import datetime as dt
+import discord
 import io
 import os
 import yaml
@@ -163,6 +165,20 @@ class Settings(Dict):
         trades = [TradeItem(**v) for k, v in self[server_id].trades.items()]
         return trades
 
+    def enable_auto(self, server_id, channel_id):
+        """Enable auto posting"""
+        self.check_server(server_id)
+        self[server_id].auto.enabled = True
+        self[server_id].auto.channel_id = channel_id
+        self.save()
+
+    def disable_auto(self, server_id):
+        """Disable auto posting"""
+        self.check_server(server_id)
+        self[server_id].auto.enabled = False
+        self[server_id].auto.channel_id = None
+        self.save()
+
 
 class Trade:
     """Clash Royale Trading"""
@@ -239,6 +255,22 @@ class Trade:
         server = ctx.message.server
         self.settings.reset_server(server.id)
         await self.bot.say("Server trades reset: all trades removed.")
+
+    @checks.mod_or_permissions()
+    @trade.command(name="auto_on", pass_context=True)
+    async def enable_auto_trade_channel(self, ctx, channel: discord.Channel):
+        """Set channel for auto trade listings."""
+        server = ctx.message.server
+        self.settings.enable_auto(server.id, channel.id)
+        await self.bot.say("Auto sending trade list.")
+
+    @checks.mod_or_permissions()
+    @trade.command(name="auto_off", pass_context=True)
+    async def disable_auto_trade_channel(self, ctx):
+        """Set channel for auto trade listings."""
+        server = ctx.message.server
+        self.settings.disable_auto(server.id)
+        await self.bot.say("Disabled auto trade list.")
 
     @trade.command(name="add", aliases=['a'], pass_context=True)
     async def add_trade(self, ctx, give: str, get: str, clan_tag: str):
@@ -463,8 +495,36 @@ class Trade:
             await self.bot.send_message(channel, "No items found matching your request.")
             return
 
+        first_message = None
+
         for page in pagify("\n".join(o)):
-            await self.bot.send_message(channel, page)
+            msg = await self.bot.send_message(channel, page)
+            if first_message is None:
+                first_message = msg
+
+        return first_message
+
+    async def auto_post_trades(self):
+        """Post trades to channel."""
+        for server_id, v in self.settings.items():
+            if v.auto and v.auto.enabled:
+                channel_id = v.auto.channel_id
+                channel = self.bot.get_channel(channel_id)
+                if channel is not None:
+                    msg = await self.send_trade_list(channel, self.settings.get_trades(server_id))
+
+                    # delete channel messages
+                    await self.bot.purge_from(channel, limit=10, before=msg)
+
+    async def auto_post_trades_task(self):
+        """Task: post embed to channel."""
+        while self == self.bot.get_cog("Trade"):
+            try:
+                await self.auto_post_trades()
+            except Exception:
+                pass
+            finally:
+                await asyncio.sleep(57)
 
 
 def check_folder():
@@ -484,3 +544,4 @@ def setup(bot):
     check_file()
     n = Trade(bot)
     bot.add_cog(n)
+    bot.loop.create_task(n.auto_post_trades_task())
