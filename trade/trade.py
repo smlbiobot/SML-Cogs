@@ -61,6 +61,19 @@ def clean_tag(tag):
     return t
 
 
+def get_now_timestamp():
+    return dt.datetime.utcnow().replace(tzinfo=dt.timezone.utc).timestamp()
+
+
+def format_timespan(time):
+    now = dt.datetime.utcnow()
+    delta = now - time
+    s = delta.total_seconds()
+    hours, remainder = divmod(s, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return '{: >2}h {: >2}m'.format(int(hours), int(minutes))
+
+
 TradeItem = namedtuple(
     "TradeItem", [
         "server_id",
@@ -84,18 +97,31 @@ class Settings(Dict):
 
     def check_server(self, server_id):
         if not self[server_id].trades:
-            self[server_id].trades = []
+            self[server_id].trades = dict()
+
+    def remove_old_trades(self, server_id):
+        """Look for trade items that’s older than 24 hours and remove them."""
+        now = get_now_timestamp()
+        day = dt.timedelta(days=1).total_seconds() * 1000
+        for k, v in self[server_id].trades.copy().items():
+            if abs(now - v.timestamp) > day:
+                self.pop(k)
 
     def add_trade_item(self, item: TradeItem):
-        """Add trade item."""
+        """Add trade item if valid."""
         self.check_server(item.server_id)
-        self[item.server_id].trades.append(item._asdict())
-        self.save()
+        id_ = str(item.timestamp)
+        if all([item.give_card, item.get_card, item.rarity]):
+            self[item.server_id].trades[id_] = item._asdict()
+            self.save()
+            return True
+        return False
 
     def get_trades(self, server_id):
         """Return list of trades"""
         self.check_server(server_id)
-        trades = [TradeItem(**item) for item in self[server_id].trades]
+        self.remove_old_trades(server_id)
+        trades = [TradeItem(**v) for k, v in self[server_id].trades.items()]
         return trades
 
 
@@ -161,10 +187,6 @@ class Trade:
                 return '<:{name}:{id}>'.format(name=emoji.name, id=emoji.id)
         return ''
 
-    def get_now_timestamp(self):
-        return dt.datetime.utcnow().replace(tzinfo=dt.timezone.utc).timestamp()
-
-
     @commands.group(name="trade", pass_context=True)
     async def trade(self, ctx):
         """Clash Royale trades."""
@@ -197,7 +219,7 @@ class Trade:
                                                get_card=get_card,
                                                clan_tag=clan_tag,
                                                rarity=rarity,
-                                               timestamp=self.get_now_timestamp()))
+                                               timestamp=get_now_timestamp()))
         self.settings.save()
         await self.bot.say(
             "Give: {give_card}, Get: {get_card}, {clan_tag}, {rarity}".format(
@@ -271,7 +293,7 @@ class Trade:
                         get_card=get_card,
                         clan_tag=clan_tag,
                         rarity=rarities[0],
-                        timestamp=self.get_now_timestamp()
+                        timestamp=get_now_timestamp()
                     )
                 )
 
@@ -313,20 +335,15 @@ class Trade:
             # skip invalid items
             if not all([item.give_card, item.get_card, item.rarity]):
                 continue
-            time = dt.datetime.utcfromtimestamp(item.timestamp)
-            delta = now - time
-            s = delta.total_seconds()
-            hours, remainder = divmod(s, 3600)
-            minutes, seconds = divmod(remainder, 60)
-            time_span = '{: >2}h {: >2}m'.format(int(hours), int(minutes))
 
+            time = dt.datetime.utcfromtimestamp(item.timestamp)
             d = item._asdict()
             d.update(dict(
                 give_card_emoji=self.get_emoji(item.give_card),
                 get_card_emoji=self.get_emoji(item.get_card),
                 r=item.rarity[0].upper(),
                 s='\u2800',
-                time_span=time_span
+                time_span=format_timespan(time)
             ))
 
             o.append(
@@ -335,6 +352,7 @@ class Trade:
 
         for page in pagify("\n".join(o)):
             await self.bot.say(page)
+
 
 def check_folder():
     """Check folder."""
