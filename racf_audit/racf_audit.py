@@ -27,6 +27,7 @@ DEALINGS IN THE SOFTWARE.
 import itertools
 from collections import OrderedDict
 from collections import defaultdict
+from collections import namedtuple
 
 import aiohttp
 import argparse
@@ -41,7 +42,7 @@ from discord.ext import commands
 from tabulate import tabulate
 
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify, box, inline, underline
+from cogs.utils.chat_formatting import box, inline, pagify, underline
 from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "racf_audit")
@@ -105,6 +106,9 @@ class RACFAuditException(Exception):
 
 class CachedClanModels(RACFAuditException):
     pass
+
+
+AuditResult = namedtuple("AuditResult", "audit_results output error")
 
 
 class RACFClan:
@@ -728,7 +732,6 @@ class RACFAudit:
         if not verified:
             return
 
-        channel = ctx.message.channel
         server = ctx.message.server
 
         parser = self.run_args_parser()
@@ -738,21 +741,50 @@ class RACFAudit:
             await self.bot.send_cmd_help(ctx)
             return
 
-        option_debug = pargs.debug
-        option_exec = pargs.exec
+        # Show settings
+        if pargs.settings:
+            await ctx.invoke(self.racfaudit_config)
 
         await self.bot.type()
+
+        clan_filters = []
+        if pargs.clan:
+            clan_filters = pargs.clan
+
+        result = await self.run_racfaudit(server, clan_filters=clan_filters)
+
+        for page in pagify('\n'.join(result.output)):
+            await self.bot.say(page)
+
+        if pargs.exec:
+            channel = ctx.message.channel
+            await self.bot.type()
+            await self.racfaudit_exec(channel=channel, audit_results=result.audit_results, server=server)
+
+        await self.bot.say("Audit finished.")
+
+    async def run_racfaudit(self, server: discord.Server, clan_filters=None) -> AuditResult:
+        """Run audit and return results."""
+        audit_results = {
+            "elder_promotion_req": [],
+            "coleader_promotion_req": [],
+            "leader_promotion_req": [],
+            "no_discord": [],
+            "no_clan_role": [],
+            "no_member_role": [],
+            "not_in_our_clans": [],
+        }
+
+        error = False
+        out = []
 
         try:
             member_models = await self.family_member_models()
         except ClashRoyaleAPIError as e:
-            await self.bot.say(e.status_message)
-            return
+            # await self.bot.say(e.status_message)
+            error = True
         else:
-            await self.bot.say("**100T Family Audit**")
-            # Show settings
-            if pargs.settings:
-                await ctx.invoke(self.racfaudit_config)
+            out.append("**100T Family Audit**")
 
             # associate Discord user to member
             for member_model in member_models:
@@ -763,24 +795,6 @@ class RACFAudit:
                     pass
                 else:
                     member_model['discord_member'] = server.get_member(discord_id)
-
-            if option_debug:
-                for member_model in member_models:
-                    print(member_model.get('tag'), member_model.get('discord_member'))
-
-            """
-            Member processing.
-    
-            """
-            audit_results = {
-                "elder_promotion_req": [],
-                "coleader_promotion_req": [],
-                "leader_promotion_req": [],
-                "no_discord": [],
-                "no_clan_role": [],
-                "no_member_role": [],
-                "not_in_our_clans": [],
-            }
 
             # find member_models mismatch
             discord_members = []
@@ -851,15 +865,14 @@ class RACFAudit:
                 )
                 return row
 
-            out = []
             for clan in self.config['clans']:
-                await self.bot.type()
+                # await self.bot.type()
                 await asyncio.sleep(0)
 
                 display_output = False
 
-                if pargs.clan:
-                    for c in pargs.clan:
+                if clan_filters:
+                    for c in clan_filters:
                         if c.lower() in clan['name'].lower():
                             display_output = True
                 else:
@@ -910,89 +923,84 @@ class RACFAudit:
             for result in audit_results['not_in_our_clans']:
                 out.append('`{}` {}'.format(result, result.id))
 
-            for page in pagify('\n'.join(out)):
-                await self.bot.say(page)
+        return AuditResult(
+            audit_results=audit_results,
+            output=out,
+            error=error
+        )
 
-            if option_exec:
-                tasks = []
-                channel = ctx.message.channel
+    async def racfaudit_exec(self, channel: discord.Channel = None, audit_results=None, server=None):
+        """Execute audit and output to specific channel."""
+        async def exec_add_roles(d_member, roles, channel=None):
+            # print("add roles", d_member, [r.name for r in roles])
+            # await asyncio.sleep(0)
+            await self.bot.add_roles(d_member, *roles)
+            if channel is not None:
+                await self.bot.send_message(channel,
+                                            "Add {} to {}".format(", ".join([r.name for r in roles]), d_member))
 
-                async def exec_add_roles(d_member, roles, channel=None):
-                    # print("add roles", d_member, [r.name for r in roles])
-                    # await asyncio.sleep(0)
-                    await self.bot.add_roles(d_member, *roles)
-                    if channel is not None:
-                        await self.bot.send_message(channel,
-                                                    "Add {} to {}".format(", ".join([r.name for r in roles]), d_member))
+        async def exec_remove_roles(d_member, roles, channel=None):
+            # print("remove roles", d_member, [r.name for r in roles])
+            # await asyncio.sleep(0)
+            await self.bot.remove_roles(d_member, *roles)
+            if channel is not None:
+                await self.bot.send_message(channel,
+                                            "Remove {} from {}".format(", ".join([r.name for r in roles]),
+                                                                       d_member))
 
-                async def exec_remove_roles(d_member, roles, channel=None):
-                    # print("remove roles", d_member, [r.name for r in roles])
-                    # await asyncio.sleep(0)
-                    await self.bot.remove_roles(d_member, *roles)
-                    if channel is not None:
-                        await self.bot.send_message(channel,
-                                                    "Remove {} from {}".format(", ".join([r.name for r in roles]),
-                                                                               d_member))
+        # change clan roles
+        for result in audit_results["no_clan_role"]:
+            try:
+                member_model = result['member_model']
+                discord_member = result['discord_member']
+                clan_role_name = self.clan_roles[member_model['clan']['name']]
+                other_clan_role_names = [r for r in self.clan_roles.values() if r != clan_role_name]
+                for rname in other_clan_role_names:
+                    role = discord.utils.get(discord_member.roles, name=rname)
+                    if role is not None:
+                        await exec_remove_roles(discord_member, [role], channel=channel)
 
-                # change clan roles
-                for result in audit_results["no_clan_role"]:
-                    try:
-                        member_model = result['member_model']
-                        discord_member = result['discord_member']
-                        clan_role_name = self.clan_roles[member_model['clan']['name']]
-                        other_clan_role_names = [r for r in self.clan_roles.values() if r != clan_role_name]
-                        for rname in other_clan_role_names:
-                            role = discord.utils.get(discord_member.roles, name=rname)
-                            if role is not None:
-                                await exec_remove_roles(discord_member, [role], channel=channel)
+                role = discord.utils.get(server.roles, name=clan_role_name)
+                if role is not None:
+                    await exec_add_roles(discord_member, [role], channel=channel)
+            except KeyError:
+                pass
 
-                        role = discord.utils.get(server.roles, name=clan_role_name)
-                        if role is not None:
-                            await exec_add_roles(discord_member, [role], channel=channel)
-                    except KeyError:
-                        pass
+        member_role = discord.utils.get(server.roles, name='Member')
+        visitor_role = discord.utils.get(server.roles, name='Visitor')
+        for discord_member in audit_results["no_member_role"]:
+            try:
+                if member_role is not None:
+                    await exec_add_roles(discord_member, [member_role], channel=channel)
 
-                member_role = discord.utils.get(server.roles, name='Member')
-                visitor_role = discord.utils.get(server.roles, name='Visitor')
-                for discord_member in audit_results["no_member_role"]:
-                    try:
-                        if member_role is not None:
-                            await exec_add_roles(discord_member, [member_role], channel=channel)
+                if visitor_role is not None:
+                    await exec_remove_roles(discord_member, [visitor_role], channel=channel)
 
-                        if visitor_role is not None:
-                            await exec_remove_roles(discord_member, [visitor_role], channel=channel)
+            except KeyError:
+                pass
 
-                    except KeyError:
-                        pass
+        # remove member roles from people who are not in our clans
+        for result in audit_results['not_in_our_clans']:
+            result_role_names = [r.name for r in result.roles]
+            # ignore people with special
+            if 'Special' in result_role_names:
+                continue
+            if 'Keep-Member' in result_role_names:
+                continue
+            if 'Leader-Emeritus' in result_role_names:
+                continue
 
-                # remove member roles from people who are not in our clans
-                for result in audit_results['not_in_our_clans']:
-                    result_role_names = [r.name for r in result.roles]
-                    # ignore people with special
-                    if 'Special' in result_role_names:
-                        continue
-                    if 'Keep-Member' in result_role_names:
-                        continue
-                    if 'Leader-Emeritus' in result_role_names:
-                        continue
-
-                    to_remove_role_names = []
-                    for role_name in ['Member', 'Tourney', 'Practice', 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo',
-                                      'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen', 'Trade', 'CW', 'Diary']:
-                        if role_name in result_role_names:
-                            to_remove_role_names.append(role_name)
-                    to_remove_roles = [discord.utils.get(server.roles, name=rname) for rname in to_remove_role_names]
-                    to_remove_roles = [r for r in to_remove_roles if r is not None]
-                    if len(to_remove_roles):
-                        await exec_remove_roles(result, to_remove_roles, channel=channel)
-                    if visitor_role is not None:
-                        await exec_add_roles(result, [visitor_role], channel=channel)
-
-                # exec tasks
-                await self.bot.type()
-                # await asyncio.gather(*tasks)
-
-            await self.bot.say("Audit finished.")
+            to_remove_role_names = []
+            for role_name in ['Member', 'Tourney', 'Practice', 'Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo',
+                              'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen', 'Trade', 'CW', 'Diary']:
+                if role_name in result_role_names:
+                    to_remove_role_names.append(role_name)
+            to_remove_roles = [discord.utils.get(server.roles, name=rname) for rname in to_remove_role_names]
+            to_remove_roles = [r for r in to_remove_roles if r is not None]
+            if len(to_remove_roles):
+                await exec_remove_roles(result, to_remove_roles, channel=channel)
+            if visitor_role is not None:
+                await exec_add_roles(result, [visitor_role], channel=channel)
 
     @racfaudit.command(name="rank", pass_context=True)
     async def racfaudit_rank(self, ctx, *names):
