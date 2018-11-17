@@ -160,10 +160,17 @@ class BrawlStars:
     def _player_mini_str(self, player: BSPlayer):
         """Minimal player profile for verification."""
         avatar = self.get_emoji(player.avatarId)
+        band = player.band
+        if band is None:
+            band = dict(
+                role='--',
+                name='No Clan',
+                tag='--'
+            )
         o = [
             '{}'.format(avatar),
             '{} #{}'.format(bold(player.name), player.tag),
-            '{}, {} #{}'.format(player.band.role, player.band.name, player.band.tag),
+            '{}, {} #{}'.format(band.role, band.name, band.tag),
             '{} {} / {}'.format(self.get_emoji('bstrophy'), player.trophies, player.highestTrophies),
         ]
         return "\n".join(o)
