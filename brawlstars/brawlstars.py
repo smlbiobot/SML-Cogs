@@ -162,11 +162,11 @@ class BrawlStars:
         avatar = self.get_emoji(player.avatarId)
         band = player.band
         if band is None:
-            band = dict(
+            band = Box(dict(
                 role='--',
                 name='No Clan',
                 tag='--'
-            )
+            ))
         o = [
             '{}'.format(avatar),
             '{} #{}'.format(bold(player.name), player.tag),
