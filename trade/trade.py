@@ -583,7 +583,8 @@ class Trade:
             except Exception:
                 pass
             finally:
-                await asyncio.sleep(57)
+                interval = int(dt.timedelta(minutes=10).total_seconds())
+                await asyncio.sleep(interval)
 
 
 def check_folder():
