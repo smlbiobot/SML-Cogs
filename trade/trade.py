@@ -124,10 +124,11 @@ class Settings(Dict):
     def remove_old_trades(self, server_id):
         """Look for trade items that’s older than 24 hours and remove them."""
         now = get_now_timestamp()
-        day = dt.timedelta(days=1).total_seconds() * 1000
+        day = dt.timedelta(days=1).total_seconds()
         for k, v in self[server_id].trades.copy().items():
             if abs(now - v.get('timestamp')) > day:
                 self.pop(k)
+        self.save()
 
     def add_trade_item(self, item: TradeItem):
         """Add trade item if valid."""
@@ -566,6 +567,7 @@ class Trade:
     async def auto_post_trades(self):
         """Post trades to channel."""
         for server_id, v in self.settings.items():
+            self.settings.remove_old_trades(server_id)
             if v.auto and v.auto.enabled:
                 channel_id = v.auto.channel_id
                 channel = self.bot.get_channel(channel_id)
