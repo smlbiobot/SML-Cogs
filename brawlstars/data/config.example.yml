@@ -10,6 +10,7 @@ servers:
       - Brawl-Stars
     member_roles:
       - BS-Member
+      - Visitor
     visitor_roles:
       - Visitor
   - name: SML
