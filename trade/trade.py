@@ -61,6 +61,8 @@ def clean_tag(tag):
         t = t[1:]
     t = t.strip()
     t = t.upper()
+    t = t.replace('O', '0')
+    t = t.replace('B', '8')
     return t
 
 
