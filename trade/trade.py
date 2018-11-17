@@ -127,7 +127,7 @@ class Settings(Dict):
         day = dt.timedelta(days=1).total_seconds()
         for k, v in self[server_id].trades.copy().items():
             if abs(now - v.get('timestamp')) > day:
-                self.pop(k)
+                self[server_id].trades.pop(k)
         self.save()
 
     def add_trade_item(self, item: TradeItem):
