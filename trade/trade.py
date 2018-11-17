@@ -205,7 +205,11 @@ class Trade:
             akas = await self.get_cards_aka()
             self._aka_to_card = dict()
             for k, v in akas.items():
+                # assign card as card
                 self._aka_to_card[k] = k
+                # assign card without hyphen
+                if '-' in k:
+                    self._aka_to_card[k.replace('-', '')] = k
                 for item in v:
                     self._aka_to_card[item] = k
         return self._aka_to_card.get(abbreviation)
