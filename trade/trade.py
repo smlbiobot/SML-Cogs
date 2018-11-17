@@ -460,7 +460,7 @@ class Trade:
         channel = ctx.message.channel
         await self.send_trade_list(channel, included_items)
 
-    async def get_filtered_list(self, server: discord.Server = None, rarity=None, give_card=None, get_card=None):
+    async def get_filtered_list(self, server: discord.Server = None, rarity=None, give_card=None, get_card=None, clan_tag=None):
         """Return filtered list items"""
         items = self.settings.get_trades(server.id)
 
@@ -486,6 +486,11 @@ class Trade:
             if get_card is not None:
                 card = await self.aka_to_card(get_card)
                 if item.get_card != card:
+                    continue
+
+            # filter clan_tag
+            if clan_tag is not None:
+                if item.clan_tag != clan_tag:
                     continue
 
             included_items.append(item)
@@ -521,6 +526,17 @@ class Trade:
         included_items = await self.get_filtered_list(
             server=server,
             rarity=rarity
+        )
+        channel = ctx.message.channel
+        await self.send_trade_list(channel, included_items)
+
+    @trade.command(name="clan", aliases=['c', 'tag'], pass_context=True)
+    async def list_clan(self, ctx, clan_tag):
+        """Filter trades by rarity."""
+        server = ctx.message.server
+        included_items = await self.get_filtered_list(
+            server=server,
+            clan_tag=clan_tag
         )
         channel = ctx.message.channel
         await self.send_trade_list(channel, included_items)
