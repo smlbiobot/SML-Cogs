@@ -573,7 +573,7 @@ class Trade:
                     msg = await self.send_trade_list(channel, self.settings.get_trades(server_id))
 
                     # delete channel messages
-                    await self.bot.purge_from(channel, limit=10, before=msg)
+                    await self.bot.purge_from(channel, limit=100, before=msg)
 
     async def auto_post_trades_task(self):
         """Task: post embed to channel."""
