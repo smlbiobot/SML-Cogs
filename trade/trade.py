@@ -328,7 +328,7 @@ class Trade:
             )
         )
 
-    @trade.command(name="remove", aliases=['rm', 'r'], pass_context=True)
+    @trade.command(name="remove", aliases=['rm'], pass_context=True)
     async def remove_trade(self, ctx, give: str, get: str, clan_tag: str):
         """Remove a trade. Can use card shorthand"""
         server = ctx.message.server
@@ -425,13 +425,14 @@ class Trade:
             await self.bot.say(page)
 
     @trade.command(name="list", aliases=['l'], pass_context=True)
+    @checks.mod_or_permissions()
     async def list_trades(self, ctx, *args):
         """List trades.
 
         Optional arguments
-        --get,    -g   | get a card, --get nw
-        --give,   -g   | give a card --give iwiz
-        --rarity, -r   | rarity filter -r epic
+        --get,       | get a card, --get nw
+        --give,      | give a card --give iwiz
+        --rarity, -r | rarity filter -r epic
         """
         parser = argparse.ArgumentParser()
         parser.add_argument("--get", type=str, help="Get a card")
@@ -445,9 +446,20 @@ class Trade:
             return
 
         server = ctx.message.server
-        items = self.settings.get_trades(server.id)
 
-        o = []
+        included_items = await self.get_filtered_list(
+            server=server,
+            rarity=pa.rarity[0] if pa.rarity else None,
+            give_card=pa.give or None,
+            get_card=pa.get or None
+        )
+
+        channel = ctx.message.channel
+        await self.send_trade_list(channel, included_items)
+
+    async def get_filtered_list(self, server: discord.Server = None, rarity=None, give_card=None, get_card=None):
+        """Return filtered list items"""
+        items = self.settings.get_trades(server.id)
 
         included_items = []
 
@@ -457,29 +469,62 @@ class Trade:
                 continue
 
             # filter rarities
-            if pa.rarity:
-                if item.rarity[0].lower() != pa.rarity[0].lower():
+            if rarity is not None:
+                if item.rarity[0].lower() != rarity.lower():
                     continue
 
             # filter give
-            if pa.give:
-                card = await self.aka_to_card(pa.give)
+            if give_card is not None:
+                card = await self.aka_to_card(give_card)
                 if item.give_card != card:
                     continue
 
             # filter get
-            if pa.get:
-                card = await self.aka_to_card(pa.get)
+            if get_card is not None:
+                card = await self.aka_to_card(get_card)
                 if item.get_card != card:
                     continue
 
             included_items.append(item)
 
+        return included_items
+
+    @trade.command(name="get", aliases=['gt'], pass_context=True)
+    async def list_get_card(self, ctx, card):
+        """Filter trades by cards to get."""
+        server = ctx.message.server
+        included_items = await self.get_filtered_list(
+            server=server,
+            get_card=card
+        )
+        channel = ctx.message.channel
+        await self.send_trade_list(channel, included_items)
+
+    @trade.command(name="give", aliases=['gv'], pass_context=True)
+    async def list_give_card(self, ctx, card):
+        """Filter trades by cards to give."""
+        server = ctx.message.server
+        included_items = await self.get_filtered_list(
+            server=server,
+            give_card=card
+        )
+        channel = ctx.message.channel
+        await self.send_trade_list(channel, included_items)
+
+    @trade.command(name="rarity", aliases=['r'], pass_context=True)
+    async def list_rarity(self, ctx, rarity):
+        """Filter trades by rarity."""
+        server = ctx.message.server
+        included_items = await self.get_filtered_list(
+            server=server,
+            rarity=rarity
+        )
         channel = ctx.message.channel
         await self.send_trade_list(channel, included_items)
 
     async def send_trade_list(self, channel, items):
         o = []
+
         def sort_items(item):
             R = dict(
                 Common=1,
