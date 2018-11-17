@@ -345,7 +345,7 @@ class BrawlStars:
         to_add_roles += server.everyone_roles
 
         # if member in bands, add member roles and remove visitor roles
-        if player.band.tag in band_tags:
+        if player.band and player.band.tag in band_tags:
             to_remove_roles += server.visitor_roles
             to_add_roles += server.member_roles
 
