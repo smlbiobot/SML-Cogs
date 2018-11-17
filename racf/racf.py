@@ -123,8 +123,8 @@ CLAN_PERMISSION = {
         'assign_role': True,
         'member': True
     },
-    'P02C9PL2': {
-        'tag': 'P02C9PL2',
+    'PYVQL8YP': {
+        'tag': 'PYVQL8YP',
         'role': 'Trade',
         'assign_role': True,
         'member': True
