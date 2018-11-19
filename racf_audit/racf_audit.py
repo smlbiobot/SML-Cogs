@@ -1114,8 +1114,6 @@ class RACFAudit:
         top50_results = []
         non_top50_results = []
 
-        trophy_50 = 0
-
         ALPHA_CLAN_TAG = '#9PJ82CRC'
 
         member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
@@ -1124,6 +1122,8 @@ class RACFAudit:
         alpha_clan_trophies = self.calculate_clan_trophies(alpha_trophies)
         top50_trophies = [m.get('trophies') for m in member_models[:50]]
         top50_clan_trophies = self.calculate_clan_trophies(top50_trophies)
+        trophy_50 = int(member_models[49].get('trophies', 0))
+
 
         # Find alpha rank if top 50 in alpha
         api = ClashRoyaleAPI(self.auth)
