@@ -542,6 +542,7 @@ class Trade:
         )
         channel = ctx.message.channel
         await self.send_trade_list(channel, included_items)
+        await self.bot.say("https://link.clashroyale.com/?clanInfo?id={}".format(clan_tag))
 
     async def send_trade_list(self, channel, items):
         o = []
