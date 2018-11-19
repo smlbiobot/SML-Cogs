@@ -126,9 +126,9 @@ class Settings(Dict):
     def remove_old_trades(self, server_id):
         """Look for trade items that’s older than 24 hours and remove them."""
         now = get_now_timestamp()
-        day = dt.timedelta(days=1).total_seconds()
+        limit = dt.timedelta(days=2).total_seconds()
         for k, v in self[server_id].trades.copy().items():
-            if abs(now - v.get('timestamp')) > day:
+            if abs(now - v.get('timestamp')) > limit:
                 self[server_id].trades.pop(k)
         self.save()
 
