@@ -90,6 +90,20 @@ class CWReady:
                 self._config = yaml.load(f)
         return self._config
 
+    @property
+    def bot_auth(self):
+        return self.settings.get('bot_auth', '')
+
+    @checks.admin()
+    @commands.command(pass_context=True)
+    async def cwrauth(self, ctx, auth):
+        """Set CWR Bot authentication token."""
+        self.settings['bot_auth'] = auth
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Bot Authentication saved.")
+        await self.bot.delete_message(ctx.message)
+
+
     @commands.command(pass_context=True, no_pm=True, aliases=['cwrt'])
     async def cwreadytag(self, ctx, tag):
         """Return clan war readiness."""
@@ -163,14 +177,15 @@ class CWReady:
 
     async def fetch_cwready(self, tag):
         """Fetch clan war readinesss."""
-        url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
+        url = 'https://royaleapi.com/bot/cwr/{}'.format(tag)
         conn = aiohttp.TCPConnector(
             family=socket.AF_INET,
             verify_ssl=False,
         )
+        headers = dict(auth=self.bot_auth)
         data = dict()
         async with aiohttp.ClientSession(connector=conn) as session:
-            async with session.get(url) as resp:
+            async with session.get(url, headers=headers) as resp:
                 if resp.status == 200:
                     data = await resp.json()
                 elif resp.status == 404:
@@ -289,7 +304,7 @@ class CWReady:
         em.add_field(name='Challenge Cards Won', value=data.get('challenge_cards_won', 0))
 
         # leagues
-        for league in data.get('leagues'):
+        for league in data.get('leagues', []):
             name = league.get('name')
             total = league.get('total', 0)
             percent = league.get('total_percent', 0)
