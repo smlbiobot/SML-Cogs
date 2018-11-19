@@ -32,6 +32,7 @@ from collections import namedtuple
 import aiohttp
 import argparse
 import asyncio
+import datetime as dt
 import discord
 import json
 import os
@@ -40,7 +41,6 @@ import unidecode
 import yaml
 from discord.ext import commands
 from tabulate import tabulate
-import datetime as dt
 
 from cogs.utils import checks
 from cogs.utils.chat_formatting import box, inline, pagify, underline
@@ -1123,7 +1123,6 @@ class RACFAudit:
         top50_trophies = [m.get('trophies') for m in member_models[:50]]
         top50_clan_trophies = self.calculate_clan_trophies(top50_trophies)
         trophy_50 = int(member_models[49].get('trophies', 0))
-
 
         # Find alpha rank if top 50 in alpha
         api = ClashRoyaleAPI(self.auth)
