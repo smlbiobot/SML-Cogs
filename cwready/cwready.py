@@ -2,11 +2,11 @@
 Clan War Readiness
 """
 
+import asyncio
 import itertools
 from collections import defaultdict
 
 import aiohttp
-import asyncio
 import discord
 import logging
 import os
@@ -103,20 +103,43 @@ class CWReady:
         await self.bot.say("Bot Authentication saved.")
         await self.bot.delete_message(ctx.message)
 
-
     @commands.command(pass_context=True, no_pm=True, aliases=['cwrt'])
     async def cwreadytag(self, ctx, tag):
         """Return clan war readiness."""
         tag = clean_tag(tag)
 
-        try:
-            data = await self.fetch_cwready(tag)
-        except Exception as e:
-            logger.exception("Unknown exception", e)
-            await self.bot.say("Server error: {}".format(e))
-        else:
-            await self.bot.say(embed=self.cwready_embed(data))
-            await self.send_cwr_req_results(ctx, data)
+        # try:
+        #     data = await self.fetch_cwready(tag)
+        # except Exception as e:
+        #     logger.exception("Unknown exception", e)
+        #     await self.bot.say("Server error: {}".format(e))
+        # else:
+        #     await self.bot.say(embed=self.cwready_embed(data))
+        #     await self.send_cwr_req_results(ctx, data)
+
+        # try:
+        tasks = [
+            self.fetch_cwready(tag),
+            self.fetch_cw_history(tag)
+        ]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for r in results:
+            if isinstance(r, TagNotFound):
+                await self.bot.say("Invalid tag #{}. Please verify that tag is set correctly.".format(tag))
+                return
+            if isinstance(r, UnknownServerError):
+                await self.bot.say("Unknown server error from API")
+                return
+            if isinstance(r, Exception):
+                logger.exception("Unknown exception", r)
+                await self.bot.say("Server error: {}".format(r))
+
+        data, hist = results
+        await self.bot.say(embed=self.cwready_embed(data, hist))
+        await self.send_cwr_req_results(ctx, data)
+
+        import json
+        print(json.dumps(hist))
 
     @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
     async def cwready(self, ctx, member: discord.Member = None):
@@ -141,21 +164,9 @@ class CWReady:
 
         tag = clean_tag(tag)
 
-        try:
-            data = await self.fetch_cwready(tag)
+        await ctx.invoke(self.cwreadytag, tag)
 
-        except TagNotFound:
-            await self.bot.say("Invalid tag #{}. Please verify that tag is set correctly.".format(tag))
-            return
-        except UnknownServerError:
-            await self.bot.say("Unknown server error from API")
-            return
-        except Exception as e:
-            logger.exception("Unknown exception", e)
-            await self.bot.say("Server error: {}".format(e))
-        else:
-            await self.bot.say(embed=self.cwready_embed(data))
-            await self.send_cwr_req_results(ctx, data)
+
 
     async def send_cwr_req_results(self, ctx, data):
         await self.send_cwr_req_results_channel(ctx.message.channel, data)
@@ -175,39 +186,41 @@ class CWReady:
                     self.config.get('addendum', '')
                 ))
 
-    async def fetch_cwready(self, tag):
-        """Fetch clan war readinesss."""
-        url = 'https://royaleapi.com/bot/cwr/{}'.format(tag)
+    async def fetch_json(self, url, headers=None, error_dict=None):
         conn = aiohttp.TCPConnector(
             family=socket.AF_INET,
             verify_ssl=False,
         )
-        headers = dict(auth=self.bot_auth)
         data = dict()
         async with aiohttp.ClientSession(connector=conn) as session:
             async with session.get(url, headers=headers) as resp:
                 if resp.status == 200:
                     data = await resp.json()
-                elif resp.status == 404:
-                    raise TagNotFound()
+                elif error_dict and resp.status in error_dict.keys():
+                    for k, v in error_dict.items():
+                        if resp.status == k:
+                            raise v()
                 else:
                     raise UnknownServerError()
 
         return data
 
+    async def fetch_cwready(self, tag):
+        """Fetch clan war readinesss."""
+        url = 'https://royaleapi.com/bot/cwr/{}'.format(tag)
+        headers = dict(auth=self.bot_auth)
+        error_dict = {
+            404: TagNotFound
+        }
+        return await self.fetch_json(url, headers=headers, error_dict=error_dict)
+
     async def fetch_clan(self, tag, session):
         headers = dict(Authorization="Bearer {}".format(self.config.get('auth')))
         url = 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
-        data = dict()
-        async with session.get(url, headers=headers) as resp:
-            if resp.status == 200:
-                data = await resp.json()
-            elif resp.status == 404:
-                raise TagNotFound()
-            else:
-                raise UnknownServerError()
-
-        return data
+        error_dict = {
+            404: TagNotFound
+        }
+        return await self.fetch_json(url, headers=headers, error_dict=error_dict)
 
     async def fetch_clans(self, tags):
         """Fetch clan info by tags."""
@@ -276,7 +289,19 @@ class CWReady:
 
         return qual
 
-    def cwready_embed(self, data):
+    async def fetch_cw_history(self, tag):
+        url = (
+            "https://royaleapi.com"
+            "/bot/player/cw_history?player_tag={tag}"
+            "&auth={auth}".format(
+                tag=tag,
+                auth=self.bot_auth
+            )
+        )
+        data = await self.fetch_json(url, error_dict={404: TagNotFound})
+        return data
+
+    def cwready_embed(self, data, hist):
 
         tag = data.get('tag')
         url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
@@ -323,6 +348,31 @@ class CWReady:
                         if card.get('overlevel'):
                             value += '+'
                 em.add_field(name=f_name if index == 0 else '.', value=value, inline=False)
+
+        # CW History: Wins
+        if hist.get('win_rate'):
+            em.add_field(
+                name='Win %',
+                value='Last 10: {last_10:.0%}, Last 20: {last_20:.0%}, Lifetime: {lifetime:.0%}'.format(**hist.get('win_rate'))
+            )
+
+        # CW History: Detail
+        battles = hist.get('battles')
+        if battles:
+            battle_list = []
+            for b in battles[:20]:
+                league = b.get('league')
+                if league is not None:
+                    league_name = 'cwl{}'.format(league).replace('-', '')
+                    b['league_emoji'] = get_emoji(self.bot, league_name)
+                else:
+                    b['league_emoji'] = get_emoji(self.bot, 'clanwar')
+                battle_list.append('{league_emoji}{wins}/{battles_played}'.format(**b))
+
+            em.add_field(
+                name='Last 20 Battles',
+                value=' '.join(battle_list)
+            )
 
         em.set_footer(text=player_url, icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
 
