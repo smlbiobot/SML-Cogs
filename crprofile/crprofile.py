@@ -746,7 +746,6 @@ class CRPlayerModel:
                 if card.get('rarity') == rarity:
                     if limit:
                         trade_count = math.floor(card.get('count', 0) / limit)
-                        print(card.get('name'), limit, trade_count)
                         if trade_count > 0:
                             cards[rarity].append(dict(
                                 emoji=bot_emoji.name(card.get('key').replace('-', '')),
