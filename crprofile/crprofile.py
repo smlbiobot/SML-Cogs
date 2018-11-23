@@ -24,11 +24,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
 import itertools
+import math
 from collections import OrderedDict, defaultdict
 
 import aiohttp
-import asyncio
 import datetime as dt
 import discord
 import inflect
@@ -723,6 +724,40 @@ class CRPlayerModel:
         deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
         return ' '.join(deck)
 
+    def trade_list(self, bot_emoji: BotEmoji):
+        """Trade list"""
+        d = dict(
+            Legendary=1,
+            Epic=10,
+            Rare=50,
+            Common=250
+        )
+
+        cards = dict(
+            Legendary=[],
+            Epic=[],
+            Rare=[],
+            Common=[]
+        )
+
+        for card in self.cards:
+            for rarity in d.keys():
+                limit = d.get(card.get('rarity'), 0)
+                if card.get('rarity') == rarity:
+                    if limit:
+                        trade_count = math.floor(card.get('count', 0) / limit)
+                        print(card.get('name'), limit, trade_count)
+                        if trade_count > 0:
+                            cards[rarity].append(dict(
+                                emoji=bot_emoji.name(card.get('key').replace('-', '')),
+                                count=trade_count
+                            ))
+        ret = {}
+        for k, v in cards.items():
+            ret[k] = ['{0[emoji]}{0[count]}x'.format(card) for card in v]
+
+        return ret
+
     @property
     def decklink(self):
         return self.info_data.get('deckLink', '')
@@ -1366,6 +1401,11 @@ class CRProfile:
         """Card collection."""
         await self.get_profile(ctx, member, sections=['cards'])
 
+    @crprofile.command(name="trade", pass_context=True, no_pm=True)
+    async def crprofile_trade(self, ctx, member: discord.Member = None):
+        """Card collection."""
+        await self.get_profile(ctx, member, sections=['trade'])
+
     @crprofile.command(name="chests", pass_context=True, no_pm=True)
     async def crprofile_chests(self, ctx, member: discord.Member = None):
         """Upcoming chests."""
@@ -1558,6 +1598,28 @@ class CRProfile:
             icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
         return em
 
+    def embed_profile_trade(self, player: CRPlayerModel, color=None):
+        """Current deck."""
+        decklink_url = player.decklink
+        profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag.lstrip('#'))
+        em = discord.Embed(
+            title="{} #{}".format(player.name, player.tag),
+            color=color,
+            url=decklink_url)
+        # cards = player.card_collection(self.bot_emoji)
+        trade_list = player.trade_list(self.bot_emoji)
+        for rarity in ['Legendary', 'Epic', 'Rare', 'Common']:
+            em.add_field(
+                name="Trade: {}".format(rarity),
+                value=' '.join(trade_list[rarity]),
+                inline=False
+            )
+        # em.add_field(name="Trade", value=player.trade_list(self.bot_emoji), inline=False)
+        em.set_footer(
+            text=profile_url,
+            icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
+        return em
+
     def embeds_profile(self, player: CRPlayerModel, server=None, sections=('overview', 'stats')):
         """Return Discord Embed of player profile."""
         embeds = []
@@ -1577,6 +1639,9 @@ class CRProfile:
 
         if 'deck' in sections:
             embeds.append(self.embed_profile_deck(player, color=color))
+
+        if 'trade' in sections:
+            embeds.append(self.embed_profile_trade(player, color=color))
 
         return embeds
 
