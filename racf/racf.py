@@ -1504,9 +1504,10 @@ class RACF:
             )
             cwready = self.bot.get_cog("CWReady")
             data = await cwready.fetch_cwready(tag)
+            hist = await cwready.fetch_cw_history(tag)
             await self.bot.send_message(
                 recruit_channel,
-                embed=cwready.cwready_embed(data)
+                embed=cwready.cwready_embed(data, hist)
             )
             await cwready.send_cwr_req_results_channel(
                 recruit_channel,
