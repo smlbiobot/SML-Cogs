@@ -149,8 +149,8 @@ class CWReady:
         await self.bot.say(embed=await self.cwready_embed(data, hist))
         await self.send_cwr_req_results(ctx, data)
 
-        import json
-        print(json.dumps(hist))
+        # import json
+        # print(json.dumps(hist))
 
     @commands.command(pass_context=True, no_pm=True, aliases=['cwr'])
     async def cwready(self, ctx, member: discord.Member = None):
@@ -395,6 +395,9 @@ class CWReady:
         battles = hist.get('battles')
         if battles:
             battle_list = []
+            mia_last20 = 0
+            mia_last20_percent = 0
+
             for b in battles[:20]:
                 league = b.get('league')
                 if league is not None:
@@ -404,8 +407,22 @@ class CWReady:
                     b['league_emoji'] = get_emoji(self.bot, 'clanwar')
                 battle_list.append('{league_emoji}{wins}/{battles_played}'.format(**b))
 
+                if b.get('battles_played', 1) == 0:
+                    mia_last20 += 1
+
+            if len(battles):
+                mia_last20_percent = mia_last20 / len(battles)
+
+            mia_str = 'No MIA'
+            if mia_last20 != 0:
+                mia_str = 'MIA: {mia_last20} / {count}: {mia_last20_percent:.0%}'.format(
+                    mia_last20=mia_last20,
+                    count=len(battles),
+                    mia_last20_percent=mia_last20_percent
+                )
+
             em.add_field(
-                name='Last 20 Battles',
+                name='Last 20 Battles : {mia_str}'.format(mia_str=mia_str),
                 value=' '.join(battle_list)
             )
 
