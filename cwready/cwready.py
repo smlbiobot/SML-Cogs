@@ -23,6 +23,8 @@ logger = logging.getLogger(__name__)
 PATH = os.path.join("data", "cwready")
 JSON = os.path.join(PATH, "settings.json")
 CONFIG_YAML = os.path.join(PATH, "config.yml")
+CARDS_JSON_URL = 'https://royaleapi.github.io/cr-api-data/json/cards.json'
+CARDS = None
 
 
 class TagNotFound(Exception):
@@ -69,6 +71,15 @@ def get_emoji(bot, name):
 def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
+
+
+async def get_card_constants():
+    global CARDS
+    if CARDS is None:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(CARDS_JSON_URL) as resp:
+                CARDS = await resp.json()
+    return CARDS
 
 
 class CWReady:
@@ -135,7 +146,7 @@ class CWReady:
                 await self.bot.say("Server error: {}".format(r))
 
         data, hist = results
-        await self.bot.say(embed=self.cwready_embed(data, hist))
+        await self.bot.say(embed=await self.cwready_embed(data, hist))
         await self.send_cwr_req_results(ctx, data)
 
         import json
@@ -165,8 +176,6 @@ class CWReady:
         tag = clean_tag(tag)
 
         await ctx.invoke(self.cwreadytag, tag)
-
-
 
     async def send_cwr_req_results(self, ctx, data):
         await self.send_cwr_req_results_channel(ctx.message.channel, data)
@@ -301,7 +310,7 @@ class CWReady:
         data = await self.fetch_json(url, error_dict={404: TagNotFound})
         return data
 
-    def cwready_embed(self, data, hist):
+    async def cwready_embed(self, data, hist):
 
         tag = data.get('tag')
         url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
@@ -328,13 +337,40 @@ class CWReady:
         em.add_field(name='Challenge Max Wins', value=data.get('challenge_max_wins', 0))
         em.add_field(name='Challenge Cards Won', value=data.get('challenge_cards_won', 0))
 
+        # Add maxed
+        maxed = dict(
+            key='maxed',
+            name='Maxed',
+            levels='Lvl 13',
+            total=0,
+            total_percent=0,
+            cards=[]
+        )
+        for league in data.get('leagues', []):
+            if league.get('key') == 'legendary':
+                for card in league.get('cards', []):
+                    if card.get('overlevel'):
+                        maxed['cards'].append(dict(
+                            key=card.get('key'),
+                            overlevel=False
+                        ))
+
+        total_card_count = len(await get_card_constants())
+        maxed.update(dict(
+            total=len(maxed['cards']),
+            total_percent=len(maxed['cards']) / total_card_count
+        ))
+        data['total_maxed'] = len(maxed['cards'])
+
+        data['leagues'].insert(0, maxed)
+
         # leagues
         for league in data.get('leagues', []):
             name = league.get('name')
             total = league.get('total', 0)
             percent = league.get('total_percent', 0)
             levels = league.get('levels', 0)
-            f_name = "{name} League .. {percent:.0%} .. {levels}".format(
+            f_name = "{name} .. {percent:.0%} .. {levels}".format(
                 name=name, total=total, percent=percent, levels=levels
             )
             cards = league.get('cards', [])
@@ -345,15 +381,14 @@ class CWReady:
                 for card in crds:
                     if card is not None:
                         value += get_emoji(self.bot, card.get('key', None).replace('-', ''))
-                        if card.get('overlevel'):
-                            value += '+'
-                em.add_field(name=f_name if index == 0 else '.', value=value, inline=False)
+                em.add_field(name=f_name if index == 0 else '\u2800', value=value, inline=False)
 
         # CW History: Wins
         if hist.get('win_rate'):
             em.add_field(
                 name='Win %',
-                value='Last 10: {last_10:.0%}, Last 20: {last_20:.0%}, Lifetime: {lifetime:.0%}'.format(**hist.get('win_rate'))
+                value='Last 10: {last_10:.0%}, Last 20: {last_20:.0%}, Lifetime: {lifetime:.0%}'.format(
+                    **hist.get('win_rate'))
             )
 
         # CW History: Detail

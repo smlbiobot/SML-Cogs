@@ -1507,7 +1507,7 @@ class RACF:
             hist = await cwready.fetch_cw_history(tag)
             await self.bot.send_message(
                 recruit_channel,
-                embed=cwready.cwready_embed(data, hist)
+                embed=await cwready.cwready_embed(data, hist)
             )
             await cwready.send_cwr_req_results_channel(
                 recruit_channel,
