@@ -383,47 +383,56 @@ class CWReady:
                         value += get_emoji(self.bot, card.get('key', None).replace('-', ''))
                 em.add_field(name=f_name if index == 0 else '\u2800', value=value, inline=False)
 
-        # CW History: Wins
-        if hist.get('win_rate'):
-            em.add_field(
-                name='Win %',
-                value='Last 10: {last_10:.0%}, Last 20: {last_20:.0%}, Lifetime: {lifetime:.0%}'.format(
-                    **hist.get('win_rate'))
-            )
-
         # CW History: Detail
-        battles = hist.get('battles')
-        if battles:
-            battle_list = []
-            mia_last20 = 0
-            mia_last20_percent = 0
-
-            for b in battles[:20]:
-                league = b.get('league')
-                if league is not None:
-                    league_name = 'cwl{}'.format(league).replace('-', '')
-                    b['league_emoji'] = get_emoji(self.bot, league_name)
-                else:
-                    b['league_emoji'] = get_emoji(self.bot, 'clanwar')
-                battle_list.append('{league_emoji}{wins}/{battles_played}'.format(**b))
-
-                if b.get('battles_played', 1) == 0:
-                    mia_last20 += 1
-
-            if len(battles):
-                mia_last20_percent = mia_last20 / len(battles)
-
-            mia_str = 'No MIA'
-            if mia_last20 != 0:
-                mia_str = 'MIA: {mia_last20} / {count}: {mia_last20_percent:.0%}'.format(
-                    mia_last20=mia_last20,
-                    count=len(battles),
-                    mia_last20_percent=mia_last20_percent
+        if isinstance(hist, dict):
+            if hist.get('win_rate'):
+                em.add_field(
+                    name='Win %',
+                    value='Last 10: {last_10:.0%}, Last 20: {last_20:.0%}, Lifetime: {lifetime:.0%}'.format(
+                        **hist.get('win_rate'))
                 )
 
+
+            battles = hist.get('battles')
+            if battles:
+                battle_list = []
+                mia_last20 = 0
+                mia_last20_percent = 0
+
+                for b in battles[:20]:
+                    league = b.get('league')
+                    if league is not None:
+                        league_name = 'cwl{}'.format(league).replace('-', '')
+                        b['league_emoji'] = get_emoji(self.bot, league_name)
+                    else:
+                        b['league_emoji'] = get_emoji(self.bot, 'clanwar')
+                    battle_list.append('{league_emoji}{wins}/{battles_played}'.format(**b))
+
+                    if b.get('battles_played', 1) == 0:
+                        mia_last20 += 1
+
+                if len(battles):
+                    mia_last20_percent = mia_last20 / len(battles)
+
+                mia_str = 'No MIA'
+                if mia_last20 != 0:
+                    mia_str = 'MIA: {mia_last20} / {count}: {mia_last20_percent:.0%}'.format(
+                        mia_last20=mia_last20,
+                        count=len(battles),
+                        mia_last20_percent=mia_last20_percent
+                    )
+
+                em.add_field(
+                    name='Last 20 Battles : {mia_str}'.format(mia_str=mia_str),
+                    value=' '.join(battle_list)
+                )
+        else:
             em.add_field(
-                name='Last 20 Battles : {mia_str}'.format(mia_str=mia_str),
-                value=' '.join(battle_list)
+                name='No Clan War History',
+                value=(
+                    'RoyaleAPI does not have this player’s history in database. '
+                    'This simply means that his/her clans have not accessed their CW analytics before.'
+                )
             )
 
         em.set_footer(text=player_url, icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
