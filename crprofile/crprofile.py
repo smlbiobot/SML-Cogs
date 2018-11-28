@@ -81,6 +81,19 @@ def random_discord_color():
     color = int(color, 16)
     return discord.Color(value=color)
 
+def clean_tag(tag):
+    """clean up tag."""
+    if tag is None:
+        return None
+    t = tag
+    if t.startswith('#'):
+        t = t[1:]
+    t = t.strip()
+    t = t.upper()
+    t = t.replace('O', '0')
+    t = t.replace('B', '8')
+    return t
+
 
 def get_card_rarity(card):
     rarity = card.get('rarity')
@@ -746,6 +759,11 @@ class CRPlayerModel:
                 if card.get('rarity') == rarity:
                     if limit:
                         trade_count = math.floor(card.get('count', 0) / limit)
+
+                        # First card can’t be traded if level 1
+                        if card.get('level') == 1:
+                            trade_count -= 1
+
                         if trade_count > 0:
                             cards[rarity].append(dict(
                                 emoji=bot_emoji.name(card.get('key').replace('-', '')),
@@ -1402,8 +1420,15 @@ class CRProfile:
 
     @crprofile.command(name="trade", pass_context=True, no_pm=True)
     async def crprofile_trade(self, ctx, member: discord.Member = None):
-        """Card collection."""
+        """Tradeable cards."""
         await self.get_profile(ctx, member, sections=['trade'])
+
+    @crprofile.command(name="tradetag", pass_context=True, no_pm=True)
+    async def crprofile_tradetag(self, ctx, tag):
+        """Tradeable cards by tag."""
+        tag = clean_tag(tag)
+        # await self.display_profile(ctx, tag)
+        await self.display_profile(ctx, tag, sections=['trade'])
 
     @crprofile.command(name="chests", pass_context=True, no_pm=True)
     async def crprofile_chests(self, ctx, member: discord.Member = None):
@@ -1449,7 +1474,10 @@ class CRProfile:
 
         server = ctx.message.server
         for em in self.embeds_profile(player_data, server=server, **kwargs):
-            await self.bot.say(embed=em)
+            try:
+                await self.bot.say(embed=em)
+            except:
+                await self.bot.say("Unknown error")
 
     def embed_profile_overview(self, player: CRPlayerModel, server=None, color=None):
         """Discord Embed: profile overview."""
