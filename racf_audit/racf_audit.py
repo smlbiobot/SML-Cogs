@@ -928,6 +928,9 @@ class RACFAudit:
     async def exec_racf_audit(self, channel: discord.Channel = None, audit_results=None, server=None):
         """Execute audit and output to specific channel."""
 
+        await self.bot.send_message(channel, "**100T Family Audit**")
+        await self.bot.send_typing(channel)
+
         async def exec_add_roles(d_member, roles, channel=None):
             # print("add roles", d_member, [r.name for r in roles])
             # await asyncio.sleep(0)
