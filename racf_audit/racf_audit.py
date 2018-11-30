@@ -1313,7 +1313,7 @@ class RACFAudit:
             except Exception:
                 pass
             finally:
-                interval = int(dt.timedelta(minutes=10).total_seconds())
+                interval = int(dt.timedelta(hours=4).total_seconds())
                 await asyncio.sleep(interval)
 
 
