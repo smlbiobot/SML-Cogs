@@ -60,6 +60,7 @@ numbs = {
 }
 
 
+
 class BotEmoji:
     """Emojis available in bot."""
 
