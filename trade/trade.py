@@ -22,12 +22,13 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
+from collections import Counter
 from collections import defaultdict
 from collections import namedtuple
 
 import aiohttp
 import argparse
-import asyncio
 import csv
 import datetime as dt
 import discord
@@ -38,6 +39,7 @@ from addict import Dict
 from discord.ext import commands
 
 from cogs.utils import checks
+from cogs.utils.chat_formatting import inline
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 
@@ -543,6 +545,29 @@ class Trade:
         channel = ctx.message.channel
         await self.send_trade_list(channel, included_items)
         await self.bot.say("https://link.clashroyale.com/?clanInfo?id={}".format(clan_tag))
+
+    @trade.command(name="info", pass_context=True)
+    async def trade_info(self, ctx):
+        """List DB info."""
+        server = ctx.message.server
+        items = self.settings.get_trades(server.id)
+
+        author_ids = [item.author_id for item in items]
+        o = []
+        o.append("Total trades: {}".format(len(items)))
+        o.append("Added by:")
+        for author_id, count in Counter(author_ids).most_common():
+            o.append(
+                inline(
+                    "{name:<16} {count:>6}".format(
+                        name=server.get_member(author_id).name,
+                        count=count
+                    )
+                )
+            )
+
+        for page in pagify('\n'.join(o)):
+            await self.bot.say(page)
 
     async def send_trade_list(self, channel, items):
         o = []
