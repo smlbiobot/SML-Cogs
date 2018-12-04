@@ -24,6 +24,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
 import itertools
 from collections import OrderedDict
 from collections import defaultdict
@@ -31,7 +32,6 @@ from collections import namedtuple
 
 import aiohttp
 import argparse
-import asyncio
 import datetime as dt
 import discord
 import json
@@ -52,6 +52,10 @@ PLAYERS = os.path.join("data", "racf_audit", "player_db.json")
 
 RACF_SERVER_ID = '218534373169954816'
 SML_SERVER_ID = '275395656955330560'
+
+
+class NoPlayerRecord(Exception):
+    pass
 
 
 def nested_dict():
@@ -1001,6 +1005,42 @@ class RACFAudit:
                 await exec_remove_roles(result, to_remove_roles, channel=channel)
             if visitor_role is not None:
                 await exec_add_roles(result, [visitor_role], channel=channel)
+
+    async def search_player(self, tag=None, user_id=None):
+        """Search for players.
+
+        Return player dict
+        {'tag': '200CYRVCU', 'user_id': '295317904633757696', 'user_name': 'Ryann'}
+        """
+        if tag is not None:
+            for key, player in self.players.items():
+                if player.get('tag') == tag:
+                    return player
+
+        if user_id is not None:
+            for key, player in self.players.items():
+                if player.get('user_id') == user_id:
+                    return player
+
+        return None
+
+    @commands.command(name="auditme", pass_context=True)
+    async def audit_member(self, ctx):
+        """Run audit against one person only."""
+        author = ctx.message.author
+        try:
+            player = await self.search_player(user_id=author.id)
+            if player is None:
+                raise NoPlayerRecord()
+            tag = player.get('tag')
+            if tag is None:
+                raise NoPlayerRecord()
+        except NoPlayerRecord as e:
+            await self.bot.say("Your tag is not set. Please ask a Co-Leader for help.")
+            return
+
+        racf = self.bot.get_cog("RACF")
+        await ctx.invoke(racf.racf_verify, author, tag, grant_permission=True)
 
     @racfaudit.command(name="rank", pass_context=True)
     async def racfaudit_rank(self, ctx, *names):

@@ -441,18 +441,19 @@ class RACF:
 
     @racf.command(name="verify", aliases=['v'], pass_context=True, no_pm=True)
     # @checks.mod_or_permissions(manage_roles=True)
-    async def racf_verify(self, ctx, member: discord.Member, tag):
+    async def racf_verify(self, ctx, member: discord.Member, tag, grant_permission=False):
         """Verify CR members by player tag."""
 
-        # verify for RoyaleAPI server
-        if ctx.message.server.name == 'RoyaleAPI':
-            await self.royaleapi_verify(ctx, member, tag)
-            return
+        if not grant_permission:
+            # verify for RoyaleAPI server
+            if ctx.message.server.name == 'RoyaleAPI':
+                await self.royaleapi_verify(ctx, member, tag)
+                return
 
-        # verify permissions on 100T server
-        verified = await check_manage_roles(ctx, self.bot)
-        if not verified:
-            return
+            # verify permissions on 100T server
+            verified = await check_manage_roles(ctx, self.bot)
+            if not verified:
+                return
 
         cleaned_tag = clean_tag(tag)
 
@@ -1342,14 +1343,17 @@ class RACF:
                 await self.bot.say("RACF Audit: associated player tag with member.")
             if not success:
                 player = await racfaudit.get_player_tag(tag)
-                if str(player.get('user_id')) == str(member.id):
-                    await self.bot.say("RACF Audit: associated player tag with member. (already set)")
+                if player is None:
+                    await self.bot.say("Invalid player tag")
                 else:
-                    await self.bot.say(
-                        "RACF Audit: Tag {} already associated with member {}. Ask a mod to run `!crsettagmod` to overwrite.".format(
-                            player.get('tag'),
-                            server.get_member(player.get('user_id'))
-                        ))
+                    if str(player.get('user_id')) == str(member.id):
+                        await self.bot.say("RACF Audit: associated player tag with member. (already set)")
+                    else:
+                        await self.bot.say(
+                            "RACF Audit: Tag {} already associated with member {}. Ask a mod to run `!crsettagmod` to overwrite.".format(
+                                player.get('tag'),
+                                server.get_member(player.get('user_id'))
+                            ))
 
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, no_pm=True)
