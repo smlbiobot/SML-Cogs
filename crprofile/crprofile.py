@@ -223,7 +223,8 @@ class BotEmoji:
             'magical chest': 'chestmagical',
             'super magical chest': 'chestsupermagical',
             'legendary chest': 'chestlegendary',
-            'epic chest': 'chestepic'
+            'epic chest': 'chestepic',
+            'mega lightning chest': 'chestmegalightning',
         }
 
     def name(self, name):
