@@ -119,16 +119,6 @@ class CWReady:
         """Return clan war readiness."""
         tag = clean_tag(tag)
 
-        # try:
-        #     data = await self.fetch_cwready(tag)
-        # except Exception as e:
-        #     logger.exception("Unknown exception", e)
-        #     await self.bot.say("Server error: {}".format(e))
-        # else:
-        #     await self.bot.say(embed=self.cwready_embed(data))
-        #     await self.send_cwr_req_results(ctx, data)
-
-        # try:
         tasks = [
             self.fetch_cwready(tag),
             self.fetch_cw_history(tag)
@@ -311,9 +301,9 @@ class CWReady:
         return data
 
     async def cwready_embed(self, data, hist):
+        """CWR embed"""
 
         tag = data.get('tag')
-        url = 'https://royaleapi.com/data/member/war/ready/{}'.format(tag)
         player_url = "https://royaleapi.com/player/{}".format(tag)
 
         em = discord.Embed(
@@ -348,12 +338,19 @@ class CWReady:
         )
         for league in data.get('leagues', []):
             if league.get('key') == 'legendary':
+                cards = []
                 for card in league.get('cards', []):
                     if card.get('overlevel'):
                         maxed['cards'].append(dict(
                             key=card.get('key'),
                             overlevel=False
                         ))
+                    else:
+                        cards.append(dict(
+                            key=card.get('key'),
+                            overlevel=False
+                        ))
+                league.update(dict(cards=cards))
 
         total_card_count = len(await get_card_constants())
         maxed.update(dict(
