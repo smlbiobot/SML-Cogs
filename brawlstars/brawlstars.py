@@ -302,7 +302,6 @@ class BrawlStars:
             if tag is None:
                 await self.bot.say("Can’t find tag associated with user.")
 
-        print(self.settings.get('brawlapi_token'))
         player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
 
 
