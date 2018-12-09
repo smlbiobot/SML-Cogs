@@ -40,7 +40,7 @@ from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "brawlstars")
 JSON = os.path.join(PATH, "settings.json")
-BAND_CONFIG_YML = os.path.join(PATH, "band.config.yml")
+BAND_CONFIG_YML = os.path.join(PATH, "club.config.yml")
 
 MANAGE_ROLE_ROLES = ['Bot Commander']
 
@@ -110,7 +110,7 @@ class BrawlStars:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
-        self._band_config = None
+        self._club_config = None
 
     def _save_settings(self):
         dataIO.save_json(JSON, self.settings)
@@ -130,8 +130,8 @@ class BrawlStars:
             color=random_discord_color()
         )
 
-        # band
-        em.add_field(name=player.band.name, value=player.band.role, inline=False)
+        # club
+        em.add_field(name=player.club.name, value=player.club.role, inline=False)
 
         # fields
         em.add_field(name='Trophies', value="{} / {} PB".format(player.trophies, player.highestTrophies))
@@ -163,7 +163,7 @@ class BrawlStars:
         o = [
             '{}'.format(avatar),
             '{} #{}'.format(bold(player.name), player.tag),
-            '{}, {} #{}'.format(player.band.role, player.band.name, player.band.tag) if player.band else 'No Clan',
+            '{}, {} #{}'.format(player.club.role, player.club.name, player.club.tag) if player.club else 'No Clan',
             '{} {} / {}'.format(self.get_emoji('bstrophy'), player.trophies, player.highestTrophies),
         ]
         return "\n".join(o)
@@ -174,7 +174,7 @@ class BrawlStars:
         o = [
             '{}'.format(avatar),
             '{} #{}'.format(bold(player.name), player.tag),
-            '{}, {} #{}'.format(player.band.role, player.band.name, player.band.tag) if player.band else 'No Clan',
+            '{}, {} #{}'.format(player.club.role, player.club.name, player.club.tag) if player.club else 'No Clan',
             '{} {} / {}'.format(self.get_emoji('bstrophy'), player.trophies, player.highestTrophies),
             '{emoji} {time} Best time as Boss'.format(
                 emoji=self.get_emoji('bossfight'),
@@ -217,12 +217,12 @@ class BrawlStars:
 
         return '\n'.join(o)
 
-    async def _get_band_config(self, force_update=False):
-        if force_update or self._band_config is None:
+    async def _get_club_config(self, force_update=False):
+        if force_update or self._club_config is None:
             async with aiofiles.open(BAND_CONFIG_YML) as f:
                 contents = await f.read()
-                self._band_config = yaml.load(contents)
-        return self._band_config
+                self._club_config = yaml.load(contents)
+        return self._club_config
 
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
@@ -302,14 +302,17 @@ class BrawlStars:
             if tag is None:
                 await self.bot.say("Can’t find tag associated with user.")
 
+        print(self.settings.get('brawlapi_token'))
         player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
+
+
         # await self.bot.say(embed=self._player_embed(player))
         await self.bot.say(self._player_str(player))
 
     @bs.command(name="verify", aliases=['v'], pass_context=True)
     @commands.has_any_role(*MANAGE_ROLE_ROLES)
     async def bs_verify(self, ctx, member: discord.Member, tag=None):
-        cfg = Box(await self._get_band_config())
+        cfg = Box(await self._get_club_config())
         server = None
         ctx_server = ctx.message.server
         for s in cfg.servers:
@@ -330,23 +333,23 @@ class BrawlStars:
 
         await self.bot.say(self._player_mini_str(player))
 
-        band_tags = [b.tag for b in server.bands]
+        club_tags = [b.tag for b in server.clubs]
 
         to_add_roles = []
         to_remove_roles = []
 
         to_add_roles += server.everyone_roles
 
-        # if member in bands, add member roles and remove visitor roles
-        if player.band and player.band.tag in band_tags:
+        # if member in clubs, add member roles and remove visitor roles
+        if player.club and player.club.tag in club_tags:
             to_remove_roles += server.visitor_roles
             to_add_roles += server.member_roles
 
-            for b in server.bands:
-                if b.tag == player.band.tag:
+            for b in server.clubs:
+                if b.tag == player.club.tag:
                     to_add_roles += b.roles
 
-        # add visitor roles if member not in band
+        # add visitor roles if member not in club
         else:
             to_remove_roles += server.member_roles
             to_add_roles += server.visitor_roles
