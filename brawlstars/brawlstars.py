@@ -123,10 +123,15 @@ class BrawlStars:
         return ''
 
     def _player_embed(self, player: BSPlayer):
-        avatar = self.get_emoji(player.avatarId)
+        if player.avatarId:
+            avatar = self.get_emoji(player.avatarId)
+            description = '{} #{}'.format(avatar, player.tag.upper())
+        else:
+            description = '#{}'.format(player.tag.upper())
+
         em = discord.Embed(
             title=player.name,
-            description='{} #{}'.format(avatar, player.tag).capitalize(),
+            description=description,
             color=random_discord_color()
         )
 
