@@ -539,7 +539,7 @@ class RACF:
                     )
                 )
 
-                channel = discord.utils.get(channels, name="family-chat")
+                channel = discord.utils.get(channels, name="clash-chat")
                 await ctx.invoke(self.dmusers, self.config.messages.member, member)
 
             if channel is not None:
@@ -978,7 +978,7 @@ class RACF:
         roles_param.extend(roles)
         roles_param.extend(["-Visitor", "-Recruit"])
         channel = discord.utils.get(
-            ctx.message.server.channels, name="family-chat")
+            ctx.message.server.channels, name="clash-chat")
         # print(roles_param)
         await self.changerole(ctx, member, *roles_param)
         if channel is not None:
