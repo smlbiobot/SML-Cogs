@@ -1146,28 +1146,28 @@ class RACF:
         #     if isinstance(r, Exception):
         #         await self.bot.say("Error assigning visitor to {}".format(member.mention))
 
-    @commands.command(pass_context=True, no_pm=True)
-    @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
-    async def brawlstars(self, ctx, member: discord.Member, *roles):
-        """Assign member with visitor and brawl-stars roles."""
-        bs_roles = ["Brawl-Stars"]
-        if discord.utils.get(member.roles, name="Member") is None:
-            if discord.utils.get(member.roles, name="Guest") is None:
-                if discord.utils.get(member.roles, name="Visitor") is None:
-                    bs_roles.append("Visitor")
-        channel = discord.utils.get(
-            ctx.message.server.channels, name="brawl-stars")
-        await self.changerole(ctx, member, *bs_roles)
-        if channel is not None:
-            await self.bot.say(
-                "{} You can now chat in {} — enjoy!".format(
-                    member.mention, channel.mention))
-        if "Visitor" in bs_roles:
-            await ctx.invoke(self.visitorrules, member)
-
-        # Add additional roles if present
-        if len(roles):
-            await self.changerole(ctx, member, *roles)
+    # @commands.command(pass_context=True, no_pm=True)
+    # @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
+    # async def brawlstars(self, ctx, member: discord.Member, *roles):
+    #     """Assign member with visitor and brawl-stars roles."""
+    #     bs_roles = ["Brawl-Stars"]
+    #     if discord.utils.get(member.roles, name="Member") is None:
+    #         if discord.utils.get(member.roles, name="Guest") is None:
+    #             if discord.utils.get(member.roles, name="Visitor") is None:
+    #                 bs_roles.append("Visitor")
+    #     channel = discord.utils.get(
+    #         ctx.message.server.channels, name="brawl-chat")
+    #     await self.changerole(ctx, member, *bs_roles)
+    #     if channel is not None:
+    #         await self.bot.say(
+    #             "{} You can now chat in {} — enjoy!".format(
+    #                 member.mention, channel.mention))
+    #     if "Visitor" in bs_roles:
+    #         await ctx.invoke(self.visitorrules, member)
+    #
+    #     # Add additional roles if present
+    #     if len(roles):
+    #         await self.changerole(ctx, member, *roles)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['vrules', 'vr'])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
