@@ -1,11 +1,15 @@
 servers:
   - name: 100 Thieves Clash Royale
     id: 218534373169954816
-    bands:
+    clubs:
       - name: Reddit Alpha
         tag: LQQ
         roles:
           - BS-Alpha
+      - name: Reddit Bravo
+        tag: 282UC998
+        roles:
+          - BS-Bravo
     everyone_roles:
       - Brawl-Stars
     member_roles:
@@ -14,11 +18,15 @@ servers:
       - Visitor
   - name: SML
     id: 275395656955330560
-    bands:
+    clubs:
       - name: Reddit Alpha
         tag: LQQ
         roles:
           - BS-Alpha
+      - name: Reddit Bravo
+        tag: 282UC998
+        roles:
+          - BS-Bravo
     everyone_roles:
       - Brawl-Stars
     member_roles:

@@ -22,6 +22,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
 from collections import defaultdict
 
 import aiofiles
@@ -69,7 +70,7 @@ class BSPlayer(Box):
         super().__init__(*args, **kwargs)
 
 
-class BSClan(Box):
+class BSClub(Box):
     """Player model"""
 
     def __init__(self, *args, **kwargs):
@@ -100,6 +101,13 @@ async def api_fetch_player(tag=None, auth=None):
     url = 'https://brawlapi.cf/api/players/{}'.format(clean_tag(tag))
     data = await api_fetch(url=url, auth=auth)
     return BSPlayer(data)
+
+
+async def api_fetch_club(tag=None, auth=None):
+    """Fetch player"""
+    url = 'https://brawlapi.cf/api/clubs/{}'.format(clean_tag(tag))
+    data = await api_fetch(url=url, auth=auth)
+    return BSClub(data)
 
 
 class BrawlStars:
@@ -309,7 +317,6 @@ class BrawlStars:
 
         player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
 
-
         # await self.bot.say(embed=self._player_embed(player))
         await self.bot.say(self._player_str(player))
 
@@ -383,6 +390,57 @@ class BrawlStars:
                 "Removed {roles} from {member}".format(roles=", ".join(to_remove_roles), member=member))
         except discord.errors.Forbidden:
             await self.bot.say("Error: I don’t have permission to add roles.")
+
+    @bs.command(name="search", aliases=['s'], pass_context=True)
+    @commands.has_any_role(*MANAGE_ROLE_ROLES)
+    async def bs_search(self, ctx, query: str):
+        """Search for member name in configured clubs."""
+        cfg = Box(await self._get_club_config())
+        server = None
+        ctx_server = ctx.message.server
+        for s in cfg.servers:
+            if str(s.id) == str(ctx.message.server.id):
+                server = s
+                break
+
+        if server is None:
+            await self.bot.say("No config for this server found.")
+            return
+
+        club_tags = [b.tag for b in server.clubs]
+
+        tasks = [
+            api_fetch_club(tag=tag, auth=self.settings.get('brawlapi_token'))
+            for tag in club_tags
+        ]
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+
+        found = []
+
+        for tag, result in zip(club_tags, results):
+            if isinstance(result, Exception):
+                await self.bot.say("Error fetching club info for {}".format(tag))
+
+            for member in result.get('members', []):
+                if query.lower() in member.get('name', '').lower():
+                    member.update(dict(
+                        clan_name=result.get('name', ''),
+                        clan_tag=result.get('tag', '')
+                    ))
+                    found.append(member)
+
+        o = [
+            "{name} #{tag}, {role}, {clan}".format(
+                name=m.get('name', ''),
+                tag=m.get('tag', ''),
+                role=m.get('role', '').title(),
+                trophies=m.get('trophies', 0),
+                clan=m.get('clan_name')
+            ) for m in found
+        ]
+
+        await self.bot.say("\n".join(o))
 
 
 def check_folder():
