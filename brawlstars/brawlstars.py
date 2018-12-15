@@ -130,9 +130,14 @@ class BrawlStars:
                 return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
+    def get_avatar(self, player):
+        avatar_id = player.get('avatarId') or 28000000
+        avatar = self.get_emoji(avatar_id)
+        return avatar
+
     def _player_embed(self, player: BSPlayer):
         if player.avatarId:
-            avatar = self.get_emoji(player.avatarId)
+            avatar = self.get_avatar(player)
             description = '{} #{}'.format(avatar, player.tag.upper())
         else:
             description = '#{}'.format(player.tag.upper())
@@ -172,7 +177,7 @@ class BrawlStars:
 
     def _player_mini_str(self, player: BSPlayer):
         """Minimal player profile for verification."""
-        avatar = self.get_emoji(player.avatarId)
+        avatar = self.get_avatar(player)
         o = [
             '{}'.format(avatar),
             '{} #{}'.format(bold(player.name), player.tag),
@@ -183,7 +188,8 @@ class BrawlStars:
 
     def _player_str(self, player: BSPlayer):
         """Player profile as plain text."""
-        avatar = self.get_emoji(player.avatarId)
+        avatar = self.get_avatar(player)
+
         o = [
             '{}'.format(avatar),
             '{} #{}'.format(bold(player.name), player.tag),
