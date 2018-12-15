@@ -431,7 +431,7 @@ class BrawlStars:
                     found.append(member)
 
         o = [
-            "{name} #{tag}, {role}, {clan}".format(
+            "{name} #{tag}, {role}, {clan}, {trophies}".format(
                 name=m.get('name', ''),
                 tag=m.get('tag', ''),
                 role=m.get('role', '').title(),
