@@ -295,15 +295,15 @@ class BrawlStars:
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
-    @bs.command(name="settag", alias=['st'], pass_context=True)
-    async def bs_settag(self, ctx, tag):
-        """Assign tag to self."""
-        tag = clean_tag(tag)
-        server = ctx.message.server
-        author = ctx.message.author
-        self.settings[server.id][author.id] = tag
-        if self._save_settings():
-            await self.bot.say("Tag saved.")
+    # @bs.command(name="settag", alias=['st'], pass_context=True)
+    # async def bs_settag(self, ctx, tag):
+    #     """Assign tag to self."""
+    #     tag = clean_tag(tag)
+    #     server = ctx.message.server
+    #     author = ctx.message.author
+    #     self.settings[server.id][author.id] = tag
+    #     if self._save_settings():
+    #         await self.bot.say("Tag saved.")
 
     @bs.command(name="profile", aliases=['p'], pass_context=True)
     async def bs_profile(self, ctx, tag=None):
