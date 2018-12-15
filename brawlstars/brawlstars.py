@@ -436,6 +436,10 @@ class BrawlStars:
                     ))
                     found.append(member)
 
+        if not found:
+            await self.bot.say("Cannot find anyone named `{}` in our clubs".format(query))
+            return
+
         o = [
             "{name} #{tag}, {role}, {clan}, {trophies}".format(
                 name=m.get('name', ''),
