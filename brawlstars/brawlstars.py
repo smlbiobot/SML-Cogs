@@ -77,6 +77,10 @@ class BSClub(Box):
         super().__init__(*args, **kwargs)
 
 
+class APIError(Exception):
+    pass
+
+
 def random_discord_color():
     """Return random color as an integer."""
     color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
@@ -92,6 +96,8 @@ async def api_fetch(url=None, auth=None):
     )
     async with aiohttp.ClientSession(connector=conn) as session:
         async with session.get(url, headers=dict(Authorization=auth)) as resp:
+            if resp.status != 200:
+                raise APIError()
             data = await resp.json()
     return data
 
@@ -243,6 +249,9 @@ class BrawlStars:
                 self._club_config = yaml.load(contents)
         return self._club_config
 
+    async def send_error_message(self, ctx):
+        await self.bot.say("BrawlAPI Error. Please try again later…")
+
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
     async def bsset(self, ctx):
@@ -321,10 +330,13 @@ class BrawlStars:
             if tag is None:
                 await self.bot.say("Can’t find tag associated with user.")
 
-        player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
-
-        # await self.bot.say(embed=self._player_embed(player))
-        await self.bot.say(self._player_str(player))
+        try:
+            player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
+        except APIError:
+            await self.send_error_message(ctx)
+        else:
+            # await self.bot.say(embed=self._player_embed(player))
+            await self.bot.say(self._player_str(player))
 
     @bs.command(name="verify", aliases=['v'], pass_context=True)
     @commands.has_any_role(*MANAGE_ROLE_ROLES)
@@ -346,7 +358,11 @@ class BrawlStars:
         self._save_settings()
         await self.bot.say("Associated {tag} with {member}".format(tag=tag, member=member))
 
-        player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
+        try:
+            player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
+        except APIError:
+            await self.send_error_message(ctx)
+            return
 
         await self.bot.say(self._player_mini_str(player))
 
@@ -425,8 +441,10 @@ class BrawlStars:
         found = []
 
         for tag, result in zip(club_tags, results):
-            if isinstance(result, Exception):
+            if isinstance(result, APIError):
                 await self.bot.say("Error fetching club info for {}".format(tag))
+                await self.send_error_message(ctx)
+                continue
 
             for member in result.get('members', []):
                 if query.lower() in member.get('name', '').lower():
