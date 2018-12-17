@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 import asyncio
 from collections import defaultdict
+from collections import namedtuple
 
 import aiofiles
 import aiohttp
@@ -38,7 +39,6 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import bold
 from cogs.utils.chat_formatting import inline
 from cogs.utils.dataIO import dataIO
-from collections import namedtuple
 
 PATH = os.path.join("data", "brawlstars")
 JSON = os.path.join(PATH, "settings.json")
@@ -81,8 +81,10 @@ class BSClub(Box):
 class APIError(Exception):
     pass
 
+
 class MissingServerConfig(Exception):
     pass
+
 
 ClubResults = namedtuple("ClubResults", ["results", "club_tags"])
 
@@ -442,7 +444,6 @@ class BrawlStars:
         results = await asyncio.gather(*tasks, return_exceptions=True)
         return ClubResults(results=results, club_tags=club_tags)
 
-
     @bs.command(name="search", aliases=['s'], pass_context=True)
     @commands.has_any_role(*MANAGE_ROLE_ROLES)
     async def bs_search(self, ctx, query: str):
@@ -527,9 +528,6 @@ class BrawlStars:
             em.add_field(name="Members", value="{0.membersCount} / 100 : {0.onlineMembers} online".format(club))
 
             await self.bot.say(embed=em)
-
-
-
 
 
 def check_folder():
