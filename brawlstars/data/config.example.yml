@@ -31,6 +31,10 @@ servers:
         tag: 282UC998
         roles:
           - BS-Bravo
+      - name: Reddit Charlie
+          tag: 29GV920P
+          roles:
+            - BS-Charlie
     everyone_roles:
       - Brawl-Stars
     member_roles:
