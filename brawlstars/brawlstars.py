@@ -35,6 +35,8 @@ import yaml
 from discord.ext import commands
 from random import choice
 
+import re
+
 from cogs.utils import checks
 from cogs.utils.chat_formatting import bold
 from cogs.utils.chat_formatting import inline
@@ -62,6 +64,10 @@ def clean_tag(tag):
     t = t.replace('B', '8')
     t = t.replace('#', '')
     return t
+
+def remove_color_tags(s):
+    """Clean string and remove color tags from string"""
+    return re.sub("<[^>]*>", "", s)
 
 
 class BSPlayer(Box):
@@ -396,10 +402,11 @@ class BrawlStars:
             to_add_roles += server.visitor_roles
 
         # change nickname to match IGN
+        player_name = remove_color_tags(player.name)
         try:
-            await self.bot.change_nickname(member, player.name)
+            await self.bot.change_nickname(member, player_name)
             await self.bot.say(
-                "Change {member} to {nick} to match IGN".format(member=member.mention, nick=player.name))
+                "Change {member} to {nick} to match IGN".format(member=member.mention, nick=player_name))
         except discord.errors.Forbidden:
             await self.bot.say("Error: I don’t have permission to change nick for this user.")
 
@@ -520,7 +527,7 @@ class BrawlStars:
                 continue
 
             club = BSClub(r)
-            em = discord.Embed(title=club.name, description=club.description, color=color)
+            em = discord.Embed(title=club.name, description=remove_color_tags(club.description), color=color)
 
             em.set_thumbnail(url=club.badgeUrl)
             em.add_field(name="Tag", value="#{0.tag}".format(club))
