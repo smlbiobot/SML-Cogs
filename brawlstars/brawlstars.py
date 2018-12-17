@@ -526,6 +526,31 @@ class BrawlStars:
 
         await self.bot.say("\n".join(o))
 
+    async def _club_info(self, ctx, club: BSClub, color=None):
+        """Show club info as embed."""
+        if color is None:
+            color = random_discord_color()
+
+        em = discord.Embed(title=club.name, description=remove_color_tags(club.description), color=color)
+
+        em.set_thumbnail(url=club.badgeUrl)
+        em.add_field(name="Tag", value="#{0.tag}".format(club))
+        em.add_field(name="Trophies", value="{0.trophies} Req: {0.requiredTrophies}".format(club))
+        em.add_field(name="Members", value="{0.membersCount} / 100 : {0.onlineMembers} online".format(club))
+
+        await self.bot.say(embed=em)
+
+    @bs.command(name="clubtag", aliases=["ct"], pass_context=True)
+    async def bs_club_tag(self, ctx, tag):
+        """Club by tag"""
+        tag = clean_tag(tag)
+        try:
+            r = await api_fetch_club(tag=tag, auth=self.settings.get('brawlapi_token'))
+            club = BSClub(r)
+            await self._club_info(ctx, club)
+        except APIError:
+            await self.send_error_message(ctx)
+
     @bs.command(name="clubs", aliases=["c"], pass_context=True)
     async def bs_clubs(self, ctx):
         """List clubs."""
@@ -541,14 +566,7 @@ class BrawlStars:
                 continue
 
             club = BSClub(r)
-            em = discord.Embed(title=club.name, description=remove_color_tags(club.description), color=color)
-
-            em.set_thumbnail(url=club.badgeUrl)
-            em.add_field(name="Tag", value="#{0.tag}".format(club))
-            em.add_field(name="Trophies", value="{0.trophies} Req: {0.requiredTrophies}".format(club))
-            em.add_field(name="Members", value="{0.membersCount} / 100 : {0.onlineMembers} online".format(club))
-
-            await self.bot.say(embed=em)
+            await self._club_info(ctx, club, color=color)
 
 
 def check_folder():
