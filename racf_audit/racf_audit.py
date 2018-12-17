@@ -88,7 +88,7 @@ async def check_manage_roles(ctx, bot):
     author = ctx.message.author
     channel = ctx.message.channel
     # For 100T server, only allow command to run if user has the "Bot Comamnder" role
-    if server.name == '100 Thieves Clash Royale':
+    if server.id == RACF_SERVER_ID:
         bc_role = discord.utils.get(server.roles, name="Bot Commander")
         if bc_role not in author.roles:
             await bot.send_message(

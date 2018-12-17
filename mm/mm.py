@@ -44,6 +44,7 @@ BOT_COMMANDER_ROLES = ["Bot Commander", "High-Elder"]
 PATH = os.path.join("data", "mm")
 JSON = os.path.join(PATH, "settings.json")
 
+FAMILY_SERVER_ID = '218534373169954816' # 100 Thieves Clan Family server
 
 def grouper(n, iterable, fillvalue=None):
     """Helper function to split lists.
@@ -442,7 +443,7 @@ class MemberManagement:
             return
 
         # For 100T server, only allow command to run if user has the "Bot Comamnder" role
-        if server.name == '100 Thieves Clash Royale':
+        if server.id == FAMILY_SERVER_ID:
             bc_role = discord.utils.get(server.roles, name="Bot Commander")
             if bc_role not in author.roles:
                 await self.bot.say("Only Bot Commanders on this server can run this command.")
