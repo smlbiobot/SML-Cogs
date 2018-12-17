@@ -30,12 +30,11 @@ import aiofiles
 import aiohttp
 import discord
 import os
+import re
 import socket
 import yaml
 from discord.ext import commands
 from random import choice
-
-import re
 
 from cogs.utils import checks
 from cogs.utils.chat_formatting import bold
@@ -64,6 +63,7 @@ def clean_tag(tag):
     t = t.replace('B', '8')
     t = t.replace('#', '')
     return t
+
 
 def remove_color_tags(s):
     """Clean string and remove color tags from string"""
@@ -335,14 +335,17 @@ class BrawlStars:
     #         await self.bot.say("Tag saved.")
 
     @bs.command(name="profile", aliases=['p'], pass_context=True)
-    async def bs_profile(self, ctx, tag=None):
-        """BS Profile."""
+    async def bs_profile(self, ctx, member: discord.Member = None):
+        """Profile by Discord username."""
         server = ctx.message.server
         author = ctx.message.author
+        if member is None:
+            member = author
+
+        tag = self.settings.get(server.id, {}).get(member.id)
         if tag is None:
-            tag = self.settings.get(server.id, {}).get(author.id)
-            if tag is None:
-                await self.bot.say("Can’t find tag associated with user.")
+            await self.bot.say("Can’t find tag associated with user.")
+            return
 
         try:
             player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
@@ -354,7 +357,7 @@ class BrawlStars:
 
     @bs.command(name="profiletag", aliases=['pt'], pass_context=True)
     async def bs_profile_tag(self, ctx, tag=None):
-        """BS Profile."""
+        """Profile by player tag."""
         tag = clean_tag(tag)
         try:
             player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
