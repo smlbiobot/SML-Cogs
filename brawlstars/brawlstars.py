@@ -352,6 +352,17 @@ class BrawlStars:
             # await self.bot.say(embed=self._player_embed(player))
             await self.bot.say(self._player_str(player))
 
+    @bs.command(name="profiletag", aliases=['pt'], pass_context=True)
+    async def bs_profile_tag(self, ctx, tag=None):
+        """BS Profile."""
+        tag = clean_tag(tag)
+        try:
+            player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
+        except APIError:
+            await self.send_error_message(ctx)
+        else:
+            await self.bot.say(self._player_str(player))
+
     @bs.command(name="verify", aliases=['v'], pass_context=True)
     @commands.has_any_role(*MANAGE_ROLE_ROLES)
     async def bs_verify(self, ctx, member: discord.Member, tag=None):
