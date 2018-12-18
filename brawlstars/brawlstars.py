@@ -582,7 +582,7 @@ class BrawlStars:
                     tag=m.tag,
                     role=m.role,
                     trophies=m.trophies,
-                    d_name=user if user else ""
+                    d_name=user if user else "----"
                 )
             )
 
