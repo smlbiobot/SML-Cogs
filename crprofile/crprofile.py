@@ -119,6 +119,10 @@ def normalized_card_level(card):
     )
     return card.get('level', 0) + rarity2level.get(get_card_rarity(card), 0)
 
+def inline(s, fmt):
+    """Wrap string with inline escape"""
+    return "`\u200B{}\u200B`".format(fmt.format(s))
+
 
 class API:
     """Clash Royale official API."""
@@ -765,14 +769,29 @@ class CRPlayerModel:
                         if card.get('level') == 1:
                             trade_count -= 1
 
+                        # Trade cards
                         if trade_count > 0:
                             cards[rarity].append(dict(
                                 emoji=bot_emoji.name(card.get('key').replace('-', '')),
-                                count=trade_count
+                                count=inline(trade_count, "x{:2}") + " "
+                            ))
+
+                        # max cards
+                        if card.get('level') == card.get('maxLevel'):
+                            cards[rarity].append(dict(
+                                emoji=bot_emoji.name(card.get('key').replace('-', '')),
+                                count=inline(trade_count, " M ") + " "
                             ))
         ret = {}
+        groups = {}
         for k, v in cards.items():
-            ret[k] = ['{0[emoji]}{0[count]}x'.format(card) for card in v]
+            groups[k] = 0
+
+        for k, v in cards.items():
+            groups = grouper(5, v)
+            ret[k] = []
+            for group in groups:
+                ret[k].extend(['{0[emoji]}{0[count]}'.format(card) for card in group if card is not None])
 
         return ret
 
