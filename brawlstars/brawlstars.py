@@ -469,27 +469,6 @@ class BrawlStars:
     @commands.has_any_role(*MANAGE_ROLE_ROLES)
     async def bs_search(self, ctx, query: str):
         """Search for member name in configured clubs."""
-        # cfg = Box(await self._get_club_config())
-        # server = None
-        # ctx_server = ctx.message.server
-        # for s in cfg.servers:
-        #     if str(s.id) == str(ctx.message.server.id):
-        #         server = s
-        #         break
-        #
-        # if server is None:
-        #     await self.bot.say("No config for this server found.")
-        #     return
-        #
-        # club_tags = [b.tag for b in server.clubs]
-        #
-        # tasks = [
-        #     api_fetch_club(tag=tag, auth=self.settings.get('brawlapi_token'))
-        #     for tag in club_tags
-        # ]
-        #
-        # results = await asyncio.gather(*tasks, return_exceptions=True)
-
         r = await self._get_clubs(ctx.message.server.id)
         results = r.results
         club_tags = r.club_tags
