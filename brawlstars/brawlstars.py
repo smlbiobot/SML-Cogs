@@ -586,7 +586,7 @@ class BrawlStars:
                 )
             )
 
-        pagified = grouper(o, 25)
+        pagified = grouper(o, 20)
         for page in pagified:
             v = [line for line in page if line is not None]
             em.add_field(name="Members", value='\n'.join(v))
