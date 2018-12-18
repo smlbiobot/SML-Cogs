@@ -593,7 +593,10 @@ class BrawlStars:
             v = [line for line in page if line is not None]
             em.add_field(name="Members {}-{}".format(index + 1, index * 10 + len(v)), value='\n'.join(v))
 
-        await self.bot.say(embed=em)
+        try:
+            await self.bot.say(embed=em)
+        except Exception as e:
+            await self.bot.say(e)
 
     @bs.command(name="members", aliases=['m'], pass_context=True)
     @commands.has_any_role(*MANAGE_ROLE_ROLES)
