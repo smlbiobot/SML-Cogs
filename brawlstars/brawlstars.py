@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 import asyncio
 from collections import defaultdict
 from collections import namedtuple
+from itertools import zip_longest
 
 import aiofiles
 import aiohttp
@@ -53,6 +54,13 @@ from box import Box
 def nested_dict():
     """Recursively nested defaultdict."""
     return defaultdict(nested_dict)
+
+
+def grouper(iterable, n, fillvalue=None):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
 
 
 def clean_tag(tag):
@@ -442,7 +450,7 @@ class BrawlStars:
         except discord.errors.Forbidden:
             await self.bot.say("Error: I don’t have permission to add roles.")
 
-    async def _get_clubs(self, server_id):
+    async def _get_clubs(self, server_id, query=None):
         """Return clubs."""
         cfg = Box(await self._get_club_config())
         server = None
@@ -455,7 +463,13 @@ class BrawlStars:
             await self.bot.say("No config for this server found.")
             return
 
-        club_tags = [b.tag for b in server.clubs]
+        if query is None:
+            club_tags = [b.tag for b in server.clubs]
+        else:
+            club_tags = []
+            for b in server.clubs:
+                if query.lower() in b.name.lower():
+                    club_tags.append(b.tag)
 
         tasks = [
             api_fetch_club(tag=tag, auth=self.settings.get('brawlapi_token'))
@@ -546,6 +560,54 @@ class BrawlStars:
 
             club = BSClub(r)
             await self._club_info(ctx, club, color=color)
+
+    async def _club_members(self, ctx, club: BSClub, color=None):
+        if color is None:
+            color = random_discord_color()
+
+        em = discord.Embed(title=club.name, description='#{}'.format(club.tag), color=color)
+
+        server = ctx.message.server
+        server_members = self.settings.get(server.id, {})
+        tag2id = {v: k for k, v in server_members.items()}
+        o = []
+        for m in club.members:
+            user_id = tag2id.get(m.tag)
+            user = None
+            if user_id is not None:
+                user = server.get_member(user_id)
+            o.append(
+                "**{name}** #{tag}, {role}, {trophies} {mention}".format(
+                    name=remove_color_tags(m.name),
+                    tag=m.tag,
+                    role=m.role,
+                    trophies=m.trophies,
+                    mention=user.mention if user else ""
+                )
+            )
+
+        pagified = grouper(o, 25)
+        for page in pagified:
+            v = [line for line in page if line is not None]
+            em.add_field(name="Members", value='\n'.join(v))
+
+        await self.bot.say(embed=em)
+
+    @bs.command(name="members", aliases=['m'], pass_context=True)
+    @commands.has_any_role(*MANAGE_ROLE_ROLES)
+    async def bs_members(self, ctx, query: str = None):
+        """List all members in clubs."""
+        clubs = await self._get_clubs(ctx.message.server.id, query=query)
+
+        color = random_discord_color()
+
+        for r, club_tag in zip(clubs.results, clubs.club_tags):
+            if isinstance(r, Exception):
+                await self.bot.say("Error fetching club info for {}".format(club_tag))
+                continue
+
+            club = BSClub(r)
+            await self._club_members(ctx, club, color=color)
 
 
 def check_folder():
