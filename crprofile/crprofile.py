@@ -773,14 +773,16 @@ class CRPlayerModel:
                         if trade_count > 0:
                             cards[rarity].append(dict(
                                 emoji=bot_emoji.name(card.get('key').replace('-', '')),
-                                count=inline(trade_count, "x{:2}") + " "
+                                count="x{}".format(trade_count)
+                                # count=inline(trade_count, "x{:2}") + " "
                             ))
 
                         # max cards
                         if card.get('level') == card.get('maxLevel'):
                             cards[rarity].append(dict(
                                 emoji=bot_emoji.name(card.get('key').replace('-', '')),
-                                count=inline(trade_count, " M ") + " "
+                                count="M"
+                                # count=inline(trade_count, " M ") + " "
                             ))
         ret = {}
         groups = {}
