@@ -577,7 +577,7 @@ class BrawlStars:
             if user_id is not None:
                 user = server.get_member(user_id)
             o.append(
-                "**{name}** #{tag}, {role}, {trophies} {d_name}".format(
+                "{name} #{tag}, {role}, {trophies} {d_name}".format(
                     name=remove_color_tags(m.name),
                     tag=m.tag,
                     role=m.role,
