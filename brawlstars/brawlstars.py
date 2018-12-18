@@ -586,10 +586,11 @@ class BrawlStars:
                 )
             )
 
-        pagified = grouper(o, 20)
-        for page in pagified:
+        count = 10
+        pagified = grouper(o, count)
+        for index, page in enumerate(pagified):
             v = [line for line in page if line is not None]
-            em.add_field(name="Members", value='\n'.join(v))
+            em.add_field(name="Members {}-{}".format(index + 1, index * 10 + len(v)), value='\n'.join(v))
 
         await self.bot.say(embed=em)
 
