@@ -124,14 +124,14 @@ async def api_fetch(url=None, auth=None):
     return data
 
 
-async def api_fetch_player(tag=None, auth=None):
+async def api_fetch_player(tag=None, auth=None, **kwargs):
     """Fetch player"""
     url = 'https://brawlapi.cf/api/players/{}'.format(clean_tag(tag))
     data = await api_fetch(url=url, auth=auth)
     return BSPlayer(data)
 
 
-async def api_fetch_club(tag=None, auth=None):
+async def api_fetch_club(tag=None, auth=None, **kwargs):
     """Fetch player"""
     url = 'https://brawlapi.cf/api/clubs/{}'.format(clean_tag(tag))
     data = await api_fetch(url=url, auth=auth)
@@ -274,6 +274,15 @@ class BrawlStars:
     async def send_error_message(self, ctx):
         await self.bot.say("BrawlAPI Error. Please try again later…")
 
+    async def _api_fetch(self, section=None, **kwargs):
+        data = dict()
+        auth = self.settings.get('brawlapi_token')
+        if section == 'player':
+            data = await api_fetch_player(auth=auth, **kwargs)
+        if section == 'club':
+            data = await api_fetch_club(auth=auth, **kwargs)
+        return data
+
     @commands.group(pass_context=True, no_pm=True)
     @checks.serverowner_or_permissions()
     async def bsset(self, ctx):
@@ -356,7 +365,7 @@ class BrawlStars:
             return
 
         try:
-            player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
+            player = await self._api_fetch(section='player', tag=tag)
         except APIError:
             await self.send_error_message(ctx)
         else:
@@ -368,7 +377,7 @@ class BrawlStars:
         """Profile by player tag."""
         tag = clean_tag(tag)
         try:
-            player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
+            player = await self._api_fetch(section='player', tag=tag)
         except APIError:
             await self.send_error_message(ctx)
         else:
@@ -472,7 +481,7 @@ class BrawlStars:
                     club_tags.append(b.tag)
 
         tasks = [
-            api_fetch_club(tag=tag, auth=self.settings.get('brawlapi_token'))
+            self._api_fetch(section='club', tag=tag)
             for tag in club_tags
         ]
 
