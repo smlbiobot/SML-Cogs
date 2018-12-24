@@ -30,6 +30,7 @@ from itertools import zip_longest
 import aiofiles
 import aiohttp
 import discord
+import json
 import os
 import re
 import socket
@@ -45,6 +46,9 @@ from cogs.utils.dataIO import dataIO
 PATH = os.path.join("data", "brawlstars")
 JSON = os.path.join(PATH, "settings.json")
 BAND_CONFIG_YML = os.path.join(PATH, "club.config.yml")
+CACHE_PATH = os.path.join(PATH, "cache")
+CACHE_PLAYER_PATH = os.path.join(CACHE_PATH, "player")
+CACHE_CLUB_PATH = os.path.join(CACHE_PATH, "club")
 
 MANAGE_ROLE_ROLES = ['Bot Commander']
 
@@ -96,6 +100,14 @@ class APIError(Exception):
     pass
 
 
+class APIRequestError(APIError):
+    pass
+
+
+class APIServerError(APIError):
+    pass
+
+
 class MissingServerConfig(Exception):
     pass
 
@@ -118,23 +130,53 @@ async def api_fetch(url=None, auth=None):
     )
     async with aiohttp.ClientSession(connector=conn) as session:
         async with session.get(url, headers=dict(Authorization=auth)) as resp:
-            if resp.status != 200:
-                raise APIError()
+
+            if str(resp.status).startswith('4'):
+                raise APIRequestError()
+
+            if str(resp.status).startswith('5'):
+                raise APIServerError()
+
             data = await resp.json()
+
     return data
 
 
 async def api_fetch_player(tag=None, auth=None, **kwargs):
     """Fetch player"""
     url = 'https://brawlapi.cf/api/players/{}'.format(clean_tag(tag))
-    data = await api_fetch(url=url, auth=auth)
+    fn = os.path.join(CACHE_PLAYER_PATH, "{}.json".format(tag))
+    try:
+        data = await api_fetch(url=url, auth=auth)
+    except APIServerError:
+        if os.path.exists(fn):
+            async with aiofiles.open(fn, mode='r') as f:
+                data = json.load(await f.read())
+        else:
+            raise
+    else:
+        async with aiofiles.open(fn, mode='w') as f:
+            json.dump(data, f)
+
     return BSPlayer(data)
 
 
 async def api_fetch_club(tag=None, auth=None, **kwargs):
     """Fetch player"""
     url = 'https://brawlapi.cf/api/clubs/{}'.format(clean_tag(tag))
-    data = await api_fetch(url=url, auth=auth)
+    fn = os.path.join(CACHE_CLUB_PATH, "{}.json".format(tag))
+    try:
+        data = await api_fetch(url=url, auth=auth)
+    except APIServerError:
+        if os.path.exists(fn):
+            async with aiofiles.open(fn, mode='r') as f:
+                data = json.load(await f.read())
+        else:
+            raise
+    else:
+        async with aiofiles.open(fn, mode='w') as f:
+            json.dump(data, f)
+
     return BSClub(data)
 
 
@@ -203,6 +245,55 @@ class BrawlStars:
         )
         return em
 
+    def _player_embed_2(self, player: BSPlayer):
+        """New player embed."""
+        if player.avatarId:
+            avatar = self.get_avatar(player)
+            description = '{} #{}'.format(avatar, player.tag.upper())
+        else:
+            description = '#{}'.format(player.tag.upper())
+
+        em = discord.Embed(
+            title=player.name,
+            description=description,
+            color=random_discord_color()
+        )
+
+        # club
+        em.add_field(name=player.club.name, value=player.club.role, inline=False)
+
+        # fields
+        em.add_field(name='Trophies', value="{} / {} PB".format(player.trophies, player.highestTrophies))
+        em.add_field(name='Boss', value="{}".format(player.bestTimeAsBoss or ''))
+        em.add_field(name='Robo Rumble', value="{}".format(player.bestRoboRumbleTime or ''))
+        em.add_field(name='XP', value="{}".format(player.totalExp or ''))
+        em.add_field(name='Victories', value="{}".format(player.victories or ''))
+        em.add_field(name='Solo SD', value="{}".format(player.soloShowdownVictories or ''))
+        em.add_field(name='Duo SD', value="{}".format(player.duoShowdownVictories or ''))
+
+        # brawlers
+        em.add_field(name="Brawlers Unlocked", value=player.brawlersUnlocked, inline=False)
+
+        o = []
+        for b in player.brawlers or []:
+            o.append(
+                '{emoji} `{trophies: >3} / {pb: >3} Lvl {level: >2}\u2800` {name}'.format(
+                    emoji=self.get_emoji(b.name.lower().replace(' ', '')),
+                    trophies=b.trophies,
+                    pb=b.highestTrophies,
+                    level=b.level,
+                    name=b.name
+                )
+            )
+
+        em.add_field(name="Brawlers {}/22".format(len(player.brawlers)), value='\n'.join(o))
+
+        # footer
+        em.set_footer(
+            text="Data by BrawlAPI https://brawlapi.cf"
+        )
+        return em
+
     def _player_mini_str(self, player: BSPlayer):
         """Minimal player profile for verification."""
         avatar = self.get_avatar(player)
@@ -246,19 +337,24 @@ class BrawlStars:
                     value=inline(player.duoShowdownVictories),
                     name='Duo SD'
                 ),
+            ),
+            # brawler stats
+            'Brawlers: {}'.format(len(player.brawlers)),
+            'Trophy per Level: {:.2f}'.format(
+                player.trophies / sum([b.level for b in player.brawlers])
             )
-
         ]
 
         # brawlers
         for b in player.brawlers or []:
             o.append(
-                '{emoji} `{trophies: >3} / {pb: >3} Lvl {level: >2}\u2800` {name}'.format(
+                '{emoji} `\u2800{trophies: >3} Lvl {level: >2} {trophy_per_level: .2f}\u2800` {name}'.format(
                     emoji=self.get_emoji(b.name.lower().replace(' ', '')),
                     trophies=b.trophies,
                     pb=b.highestTrophies,
                     level=b.level,
-                    name=b.name
+                    name=b.name,
+                    trophy_per_level=b.trophies/b.level,
                 )
             )
 
@@ -369,7 +465,7 @@ class BrawlStars:
         except APIError:
             await self.send_error_message(ctx)
         else:
-            # await self.bot.say(embed=self._player_embed(player))
+            # await self.bot.say(embed=self._player_embed_2(player))
             await self.bot.say(self._player_str(player))
 
     @bs.command(name="profiletag", aliases=['pt'], pass_context=True)
@@ -626,6 +722,9 @@ class BrawlStars:
 def check_folder():
     """Check folder."""
     os.makedirs(PATH, exist_ok=True)
+    os.makedirs(CACHE_PATH, exist_ok=True)
+    os.makedirs(CACHE_PLAYER_PATH, exist_ok=True)
+    os.makedirs(CACHE_CLUB_PATH, exist_ok=True)
 
 
 def check_file():
