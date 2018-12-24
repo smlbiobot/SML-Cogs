@@ -342,6 +342,9 @@ class BrawlStars:
             'Brawlers: {}'.format(len(player.brawlers)),
             'Trophy per Level: {:.2f}'.format(
                 player.trophies / sum([b.level for b in player.brawlers])
+            ),
+            'Trophy per Brawler: {:.2f}'.format(
+                player.trophies / len(player.brawlers)
             )
         ]
 
