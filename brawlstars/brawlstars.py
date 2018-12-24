@@ -305,7 +305,7 @@ class BrawlStars:
         ]
         return "\n".join(o)
 
-    def _player_str(self, player: BSPlayer):
+    def _player_str(self, player: BSPlayer, sort='trophies'):
         """Player profile as plain text."""
         avatar = self.get_avatar(player)
 
@@ -346,7 +346,13 @@ class BrawlStars:
         ]
 
         # brawlers
-        for b in player.brawlers or []:
+        brawlers = player.brawlers.copy()
+        if sort == 'level':
+            brawlers.sort(key=lambda x: x.level, reverse=True)
+        elif sort == 'trophy_by_level':
+            brawlers.sort(key=lambda x: x.trophies/x.level, reverse=True)
+
+        for b in brawlers or []:
             o.append(
                 '{emoji} `\u2800{trophies: >3} Lvl {level: >2} {trophy_per_level: .2f}\u2800` {name}'.format(
                     emoji=self.get_emoji(b.name.lower().replace(' ', '')),
@@ -448,12 +454,24 @@ class BrawlStars:
     #         await self.bot.say("Tag saved.")
 
     @bs.command(name="profile", aliases=['p'], pass_context=True)
-    async def bs_profile(self, ctx, member: discord.Member = None):
-        """Profile by Discord username."""
+    async def bs_profile(self, ctx, member: discord.Member = None, *, options=None):
+        """Profile by Discord username.
+
+        Optional Arguments:
+        -l: sort by brawler level
+        -tl: sort by trophy per level
+        """
         server = ctx.message.server
         author = ctx.message.author
         if member is None:
             member = author
+
+        sort = 'trophies'
+        if options is not None:
+            if '-l' in options:
+                sort = 'level'
+            if '-tl' in options:
+                sort = 'trophy_by_level'
 
         tag = self.settings.get(server.id, {}).get(member.id)
         if tag is None:
@@ -466,7 +484,7 @@ class BrawlStars:
             await self.send_error_message(ctx)
         else:
             # await self.bot.say(embed=self._player_embed_2(player))
-            await self.bot.say(self._player_str(player))
+            await self.bot.say(self._player_str(player, sort=sort))
 
     @bs.command(name="profiletag", aliases=['pt'], pass_context=True)
     async def bs_profile_tag(self, ctx, tag=None):
