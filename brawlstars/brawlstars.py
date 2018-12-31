@@ -357,7 +357,7 @@ class BrawlStars:
 
         for b in brawlers or []:
             o.append(
-                '{emoji} `\u2800{trophies: >3} Lvl {level: >2} {trophy_per_level: .2f}\u2800` {name}'.format(
+                '{emoji} `\u2800{trophies: >3} Lvl {level: >2} {trophy_per_level: >2.2f}\u2800` {name}'.format(
                     emoji=self.get_emoji(b.name.lower().replace(' ', '')),
                     trophies=b.trophies,
                     pb=b.highestTrophies,
