@@ -50,7 +50,8 @@ PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
 PLAYERS = os.path.join("data", "racf_audit", "player_db.json")
 
-RACF_SERVER_ID = '218534373169954816'
+# RACF_SERVER_ID = '218534373169954816'
+RACF_SERVER_ID = '528327242875535372'
 SML_SERVER_ID = '275395656955330560'
 
 
