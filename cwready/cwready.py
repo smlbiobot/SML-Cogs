@@ -168,7 +168,9 @@ class CWReady:
         await ctx.invoke(self.cwreadytag, tag)
 
     async def send_cwr_req_results(self, ctx, data):
-        await self.send_cwr_req_results_channel(ctx.message.channel, data)
+        # don’t send results for now
+        pass
+        # await self.send_cwr_req_results_channel(ctx.message.channel, data)
 
     async def send_cwr_req_results_channel(self, channel, data):
         clans = await self.test_cwr_requirements(data)
