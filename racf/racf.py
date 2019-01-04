@@ -62,85 +62,130 @@ COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
 COMPETITIVE_TEAM_ROLES = [
     "CRL", "RPL-NA", "RPL-EU", "RPL-APAC", "MLG",
     "ClashWars", "CRL-Elite", "CRL-Legends", "CRL-Rockets"]
+# CLAN_PERMISSION = {
+#     '9PJ82CRC': {
+#         'tag': '9PJ82CRC',
+#         'role': 'Alpha',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '9UQJUJC9': {
+#         'tag': '9UQJUJC9',
+#         'role': 'Bravo',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '9G99JQPL': {
+#         'tag': '9G99JQPL',
+#         'role': 'Charlie',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '9G8VYGL0': {
+#         'tag': '9G8VYGL0',
+#         'role': 'Delta',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '9CJ0L9RG': {
+#         'tag': '9CJ0L9RG',
+#         'role': 'Echo',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '9UQC2P0V': {
+#         'tag': '9UQC2P0V',
+#         'role': 'Foxtrot',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '9UG2R2LQ': {
+#         'tag': '9UG2R2LQ',
+#         'role': 'Golf',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '9Y9VR2JR': {
+#         'tag': '9Y9VR2JR',
+#         'role': 'Hotel',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '9R8GUC0L': {
+#         'tag': '9R8GUC0L',
+#         'role': 'YOLO',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '9LPVG9UC': {
+#         'tag': '9LPVG9UC',
+#         'role': 'Zen',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     'PYVQL8YP': {
+#         'tag': 'PYVQL8YP',
+#         'role': 'Trade',
+#         'assign_role': True,
+#         'member': True
+#     },
+#     '22LR8JJ2': {
+#         'tag': '22LR8JJ2',
+#         'role': 'Mini',
+#         'assign_role': True,
+#         'member': False
+#     },
+#     '2Q09VJC8': {
+#         'tag': '2Q09VJC8',
+#         'role': 'Mini2',
+#         'assign_role': True,
+#         'member': False
+#     },
+# }
+
 CLAN_PERMISSION = {
-    '9PJ82CRC': {
-        'tag': '9PJ82CRC',
-        'role': 'Alpha',
-        'assign_role': True,
-        'member': True
-    },
-    '9UQJUJC9': {
-        'tag': '9UQJUJC9',
-        'role': 'Bravo',
-        'assign_role': True,
-        'member': True
-    },
-    '9G99JQPL': {
-        'tag': '9G99JQPL',
-        'role': 'Charlie',
-        'assign_role': True,
-        'member': True
-    },
-    '9G8VYGL0': {
-        'tag': '9G8VYGL0',
-        'role': 'Delta',
-        'assign_role': True,
-        'member': True
-    },
-    '9CJ0L9RG': {
-        'tag': '9CJ0L9RG',
-        'role': 'Echo',
-        'assign_role': True,
-        'member': True
-    },
-    '9UQC2P0V': {
-        'tag': '9UQC2P0V',
-        'role': 'Foxtrot',
-        'assign_role': True,
-        'member': True
-    },
-    '9UG2R2LQ': {
-        'tag': '9UG2R2LQ',
-        'role': 'Golf',
-        'assign_role': True,
-        'member': True
-    },
-    '9Y9VR2JR': {
-        'tag': '9Y9VR2JR',
-        'role': 'Hotel',
-        'assign_role': True,
-        'member': True
-    },
-    '9R8GUC0L': {
-        'tag': '9R8GUC0L',
-        'role': 'YOLO',
-        'assign_role': True,
-        'member': True
-    },
-    '9LPVG9UC': {
-        'tag': '9LPVG9UC',
-        'role': 'Zen',
-        'assign_role': True,
-        'member': True
-    },
-    'PYVQL8YP': {
-        'tag': 'PYVQL8YP',
-        'role': 'Trade',
-        'assign_role': True,
-        'member': True
-    },
-    '22LR8JJ2': {
-        'tag': '22LR8JJ2',
+    '9R8G9290': {
+        'tag': '9R8G9290',
         'role': 'Mini',
         'assign_role': True,
-        'member': False
+        'member': True
     },
-    '2Q09VJC8': {
-        'tag': '2Q09VJC8',
-        'role': 'Mini2',
+    'PV98LY0P': {
+        'tag': 'PV98LY0P',
+        'role': 'A',
         'assign_role': True,
-        'member': False
+        'member': True
     },
+    'PQGU8RQ0': {
+        'tag': 'PQGU8RQ0',
+        'role': 'B',
+        'assign_role': True,
+        'member': True,
+    },
+    'P0VGU80L': {
+        'tag': 'P0VGU80L',
+        'role': 'C',
+        'assign_role': True,
+        'member': True,
+    },
+    'P8VLQPVL': {
+        'tag': 'P8VLQPVL',
+        'role': 'D',
+        'assign_role': True,
+        'member': True
+    },
+    'PQUGVQU8': {
+        'tag': 'PQUGVQU8',
+        'role': 'F',
+        'assign_role': True,
+        'member': True
+    },
+    'Y2LGRU0Q': {
+        'tag': 'Y2LGRU0Q',
+        'role': 'G',
+        'assign_role': True,
+        'member': True
+    }
 }
 
 BAND_PERMISSION = {
