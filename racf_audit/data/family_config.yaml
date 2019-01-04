@@ -1,60 +1,87 @@
-name: 100 Thieves Clan Family
-key: 100t
-emblem: A_Char_Rocket_02
+name: RoyaleAPI Clan Family
+key: royaleapi
+emblem: Sword_02
 clans:
-  - name: 100T Alpha
-    tag: 9PJ82CRC
-    role_name: Alpha
+  - name: RoyaleAPI A
+    tag: PV98LY0P
+    role_name: A
     type: Member
-  - name: 100T Bravo
-    tag: 9UQJUJC9
-    role_name: Bravo
+  - name: RoyaleAPI B
+    tag: PQGU8RQ0
+    role_name: B
     type: Member
-  - name: 100T Charlie
-    tag: 9G99JQPL
-    role_name: Charlie
+  - name: RoyaleAPI C
+    tag: P0VGU80L
+    role_name: C
     type: Member
-  - name: 100T Delta
-    tag: 9G8VYGL0
-    role_name: Delta
+  - name: RoyaleAPI D
+    tag: P8VLQPVL
+    role_name: D
     type: Member
-  - name: 100T Echo
-    tag: 9CJ0L9RG
-    role_name: Echo
+  - name: RoyaleAPI F
+    tag: PQUGVQU8
+    role_name: F
     type: Member
-  - name: 100T Foxtrot
-    tag: 9UQC2P0V
-    role_name: Foxtrot
+  - name: RoyaleAPI G
+    tag: Y2LGRU0Q
+    role_name: G
     type: Member
-  - name: 100T Golf
-    tag: 9UG2R2LQ
-    role_name: Golf
-    type: Member
-  - name: 100T Hotel
-    tag: 9Y9VR2JR
-    role_name: Hotel
-    type: Member
-  - name: 100T YOLO
-    tag: 9R8GUC0L
-    role_name: YOLO
-    type: Member
-  - name: 100T Zen
-    tag: 9LPVG9UC
-    role_name: Zen
-    type: Member
-  - name: 100T Trade
-    tag: PYVQL8YP
-    type: Member
-    role_name: Trade
-    trade: true
-  - name: RACF Mini
-    tag: 22LR8JJ2
-    role_name: Mini
-    type: Visitor
-  - name: RACF Mini 2
-    tag: 2Q09VJC8
-    role_name: Mini2
-    type: Visitor
+#clans:
+#  - name: 100T Alpha
+#    tag: 9PJ82CRC
+#    role_name: Alpha
+#    type: Member
+#  - name: 100T Bravo
+#    tag: 9UQJUJC9
+#    role_name: Bravo
+#    type: Member
+#  - name: 100T Charlie
+#    tag: 9G99JQPL
+#    role_name: Charlie
+#    type: Member
+#  - name: 100T Delta
+#    tag: 9G8VYGL0
+#    role_name: Delta
+#    type: Member
+#  - name: 100T Echo
+#    tag: 9CJ0L9RG
+#    role_name: Echo
+#    type: Member
+#  - name: 100T Foxtrot
+#    tag: 9UQC2P0V
+#    role_name: Foxtrot
+#    type: Member
+#  - name: 100T Golf
+#    tag: 9UG2R2LQ
+#    role_name: Golf
+#    type: Member
+#  - name: 100T Hotel
+#    tag: 9Y9VR2JR
+#    role_name: Hotel
+#    type: Member
+#  - name: 100T YOLO
+#    tag: 9R8GUC0L
+#    role_name: YOLO
+#    type: Member
+#  - name: 100T Zen
+#    tag: 9LPVG9UC
+#    role_name: Zen
+#    type: Member
+#  - name: 100T Trade
+#    tag: PYVQL8YP
+#    type: Member
+#    role_name: Trade
+#    trade: true
+#  - name: RACF Mini
+#    tag: 22LR8JJ2
+#    role_name: Mini
+#    type: Visitor
+#  - name: RACF Mini 2
+#    tag: 2Q09VJC8
+#    role_name: Mini2
+#    type: Visitor
+
+
 membership_types:
   - name: Member
     roles:
