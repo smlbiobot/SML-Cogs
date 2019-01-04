@@ -44,7 +44,8 @@ BOT_COMMANDER_ROLES = ["Bot Commander", "High-Elder"]
 PATH = os.path.join("data", "mm")
 JSON = os.path.join(PATH, "settings.json")
 
-FAMILY_SERVER_ID = '218534373169954816' # 100 Thieves Clan Family server
+# FAMILY_SERVER_ID = '218534373169954816' # 100 Thieves Clan Family server
+FAMILY_SERVER_ID = '528327242875535372' # RoyaleAPI Clan Family server
 
 def grouper(n, iterable, fillvalue=None):
     """Helper function to split lists.

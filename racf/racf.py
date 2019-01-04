@@ -180,6 +180,9 @@ VISITOR_ROLES = ['Visitor']
 RECRUIT_ROLES = ['{}Recruit'.format(r) for r in CLAN_ROLES]
 RECRUIT_ROLES.append('Recruit')
 
+# FAMILY_SERVER_ID = '218534373169954816' # 100 Thieves Clan Family server
+FAMILY_SERVER_ID = '528327242875535372' # RoyaleAPI Clan Family server
+
 
 def grouper(n, iterable, fillvalue=None):
     """Group lists into lists of items.
@@ -235,7 +238,7 @@ async def check_manage_roles(ctx, bot):
     author = ctx.message.author
     channel = ctx.message.channel
     # For 100T server, only allow command to run if user has the "Bot Comamnder" role
-    if server.id == '218534373169954816':
+    if server.id == FAMILY_SERVER_ID:
         bc_role = discord.utils.get(server.roles, name="Bot Commander")
         if bc_role not in author.roles:
             await bot.send_message(
