@@ -1,7 +1,7 @@
 url:
   rules: https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/
   roles: https://www.reddit.com/r/CRRedditAlpha/wiki/roles
-  discord: http://discord.gg/100t
+  discord: http://discord.io/apifam
   docs: http://docs.100talpha.com
 messages:
   welcome:
@@ -88,7 +88,7 @@ messages:
     with the red skull emblem.
     Good luck in your future games!
   visitor_rules: >
-    Welcome to the **100 Thieves Clan Family** (100T) Discord server.
+    Welcome to the **RoyaleAPI Clan Family** Discord server.
 
 
     As a visitor, you agree to follow the following rules:
@@ -114,7 +114,7 @@ messages:
 
     Thanks + enjoy!
   member: >
-    Welcome to the **100 Thieves Clan Family** (100T) Discord server.
+    Welcome to the **RoyaleAPI Clan Family** Discord server.
 
 
     Please check out http://docs.100talpha.com/ for an overview of our family rules,
