@@ -1188,7 +1188,7 @@ class RACFAudit:
 
         # Summary
         o = [
-            '50th in 100T = {:,} :trophy: '.format(trophy_50),
+            '50th = {:,} :trophy: '.format(trophy_50),
             'Alpha Clan Trophies: {:,} :trophy:'.format(alpha_clan_trophies),
             'Global Rank: {:,}'.format(alpha_global_rank),
             'Top 50 Clan Trophies: {:,} :trophy:'.format(top50_clan_trophies),
