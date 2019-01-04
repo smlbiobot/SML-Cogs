@@ -185,6 +185,12 @@ CLAN_PERMISSION = {
         'role': 'G',
         'assign_role': True,
         'member': True
+    },
+    'P0VPRCRC': {
+        'tag': 'P0VPRCRC',
+        'role': 'Z',
+        'assign_role': True,
+        'member': True
     }
 }
 
