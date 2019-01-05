@@ -572,6 +572,8 @@ class RACF:
         player_clan_tag = SCTag(player_clan_tag).tag
         channels = ctx.message.server.channels
 
+        server = ctx.message.server
+
         if player_clan_tag in CLAN_PERMISSION.keys():
             # - Check allow role assignment
             perm = CLAN_PERMISSION[player_clan_tag]
@@ -580,16 +582,21 @@ class RACF:
                 return
 
             # - Assign role - not members
-            mm = self.bot.get_cog("MemberManagement")
             if not perm['member']:
-                await ctx.invoke(mm.changerole, member, perm['role'], 'Visitor')
+                added_roles = await self.add_roles(server, member, ['Visitor'])
+                await self.bot.say(
+                    "Added {} to {}".format(
+                        ", ".join(added_roles),
+                        member
+                    )
+                )
                 channel = discord.utils.get(channels, name="visitors")
                 await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
             else:
                 # remove all clan roles
                 to_remove = CLAN_ROLES + VISITOR_ROLES + RECRUIT_ROLES
                 to_add = MEMBER_ROLES + [perm['role']]
-                server = ctx.message.server
+
                 removed_roles = await self.remove_roles(server, member, to_remove)
                 added_roles = await self.add_roles(server, member, to_add)
                 await self.bot.say(
