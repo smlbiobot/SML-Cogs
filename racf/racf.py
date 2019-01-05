@@ -174,6 +174,12 @@ CLAN_PERMISSION = {
         'assign_role': True,
         'member': True
     },
+    'P2QYLV0V': {
+        'tag': 'P2QYLV0V',
+        'role': 'E',
+        'assign_role': True,
+        'member': True
+    },
     'PQUGVQU8': {
         'tag': 'PQUGVQU8',
         'role': 'F',
