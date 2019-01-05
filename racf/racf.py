@@ -581,7 +581,7 @@ class RACF:
                     member
                 )
             )
-            channel = discord.utils.get(channels, name="visitors")
+
             await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
 
         if player_clan_tag in CLAN_PERMISSION.keys():
@@ -594,6 +594,7 @@ class RACF:
             # - Assign role - not members
             if not perm['member']:
                 await add_visitor()
+                channel = discord.utils.get(channels, name="visitors")
             else:
                 # remove all clan roles
                 to_remove = CLAN_ROLES + VISITOR_ROLES + RECRUIT_ROLES
