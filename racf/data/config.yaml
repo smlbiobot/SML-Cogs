@@ -61,12 +61,12 @@ messages:
     to increase your war success and remain in the 100T clan family.
 
 
-    If clan wars is not your cup of tea, you may wish to join 100T Zen.
+    If clan wars is not your cup of tea, you may wish to join RoyaleAPI Z.
     Please use the passphrase “Life is a journey” when requesting.
 
 
-    Our clans are Alpha / Bravo / Charlie / Delta /
-    Echo / Foxtrot / Golf / Hotel / Zen with the red rocket emblem.
+    Our clans are Royale API A / B / C / D / E / F / G / Z
+    with the red and blue sword emblem.
     Good luck on the ladder + the next war!
   k5alpha: >
     You have been kicked due to your card levels not being up to our expectancy.
@@ -74,10 +74,8 @@ messages:
     due to our high ranking in the Clan Wars Leaderboard.
 
 
-    If you decide to join a lower feeder our clans are 100T Alpha / 100T Bravo /
-    100T Charlie / 100T Delta / 100T Echo / 100T Foxtrot / 100T Golf / 100T Hotel /
-    100T Zen with the red rocket emblem.
-
+    If you decide to join a lower feeder our clans are Royale API A / B / C / D / E / F / G / Z
+    with the red and blue sword emblem.
 
     Good luck on the ladder + the next war!"
   bskick5050: >
@@ -98,7 +96,7 @@ messages:
     + No advertisement of any kind,
     e.g. Facebook / Twitter / YouTube / Friend Invite Links
 
-    + Use <#513230351972302860> for bot features, e.g. `!deck` / `!crprofile get` / `!cpg` / `!cwr`
+    + Use <#530524703115444227> for bot features, e.g. `!deck` / `!crprofile get` / `!cpg` / `!cwr`
 
 
     Failure to follow these rules will get you kicked from the server.
@@ -106,10 +104,10 @@ messages:
 
 
     If you would like to invite your friends to join this server,
-    you may use this Discord invite: <http://discord.gg/100t>
+    you may use this Discord invite: <http://discord.io/apifam>
 
 
-    Additional help and information: http://docs.100talpha.com/
+    Additional help and information: http://fam.royaleapi.com/
 
 
     Thanks + enjoy!
@@ -117,7 +115,7 @@ messages:
     Welcome to the **RoyaleAPI Clan Family** Discord server.
 
 
-    Please check out http://docs.100talpha.com/ for an overview of our family rules,
+    Please check out http://fam.royaleapi.com/ for an overview of our family rules,
     together with help documentation on a plethora of bot commands for you to use and enjoy.
 
 
@@ -128,7 +126,7 @@ messages:
     That’s all this means. Don’t touch a damn thing. We’re serious.
 
 
-    Please consult http://docs.100talpha.com/#/racf/roles
+    Please consult http://fam.royaleapi.com/#/racf/roles
     to learn what to do, and if you eventually rise to the role of Co-Leader
     where we care about you because you’re doing important things.
   elder_refresh: >
@@ -140,11 +138,11 @@ messages:
     That’s all this means. Don’t touch a damn thing. We’re serious.
 
 
-    Please consult http://docs.100talpha.com/#/racf/roles
+    Please consult http://fam.royaleapi.com/#/racf/roles
     to learn what to do, and if you eventually rise to the role of Co-Leader
     where we care about you because you’re doing important things.
   reject: >
-    Thank you for your interest in joining 100 Thieves.
+    Thank you for your interest in joining the RoyaleAPI Clan Family.
     Unfortunately, your request to join our clan family wasn’t approved at this time.
     This is generally due to low war wins and/or low card levels.
 
@@ -154,7 +152,7 @@ messages:
     You can check your ”gold readiness’ at any time by viewing your profile on https://www.royaleapi.com/.
 
 
-    Please feel free to hang around in our <#277425134862860288> channel and connect with us later
+    Please feel free to hang around in our <#530523965232250880> channel and connect with us later
     after you’ve had a chance to upgrade your cards and/or improve your war wins.
 permission:
   bands:

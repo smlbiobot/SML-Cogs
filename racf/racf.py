@@ -62,6 +62,7 @@ COMPETITIVE_CAPTAIN_ROLES = ["Competitive-Captain", "Bot Commander"]
 COMPETITIVE_TEAM_ROLES = [
     "CRL", "RPL-NA", "RPL-EU", "RPL-APAC", "MLG",
     "ClashWars", "CRL-Elite", "CRL-Legends", "CRL-Rockets"]
+
 # CLAN_PERMISSION = {
 #     '9PJ82CRC': {
 #         'tag': '9PJ82CRC',
