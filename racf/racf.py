@@ -573,6 +573,17 @@ class RACF:
 
         server = ctx.message.server
 
+        async def add_visitor():
+            added_roles = await self.add_roles(server, member, ['Visitor'])
+            await self.bot.say(
+                "Added {} to {}".format(
+                    ", ".join(added_roles),
+                    member
+                )
+            )
+            channel = discord.utils.get(channels, name="visitors")
+            await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
+
         if player_clan_tag in CLAN_PERMISSION.keys():
             # - Check allow role assignment
             perm = CLAN_PERMISSION[player_clan_tag]
@@ -582,15 +593,7 @@ class RACF:
 
             # - Assign role - not members
             if not perm['member']:
-                added_roles = await self.add_roles(server, member, ['Visitor'])
-                await self.bot.say(
-                    "Added {} to {}".format(
-                        ", ".join(added_roles),
-                        member
-                    )
-                )
-                channel = discord.utils.get(channels, name="visitors")
-                await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
+                await add_visitor()
             else:
                 # remove all clan roles
                 to_remove = CLAN_ROLES + VISITOR_ROLES + RECRUIT_ROLES
@@ -615,7 +618,7 @@ class RACF:
                         member.mention, channel.mention))
 
         else:
-            await ctx.invoke(self.visitor, member)
+            await add_visitor()
 
     async def royaleapi_verify(self, ctx, member: discord.Member, tag):
         """Verify CR members by player tag."""
