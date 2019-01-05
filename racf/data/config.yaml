@@ -1,10 +1,9 @@
 url:
   rules: https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/
   roles: https://www.reddit.com/r/CRRedditAlpha/wiki/roles
-  discord: http://discord.io/apifam
-  docs: http://docs.100talpha.com
-messages:
-  welcome:
+  discord: https://discord.royaleapi.com
+  docs: http://fam.royaleapi.com
+
 roles:
   restricted:
     - SUPERMOD

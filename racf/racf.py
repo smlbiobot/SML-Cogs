@@ -573,6 +573,7 @@ class RACF:
 
         server = ctx.message.server
 
+
         async def add_visitor():
             added_roles = await self.add_roles(server, member, ['Visitor'])
             await self.bot.say(
