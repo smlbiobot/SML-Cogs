@@ -1027,9 +1027,26 @@ class RACFAudit:
 
         return None
 
+    @commands.command(name="audit", pass_context=True)
+    async def audit_member(self, ctx, member: discord.Member):
+        """Run audit against specific user."""
+        try:
+            player = await self.search_player(user_id=member.id)
+            if player is None:
+                raise NoPlayerRecord()
+            tag = player.get('tag')
+            if tag is None:
+                raise NoPlayerRecord()
+        except NoPlayerRecord as e:
+            await self.bot.say("Your tag is not set. Please ask a Co-Leader for help.")
+            return
+
+        racf = self.bot.get_cog("RACF")
+        await ctx.invoke(racf.racf_verify, member, tag)
+
     @commands.command(name="auditme", pass_context=True)
-    async def audit_member(self, ctx):
-        """Run audit against one person only."""
+    async def audit_self(self, ctx):
+        """Run audit against self."""
         author = ctx.message.author
         try:
             player = await self.search_player(user_id=author.id)
