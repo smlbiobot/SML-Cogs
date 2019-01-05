@@ -51,8 +51,8 @@ BS_CHANGECLAN_ROLES = ["Member", "Brawl-Stars"]
 DISALLOWED_ROLES = ["SUPERMOD", "MOD", "AlphaBot"]
 MEMBER_DEFAULT_ROLES = ["Member", "Tourney" "Content"]
 CLANS = [
-    "Alpha", "Bravo", "Charlie", "Delta",
-    "Echo", "Foxtrot", "Golf", "Hotel", "Zen", "YOLO", "Trade"]
+    "A", "B", "C", "D",
+    "E", "F", "G", "Z", "T"]
 BS_CLANS = [
     "BS-Alpha", "BS-Bravo", "BS-Charlie"]
 BS_CLANS_PREFIX = 'BS-'
@@ -232,8 +232,8 @@ BAND_PERMISSION = {
 PATH = os.path.join("data", "racf")
 JSON = os.path.join(PATH, "settings.json")
 
-CLAN_ROLES = ['Alpha', 'Bravo', 'Charlie', 'Delta', 'Echo', 'Foxtrot', 'Golf', 'Hotel', 'YOLO', 'Zen']
-MEMBER_ROLES = ['Content', 'Tourney', 'Member']
+CLAN_ROLES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', "Z", "Mini"]
+MEMBER_ROLES = ['Member']
 VISITOR_ROLES = ['Visitor']
 RECRUIT_ROLES = ['{}Recruit'.format(r) for r in CLAN_ROLES]
 RECRUIT_ROLES.append('Recruit')
