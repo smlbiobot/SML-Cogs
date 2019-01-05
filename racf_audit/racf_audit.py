@@ -1027,7 +1027,7 @@ class RACFAudit:
 
         return None
 
-    @commands.command(name="audit", pass_context=True)
+    @racfaudit.command(name="audit", pass_context=True)
     async def audit_member(self, ctx, member: discord.Member):
         """Run audit against specific user."""
         try:
