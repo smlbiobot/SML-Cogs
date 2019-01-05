@@ -23,26 +23,25 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
+import asyncio
 import itertools
 from itertools import zip_longest
 
 import aiohttp
-import asyncio
+import cogs
 import discord
 import json
 import logging
 import os
 import yaml
 from box import Box
-from discord.ext import commands
-from discord.ext.commands import Context
-from random import choice
-
-import cogs
 from cogs.utils import checks
 from cogs.utils import dataIO
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
+from discord.ext.commands import Context
+from random import choice
 
 logger = logging.getLogger(__name__)
 
@@ -239,7 +238,7 @@ RECRUIT_ROLES = ['{}Recruit'.format(r) for r in CLAN_ROLES]
 RECRUIT_ROLES.append('Recruit')
 
 # FAMILY_SERVER_ID = '218534373169954816' # 100 Thieves Clan Family server
-FAMILY_SERVER_ID = '528327242875535372' # RoyaleAPI Clan Family server
+FAMILY_SERVER_ID = '528327242875535372'  # RoyaleAPI Clan Family server
 
 
 def grouper(n, iterable, fillvalue=None):
@@ -1199,7 +1198,6 @@ class RACF:
     async def visitor(self, ctx, member: discord.Member):
         """Assign member with visitor roles and give them info."""
         await self.assign_visitor(ctx, member)
-
 
     @commands.command(pass_context=True, no_pm=True, aliases=['vs'])
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
