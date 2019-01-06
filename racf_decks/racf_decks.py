@@ -56,7 +56,7 @@ async def fetch_decks(time=None, fam=True, auth=None):
     )
 
     if fam:
-        url = 'https://royaleapi.com/bot/100t/gc?auth={}'.format(auth)
+        url = 'https://royaleapi.com/bot/gc/fam?auth={}'.format(auth)
     else:
         url = 'https://royaleapi.com/bot/gc?auth={}'.format(auth)
 
