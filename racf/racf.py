@@ -152,49 +152,49 @@ CLAN_PERMISSION = {
     },
     'PV98LY0P': {
         'tag': 'PV98LY0P',
-        'role': 'A',
+        'role': 'A.',
         'assign_role': True,
         'member': True
     },
     'PQGU8RQ0': {
         'tag': 'PQGU8RQ0',
-        'role': 'B',
+        'role': 'B.',
         'assign_role': True,
         'member': True,
     },
     'P0VGU80L': {
         'tag': 'P0VGU80L',
-        'role': 'C',
+        'role': 'C.',
         'assign_role': True,
         'member': True,
     },
     'P8VLQPVL': {
         'tag': 'P8VLQPVL',
-        'role': 'D',
+        'role': 'D.',
         'assign_role': True,
         'member': True
     },
     'P2QYLV0V': {
         'tag': 'P2QYLV0V',
-        'role': 'E',
+        'role': 'E.',
         'assign_role': True,
         'member': True
     },
     'PQUGVQU8': {
         'tag': 'PQUGVQU8',
-        'role': 'F',
+        'role': 'F.',
         'assign_role': True,
         'member': True
     },
     'Y2LGRU0Q': {
         'tag': 'Y2LGRU0Q',
-        'role': 'G',
+        'role': 'G.',
         'assign_role': True,
         'member': True
     },
     'P0VPRCRC': {
         'tag': 'P0VPRCRC',
-        'role': 'Z',
+        'role': 'Z.',
         'assign_role': True,
         'member': True
     }
