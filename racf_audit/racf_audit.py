@@ -111,6 +111,7 @@ async def check_manage_roles(ctx, bot):
     return True
 
 
+
 class RACFAuditException(Exception):
     pass
 
