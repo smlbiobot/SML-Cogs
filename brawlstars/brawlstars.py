@@ -35,13 +35,12 @@ import os
 import re
 import socket
 import yaml
-from discord.ext import commands
-from random import choice
-
 from cogs.utils import checks
 from cogs.utils.chat_formatting import bold
 from cogs.utils.chat_formatting import inline
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
+from random import choice
 
 PATH = os.path.join("data", "brawlstars")
 JSON = os.path.join(PATH, "settings.json")
@@ -108,6 +107,10 @@ class APIServerError(APIError):
     pass
 
 
+class APITimeoutError(APIError):
+    pass
+
+
 class MissingServerConfig(Exception):
     pass
 
@@ -128,16 +131,19 @@ async def api_fetch(url=None, auth=None):
         family=socket.AF_INET,
         verify_ssl=False,
     )
-    async with aiohttp.ClientSession(connector=conn) as session:
-        async with session.get(url, headers=dict(Authorization=auth)) as resp:
+    try:
+        async with aiohttp.ClientSession(connector=conn) as session:
+            async with session.get(url, headers=dict(Authorization=auth), timeout=10) as resp:
 
-            if str(resp.status).startswith('4'):
-                raise APIRequestError()
+                if str(resp.status).startswith('4'):
+                    raise APIRequestError()
 
-            if str(resp.status).startswith('5'):
-                raise APIServerError()
+                if str(resp.status).startswith('5'):
+                    raise APIServerError()
 
-            data = await resp.json()
+                data = await resp.json()
+    except asyncio.TimeoutError:
+        raise APITimeoutError()
 
     return data
 
@@ -353,7 +359,7 @@ class BrawlStars:
         if sort == 'level':
             brawlers.sort(key=lambda x: x.level, reverse=True)
         elif sort == 'trophy_by_level':
-            brawlers.sort(key=lambda x: x.trophies/x.level, reverse=True)
+            brawlers.sort(key=lambda x: x.trophies / x.level, reverse=True)
 
         for b in brawlers or []:
             o.append(
@@ -363,7 +369,7 @@ class BrawlStars:
                     pb=b.highestTrophies,
                     level=b.level,
                     name=b.name,
-                    trophy_per_level=b.trophies/b.level,
+                    trophy_per_level=b.trophies / b.level,
                 )
             )
 
@@ -377,7 +383,8 @@ class BrawlStars:
         return self._club_config
 
     async def send_error_message(self, ctx):
-        await self.bot.say("BrawlAPI Error. Please try again later…")
+        channel = ctx.message.channel
+        await self.bot.send_message(channel, "BrawlAPI Error. Please try again later…")
 
     async def _api_fetch(self, section=None, **kwargs):
         data = dict()
