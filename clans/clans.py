@@ -245,9 +245,9 @@ class Clans:
                 with open(AUTH_YAML) as f:
                     config = yaml.load(f)
                     if self.api_provider == 'cr-api':
-                        self._auth = config.get('cr_api_token')
+                        self._auth = config.get('token')
                     else:
-                        self._auth = config.get('official_token')
+                        self._auth = config.get('token')
         return self._auth
 
     @property
@@ -405,7 +405,9 @@ class Clans:
         show_clan_tag = "-t" not in args
 
         for clan in clans:
-            desc = clan.get('description')
+            desc = clan.get('description', '')
+
+            print(clan)
 
             # trophies, pb, psf
             match = re.search('[\d,O]{4,}', desc)
@@ -460,6 +462,7 @@ class Clans:
             # aux requirements
             aux = ""
             for c in config.clans:
+                print(c)
                 if c.tag in clan.get('tag'):
                     if c.get('aux'):
                         aux = '\n{}'.format(c.get('aux'))
