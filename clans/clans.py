@@ -407,8 +407,6 @@ class Clans:
         for clan in clans:
             desc = clan.get('description', '')
 
-            print(clan)
-
             # trophies, pb, psf
             match = re.search('[\d,O]{4,}', desc)
             pb_match = re.search('PB', desc)
@@ -462,7 +460,6 @@ class Clans:
             # aux requirements
             aux = ""
             for c in config.clans:
-                print(c)
                 if c.tag in clan.get('tag'):
                     if c.get('aux'):
                         aux = '\n{}'.format(c.get('aux'))
