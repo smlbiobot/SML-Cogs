@@ -108,6 +108,12 @@ class RACFDecks:
         self.threadex = ThreadPoolExecutor(max_workers=2)
 
     @checks.mod_or_permissions()
+    @commands.command(no_pm=True, pass_context=True)
+    async def rdecks_reset_timestamp(self, ctx):
+        self.settings["family_timestamp"] = 1545709664
+        await self.bot.say("Reset family decks timestamp")
+
+    @checks.mod_or_permissions()
     @commands.command(aliases=['rdecks', 'rdeck'], no_pm=True, pass_context=True)
     async def racf_decks(self, ctx):
         """Auto-fetch 12-win GC decks in channel."""
@@ -115,7 +121,7 @@ class RACFDecks:
         self.settings["family_auto"] = True
         self.settings["family_channel_id"] = ctx.message.channel.id
         dataIO.save_json(JSON, self.settings)
-        await self.bot.say("Automatically sending 12-win 100T decks to this channel.")
+        await self.bot.say("Automatically sending 12-win family decks to this channel.")
         # await self.post_decks(ctx, fam=True, show_empty=True)
 
     @checks.mod_or_permissions()
