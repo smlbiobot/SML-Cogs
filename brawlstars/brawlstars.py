@@ -678,9 +678,9 @@ class BrawlStars:
             await self.send_error_message(ctx)
 
     @bs.command(name="clubs", aliases=["c"], pass_context=True)
-    async def bs_clubs(self, ctx):
+    async def bs_clubs(self, ctx, query=None):
         """List clubs."""
-        r = await self._get_clubs(ctx.message.server.id)
+        r = await self._get_clubs(ctx.message.server.id, query=query)
         results = r.results
         club_tags = r.club_tags
 
