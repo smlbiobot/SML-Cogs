@@ -32,8 +32,10 @@ from collections import namedtuple
 
 import aiohttp
 import argparse
+import csv
 import datetime as dt
 import discord
+import io
 import json
 import os
 import re
@@ -109,7 +111,6 @@ async def check_manage_roles(ctx, bot):
         return False
 
     return True
-
 
 
 class RACFAuditException(Exception):
@@ -331,9 +332,9 @@ class ClashRoyaleAPI:
         tags = [clean_tag(tag) for tag in tags]
         tasks = [self.fetch_clan(tag) for tag in tags]
         results = await asyncio.gather(*tasks, return_exceptions=True)
-        for r in results:
+        for index, r in enumerate(results):
             if isinstance(r, Exception):
-                r = {}
+                results[index] = {}
         return results
 
     async def fetch_clan_leaderboard(self, location=None):
@@ -1142,6 +1143,56 @@ class RACFAudit:
 
         for page in pagify('\n'.join(out)):
             await self.bot.say(box(page, lang='py'))
+
+    @racfaudit.command(name="csv", pass_context=True)
+    async def racfaudit_csv(self, ctx):
+        """Output membership in CSV format."""
+        await self.bot.type()
+
+        try:
+            member_models = await self.family_member_models()
+        except ClashRoyaleAPIError as e:
+            await self.bot.say(e.status_message)
+            return
+
+        filename = "members-{:%Y%m%d-%H%M%S}.csv".format(dt.datetime.utcnow())
+
+        tmp_file = os.path.join("data", "racf_audit", "member_csv.csv")
+
+        fieldnames = [
+            'name',
+            'tag',
+            'role',
+            'expLevel',
+            'trophies',
+            'clan_tag',
+            'clan_name',
+            'clanRank',
+            'previousClanRank',
+            'donations',
+            'donationsReceived',
+        ]
+
+        members = []
+        for model in member_models:
+            member = {k: v for k, v in model.items() if k in fieldnames}
+            member['clan_tag'] = clean_tag(model.get('clan', {}).get('tag', ''))
+            member['clan_name'] = model.get('clan', {}).get('name', '')
+            member['tag'] = clean_tag(model.get('tag', ''))
+            members.append(member)
+
+        channel = ctx.message.channel
+        with io.StringIO() as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            for member in members:
+                writer.writerow(member)
+
+            s = f.getvalue()
+
+            with io.BytesIO(s.encode()) as fb:
+                await self.bot.send_file(
+                    channel, fb, filename=filename)
 
     def calculate_clan_trophies(self, trophies):
         """Add a list of trophies to be calculated."""
