@@ -878,7 +878,7 @@ class RACFAudit:
 
                 if clan_filters:
                     for c in clan_filters:
-                        if c.lower() in clan['name'].lower():
+                        if c.lower() in [f.lower() for f in clan.get('filters', [])]:
                             display_output = True
                 else:
                     display_output = True

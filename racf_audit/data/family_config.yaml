@@ -6,38 +6,52 @@ clans:
     tag: PV98LY0P
     role_name: A.
     type: Member
+    filters: [a, alpha]
   - name: RoyaleAPI B
     tag: PQGU8RQ0
     role_name: B.
     type: Member
+    filters: [b, bravo]
   - name: RoyaleAPI C
     tag: P0VGU80L
     role_name: C.
     type: Member
+    filters: [c, charlie]
   - name: RoyaleAPI D
     tag: P8VLQPVL
     role_name: D.
     type: Member
+    filters: [d, delta]
   - name: RoyaleAPI E
     tag: P2QYLV0V
     role_name: E.
     type: Member
+    filters: [e, echo]
   - name: RoyaleAPI F
     tag: PQUGVQU8
     role_name: F.
     type: Member
+    filters: [f, fox, foxtrot]
   - name: RoyaleAPI G
     tag: Y2LGRU0Q
     role_name: G.
     type: Member
+    filters: [g, golf]
+  - name: RoyaleAPI T
+    tag: PVYP2PR8
+    role_name: T.
+    type: Member
+    filters: [t, trade]
   - name: RoyaleAPI Z
     tag: P0VPRCRC
     role_name: Z.
     type: Member
+    filters: [z, zen]
   - name: RoyaleAPI
     tag: 9R8G9290
     role_name: Mini
     type: Member
+    filters: [m, mini, og]
 #clans:
 #  - name: 100T Alpha
 #    tag: 9PJ82CRC
