@@ -581,11 +581,11 @@ class RACFAudit:
         found = False
         for tag, m in self.players.items():
             if m["user_id"] == member.id:
-                await self.bot.say("100T Audit database: `{}` is associated to `#{}`".format(member, tag))
+                await self.bot.say("RACF Audit database: `{}` is associated to `#{}`".format(member, tag))
                 found = True
 
         if not found:
-            await self.bot.say("100T Audit database: Member is not associated with any tags.")
+            await self.bot.say("RACF Audit database: Member is not associated with any tags.")
 
     @racfaudit.command(name="rmtag", pass_context=True)
     # @checks.mod_or_permissions(manage_roles=True)
@@ -789,7 +789,7 @@ class RACFAudit:
             # await self.bot.say(e.status_message)
             error = True
         else:
-            out.append("**100T Family Audit**")
+            out.append("**RACF Family Audit**")
 
             # associate Discord user to member
             for member_model in member_models:
@@ -937,7 +937,7 @@ class RACFAudit:
     async def exec_racf_audit(self, channel: discord.Channel = None, audit_results=None, server=None):
         """Execute audit and output to specific channel."""
 
-        await self.bot.send_message(channel, "**100T Family Audit**")
+        await self.bot.send_message(channel, "**RACF Family Audit**")
         await self.bot.send_typing(channel)
 
         async def exec_add_roles(d_member, roles, channel=None):
@@ -1296,7 +1296,7 @@ class RACFAudit:
         def append_result(result, out, out_members):
             index = result['index']
             member = result['member']
-            clan_name = member.get('clan', {}).get('name').replace('100T', '').strip()
+            clan_name = member.get('clan', {}).get('name').replace('RoyaleAPI', '').strip()
             trophies = member.get('trophies')
             delta = trophies - trophy_50
             if delta > 0:
@@ -1368,14 +1368,14 @@ class RACFAudit:
                 for discord_member in top50_discord_members:
                     out.append(discord_member.mention)
                 out.append(
-                    'Congratulations! You are top 50 in the 100T. '
+                    'Congratulations! You are top 50 in the RACF. '
                     'Please move to Alpha by end of season to help us with the global rank!'
                 )
 
                 for discord_member in non_top50_discord_members:
                     out.append(discord_member.mention)
                 out.append(
-                    'You are not within top 50 in the 100T right now. '
+                    'You are not within top 50 in the RACF right now. '
                     'Please move to Bravo unless you are certain that you can un-tilt.'
                 )
                 out.append(
