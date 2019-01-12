@@ -1003,6 +1003,7 @@ class RACFAudit:
             'G.',
             'T.',
             'Z.',
+            'Mini',
         ]
 
         # remove member roles from people who are not in our clans
