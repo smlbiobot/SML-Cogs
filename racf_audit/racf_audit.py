@@ -988,6 +988,23 @@ class RACFAudit:
             except KeyError:
                 pass
 
+        MEMBER_ROLE_NAMES = [
+            'Member',
+            'Touney',
+            'Practice',
+            'CW',
+            'Diary',
+            'A.',
+            'B.',
+            'C.',
+            'D.',
+            'E.',
+            'F.',
+            'G.',
+            'T.',
+            'Z.',
+        ]
+
         # remove member roles from people who are not in our clans
         for result in audit_results['not_in_our_clans']:
             result_role_names = [r.name for r in result.roles]
@@ -1000,8 +1017,7 @@ class RACFAudit:
                 continue
 
             to_remove_role_names = []
-            for role_name in ['Member', 'Tourney', 'Practice', 'A.', 'B.', 'C.', 'D.', 'E.',
-                              'F.', 'G.', 'H.', 'Y.', 'Z.', 'T.', 'CW', 'Diary']:
+            for role_name in MEMBER_ROLE_NAMES:
                 if role_name in result_role_names:
                     to_remove_role_names.append(role_name)
             to_remove_roles = [discord.utils.get(server.roles, name=rname) for rname in to_remove_role_names]
@@ -1010,6 +1026,21 @@ class RACFAudit:
                 await exec_remove_roles(result, to_remove_roles, channel=channel)
             if visitor_role is not None:
                 await exec_add_roles(result, [visitor_role], channel=channel)
+
+        # Remove clan roles from visitors
+        member_role = discord.utils.get(server.roles, name='Member')
+        for user in server.members:
+            # not a member
+            if member_role not in user.roles:
+                user_role_names = [r.name for r in user.roles]
+                user_member_role_names = set(user_role_names) & set(MEMBER_ROLE_NAMES)
+                # union of user roles with member role names -> user has member roles which need to be removed
+                if user_member_role_names:
+                    to_remove_roles = [discord.utils.get(server.roles, name=rname) for rname in user_member_role_names]
+                    to_remove_roles = [r for r in to_remove_roles if r is not None]
+                    if to_remove_roles:
+                        await exec_remove_roles(user, to_remove_roles, channel=channel)
+
 
     async def search_player(self, tag=None, user_id=None):
         """Search for players.
