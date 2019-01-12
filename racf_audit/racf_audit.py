@@ -1043,7 +1043,6 @@ class RACFAudit:
 
         await self.bot.send_message(channel, "Audit finished.")
 
-
     async def search_player(self, tag=None, user_id=None):
         """Search for players.
 
