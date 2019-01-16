@@ -49,14 +49,17 @@ def nested_dict():
     return defaultdict(nested_dict)
 
 
-async def fetch_decks(time=None, fam=True, auth=None):
+async def fetch_decks(time=None, fam=True, auth=None, cc=False):
     conn = aiohttp.TCPConnector(
         family=socket.AF_INET,
         verify_ssl=False,
     )
 
     if fam:
-        url = 'https://royaleapi.com/bot/gc/fam?auth={}'.format(auth)
+        if cc:
+            url = 'https://royaleapi.com/bot/cc/fam?auth={}'.format(auth)
+        else:
+            url = 'https://royaleapi.com/bot/gc/fam?auth={}'.format(auth)
     else:
         url = 'https://royaleapi.com/bot/gc?auth={}'.format(auth)
 
@@ -87,7 +90,8 @@ async def fetch_decks(time=None, fam=True, auth=None):
             timestamp_epoch_millis=_source.get('battleTime_timestamp_epoch_millis', 0),
             deck_name=team.get('deck', {}).get('name'),
             player_name=team.get('name'),
-            clan_name=team.get('clan', {}).get('name', '')
+            clan_name=team.get('clan', {}).get('name', ''),
+            cc=cc
         )
         decks.append(deck)
 
@@ -166,7 +170,13 @@ class RACFDecks:
         else:
             time = self.settings.get('gc_timestamp')
 
-        decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'])
+        gc_decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'])
+
+        cc_decks = []
+        if fam:
+            cc_decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'], cc=True)
+
+        decks = gc_decks + cc_decks
 
         deck_cog = self.bot.get_cog("Deck")
         timestamps = []
@@ -181,7 +191,13 @@ class RACFDecks:
             ts = deck.get('timestamp_epoch_millis')
             timestamps.append(ts)
             ts_dt = dt.datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M UTC")
-            message = "**12-win GC deck by {}**, {}\n{}".format(player_name, clan_name, ts_dt)
+            cc = deck.get('cc', False)
+            message = "**12-win {} deck by {}**, {}\n{}".format(
+                'CC' if cc else 'GC',
+                player_name,
+                clan_name,
+                ts_dt
+            )
             deck_img_name = player_name
             await self.bot.send_message(
                 channel,
