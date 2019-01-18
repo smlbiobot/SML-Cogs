@@ -192,7 +192,9 @@ class RACFDecks:
             timestamps.append(ts)
             ts_dt = dt.datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M UTC")
             cc = deck.get('cc', False)
-            message = "**12-win {} deck by {}**, {}\n{}".format(
+            gc_star = ':star: ' if fam and not cc else ''
+            message = "{}**12-win {} deck by {}**, {}\n{}".format(
+                gc_star,
                 'CC' if cc else 'GC',
                 player_name,
                 clan_name,
