@@ -150,7 +150,7 @@ async def api_fetch(url=None, auth=None):
 
 async def api_fetch_player(tag=None, auth=None, **kwargs):
     """Fetch player"""
-    url = 'https://brawlapi.cf/api/players/{}'.format(clean_tag(tag))
+    url = 'https://brawlapi.cf/api/player?tag={}'.format(clean_tag(tag))
     fn = os.path.join(CACHE_PLAYER_PATH, "{}.json".format(tag))
     try:
         data = await api_fetch(url=url, auth=auth)
@@ -169,7 +169,7 @@ async def api_fetch_player(tag=None, auth=None, **kwargs):
 
 async def api_fetch_club(tag=None, auth=None, **kwargs):
     """Fetch player"""
-    url = 'https://brawlapi.cf/api/clubs/{}'.format(clean_tag(tag))
+    url = 'https://brawlapi.cf/api/club?tag={}'.format(clean_tag(tag))
     fn = os.path.join(CACHE_CLUB_PATH, "{}.json".format(tag))
     try:
         data = await api_fetch(url=url, auth=auth)
