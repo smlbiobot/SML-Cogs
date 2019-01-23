@@ -379,7 +379,7 @@ class BrawlStars:
         if sort == 'level':
             brawlers.sort(key=lambda x: x.level, reverse=True)
         elif sort == 'trophy_by_level':
-            brawlers.sort(key=lambda x: x.trophies / x.level, reverse=True)
+            brawlers.sort(key=lambda x: normalized_trophy_by_level(x.trophies, x.level), reverse=True)
 
         for b in brawlers or []:
             o.append(
