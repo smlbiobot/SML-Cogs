@@ -1183,9 +1183,15 @@ class RACFAudit:
 
         out = []
 
+        def name_to_symbol(name):
+            s = name[10:]
+            if not s:
+                s = 'OG'
+            return s
+
         for index, member in enumerate(results, 1):
-            out.append('{:<4} {:>4} {:<8} {}'.format(
-                index, member['trophies'], member['clan']['name'][5:], member['name']
+            out.append('{:<4} {:>4} {:<2} {}'.format(
+                index, member['trophies'], name_to_symbol(member['clan']['name']), member['name']
             ))
 
         for page in pagify('\n'.join(out)):
