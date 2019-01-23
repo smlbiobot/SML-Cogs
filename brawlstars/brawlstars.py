@@ -490,7 +490,7 @@ class BrawlStars:
 
         Optional Arguments:
         -l: sort by brawler level
-        -tl: sort by trophy per level
+        -tl: sort by normalized trophy per level
         """
         server = ctx.message.server
         author = ctx.message.author
