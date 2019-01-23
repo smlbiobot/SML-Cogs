@@ -1099,7 +1099,11 @@ class RACFAudit:
 
     @racfaudit.command(name="rank", pass_context=True)
     async def racfaudit_rank(self, ctx, *names):
-        """Look up member rank within the family."""
+        """Look up member rank within the family.
+
+        Options:
+        -startswith search names from the start only
+        """
         await self.bot.type()
 
         try:
@@ -1112,12 +1116,22 @@ class RACFAudit:
 
         member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
 
+        option_startwith = '-startswith' in names
+
+        if option_startwith:
+            names = list(names)
+            names.remove('-startswith')
+
         for index, member_model in enumerate(member_models, 1):
             # simple search
             for name in names:
                 add_it = False
                 if name.lower() in member_model.get('name').lower():
-                    add_it = True
+                    if option_startwith:
+                        if member_model.get('name').lower().startswith(name):
+                            add_it = True
+                    else:
+                        add_it = True
                 else:
                     # unidecode search
                     s = unidecode.unidecode(member_model.get('name'))
