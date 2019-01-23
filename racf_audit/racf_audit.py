@@ -1186,11 +1186,11 @@ class RACFAudit:
         def name_to_symbol(name):
             s = name[10:]
             if not s:
-                s = 'OG'
+                s = 'M'
             return s
 
         for index, member in enumerate(results, 1):
-            out.append('{:<4} {:>4} {:<2} {}'.format(
+            out.append('{:<4} {:>4} {:<1} {}'.format(
                 index, member['trophies'], name_to_symbol(member['clan']['name']), member['name']
             ))
 
