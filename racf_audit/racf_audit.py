@@ -1550,7 +1550,7 @@ class RACFAudit:
 
             if discord_users:
                 msg = "{mentions} {timedelta} til end of Collection Day and you have battle remaining!!".format(
-                    mentions=[u.mention for u in discord_users],
+                    mentions=" ".join([u.mention for u in discord_users]),
                     timedelta=timedelta_human,
                     member_tags=", ".join(member_tags)
                 )
