@@ -1513,6 +1513,17 @@ class RACFAudit:
         c = await api.fetch_clan(tag)
         cd = Dict(c)
 
+        # helpers
+        async def send_message(war_day="Collection Day", timedelta_human="0 minutes", discord_users=None):
+            if discord_users:
+                msg = "{mentions} {timedelta} til end of {war_day} and you have battles remaining!!".format(
+                    war_day=war_day,
+                    mentions=" ".join([u.mention for u in discord_users]),
+                    timedelta=timedelta_human,
+                    member_tags=", ".join(member_tags)
+                )
+                await self.bot.say(msg)
+
         # collection day nudge
         now = dt.datetime.utcnow()
         member_tags = []
@@ -1521,7 +1532,8 @@ class RACFAudit:
             end_time = dt.datetime.strptime(cwd.collectionEndTime, '%Y%m%dT%H%M%S.%fZ')
             # end_time = dt.datetime.strptime('20190126T102716.230Z', '%Y%m%dT%H%M%S.%fZ')
             timedelta = end_time - now
-            timedelta_human = "{}".format(humanfriendly.format_timespan(timedelta.total_seconds()))
+            minutes = timedelta // dt.timedelta(minutes=1)
+            timedelta_human = "{}".format(humanfriendly.format_timespan(dt.timedelta(minutes=minutes).total_seconds()))
 
             # battle remaining
             for p in cwd.participants:
@@ -1548,13 +1560,46 @@ class RACFAudit:
                 else:
                     await self.bot.say("{} is not on Discord.".format(member_tag))
 
-            if discord_users:
-                msg = "{mentions} {timedelta} til end of Collection Day and you have battle remaining!!".format(
-                    mentions=" ".join([u.mention for u in discord_users]),
-                    timedelta=timedelta_human,
-                    member_tags=", ".join(member_tags)
-                )
-                await self.bot.say(msg)
+            await send_message(war_day="Collection Day", timedelta_human=timedelta_human, discord_users=discord_users)
+            return
+
+        if cwd.state == 'warDay':
+            # time remaining
+            end_time = dt.datetime.strptime(cwd.warEndTime, '%Y%m%dT%H%M%S.%fZ')
+            timedelta = end_time - now
+            minutes = timedelta // dt.timedelta(minutes=1)
+            timedelta_human = "{}".format(humanfriendly.format_timespan(dt.timedelta(minutes=minutes).total_seconds()))
+
+            # battles remaining
+            for p in cwd.participants:
+                if p.battlesPlayed == 0:
+                    member_tags.append(clean_tag(p.tag))
+
+            # discord user
+            players = [self.players.get(member_tag) for member_tag in member_tags]
+
+            discord_users = []
+            for player in players:
+                discord_id = player.get('user_id')
+                discord_user = server.get_member(discord_id)
+                if discord_user is None:
+                    await self.bot.say("#{} is not on Discord.".format(player.get('tag')))
+                else:
+                    discord_users.append(discord_user)
+
+            await send_message(war_day="War Day", timedelta_human=timedelta_human, discord_users=discord_users)
+            return
+
+        if cwd.state.lower() == 'matchmaking':
+            await self.bot.say("Clan is matchmaking… aborted.")
+            return
+
+        if cwd.state.lower() == 'notinwar':
+            await self.bot.say("Clan is not in war… aborted.")
+            return
+
+        # not in war or collection
+        await self.bot.say("Clan is not in a known war state… aborted.")
 
 
 def check_folder():
