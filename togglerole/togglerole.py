@@ -377,10 +377,14 @@ class ToggleRole:
 
             # check user has allowed_roles
             valid = False
+            if '_everyone' in allowed_roles:
+                valid = True
+
             for u_role in user.roles:
                 if u_role.name in allowed_roles:
                     valid = True
                     break
+
             if not valid:
                 continue
 
