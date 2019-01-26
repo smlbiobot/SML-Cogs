@@ -5,8 +5,10 @@
     "DISABLED": false,
     "NAME": "RACFAudit",
     "REQUIREMENTS": [
+        "addict",
         "aiofiles",
         "flatten_json",
+        "humanize",
         "pyyaml",
         "tabulate",
         "unidecode",

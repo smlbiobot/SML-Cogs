@@ -33,14 +33,15 @@ from collections import namedtuple
 import aiohttp
 import argparse
 import csv
-import datetime as dt
 import discord
+import humanfriendly
 import io
 import json
 import os
 import re
 import unidecode
 import yaml
+from addict import Dict
 from cogs.utils import checks
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import inline
@@ -57,6 +58,8 @@ PLAYERS = os.path.join("data", "racf_audit", "player_db.json")
 # RACF_SERVER_ID = '218534373169954816'
 RACF_SERVER_ID = '528327242875535372'
 SML_SERVER_ID = '275395656955330560'
+
+import datetime as dt
 
 
 class NoPlayerRecord(Exception):
@@ -340,6 +343,11 @@ class ClashRoyaleAPI:
     async def fetch_clan_leaderboard(self, location=None):
         """Get clan leaderboard"""
         url = 'https://api.clashroyale.com/v1/locations/global/rankings/clans'
+        body = await self.fetch(url)
+        return body
+
+    async def fetch_clan_war(self, tag=None):
+        url = 'https://api.clashroyale.com/v1/clans/%23{}/currentwar'.format(tag)
         body = await self.fetch(url)
         return body
 
@@ -1481,6 +1489,72 @@ class RACFAudit:
             finally:
                 interval = int(dt.timedelta(hours=4).total_seconds())
                 await asyncio.sleep(interval)
+
+    @racfaudit.command(name="nudge", pass_context=True, no_pm=True)
+    async def racfaudit_nudge(self, ctx, query):
+        """Nudge members for CW battles."""
+        api = ClashRoyaleAPI(self.auth)
+        server = ctx.message.server
+
+        # find clan tag based on config filters
+        tag = None
+        for clan in self.config.get('clans'):
+            if query.lower() in [f.lower() for f in clan.get('filters', [])]:
+                tag = clan.get('tag')
+                break
+
+        if tag is None:
+            await self.bot.say("Cannot find clan tag")
+            return
+
+        await self.bot.say("Clan tag: {}".format(tag))
+        cw = await api.fetch_clan_war(tag)
+        cwd = Dict(cw)
+        c = await api.fetch_clan(tag)
+        cd = Dict(c)
+
+        # collection day nudge
+        now = dt.datetime.utcnow()
+        member_tags = []
+        if cwd.state == 'collectionDay':
+            # time remaining
+            end_time = dt.datetime.strptime(cwd.collectionEndTime, '%Y%m%dT%H%M%S.%fZ')
+            # end_time = dt.datetime.strptime('20190126T102716.230Z', '%Y%m%dT%H%M%S.%fZ')
+            timedelta = end_time - now
+            timedelta_human = "{}".format(humanfriendly.format_timespan(timedelta.total_seconds()))
+
+            # battle remaining
+            for p in cwd.participants:
+                if p.collectionDayBattlesPlayed != 3:
+                    member_tags.append(clean_tag(p.tag))
+
+            # not yet participating
+            participant_tags = [p.get('tag') for p in cwd.participants]
+            for m in cd.memberList:
+                if m.get('tag') not in participant_tags:
+                    member_tags.append(clean_tag(m.get('tag')))
+
+            # discord user
+            discord_users = []
+            tag2discord = {v.get('tag'): v.get('user_id') for k, v in self.players.items()}
+            for member_tag in member_tags:
+                if member_tag in tag2discord:
+                    discord_id = tag2discord.get(member_tag)
+                    discord_user = server.get_member(discord_id)
+                    if discord_user is not None:
+                        discord_users.append(discord_user)
+                    else:
+                        await self.bot.say("{} is not on Discord.".format(member_tag))
+                else:
+                    await self.bot.say("{} is not on Discord.".format(member_tag))
+
+            if discord_users:
+                msg = "{mentions} {timedelta} til end of Collection Day and you have battle remaining!!".format(
+                    mentions=[u.mention for u in discord_users],
+                    timedelta=timedelta_human,
+                    member_tags=", ".join(member_tags)
+                )
+                await self.bot.say(msg)
 
 
 def check_folder():
