@@ -1514,7 +1514,10 @@ class RACFAudit:
         c = await api.fetch_clan(tag)
         cd = Dict(c)
 
-        # helpers
+        # tag to member name
+        member_tag_to_name = {clean_tag(m.get('tag', '')): m.get('name', '') for m in cd.memberList}
+
+        # helper: send message
         async def send_message(war_day="Collection Day", timedelta_human="0 minutes", discord_users=None):
             if discord_users:
                 msg = "{mentions} {timedelta} til end of {war_day} and you have battles remaining!!".format(
@@ -1527,6 +1530,15 @@ class RACFAudit:
 
             if war_day == 'War Day':
                 await self.bot.say("Note: we cannot detect members who have more than one battles to play.")
+
+        # helper: not on discord:
+        async def send_not_on_discord(member_tag):
+            await self.bot.say(
+                "{member_name} #{member_tag} is not on Discord.".format(
+                    member_name=member_tag_to_name.get(member_tag, ''),
+                    member_tag=member_tag
+                )
+            )
 
         # collection day nudge
         now = dt.datetime.utcnow()
@@ -1560,9 +1572,10 @@ class RACFAudit:
                     if discord_user is not None:
                         discord_users.append(discord_user)
                     else:
-                        await self.bot.say("{} is not on Discord.".format(member_tag))
+                        await send_not_on_discord(member_tag)
+
                 else:
-                    await self.bot.say("{} is not on Discord.".format(member_tag))
+                    await send_not_on_discord(member_tag)
 
             await send_message(war_day="Collection Day", timedelta_human=timedelta_human, discord_users=discord_users)
             return
@@ -1581,13 +1594,15 @@ class RACFAudit:
 
             # discord user
             players = [self.players.get(member_tag) for member_tag in member_tags]
+            players = [p for p in players if p]
 
             discord_users = []
             for player in players:
                 discord_id = player.get('user_id')
                 discord_user = server.get_member(discord_id)
                 if discord_user is None:
-                    await self.bot.say("#{} is not on Discord.".format(player.get('tag')))
+                    member_tag = player.get('tag')
+                    await send_not_on_discord(member_tag)
                 else:
                     discord_users.append(discord_user)
 
