@@ -1491,6 +1491,7 @@ class RACFAudit:
                 await asyncio.sleep(interval)
 
     @racfaudit.command(name="nudge", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(kick_members=True)
     async def racfaudit_nudge(self, ctx, query):
         """Nudge members for CW battles."""
         api = ClashRoyaleAPI(self.auth)
