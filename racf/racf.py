@@ -200,7 +200,6 @@ CLAN_PERMISSION = {
     }
 }
 
-
 BAND_PERMISSION = {
     'LQQ': {
         'tag': 'LQQ',
@@ -573,7 +572,6 @@ class RACF:
         channels = ctx.message.server.channels
 
         server = ctx.message.server
-
 
         async def add_visitor():
             added_roles = await self.add_roles(server, member, ['Visitor'])
