@@ -200,6 +200,7 @@ CLAN_PERMISSION = {
     }
 }
 
+
 BAND_PERMISSION = {
     'LQQ': {
         'tag': 'LQQ',
