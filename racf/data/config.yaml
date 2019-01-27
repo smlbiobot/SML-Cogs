@@ -141,18 +141,21 @@ messages:
     to learn what to do, and if you eventually rise to the role of Co-Leader
     where we care about you because you’re doing important things.
   reject: >
-    Thank you for your interest in joining the RoyaleAPI Clan Family.
-    Unfortunately, your request to join our clan family wasn’t approved at this time.
-    This is generally due to low war wins and/or low card levels.
+    Thanks for your interest in joining our clan family. While we’re unable to approve your join request now, we’d love for you to hang around in our <#530523965232250880> channel and connect with us later after you’ve had a chance to progress your account by: upgrading cards / getting 12+ challenge wins / pushing on ladder.
 
 
-    Most of our clans require anywhere from 30-50% of your cards to be upgraded to
-    gold league standard levels (tournament standard +2) — we call this your “gold readiness percentage”.
-    You can check your ”gold readiness’ at any time by viewing your profile on https://www.royaleapi.com/.
+    **Recruitment Criteria**
+
+    While our clans are primarily focused on ladder results (RoyaleAPI A is a global top 25 ladder clan), we have a secondary focus on war and look for recruits that have 12+ challenge wins and decent clan war readiness levels.
 
 
-    Please feel free to hang around in our <#530523965232250880> channel and connect with us later
-    after you’ve had a chance to upgrade your cards and/or improve your war wins.
+    **Explanation of clan war readiness (CWR):**
+
+
+    Legendary League Standard is level 12, so your Legendary League Readiness % is based on the number of cards at that level or higher. Again, 30-50%+ is the standard we look for today.
+
+
+    In Legendary League, you can also see +1 levels (Legendary League Readiness level 13 — max cards) when you battle, so a player with 50% Legendary Readiness is better off than someone with 5% Legendary when it comes to building strong decks to go to battle with.
 permission:
   bands:
   - {assign_role: true, member: false, role: BS-Alpha, tag: LQQ}
