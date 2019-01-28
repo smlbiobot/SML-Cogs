@@ -53,6 +53,7 @@ from tabulate import tabulate
 
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
+
 PLAYERS = os.path.join("data", "racf_audit", "player_db.json")
 
 # RACF_SERVER_ID = '218534373169954816'
@@ -452,8 +453,9 @@ class RACFAudit:
         await asyncio.sleep(0)
         return self.players.get(tag)
 
-    async def rm_playr_tag(self, tag):
+    async def rm_player_tag(self, tag):
         """Remove player tag from settings."""
+        pass
 
     @racfauditset.command(name="auth", pass_context=True)
     @checks.is_owner()
@@ -1619,6 +1621,9 @@ class RACFAudit:
 
         # not in war or collection
         await self.bot.say("Clan is not in a known war state… aborted.")
+
+
+
 
 
 def check_folder():
