@@ -1207,14 +1207,12 @@ class RACF:
     @commands.has_any_role(*BOTCOMMANDER_ROLE)
     async def visitors(self, ctx, *members: discord.Member):
         """Assign member with visitor roles and give them info."""
-        pass
-        # temp remove
-        # tasks = [self.assign_visitor(ctx, member, status_channel=ctx.message.channel) for member in members]
-        # results = await asyncio.gather(*tasks, return_exceptions=True)
-        # for member, r in zip(members, results):
-        #     print(r)
-        #     if isinstance(r, Exception):
-        #         await self.bot.say("Error assigning visitor to {}".format(member.mention))
+        for member in members:
+            try:
+                await self.assign_visitor(ctx, member)
+            except Exception as e:
+                await self.bot.say("Partial error when assigning {} as visitor".format(member))
+
 
     # @commands.command(pass_context=True, no_pm=True)
     # @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
