@@ -145,17 +145,23 @@ class RACFTourney:
         self._save_settings()
         await self.bot.say("Player removed from tourney.")
 
-    @racf_tourney.command(name="list", pass_context=True)
-    async def _list_players(self, ctx, name=None):
-        """List players"""
-        # validate tourneys
+    async def _validate_tourney_name(self, ctx, name=None):
         if name not in TOURNEY_NAMES:
             await self.bot.say(
                 "You must enter a valid tourney name. \n{}".format(
                     "\n".join(["- {}".format(n) for n in TOURNEY_NAMES])
                 )
             )
-            await self.bot.say("Aborting")
+            return False
+
+        return True
+
+    @racf_tourney.command(name="list", pass_context=True)
+    async def _list_players(self, ctx, name=None):
+        """List players"""
+        # validate tourneys
+        valid = await self._validate_tourney_name(ctx, name=name)
+        if not valid:
             return
 
         o = [
@@ -169,17 +175,28 @@ class RACFTourney:
         for page in pagify('\n'.join(o)):
             await self.bot.say(page)
 
+    @racf_tourney.command(name="listid", pass_context=True)
+    @checks.mod_or_permissions()
+    async def _list_player_id(self, ctx, name=None):
+        """List player IDs"""
+        valid = await self._validate_tourney_name(ctx, name=name)
+        if not valid:
+            return
+
+        o = []
+        server = ctx.message.server
+        for author_id, player in self.settings.get(server.id, {}).get(name, {}).get('players', {}).items():
+            o.append(player.get('user_id'))
+
+        for page in pagify(' '.join(o)):
+            await self.bot.say(page)
+
     @racf_tourney.command(name="signup", pass_context=True)
     async def _signup(self, ctx, name=None):
         """Signup."""
         # validate tourneys
-        if name not in TOURNEY_NAMES:
-            await self.bot.say(
-                "You must enter a valid tourney name. \n{}".format(
-                    "\n".join(["- {}".format(n) for n in TOURNEY_NAMES])
-                )
-            )
-            await self.bot.say("Aborting")
+        valid = await self._validate_tourney_name(ctx, name=name)
+        if not valid:
             return
 
         author = ctx.message.author
