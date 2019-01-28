@@ -542,6 +542,10 @@ class RACFAudit:
 
         return parser
 
+    @property
+    def api(self):
+        return ClashRoyaleAPI(self.auth)
+
     async def family_member_models(self):
         """All family member models."""
         api = ClashRoyaleAPI(self.auth)
