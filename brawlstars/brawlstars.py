@@ -186,7 +186,7 @@ async def api_fetch_club(tag=None, auth=None, **kwargs):
     return BSClub(data)
 
 
-def normalized_trophy_by_level(trophy, level):
+def normalized_trophy_by_level(trophy, level, count=1):
     """Calculate trophy per level using specific formula.
 
     In BS, levels have the following multiplier:
@@ -201,8 +201,10 @@ def normalized_trophy_by_level(trophy, level):
     9  140
 
     relative level = (100 + 5 * level)/100
+
+    Add 100 per count
     """
-    return trophy / (1 + 0.05 * (level - 1))
+    return trophy / (1 * count + 0.05 * (level - 1))
 
 
 class BrawlStars:
@@ -366,7 +368,7 @@ class BrawlStars:
             # brawler stats
             'Brawlers: {}'.format(len(player.brawlers)),
             'Normalized Trophies per Level {:.2f}'.format(
-                normalized_trophy_by_level(player.trophies, sum([b.level for b in player.brawlers]))
+                normalized_trophy_by_level(player.trophies, sum([b.level for b in player.brawlers]), count=len(player.brawlers))
                 # player.trophies / sum([b.level for b in player.brawlers])
             ),
             'Trophies per Brawler: {:.2f}'.format(
