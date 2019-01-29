@@ -53,6 +53,7 @@ TOURNEY_NAMES = {
             ROYALEAPI_D,
             ROYALEAPI_E,
             ROYALEAPI_F,
+            ROYALEAPI_G,
             ROYALEAPI_Z
         ]
     }
