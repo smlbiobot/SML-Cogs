@@ -45,18 +45,19 @@ ROYALEAPI_Z = 'P0VPRCRC'
 ROYALEAPI_M = '9R8G9290'
 
 TOURNEY_NAMES = {
-    # 'nnmod': {
-    #     'clan_tags': [
-    #         ROYALEAPI_A,
-    #         ROYALEAPI_B,
-    #         ROYALEAPI_C,
-    #         ROYALEAPI_D,
-    #         ROYALEAPI_E,
-    #         ROYALEAPI_F,
-    #         ROYALEAPI_G,
-    #         ROYALEAPI_Z
-    #     ]
-    # }
+    'nnmod': {
+        'clan_tags': [
+            ROYALEAPI_A,
+            ROYALEAPI_B,
+            ROYALEAPI_C,
+            ROYALEAPI_D,
+            ROYALEAPI_E,
+            ROYALEAPI_F,
+            ROYALEAPI_G,
+            ROYALEAPI_Z
+        ],
+        'sign_up': False
+    }
 }
 
 
@@ -158,6 +159,11 @@ class RACFTourney:
 
         return True
 
+    async def _validate_tourney_signup_enabled(self, ctx, name=None):
+        if not TOURNEY_NAMES.get(name, {}).get('enabled'):
+            return False
+        return True
+
     @racf_tourney.command(name="list", pass_context=True)
     async def _list_players(self, ctx, name=None):
         """List players"""
@@ -200,6 +206,10 @@ class RACFTourney:
         valid = await self._validate_tourney_name(ctx, name=name)
         if not valid:
             return
+
+        # Signup must be enabled
+        if not self._validate_tourney_signup_enabled(name=name):
+            await self.bot.say("Signup has finished for this tourney")
 
         author = ctx.message.author
         server = ctx.message.server
