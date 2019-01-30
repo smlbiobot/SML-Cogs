@@ -45,18 +45,18 @@ ROYALEAPI_Z = 'P0VPRCRC'
 ROYALEAPI_M = '9R8G9290'
 
 TOURNEY_NAMES = {
-    'nnmod': {
-        'clan_tags': [
-            ROYALEAPI_A,
-            ROYALEAPI_B,
-            ROYALEAPI_C,
-            ROYALEAPI_D,
-            ROYALEAPI_E,
-            ROYALEAPI_F,
-            ROYALEAPI_G,
-            ROYALEAPI_Z
-        ]
-    }
+    # 'nnmod': {
+    #     'clan_tags': [
+    #         ROYALEAPI_A,
+    #         ROYALEAPI_B,
+    #         ROYALEAPI_C,
+    #         ROYALEAPI_D,
+    #         ROYALEAPI_E,
+    #         ROYALEAPI_F,
+    #         ROYALEAPI_G,
+    #         ROYALEAPI_Z
+    #     ]
+    # }
 }
 
 
