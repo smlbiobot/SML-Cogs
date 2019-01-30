@@ -148,11 +148,15 @@ class RACFTourney:
         self._save_settings()
         await self.bot.say("Player removed from tourney.")
 
-    async def _validate_tourney_name(self, ctx, name=None):
-        if name not in TOURNEY_NAMES:
+    async def _validate_tourney_name(self, ctx, name=None, enabled_only=False):
+        tourney_names = [n for n, v in TOURNEY_NAMES.items()]
+        if enabled_only:
+            tourney_names = [n for n, v in TOURNEY_NAMES.items() if v.get('enabled')]
+
+        if name not in tourney_names:
             await self.bot.say(
                 "You must enter a valid tourney name. \n{}".format(
-                    "\n".join(["- {}".format(n) for n in TOURNEY_NAMES])
+                    "\n".join(["- {}".format(n) for n in tourney_names])
                 )
             )
             return False
@@ -203,13 +207,9 @@ class RACFTourney:
     async def _signup(self, ctx, name=None):
         """Signup."""
         # validate tourneys
-        valid = await self._validate_tourney_name(ctx, name=name)
+        valid = await self._validate_tourney_name(ctx, name=name, enabled_only=True)
         if not valid:
             return
-
-        # Signup must be enabled
-        if not self._validate_tourney_signup_enabled(name=name):
-            await self.bot.say("Signup has finished for this tourney")
 
         author = ctx.message.author
         server = ctx.message.server
