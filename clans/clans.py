@@ -914,7 +914,7 @@ class Clans:
     async def get_clanwars(self):
         # official
         config = self.clans_config
-        clan_tags = [c.tag for c in config.clans]
+        clan_tags = [c.tag for c in config.clans if not c.hide]
         war_url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}/currentwar'
         info_url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}'
 
