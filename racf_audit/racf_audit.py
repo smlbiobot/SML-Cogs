@@ -472,6 +472,7 @@ class RACFAudit:
         """Set API Authentication token."""
         await self.bot.say(box(self.settings))
 
+
     @property
     def auth(self):
         """API authentication token."""
