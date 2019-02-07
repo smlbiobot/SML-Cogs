@@ -472,7 +472,6 @@ class RACFAudit:
         """Set API Authentication token."""
         await self.bot.say(box(self.settings))
 
-
     @property
     def auth(self):
         """API authentication token."""
@@ -1626,9 +1625,6 @@ class RACFAudit:
 
         # not in war or collection
         await self.bot.say("Clan is not in a known war state… aborted.")
-
-
-
 
 
 def check_folder():
