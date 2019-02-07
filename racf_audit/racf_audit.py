@@ -1204,7 +1204,7 @@ class RACFAudit:
             return s
 
         for index, member in enumerate(results, 1):
-            out.append('{:<4} {:>4} {:<1} {}'.format(
+            out.append('{:<4} {:>4} {:<5} {}'.format(
                 index, member['trophies'], name_to_symbol(member['clan']['name']), member['name']
             ))
 

@@ -57,6 +57,8 @@ CLAN_WARS_INTERVAL = dt.timedelta(minutes=5)
 CLAN_WARS_SLEEP = 10
 CLAN_WARS_CACHE = os.path.join(PATH, "clan_wars_cache.json")
 
+EMOJI_CW_TROPHY = '<:cwtrophy:450878327880941589>'
+
 
 def nested_dict():
     """Recursively nested defaultdict."""
@@ -116,7 +118,7 @@ def emoji_value(emoji, value, pad=5, inline=True, truncate=True):
         'win': '<:cwwarwin:450890799312404483>',
         'crown': '<:crownblue:337975460405444608>',
         'battle': '<:cwbattle:450889588215513089>',
-        'trophy': '<:cwtrophy:450878327880941589>'
+        'trophy': '<:cwtrophy:450878327880941589>',
     }
     value = str(value)
 
@@ -142,6 +144,8 @@ def wrap_inline(str):
 class APIError(Exception):
     def __init__(self, message):
         self.message = message
+
+
 
 
 class Clans:
@@ -457,6 +461,13 @@ class Clans:
                     gold
                 )
 
+            # clan scores + cw trophies
+            clan_score_cw_trophies = "\n{trophy} :trophy: {cw_trophy} {emoji_cw_trophy}".format(
+                trophy=clan.get('clanScore', 0),
+                cw_trophy=clan.get('clanWarTrophies', 0),
+                emoji_cw_trophy=EMOJI_CW_TROPHY,
+            )
+
             # aux requirements
             aux = ""
             for c in config.clans:
@@ -465,14 +476,15 @@ class Clans:
                         aux = '\n{}'.format(c.get('aux'))
 
             # embed value
-            value = '`{trophies}{pb}{psf}{member_count}{clan_tag}`{cw}{aux}'.format(
+            value = '`{trophies}{pb}{psf}{member_count}{clan_tag}`{cw}{aux}{clan_score_cw_trophies}'.format(
                 clan_tag=clan_tag,
                 member_count=member_count,
                 trophies=trophies,
                 pb=pb,
                 psf=psf,
                 cw=cw,
-                aux=aux)
+                aux=aux,
+                clan_score_cw_trophies=clan_score_cw_trophies)
             em.add_field(name=name, value=value, inline=False)
 
             if badge_url is None:
