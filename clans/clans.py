@@ -118,7 +118,9 @@ def emoji_value(emoji, value, pad=5, inline=True, truncate=True):
         'win': '<:cwwarwin:450890799312404483>',
         'crown': '<:crownblue:337975460405444608>',
         'battle': '<:cwbattle:450889588215513089>',
-        'trophy': '<:cwtrophy:450878327880941589>',
+        'trophy': ':trophy:',
+        'laddertrophy': '<:laddertrophy:337975460451319819>',
+        'cwtrophy': '<:cwtrophy:450878327880941589>',
     }
     value = str(value)
 
@@ -462,10 +464,9 @@ class Clans:
                 )
 
             # clan scores + cw trophies
-            clan_score_cw_trophies = "\n{trophy} :trophy: {cw_trophy} {emoji_cw_trophy}".format(
-                trophy=clan.get('clanScore', 0),
-                cw_trophy=clan.get('clanWarTrophies', 0),
-                emoji_cw_trophy=EMOJI_CW_TROPHY,
+            clan_score_cw_trophies = "{trophy}{cw_trophy}".format(
+                trophy=emoji_value('laddertrophy', clan.get('clanScore', 0), 5),
+                cw_trophy=emoji_value('cwtrophy', clan.get('clanWarTrophies', 0), 5),
             )
 
             # aux requirements
@@ -476,7 +477,7 @@ class Clans:
                         aux = '\n{}'.format(c.get('aux'))
 
             # embed value
-            value = '`{trophies}{pb}{psf}{member_count}{clan_tag}`{cw}{aux}{clan_score_cw_trophies}'.format(
+            value = '`{trophies}{pb}{psf}{member_count}{clan_tag}`{cw}{aux}\n{clan_score_cw_trophies}'.format(
                 clan_tag=clan_tag,
                 member_count=member_count,
                 trophies=trophies,
@@ -665,7 +666,7 @@ class Clans:
             wins=emoji_value('win', 'Wins', inline=False, truncate=False),
             crowns=emoji_value('crown', 'Crowns', inline=False, truncate=False),
             battles_played=emoji_value('battle', 'Battles Played', inline=False, truncate=False),
-            trophies=emoji_value('trophy', 'CW Trophies', inline=False, truncate=False)
+            trophies=emoji_value('cwtrophy', 'CW Trophies', inline=False, truncate=False)
         )
 
         o += [
