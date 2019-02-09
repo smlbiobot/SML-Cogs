@@ -33,6 +33,7 @@ from collections import namedtuple
 import aiohttp
 import argparse
 import csv
+import datetime as dt
 import discord
 import humanfriendly
 import io
@@ -60,7 +61,23 @@ PLAYERS = os.path.join("data", "racf_audit", "player_db.json")
 RACF_SERVER_ID = '528327242875535372'
 SML_SERVER_ID = '275395656955330560'
 
-import datetime as dt
+MEMBER_ROLE_NAMES = [
+    'Member',
+    'Touney',
+    'Practice',
+    'CW',
+    'Diary',
+    'Alpha',
+    'Bravo',
+    'Coca',
+    'Delta',
+    'Echo',
+    'Fox',
+    'Golf',
+    'Trade',
+    'Zen',
+    'Mini',
+]
 
 
 class NoPlayerRecord(Exception):
@@ -1001,24 +1018,6 @@ class RACFAudit:
 
             except KeyError:
                 pass
-
-        MEMBER_ROLE_NAMES = [
-            'Member',
-            'Touney',
-            'Practice',
-            'CW',
-            'Diary',
-            'A.',
-            'B.',
-            'C.',
-            'D.',
-            'E.',
-            'F.',
-            'G.',
-            'T.',
-            'Z.',
-            'Mini',
-        ]
 
         # remove member roles from people who are not in our clans
         for result in audit_results['not_in_our_clans']:
