@@ -717,7 +717,7 @@ class Clans:
                 o += [
                     "\u2800",
                     (
-                            wrap_inline("{clan_name: <12} {state: <4} {timespan: >11}") +
+                            wrap_inline("{clan_name:<15.15} {state: <4} {timespan: >11.11}") +
                             "\n{wins} "
                             "{crowns} "
                             "{battles_played}"
@@ -729,7 +729,7 @@ class Clans:
                         wins=emoji_value('win', wins, 2),
                         crowns=emoji_value('crown', crowns, 2),
                         battles_played=emoji_value('battle', battles_played, 3),
-                        trophies=emoji_value('trophy', clan_score, 5)
+                        trophies=emoji_value('cwtrophy', clan_score, 5)
                     )
                 ]
             else:
