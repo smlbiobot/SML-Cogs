@@ -1605,19 +1605,23 @@ class RACF:
         removed = await self.remove_roles(server, member, role_names)
         await self.bot.say("Removed {} from {}".format(", ".join(removed), member))
 
-        # delete messages from recruit channel
-        recruit_channel = discord.utils.get(ctx.message.server.channels, name='recruit')
-        tmp = ctx.message
-        to_delete = [ctx.message]
-        async for message in self.bot.logs_from(recruit_channel, limit=200, before=tmp):
-            if message.author == member:
-                to_delete.append(message)
+        # send removal message
+        await ctx.invoke(self.dmusers, self.config.messages.remove_recruit, member)
 
-        for message in to_delete:
-            try:
-                await self.bot.delete_message(message)
-            except:
-                pass
+        # skip message delete
+        # delete messages from recruit channel
+        # recruit_channel = discord.utils.get(ctx.message.server.channels, name='recruit')
+        # tmp = ctx.message
+        # to_delete = [ctx.message]
+        # async for message in self.bot.logs_from(recruit_channel, limit=200, before=tmp):
+        #     if message.author == member:
+        #         to_delete.append(message)
+        #
+        # for message in to_delete:
+        #     try:
+        #         await self.bot.delete_message(message)
+        #     except:
+        #         pass
 
     @commands.command(pass_context=True, no_pm=True)
     async def reject(self, ctx, member: discord.Member):

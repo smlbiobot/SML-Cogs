@@ -155,6 +155,8 @@ messages:
 
 
     In Legendary League, you can also see +1 levels (Legendary League Readiness level 13 — max cards) when you battle, so a player with 50% Legendary Readiness is better off than someone with 5% Legendary when it comes to building strong decks to go to battle with.
+  remove_recruit: >
+    Thanks for your interest in joining our clan family. While we understand that you are not ready to join right now, we’d love for you to hang around in our <#530523965232250880> channel and connect with us later should you wish to apply again.
 permission:
   bands:
   - {assign_role: true, member: false, role: BS-Alpha, tag: LQQ}
