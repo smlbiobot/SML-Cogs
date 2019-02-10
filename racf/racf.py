@@ -1572,10 +1572,10 @@ class RACF:
                 recruit_channel,
                 embed=await cwready.cwready_embed(data, hist)
             )
-            # await cwready.send_cwr_req_results_channel(
-            #     recruit_channel,
-            #     data
-            # )
+            await cwready.send_cwr_req_results_channel(
+                recruit_channel,
+                data
+            )
 
         else:
             await self.bot.send_message(
