@@ -13,10 +13,9 @@ import os
 import re
 import socket
 import yaml
-from discord.ext import commands
-
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 logger = logging.getLogger(__name__)
 
@@ -32,6 +31,10 @@ class TagNotFound(Exception):
 
 
 class UnknownServerError(Exception):
+    pass
+
+
+class MinChallengeWinFailed(Exception):
     pass
 
 
@@ -168,24 +171,33 @@ class CWReady:
         await ctx.invoke(self.cwreadytag, tag)
 
     async def send_cwr_req_results(self, ctx, data):
-        # don’t send results for now
-        pass
-        # await self.send_cwr_req_results_channel(ctx.message.channel, data)
+        """Send CWR requirement results."""
+        await self.send_cwr_req_results_channel(ctx.message.channel, data)
 
     async def send_cwr_req_results_channel(self, channel, data):
-        clans = await self.test_cwr_requirements(data)
-        if len(clans) == 0:
+        """Send CWR requirement results."""
+        try:
+            clans = await self.test_cwr_requirements(data)
+        except MinChallengeWinFailed:
             await self.bot.send_message(
                 channel,
-                "User does not meet requirements for any of our clans."
+                "User does not meet requirements for any of our clans. "
+                "Minimum challenge wins lower than 12."
             )
+            return
         else:
-            await self.bot.send_message(
-                channel,
-                "Qualified clans: {}. {}".format(
-                    ", ".join([clan.get('name') for clan in clans]),
-                    self.config.get('addendum', '')
-                ))
+            if len(clans) == 0:
+                await self.bot.send_message(
+                    channel,
+                    "User does not meet requirements for any of our clans."
+                )
+            else:
+                await self.bot.send_message(
+                    channel,
+                    "Qualified clans: {}. {}".format(
+                        ", ".join([clan.get('name') for clan in clans]),
+                        self.config.get('addendum', '')
+                    ))
 
     async def fetch_json(self, url, headers=None, error_dict=None):
         conn = aiohttp.TCPConnector(
@@ -271,7 +283,7 @@ class CWReady:
 
         # test minimum challenge wins
         if cwr_data.get('challenge_max_wins', 0) < self.config.get('min_challenge_wins', 0):
-            return qual
+            raise MinChallengeWinFailed
 
         tags = [clan.get('tag') for clan in self.config.get('clans', [])]
         reqs = await self.fetch_cwr_requirements(tags)
@@ -390,7 +402,6 @@ class CWReady:
                     value='Last 10: {last_10:.0%}, Last 20: {last_20:.0%}, Lifetime: {lifetime:.0%}'.format(
                         **hist.get('win_rate'))
                 )
-
 
             battles = hist.get('battles')
             if battles:
