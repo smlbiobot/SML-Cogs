@@ -263,7 +263,7 @@ class BrawlStars:
         for b in player.brawlers or []:
             em.add_field(
                 name="{} {}".format(self.get_emoji(b.name.lower().replace(' ', '')), b.name),
-                value="{} / {} Lvl {}".format(b.trophies, b.highestTrophies, b.level)
+                value="{} / {} Lvl {}".format(b.trophies, b.highestTrophies, b.power)
             )
 
         # footer
@@ -308,7 +308,7 @@ class BrawlStars:
                     emoji=self.get_emoji(b.name.lower().replace(' ', '')),
                     trophies=b.trophies,
                     pb=b.highestTrophies,
-                    level=b.level,
+                    level=b.power,
                     name=b.name
                 )
             )
@@ -341,9 +341,9 @@ class BrawlStars:
             '{} #{}'.format(bold(player.name), player.tag),
             '{}, {} #{}'.format(player.club.role, player.club.name, player.club.tag) if player.club else 'No Clan',
             '{} {} / {}'.format(self.get_emoji('bstrophy'), player.trophies, player.highestTrophies),
-            '{emoji} {time} Best time as Boss'.format(
+            '{emoji} {time} Best time as Big Brawler'.format(
                 emoji=self.get_emoji('bossfight'),
-                time=inline(player.bestTimeAsBoss)),
+                time=inline(player.bestTimeAsBigBrawler)),
             '{emoji} {time} Best Robo Rumble time'.format(
                 emoji=self.get_emoji('roborumble'),
                 time=inline(player.bestRoboRumbleTime)),
@@ -368,7 +368,7 @@ class BrawlStars:
             # brawler stats
             'Brawlers: {}'.format(len(player.brawlers)),
             'Normalized Trophies per Level {:.2f}'.format(
-                normalized_trophy_by_level(player.trophies, sum([b.level for b in player.brawlers]), count=len(player.brawlers))
+                normalized_trophy_by_level(player.trophies, sum([b.power for b in player.brawlers]), count=len(player.brawlers))
                 # player.trophies / sum([b.level for b in player.brawlers])
             ),
             'Trophies per Brawler: {:.2f}'.format(
@@ -389,10 +389,10 @@ class BrawlStars:
                     emoji=self.get_emoji(b.name.lower().replace(' ', '')),
                     trophies=b.trophies,
                     pb=b.highestTrophies,
-                    level=b.level,
+                    level=b.power,
                     name=b.name,
                     # trophy_per_level=b.trophies / b.level,
-                    trophy_per_level=normalized_trophy_by_level(b.trophies, b.level)
+                    trophy_per_level=normalized_trophy_by_level(b.trophies, b.power)
                 )
             )
 
