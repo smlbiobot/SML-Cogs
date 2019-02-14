@@ -63,7 +63,7 @@ COMPETITIVE_TEAM_ROLES = [
     "ClashWars", "CRL-Elite", "CRL-Legends", "CRL-Rockets"]
 
 CLAN_PERMISSION = {
-'9PJ82CRC': {
+    '9PJ82CRC': {
         'tag': '9PJ82CRC',
         'role': 'Alpha',
         'assign_role': True,
@@ -222,7 +222,18 @@ BAND_PERMISSION = {
 PATH = os.path.join("data", "racf")
 JSON = os.path.join(PATH, "settings.json")
 
-CLAN_ROLES = ['A', 'B', 'C', 'D', 'E', 'F', 'G', "Z", "Mini"]
+CLAN_ROLES = [
+    'Alpha',
+    'Bravo',
+    'Coca',
+    'Delta',
+    'Echo',
+    'Fox',
+    'Golf',
+    'Hotel',
+    'Zen',
+    'Mini'
+]
 MEMBER_ROLES = ['Member']
 VISITOR_ROLES = ['Visitor']
 RECRUIT_ROLES = ['{}Recruit'.format(r) for r in CLAN_ROLES]
@@ -1203,7 +1214,6 @@ class RACF:
                 await self.assign_visitor(ctx, member)
             except Exception as e:
                 await self.bot.say("Partial error when assigning {} as visitor".format(member))
-
 
     # @commands.command(pass_context=True, no_pm=True)
     # @commands.has_any_role(*HE_BOTCOMMANDER_ROLES)
