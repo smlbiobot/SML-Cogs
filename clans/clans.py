@@ -381,7 +381,7 @@ class Clans:
                     # delete channel messages
                     await self.bot.purge_from(channel, limit=5, before=message)
 
-    async def post_clans(self, channel, *args):
+    async def post_clans(self, channel, *args, msg=None):
         """Post clans to channel."""
         config = self.clans_config
         clan_tags = [clan.tag for clan in config.clans if not clan.hide]
@@ -404,7 +404,8 @@ class Clans:
         em = discord.Embed(
             title=config.name,
             description=config.description,
-            color=discord.Color(int(config.color, 16))
+            color=discord.Color(int(config.color, 16)),
+            timestamp=dt.datetime.utcnow()
         )
         badge_url = None
         show_member_count = "-m" not in args
@@ -509,8 +510,12 @@ class Clans:
                 value=inf.value
             )
 
-        message = await self.bot.send_message(channel, embed=em)
-        return message
+        if msg is None:
+            msg = await self.bot.send_message(channel, embed=em)
+        else:
+            await self.bot.edit_message(msg, embed=em)
+
+        return msg
 
     def search_args_parser(self):
         """Search arguments parser."""
