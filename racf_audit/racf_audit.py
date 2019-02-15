@@ -1295,8 +1295,8 @@ class RACFAudit:
         top50_results = []
         non_top50_results = []
 
-        # ALPHA_CLAN_TAG = '#9PJ82CRC'
-        ALPHA_CLAN_TAG = '#PV98LY0P'
+        ALPHA_CLAN_TAG = '#9PJ82CRC'
+        # ALPHA_CLAN_TAG = '#PV98LY0P'
 
         member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
 
