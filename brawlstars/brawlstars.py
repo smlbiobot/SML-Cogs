@@ -827,7 +827,7 @@ class BrawlStarsAudit:
         self.cog = cog
 
     async def exec_add_roles(self, d_member, roles, channel=None):
-        await self.cog.bot.add_roles(self, d_member, *roles)
+        await self.cog.bot.add_roles(d_member, *roles)
         if channel is not None:
             await self.cog.bot.send_message(
                 channel,
@@ -840,7 +840,7 @@ class BrawlStarsAudit:
             )
 
     async def exec_remove_roles(self, d_member, roles, channel=None):
-        await self.cog.bot.remove_roles(self, d_member, *roles)
+        await self.cog.bot.remove_roles(d_member, *roles)
         if channel is not None:
             await self.cog.bot.send_message(
                 channel,
