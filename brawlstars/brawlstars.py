@@ -959,7 +959,7 @@ class BrawlStarsAudit:
         # add visitor for those who don’t have normal roles
         if exec:
             visitor_role = discord.utils.get(server.roles, name='Visitor')
-            membership_role_names = ['Member', 'BS-Member', 'BOT', 'Guest']
+            membership_role_names = ['Member', 'BS-Member', 'BOT', 'Guest', 'Visitor']
             for user in server.members:
                 user_role_names = [r.name for r in user.roles]
                 if len(set(user_role_names) & set(membership_role_names)) == 0:
