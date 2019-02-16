@@ -901,7 +901,7 @@ class BrawlStarsAudit:
                     if bs_member_role in user.roles:
                         await self.cog.bot.send_message(status_channel, "{} is not in our clubs".format(user))
                         if exec:
-                            await self.exec_remove_roles(user, bs_member_roles)
+                            await self.exec_remove_roles(user, bs_member_roles, channel=status_channel)
 
             for member_id in member_ids:
                 user = server.get_member(member_id)
@@ -909,7 +909,7 @@ class BrawlStarsAudit:
                     if bs_member_role not in user.roles:
                         await self.cog.bot.send_message(status_channel, "{} is in our clubs".format(user))
                         if exec:
-                            await self.exec_add_roles(user, [bs_member_role])
+                            await self.exec_add_roles(user, [bs_member_role], channel=status_channel)
 
         # clubs
         for club_tag, club in results.items():
@@ -921,12 +921,12 @@ class BrawlStarsAudit:
                     user = server.get_member(user_id)
                     if user is not None:
                         if club_role not in user.roles:
-                            await self.cog.bot.send_message(status_channel, "{} is in {}".format(user, club.get('name')))
+                            await self.cog.bot.send_message(status_channel,
+                                                            "{} is in {}".format(user, club.get('name')))
                             if exec:
-                                await self.exec_add_roles(user, [club_role])
+                                await self.exec_add_roles(user, [club_role], channel=status_channel)
 
-
-        print_json(results)
+        # print_json(results)
         await self.cog.bot.send_message(status_channel, "Audit finished")
 
 
