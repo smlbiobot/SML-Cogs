@@ -892,7 +892,10 @@ class BrawlStarsAudit:
         club_tag_to_club_roles = {}
         club_role_names = []
         for club in cfg.get('clubs', []):
-            club_tag_to_club_roles[club.get('tag')] = club.get('roles')
+            club_tag_to_club_roles[club.get('tag')] = [
+                discord.utils.get(server.roles, name=name) for name in
+                club.get('roles', [])
+            ]
             club_role_names += club.get('roles')
 
         all_club_roles = [
