@@ -827,30 +827,38 @@ class BrawlStarsAudit:
         self.cog = cog
 
     async def exec_add_roles(self, d_member, roles, channel=None):
-        await self.cog.bot.add_roles(d_member, *roles)
-        if channel is not None:
-            await self.cog.bot.send_message(
-                channel,
-                "Add {} to {}".format(
-                    ", ".join(
-                        [r.name for r in roles]
-                    ),
-                    d_member
+        try:
+            await self.cog.bot.add_roles(d_member, *roles)
+        except Exception as e:
+            pass
+        else:
+            if channel is not None:
+                await self.cog.bot.send_message(
+                    channel,
+                    "Add {} to {}".format(
+                        ", ".join(
+                            [r.name for r in roles]
+                        ),
+                        d_member
+                    )
                 )
-            )
 
     async def exec_remove_roles(self, d_member, roles, channel=None):
-        await self.cog.bot.remove_roles(d_member, *roles)
-        if channel is not None:
-            await self.cog.bot.send_message(
-                channel,
-                "Remove {} from {}".format(
-                    ", ".join(
-                        [r.name for r in roles]
-                    ),
-                    d_member
+        try:
+            await self.cog.bot.remove_roles(d_member, *roles)
+        except Exception as e:
+            pass
+        else:
+            if channel is not None:
+                await self.cog.bot.send_message(
+                    channel,
+                    "Remove {} from {}".format(
+                        ", ".join(
+                            [r.name for r in roles]
+                        ),
+                        d_member
+                    )
                 )
-            )
 
     async def run(self, server: discord.Server = None, exec=False, status_channel=None):
         """Run audit against server."""
