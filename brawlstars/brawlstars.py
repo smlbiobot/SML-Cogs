@@ -960,7 +960,7 @@ class BrawlStarsAudit:
         if exec:
             visitor_role = discord.utils.get(server.roles, name='Visitor')
             membership_role_names = ['Member', 'BS-Member', 'BOT', 'Guest', 'Visitor']
-            for user in server.members:
+            for user in server.members.copy():
                 user_role_names = [r.name for r in user.roles]
                 if len(set(user_role_names) & set(membership_role_names)) == 0:
                     await self.exec_add_roles(user, [visitor_role], channel=status_channel)
