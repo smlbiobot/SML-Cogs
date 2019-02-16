@@ -924,18 +924,37 @@ class BrawlStarsAudit:
 
         # clubs
         for club_tag, club in results.items():
+            club_member_ids = []
             for member in club.get('members', []):
                 user_id = member.get('discord_user_id')
-                club_roles = club_tag_to_club_roles[club_tag]
-                club_role = club_roles[0]
                 if user_id is not None:
-                    user = server.get_member(user_id)
-                    if user is not None:
-                        if club_role not in user.roles:
-                            await self.cog.bot.send_message(status_channel,
-                                                            "{} is in {}".format(user, club.get('name')))
-                            if exec:
-                                await self.exec_add_roles(user, [club_role], channel=status_channel)
+                    club_member_ids.append(user_id)
+
+            non_club_member_ids = [m.id for m in server.members if m.id not in club_member_ids]
+
+            club_roles = club_tag_to_club_roles[club_tag]
+            club_role = club_roles[0]
+
+            # members
+            for user_id in club_member_ids:
+                user = server.get_member(user_id)
+                if user is not None:
+                    if club_role not in user.roles:
+                        await self.cog.bot.send_message(
+                            status_channel,
+                            "{} is in {}".format(user, club.get('name')))
+                        if exec:
+                            await self.exec_add_roles(user, [club_role], channel=status_channel)
+
+            for user_id in non_club_member_ids:
+                user = server.get_member(user_id)
+                if user is not None:
+                    if club_role in user.roles:
+                        await self.cog.bot.send_message(
+                            status_channel,
+                            "{} is not in {}".format(user, club.get('name')))
+                        if exec:
+                            await self.exec_remove_roles(user, [club_role], channel=status_channel)
 
         # print_json(results)
         await self.cog.bot.send_message(status_channel, "Audit finished")
