@@ -1,4 +1,25 @@
 servers:
+  - name: RoyaleAPI Clan Family
+    id: 528327242875535372
+    clubs:
+      - name: Reddit Alpha
+        tag: LQQ
+        roles:
+          - BS-Alpha
+      - name: Reddit Bravo
+        tag: 282UC998
+        roles:
+          - BS-Bravo
+      - name: Reddit Charlie
+        tag: 29GV920P
+        roles:
+          - BS-Charlie
+    everyone_roles:
+      - Brawl-Stars
+    member_roles:
+      - BS-Member
+    visitor_roles:
+      - Visitor
   - name: 100 Thieves Clash Royale
     id: 218534373169954816
     clubs:
@@ -32,9 +53,9 @@ servers:
         roles:
           - BS-Bravo
       - name: Reddit Charlie
-          tag: 29GV920P
-          roles:
-            - BS-Charlie
+        tag: 29GV920P
+        roles:
+          - BS-Charlie
     everyone_roles:
       - Brawl-Stars
     member_roles:
