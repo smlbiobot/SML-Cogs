@@ -1719,6 +1719,23 @@ class RACF:
         hash = int(arg[::-1], 36)
         await self.bot.say("fadmin: {}".format(hash))
 
+    @commands.command(name="eloplayer", no_pm=True, pass_context=True)
+    async def eloplayer(self, ctx, member:discord.Member):
+        """Add elo player"""
+        server = ctx.message.server
+        elo_role = discord.utils.get(server.roles, name='ELO.Player')
+        elo_instructions_channel = discord.utils.get(server.channels, name='elo-instructions')
+        elo_feedback_channel = discord.utils.get(server.channels, name='elo-feedback')
+        await self.bot.add_roles(member, elo_role)
+        await self.bot.say("Added {} to {}".format(elo_role, member))
+        await self.bot.say(
+            "{} Thank you for participating in the Elo Ladder series. "
+            "Please read and complete the steps in {} and leave your feedback in {}. "
+            "We are currently in early testing and the Leaderboard + params may reset without prior notice. ".format(
+                member.mention, elo_instructions_channel.mention, elo_feedback_channel.mention
+            )
+        )
+
     @checks.mod_or_permissions(manage_roles=True)
     @commands.command(no_pm=True, pass_context=True)
     async def rmnonmemberclanroles(self, ctx):
