@@ -1728,7 +1728,9 @@ class RACF:
         elo_feedback_channel = discord.utils.get(server.channels, name='elo-feedback')
         await self.bot.add_roles(member, elo_role)
         await self.bot.say("Added {} to {}".format(elo_role, member))
-        await self.bot.say(
+        elo_chat_channel = discord.utils.get(server.channels, name='elo-chat')
+        await self.bot.send_message(
+            elo_chat_channel,
             "{} Thank you for participating in the Elo Ladder series. "
             "Please read and complete the steps in {} and leave your feedback in {}. "
             "We are currently in early testing and the Leaderboard + params may reset without prior notice. ".format(
