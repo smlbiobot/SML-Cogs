@@ -1728,7 +1728,7 @@ class RACF:
         elo_feedback_channel = discord.utils.get(server.channels, name='elo-feedback')
         await self.bot.add_roles(member, elo_role)
         await self.bot.say("Added {} to {}".format(elo_role, member))
-        elo_chat_channel = discord.utils.get(server.channels, name='elo-chat')
+        elo_chat_channel = discord.utils.get(server.channels, name='elo-bot')
         await self.bot.send_message(
             elo_chat_channel,
             "{} Thank you for participating in the Elo Ladder series. "
