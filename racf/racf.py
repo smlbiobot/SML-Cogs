@@ -1722,6 +1722,11 @@ class RACF:
     @commands.command(name="eloplayer", no_pm=True, pass_context=True)
     async def eloplayer(self, ctx, member:discord.Member):
         """Add elo player"""
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            await self.bot.say("Ask a co-leader to run this for you.")
+            return
+
         server = ctx.message.server
         elo_role = discord.utils.get(server.roles, name='ELO.Player')
         elo_instructions_channel = discord.utils.get(server.channels, name='elo-instructions')
