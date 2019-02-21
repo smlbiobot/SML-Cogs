@@ -338,7 +338,7 @@ class Clans:
         self.save_settings()
 
     @checks.mod_or_permissions()
-    @commands.command(pass_context=True, no_pm=True)
+    @commands.command(pass_context=True, no_pm=True, aliases=['auto_clans', 'autoclans'])
     async def auto_clan(self, ctx):
         """Auto display clan info."""
         await self.bot.type()
@@ -376,7 +376,15 @@ class Clans:
                 channel_id = v.get('channel_id')
                 channel = self.bot.get_channel(channel_id)
                 if channel is not None:
-                    message = await self.post_clans(channel)
+                    message_id = v.get('message_id')
+                    msg = None
+                    if message_id is not None:
+                        try:
+                            msg = await self.bot.get_message(channel, message_id)
+                        except (discord.NotFound, discord.Forbidden, discord.HTTPException):
+                            msg = None
+                    message = await self.post_clans(channel, msg=msg)
+                    v['message_id'] = message.id
 
                     # delete channel messages
                     await self.bot.purge_from(channel, limit=5, before=message)
