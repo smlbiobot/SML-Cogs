@@ -37,12 +37,11 @@ import yaml
 from PIL import Image
 from PIL import ImageDraw
 from PIL import ImageFont
-from concurrent.futures import ThreadPoolExecutor
-from discord.ext import commands
-
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from concurrent.futures import ThreadPoolExecutor
+from discord.ext import commands
 
 SETTINGS_PATH = os.path.join("data", "deck", "settings.json")
 AKA_PATH = os.path.join("data", "deck", "cards_aka.yaml")
