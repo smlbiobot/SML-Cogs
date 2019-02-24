@@ -1719,13 +1719,16 @@ class RACF:
         hash = int(arg[::-1], 36)
         await self.bot.say("fadmin: {}".format(hash))
 
-    @commands.command(name="eloplayer", no_pm=True, pass_context=True)
-    async def eloplayer(self, ctx, member:discord.Member):
+    @commands.command(name="eloplayer", aliases=["ep"], no_pm=True, pass_context=True)
+    async def eloplayer(self, ctx, member: discord.Member, tag: str = None):
         """Add elo player"""
         verified = await check_manage_roles(ctx, self.bot)
         if not verified:
             await self.bot.say("Ask a co-leader to run this for you.")
             return
+
+        if tag is not None:
+            await ctx.invoke(self.racf_verify, member, tag, grant_permission=True)
 
         server = ctx.message.server
         elo_role = discord.utils.get(server.roles, name='ELO.Player')
