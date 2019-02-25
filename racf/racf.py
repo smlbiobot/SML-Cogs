@@ -1719,7 +1719,7 @@ class RACF:
         hash = int(arg[::-1], 36)
         await self.bot.say("fadmin: {}".format(hash))
 
-    @commands.command(name="eloplayer", aliases=["ep"], no_pm=True, pass_context=True)
+    @commands.command(name="eloplayer", aliases=["ep, rrplayer, rp"], no_pm=True, pass_context=True)
     async def eloplayer(self, ctx, member: discord.Member, tag: str = None):
         """Add elo player"""
         verified = await check_manage_roles(ctx, self.bot)
@@ -1732,11 +1732,11 @@ class RACF:
 
         server = ctx.message.server
         elo_role = discord.utils.get(server.roles, name='ELO.Player')
-        elo_instructions_channel = discord.utils.get(server.channels, name='elo-instructions')
-        elo_feedback_channel = discord.utils.get(server.channels, name='elo-feedback')
+        elo_instructions_channel = discord.utils.get(server.channels, name='rr-instructions')
+        elo_feedback_channel = discord.utils.get(server.channels, name='rr-feedback')
         await self.bot.add_roles(member, elo_role)
         await self.bot.say("Added {} to {}".format(elo_role, member))
-        elo_chat_channel = discord.utils.get(server.channels, name='elo-bot')
+        elo_chat_channel = discord.utils.get(server.channels, name='rr-bot')
         await self.bot.send_message(
             elo_chat_channel,
             "{} Thank you for participating in the Elo Ladder series. "
