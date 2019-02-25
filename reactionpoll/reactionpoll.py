@@ -30,7 +30,7 @@ import datetime as dt
 from collections import defaultdict
 from discord.ext import commands
 
-from __main__ import send_cmd_help
+
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
@@ -61,11 +61,11 @@ class ReactionPoll:
         """Verify settings have all the keys."""
 
     @checks.mod_or_permissions()
-    @commands.group(aliases=['rp'], pass_context=True, no_pm=True)
+    @commands.group(aliases=['rep'], pass_context=True, no_pm=True)
     async def reactionpoll(self, ctx):
         """Reaction polling utility."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @checks.serverowner_or_permissions()
     @reactionpoll.command(name="init", pass_context=True, no_pm=True)
@@ -83,7 +83,7 @@ class ReactionPoll:
         message_id: the message to track
         """
         if message_id is None:
-            await send_cmd_help(ctx)
+            await self.send_cmd_help(ctx)
             return
 
         server = ctx.message.server
@@ -111,7 +111,7 @@ class ReactionPoll:
         message_id: the message to track
         """
         if message_id is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         server = None
@@ -146,7 +146,7 @@ class ReactionPoll:
     async def reactionpoll_del(self, ctx, message_id=None):
         """Remove message from being tracked."""
         if message_id is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         server = ctx.message.server
