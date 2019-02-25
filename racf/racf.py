@@ -1719,7 +1719,7 @@ class RACF:
         hash = int(arg[::-1], 36)
         await self.bot.say("fadmin: {}".format(hash))
 
-    @commands.command(name="eloplayer", aliases=["ep, rrplayer, rp"], no_pm=True, pass_context=True)
+    @commands.command(name="eloplayer", aliases=["ep", "rrplayer", "rp"], no_pm=True, pass_context=True)
     async def eloplayer(self, ctx, member: discord.Member, tag: str = None):
         """Add elo player"""
         verified = await check_manage_roles(ctx, self.bot)
