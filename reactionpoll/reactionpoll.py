@@ -24,16 +24,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import os
-import discord
-import datetime as dt
 from collections import defaultdict
-from discord.ext import commands
 
-
+import datetime as dt
+import discord
+import os
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "reactionpoll")
 JSON = os.path.join(PATH, "settings.json")
