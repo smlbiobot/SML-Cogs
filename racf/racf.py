@@ -1731,7 +1731,7 @@ class RACF:
             await ctx.invoke(self.racf_verify, member, tag, grant_permission=True)
 
         server = ctx.message.server
-        elo_role = discord.utils.get(server.roles, name='ELO.Player')
+        elo_role = discord.utils.get(server.roles, name='RR.Player')
         elo_instructions_channel = discord.utils.get(server.channels, name='rr-instructions')
         elo_feedback_channel = discord.utils.get(server.channels, name='rr-feedback')
         await self.bot.add_roles(member, elo_role)
