@@ -27,7 +27,8 @@ DEALINGS IN THE SOFTWARE.
 import asyncio
 import itertools
 import math
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
+from collections import defaultdict
 
 import aiohttp
 import datetime as dt
@@ -38,12 +39,11 @@ import os
 import requests
 import socket
 import urllib.request
+from cogs.utils import checks
+from cogs.utils.dataIO import dataIO
 from datetime import timedelta
 from discord.ext import commands
 from random import choice
-
-from cogs.utils import checks
-from cogs.utils.dataIO import dataIO
 
 PATH = os.path.join("data", "crprofile")
 PATH_PLAYERS = os.path.join(PATH, "players")
@@ -80,6 +80,7 @@ def random_discord_color():
     color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
     color = int(color, 16)
     return discord.Color(value=color)
+
 
 def clean_tag(tag):
     """clean up tag."""
@@ -118,6 +119,7 @@ def normalized_card_level(card):
         Legendary=8
     )
     return card.get('level', 0) + rarity2level.get(get_card_rarity(card), 0)
+
 
 def inline(s, fmt):
     """Wrap string with inline escape"""
