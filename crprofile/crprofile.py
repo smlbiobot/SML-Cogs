@@ -1469,6 +1469,14 @@ class CRProfile:
         """Current deck of player tag."""
         await self.display_profile(ctx, tag, sections=['deck'])
 
+    @crprofile.command(name="mini", pass_context=True, no_pm=True)
+    async def crprofile_mini(self, ctx, member: discord.Member = None):
+        """Player profile
+
+        if member is not entered, retrieve own profile
+        """
+        await self.get_profile(ctx, member, sections=['overview'])
+
     async def display_profile(self, ctx, tag, **kwargs):
         """Display profile."""
         sctag = SCTag(tag)
