@@ -1616,7 +1616,7 @@ class RACF:
         await self.bot.say("Removed {} from {}".format(", ".join(removed), member))
 
         # send removal message
-        await ctx.invoke(self.dmusers, self.config.messages.remove_recruit, member)
+        # await ctx.invoke(self.dmusers, self.config.messages.remove_recruit, member)
 
         # skip message delete
         # delete messages from recruit channel
