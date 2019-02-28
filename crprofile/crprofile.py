@@ -36,6 +36,7 @@ import discord
 import inflect
 import json
 import os
+import re
 import requests
 import socket
 import urllib.request
@@ -133,6 +134,15 @@ class API:
     def player(tag):
         """Return player URL"""
         return "https://api.royaleapi.com/player/" + tag.upper()
+
+
+class APIError(Exception):
+    """Catch all API errors"""
+
+    def __init__(self, status=None, message=None, reason=None):
+        self.status = status
+        self.message = message
+        self.reason = reason
 
 
 class Constants:
@@ -342,6 +352,8 @@ class CRPlayerModel:
     def tag(self):
         """Player tag"""
         t = self.info_data.get("tag", None)
+        if t is None:
+            return None
         t = t.upper()
         t = t.replace('#', '')
         return t
@@ -696,6 +708,10 @@ class CRPlayerModel:
         return 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena_arena)
 
     @property
+    def profile_url(self):
+        return 'https://royaleapi.com/player/{}'.format(self.tag)
+
+    @property
     def league(self):
         """League (int)."""
         league = max(self.arena_id - 12, 0)
@@ -1037,6 +1053,8 @@ class Settings:
                     async with session.get(url, headers=headers) as resp:
                         if resp.status != 200:
                             error = True
+                            data = await resp.json()
+                            raise APIError(status=resp.status, message=data.get('message'), reason=data.get('reason'))
                         else:
                             if url == info_url:
                                 data['info'] = await resp.json()
@@ -1044,9 +1062,9 @@ class Settings:
                                 data['chests'] = await resp.json()
 
         except json.decoder.JSONDecodeError:
-            raise
+            raise APIError()
         except asyncio.TimeoutError:
-            raise
+            raise APIError()
 
         return CRPlayerModel(data=data, error=error, api_provider=self.api_provider)
 
@@ -1435,39 +1453,81 @@ class CRProfile:
 
         if member is not entered, retrieve own profile
         """
-        await self.get_profile(ctx, member, sections=['overview', 'stats'])
+        try:
+            await self.get_profile(ctx, member, sections=['overview', 'stats'])
+        except APIError as e:
+            await self.bot.say("API Error {status} {message}".format(
+                status=e.status,
+                message=e.message
+            ))
 
     @crprofile.command(name="cards", pass_context=True, no_pm=True)
     async def crprofile_cards(self, ctx, member: discord.Member = None):
         """Card collection."""
-        await self.get_profile(ctx, member, sections=['cards'])
+        try:
+            await self.get_profile(ctx, member, sections=['cards'])
+        except APIError as e:
+            await self.bot.say("API Error {status} {message}".format(
+                status=e.status,
+                message=e.message
+            ))
 
     @crprofile.command(name="trade", pass_context=True, no_pm=True)
     async def crprofile_trade(self, ctx, member: discord.Member = None):
         """Tradeable cards."""
-        await self.get_profile(ctx, member, sections=['trade'])
+        try:
+            await self.get_profile(ctx, member, sections=['trade'])
+        except APIError as e:
+            await self.bot.say("API Error {status} {message}".format(
+                status=e.status,
+                message=e.message
+            ))
 
     @crprofile.command(name="tradetag", pass_context=True, no_pm=True)
     async def crprofile_tradetag(self, ctx, tag):
         """Tradeable cards by tag."""
         tag = clean_tag(tag)
         # await self.display_profile(ctx, tag)
-        await self.display_profile(ctx, tag, sections=['trade'])
+        try:
+            await self.display_profile(ctx, tag, sections=['trade'])
+        except APIError as e:
+            await self.bot.say("API Error {status} {message}".format(
+                status=e.status,
+                message=e.message
+            ))
 
     @crprofile.command(name="chests", pass_context=True, no_pm=True)
     async def crprofile_chests(self, ctx, member: discord.Member = None):
         """Upcoming chests."""
-        await self.get_profile(ctx, member, sections=['chests'])
+        try:
+            await self.get_profile(ctx, member, sections=['chests'])
+        except APIError as e:
+            await self.bot.say("API Error {status} {message}".format(
+                status=e.status,
+                message=e.message
+            ))
 
     @crprofile.command(name="deck", pass_context=True, no_pm=True)
     async def crprofile_deck(self, ctx, member: discord.Member = None):
         """Current deck."""
-        await self.get_profile(ctx, member, sections=['deck'])
+        try:
+            await self.get_profile(ctx, member, sections=['deck'])
+        except APIError as e:
+            await self.bot.say("API Error {status} {message}".format(
+                status=e.status,
+                message=e.message
+            ))
 
     @crprofile.command(name="tagdeck", pass_context=True, no_pm=True)
     async def crprofile_tagdeck(self, ctx, tag):
         """Current deck of player tag."""
-        await self.display_profile(ctx, tag, sections=['deck'])
+        try:
+            await self.display_profile(ctx, tag, sections=['deck'])
+        except APIError as e:
+            await self.bot.say("API Error {status} {message}".format(
+                status=e.status,
+                message=e.message
+            ))
 
     @crprofile.command(name="mini", pass_context=True, no_pm=True)
     async def crprofile_mini(self, ctx, member: discord.Member = None):
@@ -1475,7 +1535,13 @@ class CRProfile:
 
         if member is not entered, retrieve own profile
         """
-        await self.get_profile(ctx, member, sections=['overview'])
+        try:
+            await self.get_profile(ctx, member, sections=['overview'])
+        except APIError as e:
+            await self.bot.say("API Error {status} {message}".format(
+                status=e.status,
+                message=e.message
+            ))
 
     async def display_profile(self, ctx, tag, **kwargs):
         """Display profile."""
@@ -1703,6 +1769,47 @@ class CRProfile:
             embeds.append(self.embed_profile_trade(player, color=color))
 
         return embeds
+
+    async def on_message(self, msg):
+        """Convert friend invite links to embeds.
+
+        https://link.clashroyale.com/invite/friend/en?tag={tag}&token={token}&platform={platform}
+        """
+        m = re.search(
+            'https://link.clashroyale.com/invite/friend/..\?tag=([A-Z0-9]+)&token=([a-z0-9]+)&platform=([A-Za-z0-9]+)',
+            msg.content)
+
+        if not m:
+            return
+
+        url = m.group(0)
+        player_tag = m.group(1)
+
+        try:
+            p = await self.model.player_data(player_tag)
+        except APIError as e:
+            return
+
+        em = discord.Embed(
+            title="Friend Request - Clash Royale",
+            description="{} #{}".format(p.name, p.tag),
+            url=url,
+            color=discord.Color.blue()
+        )
+
+        em.add_field(name="Trophies", value="{} / {} PB".format(p.trophy_current, p.trophy_highest))
+        em.add_field(name="Clan", value="{}, {}".format(p.clan_role.title(), p.clan_name))
+        em.add_field(name="Challenge Max Wins", value=p.challenge_max_wins)
+        em.add_field(name="Challenge Cards Won", value=p.challenge_cards_won)
+        em.add_field(name="Level", value=p.level)
+        em.add_field(name="Total Games", value=p.total_games)
+        em.add_field(name="Current Deck", value=p.deck_list(self.bot_emoji), inline=False)
+        em.set_footer(
+            text=p.profile_url,
+            icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
+
+        await self.bot.send_message(msg.channel, embed=em)
+        await self.bot.delete_message(msg)
 
 
 def check_folder():
