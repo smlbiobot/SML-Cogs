@@ -1809,7 +1809,11 @@ class CRProfile:
             icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
 
         await self.bot.send_message(msg.channel, embed=em)
-        await self.bot.delete_message(msg)
+        try:
+            await self.bot.delete_message(msg)
+        except Exception as e:
+            # if one bot deleted already then don’t do it.
+            pass
 
 
 def check_folder():
