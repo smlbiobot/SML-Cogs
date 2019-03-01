@@ -42,6 +42,7 @@ from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from concurrent.futures import ThreadPoolExecutor
 from discord.ext import commands
+import datetime as dt
 
 SETTINGS_PATH = os.path.join("data", "deck", "settings.json")
 AKA_PATH = os.path.join("data", "deck", "cards_aka.yaml")
@@ -150,6 +151,25 @@ class Deck:
         self.save_settings()
         await self.bot.say("Settings saved.")
 
+    @deckset.command(name="imageserver", pass_context=True, no_pm=True)
+    @checks.mod_or_permissions()
+    async def deckset_imageserver(self, ctx, server_id, channel_id):
+        self.settings["ImageServer"] = dict(
+            server_id=server_id,
+            channel_id=channel_id
+        )
+        self.save_settings()
+        server = discord.utils.get(self.bot.servers, id=server_id)
+        channel = discord.utils.get(server.channels, id=channel_id)
+        await self.bot.say(
+            "Images will be uploaded to:\n"
+            "Server: {} ({})\n"
+            "Channel: {} ({})".format(
+                server.name, server_id,
+                channel.name, channel_id
+            )
+        )
+
     def decklink_settings(self, server):
         """embed, link, none. Default: embed"""
         default = 'embed'
@@ -228,9 +248,9 @@ class Deck:
         else:
             await self.deck_upload(ctx, member_deck, deck_name, author)
             # generate link
-            if self.deck_is_valid:
-                em = await self.decklink_embed(member_deck)
-                await self.bot.say(embed=em)
+            # if self.deck_is_valid:
+            #     em = await self.decklink_embed(member_deck)
+            #     await self.bot.say(embed=em)
 
     async def card_decklink_to_key(self, decklink):
         """Decklink id to card."""
@@ -662,7 +682,13 @@ class Deck:
             deck_is_valid = False
 
         if deck_is_valid:
-            await self.upload_deck_image(ctx, member_deck, deck_name, member)
+            await self.post_deck(
+                channel=ctx.message.channel,
+                card_keys=member_deck,
+                deck_name=deck_name,
+                deck_author=member.display_name
+            )
+            # await self.upload_deck_image(ctx, member_deck, deck_name, member)
 
         self.deck_is_valid = deck_is_valid
 
@@ -688,6 +714,45 @@ class Deck:
                 filename=filename, content=description)
 
         return message
+
+    async def upload_deck_image_to(self, channel, deck, deck_name, author, description=""):
+        """Upload deck image to destination."""
+        deck_image = await self.bot.loop.run_in_executor(
+            None,
+            self.get_deck_image,
+            deck, deck_name, author
+        )
+
+        # construct a filename using first three letters of each card
+        filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
+
+        message = None
+
+        with io.BytesIO() as f:
+            deck_image.save(f, "PNG")
+            f.seek(0)
+            message = await self.bot.send_file(
+                channel, f,
+                filename=filename, content=description)
+
+        return message
+
+    def get_deck_elxiir(self, card_keys):
+        # elixir
+        total_elixir = 0
+        # total card exclude mirror (0-elixir cards)
+        card_count = 0
+
+        for card in self.cards:
+            if card["key"] in card_keys:
+                total_elixir += card["elixir"]
+                if card["elixir"]:
+                    card_count += 1
+
+        average_elixir = "{:.3f}".format(total_elixir / card_count)
+
+        return average_elixir
+
 
     def get_deck_image(self, deck, deck_name=None, deck_author=None):
         """Construct the deck with Pillow and return image."""
@@ -726,18 +791,20 @@ class Deck:
                    card_h + card_y)
             image.paste(card_image, box, card_image)
 
-        # elixir
-        total_elixir = 0
-        # total card exclude mirror (0-elixir cards)
-        card_count = 0
+        # # elixir
+        # total_elixir = 0
+        # # total card exclude mirror (0-elixir cards)
+        # card_count = 0
+        #
+        # for card in self.cards:
+        #     if card["key"] in deck:
+        #         total_elixir += card["elixir"]
+        #         if card["elixir"]:
+        #             card_count += 1
+        #
+        # average_elixir = "{:.3f}".format(total_elixir / card_count)
 
-        for card in self.cards:
-            if card["key"] in deck:
-                total_elixir += card["elixir"]
-                if card["elixir"]:
-                    card_count += 1
-
-        average_elixir = "{:.3f}".format(total_elixir / card_count)
+        average_elixir = self.get_deck_elxiir(deck)
 
         # text
         # Take out hyphnens and capitlize the name of each card
@@ -755,7 +822,17 @@ class Deck:
         line2 = ', '.join(card_names[4:])
         # card_text = '\n'.join([line0, line1])
 
-        deck_author_name = deck_author.name if deck_author else ""
+        if deck_author:
+            if isinstance(deck_author, str):
+                deck_author_name = deck_author
+            elif hasattr(deck_author, "name"):
+                deck_author_name = deck_author.name
+            else:
+                deck_author_name = ""
+        else:
+            deck_author_name = ""
+
+        # deck_author_name = deck_author.name if deck_author else ""
 
         d_name.text(
             (txt_x_name, txt_y_line1), deck_name, font=font_bold,
@@ -843,15 +920,99 @@ class Deck:
                 if card_keys is None:
                     return
 
-                CTX = namedtuple("CTX", ['bot', 'message'])
-                ctx = CTX(self.bot, msg)
-                deck = card_keys
-                deck_name = ''
-                member = msg.author
+                # CTX = namedtuple("CTX", ['bot', 'message'])
+                # ctx = CTX(self.bot, msg)
+                # deck = card_keys
+                # deck_name = ''
+                # member = msg.author
+                await self.post_deck(
+                    channel=msg.channel,
+                    card_keys=card_keys,
+                    deck_author=msg.author
+                )
 
-                await self.upload_deck_image(ctx, deck, deck_name, member)
-                await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys))
+                # if image server is set, upload as embed
+                # has_image_server = False
+                # img_server_id = self.settings.get('ImageServer', {}).get('server_id')
+                # img_channel_id = self.settings.get('ImageServer', {}).get('channel_id')
+                # if img_server_id and img_channel_id:
+                #     img_server = discord.utils.get(self.bot.servers, id=img_server_id)
+                #     img_channel = discord.utils.get(img_server.channels, id=img_channel_id)
+                #     if img_channel:
+                #         img_msg = await self.upload_deck_image_to(img_channel, deck, deck_name, member)
+                #         has_image_server = True
+                #         img_url = img_msg.attachments[0].get('url')
+                #         em = discord.Embed(
+                #             title="Copy Deck",
+                #             color=discord.Color.blue(),
+                #             url=await self.decklink_url(card_keys),
+                #         )
+                #         em.set_image(url=img_url)
+                #         await self.bot.send_message(
+                #             msg.channel, embed=em
+                #         )
+                #
+                #
+                # if not has_image_server:
+                #     await self.upload_deck_image(ctx, deck, deck_name, member)
+                #     await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys))
+
                 await self.bot.delete_message(msg)
+
+    async def post_deck(self, channel=None, title=None, description=None, timestamp=None, card_keys=None, deck_name=None, deck_author=None, color=None):
+        """Post a deck to destination channel.
+
+        If image server is set, post as an embed.
+        If not, post as image with associated links.
+        """
+        msg = None
+
+        # if image server is set, upload as embed
+        has_image_server = False
+        img_server_id = self.settings.get('ImageServer', {}).get('server_id')
+        img_channel_id = self.settings.get('ImageServer', {}).get('channel_id')
+        if img_server_id and img_channel_id:
+            img_server = discord.utils.get(self.bot.servers, id=img_server_id)
+            img_channel = discord.utils.get(img_server.channels, id=img_channel_id)
+            if img_channel:
+                img_msg = await self.upload_deck_image_to(img_channel, card_keys, deck_name, deck_author or self.bot.name)
+
+                img_url = img_msg.attachments[0].get('url')
+                em = discord.Embed(
+                    title=title or "Deck",
+                    description=description,
+                    color=color or discord.Color.blue(),
+                    url=await self.decklink_url(card_keys),
+                    timestamp=timestamp or dt.datetime.utcnow(),
+                )
+                em.add_field(
+                    name="Avg Elixir: {}".format(self.get_deck_elxiir(card_keys)),
+                    value=" • ".join([
+                        "[Deck Stats]({})".format(
+                            'https://royaleapi.com/decks/stats/{}'.format(','.join(card_keys))
+                        ),
+                        "[Copy Deck]({})".format(
+                            await self.decklink_url(card_keys)
+                        ),
+                        "[War]({})".format(
+                            await self.decklink_url(card_keys, war=True)
+                        )
+                    ])
+                )
+                em.set_image(url=img_url)
+                msg = await self.bot.send_message(
+                    channel, embed=em
+                )
+
+                has_image_server = True
+
+        if not has_image_server:
+            msg = await self.upload_deck_image_to(channel, card_keys, deck_author or self.bot.name)
+            # await self.upload_deck_image(ctx, deck, deck_name, member)
+            await self.bot.send_message(channel, embed=await self.decklink_embed(card_keys))
+
+        return msg
+
 
 
 def check_folder():

@@ -164,7 +164,7 @@ class RACFDecks:
         await self.bot.say("Stopped automatic deck fetch.")
 
     async def post_decks(self, channel: discord.Channel, show_empty=True, fam=True):
-        # print("post_decks")
+        print("post_decks")
         if fam:
             time = self.settings.get('family_timestamp')
         else:
@@ -185,44 +185,60 @@ class RACFDecks:
             await self.bot.send_message(channel, "No more decks found.")
 
         for deck in decks:
-            cards = deck.get('deck_name').split(',')
+            card_keys = deck.get('deck_name').split(',')
             player_name = deck.get('player_name', '')
             clan_name = deck.get('clan_name', '')
             ts = deck.get('timestamp_epoch_millis')
             timestamps.append(ts)
-            ts_dt = dt.datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M UTC")
+            # ts_dt = dt.datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M UTC")
             cc = deck.get('cc', False)
             gc_star = ':star: ' if fam and not cc else ''
-            message = "{}**12-win {} deck by {}**, {}\n{}".format(
-                gc_star,
-                'CC' if cc else 'GC',
-                player_name,
-                clan_name,
-                ts_dt
+            # message = "{}**12-win {} deck by {}**, {}\n{}".format(
+            #     gc_star,
+            #     'CC' if cc else 'GC',
+            #     player_name,
+            #     clan_name,
+            #     ts_dt
+            # )
+            # deck_img_name = player_name
+            # await self.bot.send_message(
+            #     channel,
+            #     message
+            # )
+            #
+            # deck_image = await self.bot.loop.run_in_executor(
+            #     self.threadex,
+            #     deck_cog.get_deck_image,
+            #     card_keys, deck_img_name, self.bot.user
+            # )
+            #
+            # # construct a filename using first three letters of each card
+            # filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
+            #
+            # with io.BytesIO() as f:
+            #     deck_image.save(f, "PNG")
+            #     f.seek(0)
+            #     await self.bot.send_file(
+            #         channel, f,
+            #         filename=filename, content="")
+            #
+            # await self.bot.send_message(channel, embed=await deck_cog.decklink_embed(card_keys))
+
+            if cc:
+                color = discord.Color.green()
+            else:
+                color = discord.Color.gold()
+
+
+            await deck_cog.post_deck(
+                channel=channel,
+                title="12-win {} deck".format('CC' if cc else 'GC'),
+                description="**{}**, {}".format(player_name, clan_name),
+                card_keys=card_keys,
+                deck_author=player_name,
+                timestamp=dt.datetime.utcfromtimestamp(ts / 1000),
+                color=color
             )
-            deck_img_name = player_name
-            await self.bot.send_message(
-                channel,
-                message
-            )
-
-            deck_image = await self.bot.loop.run_in_executor(
-                self.threadex,
-                deck_cog.get_deck_image,
-                cards, deck_img_name, self.bot.user
-            )
-
-            # construct a filename using first three letters of each card
-            filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
-
-            with io.BytesIO() as f:
-                deck_image.save(f, "PNG")
-                f.seek(0)
-                await self.bot.send_file(
-                    channel, f,
-                    filename=filename, content="")
-
-            await self.bot.send_message(channel, embed=await deck_cog.decklink_embed(cards))
 
         # store latest timestamp
         if len(decks) != 0:
@@ -239,6 +255,7 @@ class RACFDecks:
             server_id = self.settings.get("server_id")
             if server_id:
                 server = self.bot.get_server(server_id)
+
             if server:
                 family_auto = self.settings.get('family_auto')
                 family_channel_id = self.settings.get('family_channel_id')
@@ -254,6 +271,7 @@ class RACFDecks:
                     if channel:
                         await self.post_decks(channel, fam=False, show_empty=False)
 
+            DELAY = 10
             await asyncio.sleep(DELAY)
 
 
