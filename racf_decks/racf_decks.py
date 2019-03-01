@@ -164,7 +164,6 @@ class RACFDecks:
         await self.bot.say("Stopped automatic deck fetch.")
 
     async def post_decks(self, channel: discord.Channel, show_empty=True, fam=True):
-        print("post_decks")
         if fam:
             time = self.settings.get('family_timestamp')
         else:
@@ -271,7 +270,6 @@ class RACFDecks:
                     if channel:
                         await self.post_decks(channel, fam=False, show_empty=False)
 
-            DELAY = 10
             await asyncio.sleep(DELAY)
 
 
