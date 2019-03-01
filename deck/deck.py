@@ -24,10 +24,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-from collections import namedtuple
-
 import aiohttp
 import datetime
+import datetime as dt
 import discord
 import io
 import os
@@ -42,7 +41,6 @@ from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from concurrent.futures import ThreadPoolExecutor
 from discord.ext import commands
-import datetime as dt
 
 SETTINGS_PATH = os.path.join("data", "deck", "settings.json")
 AKA_PATH = os.path.join("data", "deck", "cards_aka.yaml")
@@ -753,7 +751,6 @@ class Deck:
 
         return average_elixir
 
-
     def get_deck_image(self, deck, deck_name=None, deck_author=None):
         """Construct the deck with Pillow and return image."""
         card_w = 302
@@ -959,7 +956,8 @@ class Deck:
 
                 await self.bot.delete_message(msg)
 
-    async def post_deck(self, channel=None, title=None, description=None, timestamp=None, card_keys=None, deck_name=None, deck_author=None, color=None):
+    async def post_deck(self, channel=None, title=None, description=None, timestamp=None, card_keys=None,
+                        deck_name=None, deck_author=None, color=None):
         """Post a deck to destination channel.
 
         If image server is set, post as an embed.
@@ -975,7 +973,8 @@ class Deck:
             img_server = discord.utils.get(self.bot.servers, id=img_server_id)
             img_channel = discord.utils.get(img_server.channels, id=img_channel_id)
             if img_channel:
-                img_msg = await self.upload_deck_image_to(img_channel, card_keys, deck_name, deck_author or self.bot.name)
+                img_msg = await self.upload_deck_image_to(img_channel, card_keys, deck_name,
+                                                          deck_author or self.bot.name)
 
                 img_url = img_msg.attachments[0].get('url')
                 em = discord.Embed(
@@ -1007,12 +1006,11 @@ class Deck:
                 has_image_server = True
 
         if not has_image_server:
-            msg = await self.upload_deck_image_to(channel, card_keys, deck_author or self.bot.name)
+            msg = await self.upload_deck_image_to(channel, card_keys, "Deck", deck_author or self.bot.name)
             # await self.upload_deck_image(ctx, deck, deck_name, member)
             await self.bot.send_message(channel, embed=await self.decklink_embed(card_keys))
 
         return msg
-
 
 
 def check_folder():
