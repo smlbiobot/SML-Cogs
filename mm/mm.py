@@ -24,28 +24,28 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
 import itertools
 from collections import defaultdict
 
 import argparse
-import asyncio
 import discord
 import os
-from discord.ext import commands
-from discord.ext.commands import Context
-from random import choice
-
 from cogs.utils import checks
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
+from discord.ext.commands import Context
+from random import choice
 
 BOT_COMMANDER_ROLES = ["Bot Commander", "High-Elder"]
 PATH = os.path.join("data", "mm")
 JSON = os.path.join(PATH, "settings.json")
 
 # FAMILY_SERVER_ID = '218534373169954816' # 100 Thieves Clan Family server
-FAMILY_SERVER_ID = '528327242875535372' # RoyaleAPI Clan Family server
+FAMILY_SERVER_ID = '528327242875535372'  # RoyaleAPI Clan Family server
+
 
 def grouper(n, iterable, fillvalue=None):
     """Helper function to split lists.
@@ -146,6 +146,10 @@ class MemberManagement:
             action='store_true',
             help='Check members with exactly one role')
         parser.add_argument(
+            '-nr', '--norole',
+            action='store_true',
+            help='Include everyone without any roles')
+        parser.add_argument(
             '-e', '--everyone',
             action='store_true',
             help='Include everyone.')
@@ -203,6 +207,8 @@ class MemberManagement:
             none: Do not display results (show only count + output specified.
         --everyone
             Include everyone. Useful for finding members without specific roles.
+        --norole
+            Include everyone without roles.
         """
         parser = self.parser()
         try:
@@ -215,6 +221,7 @@ class MemberManagement:
         option_output_id = (pargs.output == 'id')
         option_output_mentions_only = (pargs.output == 'mentiononly')
         option_everyone = pargs.everyone or 'everyone' in pargs.roles
+        option_norole = pargs.norole
         option_sort_alpha = (pargs.sort == 'alpha')
         option_csv = (pargs.result == 'csv')
         option_list = (pargs.result == 'list')
@@ -231,11 +238,14 @@ class MemberManagement:
         # Used for output only, so it won’t mention everyone in chat
         plus_out = plus.copy()
 
+        # special case: no role
+        out_members = set()
+
         if option_everyone:
             plus.add('@everyone')
             plus_out.add('everyone')
 
-        if len(plus) < 1:
+        if not option_norole and len(plus) < 1:
             help_str = (
                 'Syntax Error: You must include at '
                 'least one role to display results.')
@@ -244,19 +254,25 @@ class MemberManagement:
             return
 
         out = ["**Member Management**"]
-        out.append("Listing members who have these roles: {}".format(
-            ', '.join(plus_out)))
-        if len(minus):
-            out.append("but not these roles: {}".format(
-                ', '.join(minus)))
+        if option_norole:
+            out.append("Listing members without roles:")
+        else:
+            out.append("Listing members who have these roles: {}".format(
+                ', '.join(plus_out)))
+            if len(minus):
+                out.append("but not these roles: {}".format(
+                    ', '.join(minus)))
 
         await self.bot.say('\n'.join(out))
 
-        # only output if argument is supplied
-        if len(plus):
+        if option_norole:
+            for m in server.members:
+                if len(m.roles) == 1:
+                    out_members.add(m)
+        elif len(plus):
+            # only output if argument is supplied
             # include roles with '+' flag
             # exclude roles with '-' flag
-            out_members = set()
             for m in server.members:
                 roles = set([r.name.lower() for r in m.roles])
                 if option_everyone:
@@ -265,62 +281,62 @@ class MemberManagement:
                 if not exclude and roles >= plus:
                     out_members.add(m)
 
-            # only role
-            if option_only_role:
-                out_members = [m for m in out_members if len(m.roles) == 2]
+        # only role
+        if option_only_role:
+            out_members = [m for m in out_members if len(m.roles) == 2]
 
-            suffix = 's' if len(out_members) > 1 else ''
-            await self.bot.say("**Found {} member{}.**".format(
-                len(out_members), suffix))
+        suffix = 's' if len(out_members) > 1 else ''
+        await self.bot.say("**Found {} member{}.**".format(
+            len(out_members), suffix))
 
-            # sort join
+        # sort join
+        out_members = list(out_members)
+        out_members.sort(key=lambda x: x.joined_at)
+
+        # sort alpha
+        if option_sort_alpha:
             out_members = list(out_members)
-            out_members.sort(key=lambda x: x.joined_at)
+            out_members.sort(key=lambda x: x.display_name.lower())
 
-            # sort alpha
-            if option_sort_alpha:
-                out_members = list(out_members)
-                out_members.sort(key=lambda x: x.display_name.lower())
+        # embed output
+        if not option_output_mentions_only:
+            if option_none:
+                pass
+            elif option_csv:
+                for page in pagify(
+                        self.get_member_csv(out_members), shorten_by=50):
+                    await self.bot.say(page)
+            elif option_list:
+                for page in pagify(
+                        self.get_member_list(out_members), shorten_by=50):
+                    await self.bot.say(page)
+            else:
+                for data in self.get_member_embeds(out_members, ctx.message.timestamp):
+                    try:
+                        await self.bot.say(embed=data)
+                    except discord.HTTPException:
+                        await self.bot.say(
+                            "I need the `Embed links` permission "
+                            "to send this")
 
-            # embed output
-            if not option_output_mentions_only:
-                if option_none:
-                    pass
-                elif option_csv:
-                    for page in pagify(
-                            self.get_member_csv(out_members), shorten_by=50):
-                        await self.bot.say(page)
-                elif option_list:
-                    for page in pagify(
-                            self.get_member_list(out_members), shorten_by=50):
-                        await self.bot.say(page)
-                else:
-                    for data in self.get_member_embeds(out_members, ctx.message.timestamp):
-                        try:
-                            await self.bot.say(embed=data)
-                        except discord.HTTPException:
-                            await self.bot.say(
-                                "I need the `Embed links` permission "
-                                "to send this")
+        # Display a copy-and-pastable list
+        if option_output_mentions | option_output_mentions_only:
+            mention_list = [m.mention for m in out_members]
+            await self.bot.say(
+                "Copy and paste these in message to mention users listed:")
 
-            # Display a copy-and-pastable list
-            if option_output_mentions | option_output_mentions_only:
-                mention_list = [m.mention for m in out_members]
-                await self.bot.say(
-                    "Copy and paste these in message to mention users listed:")
+            out = ' '.join(mention_list)
+            for page in pagify(out, shorten_by=24):
+                await self.bot.say(box(page))
 
-                out = ' '.join(mention_list)
-                for page in pagify(out, shorten_by=24):
-                    await self.bot.say(box(page))
-
-            # Display a copy-and-pastable list of ids
-            if option_output_id:
-                id_list = [m.id for m in out_members]
-                await self.bot.say(
-                    "Copy and paste these in message to mention users listed:")
-                out = ' '.join(id_list)
-                for page in pagify(out, shorten_by=24):
-                    await self.bot.say(box(page))
+        # Display a copy-and-pastable list of ids
+        if option_output_id:
+            id_list = [m.id for m in out_members]
+            await self.bot.say(
+                "Copy and paste these in message to mention users listed:")
+            out = ' '.join(id_list)
+            for page in pagify(out, shorten_by=24):
+                await self.bot.say(box(page))
 
     @staticmethod
     def get_member_csv(members):
@@ -835,6 +851,7 @@ class MemberManagement:
                 print(r)
 
         await self.bot.say("Task completed.")
+
 
 def check_folder():
     """Check folder."""
