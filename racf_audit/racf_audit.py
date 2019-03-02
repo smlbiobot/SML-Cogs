@@ -1371,7 +1371,7 @@ class RACFAudit:
                 delta = '+{}'.format(delta)
             elif delta == 0:
                 delta = ' {}'.format(delta)
-            line = '`\u2800{rank: >3} {trophies:<4}\u2800` **{member: <15}** {clan_name:<7}  {delta:<4}'.format(
+            line = '`\u2800{rank: >3} {trophies:<4}\u2800`**{member}** {clan_name} {delta:<4}'.format(
                 rank=index,
                 member=member.get('name')[:15],
                 clan_name=clan_name,
