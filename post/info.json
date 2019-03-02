@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Post",
+	"DESCRIPTION": "Post a list of files as embeds onto a channel",
+	"DISABLED": false,
+	"NAME": "Post",
+	"REQUIREMENTS": [],
+	"TAGS": ["utility"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}

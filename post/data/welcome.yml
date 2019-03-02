@@ -1,0 +1,28 @@
+embeds:
+  - image:
+      url: https://github.com/RoyaleAPI/cr-api-assets/blob/master/logo/royaleapi-bg-dark.png?raw=true
+  - title: Welcome
+    description: >
+      As you know, RoyaleAPI.com is the definitive destination for esports teams
+      and professional players looking to get an edge.  The website started out
+      as a proof-of-concept for our own API but has since grown into a data-rich
+      content analytics site, serving players around the world to explore and
+      discover the best meta decks to play while playing the game, as well as
+      providing useful tools to manage their clan and clan families better.
+    fields:
+      - name: Help
+        value: If you need help at any time, message one of our FAMILYLEAD members from the user list --->
+      - name: Rules
+        value: >
+          - No spamming
+
+          - No advertisement of any kind (e.g. Facebook, Twitter, YouTube)
+
+          - No excessive tagging - abusing our notification anxiety is forbidden!
+
+          - Friend Invite Links for CR & BS go in the #friendlinks channel ONLY
+
+          - #bot-commands should be used for all of your robot ninja needs
+
+          **Failure to comply with these simple requests to
+          keep our community happy & healthy may result in your removal.**
