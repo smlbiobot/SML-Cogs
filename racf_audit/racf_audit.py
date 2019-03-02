@@ -1441,7 +1441,7 @@ class RACFAudit:
                 append_discord_member(non_top50_discord_members, member)
 
             if '-id' in args:
-                out = ['Top 50 not in tAlpha']
+                out = ['Top 50 not in Alpha']
                 for discord_member in top50_discord_members:
                     out.append(discord_member.id)
 
