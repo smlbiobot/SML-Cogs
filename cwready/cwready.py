@@ -194,7 +194,7 @@ class CWReady:
             else:
                 await self.bot.send_message(
                     channel,
-                    "Qualified clans by card levels: {}. {}".format(
+                    "Qualified clans by CWR: {}. {}".format(
                         ", ".join([clan.get('name') for clan in clans]),
                         self.config.get('addendum', '')
                     ))
