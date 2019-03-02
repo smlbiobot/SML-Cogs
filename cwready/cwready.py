@@ -189,12 +189,12 @@ class CWReady:
             if len(clans) == 0:
                 await self.bot.send_message(
                     channel,
-                    "User does not meet requirements for any of our clans."
+                    "User’s card levels do not meet requirements for any of our clans."
                 )
             else:
                 await self.bot.send_message(
                     channel,
-                    "Qualified clans: {}. {}".format(
+                    "Qualified clans by card levels: {}. {}".format(
                         ", ".join([clan.get('name') for clan in clans]),
                         self.config.get('addendum', '')
                     ))
