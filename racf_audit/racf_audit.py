@@ -354,7 +354,8 @@ class ClashRoyaleAPI:
         tasks = [self.fetch_clan(tag) for tag in tags]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         for index, r in enumerate(results):
-            if isinstance(r, Exception):
+            if isinstance(r, ClashRoyaleAPIError):
+                print(r.status_message)
                 results[index] = {}
         return results
 
@@ -568,6 +569,7 @@ class RACFAudit:
         api = ClashRoyaleAPI(self.auth)
         tags = self.clan_tags()
         clan_models = await api.fetch_clan_list(tags)
+        print(clan_models)
         members = []
         for clan_model in clan_models:
             for member_model in clan_model.get('memberList'):
@@ -1325,7 +1327,7 @@ class RACFAudit:
             possible_alpha_rank = len([score for score in clan_scores if score > top50_clan_trophies])
 
         # Summary
-        o = [
+        o_summary = [
             '50th = {:,} :trophy: '.format(trophy_50),
             'Alpha Clan Trophies: {:,} :trophy:'.format(alpha_clan_trophies),
             'Global Rank: {:,}'.format(alpha_global_rank),
@@ -1333,7 +1335,7 @@ class RACFAudit:
             'Possible Rank: {:,}'.format(possible_alpha_rank),
         ]
 
-        await self.bot.say('\n'.join(o))
+        # await self.bot.say('\n'.join(o))
 
         # logic calc
 
@@ -1369,33 +1371,53 @@ class RACFAudit:
                 delta = '+{}'.format(delta)
             elif delta == 0:
                 delta = ' {}'.format(delta)
-            line = '{:<3} {: <15} {:<7} {:<4} {:<4}'.format(
-                index,
-                member.get('name')[:15],
-                clan_name,
-                trophies,
-                delta
+            line = '`\u2800{rank: >3} {trophies:<4}\u2800` **{member: <15}** {clan_name:<7}  {delta:<4}'.format(
+                rank=index,
+                member=member.get('name')[:15],
+                clan_name=clan_name,
+                trophies=trophies,
+                delta=delta
             )
             out.append(line)
             out_members.append(member)
 
         # top 50 not in alpha
-        out = ['Top 50 not in Alpha']
+        # out = ['Top 50 not in Alpha']
+        out = []
         out_members = []
         for result in top50_results:
             append_result(result, out, out_members)
 
-        for page in pagify('\n'.join(out)):
-            await self.bot.say(box(page, lang='py'))
+        # for page in pagify('\n'.join(out)):
+        #     await self.bot.say(box(page, lang='py'))
 
         # alphas not in top 50
-        out_2 = ['Alphas not in top 50']
+        # out_2 = ['Alphas not in top 50']
+        out_2 = []
         out_2_members = []
         for result in non_top50_results:
             append_result(result, out_2, out_2_members)
 
-        for page in pagify('\n'.join(out_2)):
-            await self.bot.say(box(page, lang='py'))
+        # for page in pagify('\n'.join(out_2)):
+        #     await self.bot.say(box(page, lang='py'))
+
+        # embed display
+        em = discord.Embed(
+            title="End of season",
+            description="\n".join(o_summary),
+            color=discord.Color.blue()
+        )
+        em.add_field(
+            name="Top 50 not in Alpha",
+            value='\n'.join(out),
+            inline=False
+        )
+        em.add_field(
+            name="Alphas not in Top 50",
+            value='\n'.join(out_2),
+            inline=False
+        )
+        await self.bot.say(embed=em)
 
         def append_discord_member(member_list, member):
             tag = clean_tag(member.get('tag'))
