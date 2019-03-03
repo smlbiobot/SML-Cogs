@@ -4,7 +4,7 @@ embeds:
   - title: Welcome
     description: >
       As you know, RoyaleAPI.com is the definitive destination for esports teams
-      and professional players looking to get an edge.  The website started out
+      and professional players looking to get an edge. The website started out
       as a proof-of-concept for our own API but has since grown into a data-rich
       content analytics site, serving players around the world to explore and
       discover the best meta decks to play while playing the game, as well as
@@ -26,8 +26,6 @@ embeds:
 
           **Failure to comply with these simple requests to
           keep our community happy & healthy may result in your removal.**
-  - title: _
-    fields:
       - name: Next Steps
         value: >
           + Scroll down to learn more about our family, channels, and roles
@@ -54,14 +52,14 @@ embeds:
     fields:
       - name: Interested in joining?
         value: >
-          Let us know in the #welcome channel.
+          Let us know in the #join-our-family channel.
           Simply tell us your player tag and which game you want to join us in
           (Clash Royale or Brawl Stars) and we’ll take it from there
   - title: Channels
     fields:
       - name: General RoyaleAPI.com Users
         value: >
-          #leader-lounge - hang out and chat with a variety of Clash Royale players that enjoy our community and service
+          #lounge - hang out and chat with a variety of Clash Royale players that enjoy our community and service
 
           #website-requests - have an idea for the website? Chat about it here! All formal requests must still be made through GitHub
 
@@ -75,7 +73,7 @@ embeds:
         value: >
           #rr-matches - displays all current Royale-Rating matches -- click the link on your mobile device to spectate live!
 
-          Read the docs here: https://royalerating.royaleapi.com
+          RR participants can read the docs here: https://royalerating.royaleapi.com
       - name: Family-Only Channels
         value: >
           #family-chat - highly active; general family chat for all games

@@ -32,6 +32,8 @@ import yaml
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
+import aiohttp
+from io import StringIO
 
 PATH = os.path.join("data", "post")
 JSON = os.path.join(PATH, "settings.json")
@@ -58,6 +60,12 @@ class Post:
             "--path",
             action="store",
             dest="path"
+        )
+
+        p.add_argument(
+            "--url",
+            action="store",
+            dest="url"
         )
 
         return p
@@ -91,6 +99,13 @@ class Post:
         if pa.path:
             with open(os.path.join(PATH, pa.path)) as f:
                 data = yaml.load(f)
+
+        elif pa.url:
+            async with aiohttp.ClientSession() as session:
+                async with session.get(pa.url) as resp:
+                    s = await resp.text()
+                    with StringIO(s) as f:
+                        data = yaml.load(f)
 
         if not data:
             await self.bot.say("No data found.")
