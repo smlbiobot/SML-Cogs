@@ -1556,8 +1556,8 @@ class RACF:
             await ctx.invoke(self.racf_verify, member, tag)
 
         # Send visitor rule if in welcome
-        elif channel.name == 'welcome':
-            await ctx.invoke(self.visitor, member)
+        # elif channel.name == 'welcome':
+        #     await ctx.invoke(self.visitor, member)
 
         recruit_role = discord.utils.get(ctx.message.server.roles, name='Recruit')
         recruit_channel = discord.utils.get(ctx.message.server.channels, name='recruit')
