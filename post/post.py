@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 from collections import defaultdict
 
+import aiohttp
 import argparse
 import discord
 import os
@@ -32,7 +33,6 @@ import yaml
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-import aiohttp
 from io import StringIO
 
 PATH = os.path.join("data", "post")
@@ -68,10 +68,18 @@ class Post:
             dest="url"
         )
 
+        p.add_argument(
+            "--data",
+            action="store",
+            dest="data"
+        )
+
         return p
 
     def parse_mentions(self, value, server=None):
         """Parse channel mentions"""
+        if value is None:
+            return None
 
         def channel_repl(matchobj):
             name = matchobj.group(1)
@@ -82,6 +90,24 @@ class Post:
                 return "#{}".format(name)
 
         return re.sub('#([A-Za-z0-9\-]+)', channel_repl, value)
+
+    def parse_emoji(self, value):
+        """Parse emojis."""
+        if value is None:
+            return None
+
+        def emoji_repl(matchobj):
+            name = matchobj.group(1)
+
+            s = ':{}:'.format(name)
+
+            for emoji in self.bot.get_all_emojis():
+                if emoji.name == name:
+                    s = '<:{}:{}>'.format(emoji.name, emoji.id)
+                    break
+            return s
+
+        return re.sub(':([A-Za-z0-9\-_]+):', emoji_repl, value)
 
     @checks.mod_or_permissions()
     @commands.command(name="post", pass_context=True, no_pm=True)
@@ -96,8 +122,8 @@ class Post:
             return
 
         data = None
-        if pa.path:
-            with open(os.path.join(PATH, pa.path)) as f:
+        if pa.data:
+            with open(os.path.join(PATH, pa.data)) as f:
                 data = yaml.load(f)
 
         elif pa.url:
@@ -107,12 +133,23 @@ class Post:
                     with StringIO(s) as f:
                         data = yaml.load(f)
 
+        elif pa.path:
+            with open(pa.path) as f:
+                data = yaml.load(f)
+
         if not data:
             await self.bot.say("No data found.")
             return
 
         for d in data.get('embeds', []):
-            em = discord.Embed(**d)
+            title = self.parse_emoji(d.get('title'))
+            description = self.parse_emoji(d.get('description'))
+
+            em = discord.Embed(
+                title=title,
+                description=description,
+                color=discord.Color.dark_blue()
+            )
 
             image_url = d.get('image', {}).get('url')
             if image_url:
@@ -123,6 +160,7 @@ class Post:
                 for f in fields:
                     name = f.get('name')
                     value = f.get('value')
+                    name = self.parse_emoji(name)
                     value = self.parse_mentions(value, server=ctx.message.server)
                     em.add_field(name=name, value=value)
 
