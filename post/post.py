@@ -109,7 +109,6 @@ class Post:
                     name = f.get('name')
                     value = f.get('value')
                     value = self.parse_mentions(value, server=ctx.message.server)
-                    # s = '<#275772768799162368>'
                     em.add_field(name=name, value=value)
 
             try:
