@@ -55,9 +55,9 @@ class Post:
         p = argparse.ArgumentParser('[p]post')
 
         p.add_argument(
-            "--localfile",
+            "--path",
             action="store",
-            dest="localfile"
+            dest="path"
         )
 
         return p
@@ -88,8 +88,8 @@ class Post:
             return
 
         data = None
-        if pa.localfile:
-            with open(os.path.join(PATH, pa.localfile)) as f:
+        if pa.path:
+            with open(os.path.join(PATH, pa.path)) as f:
                 data = yaml.load(f)
 
         if not data:

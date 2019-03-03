@@ -26,15 +26,78 @@ embeds:
 
           **Failure to comply with these simple requests to
           keep our community happy & healthy may result in your removal.**
-  - title: Next Steps
+  - title: _
     fields:
-      - name: channels
-        value: "hi there #bot Lorem ipsum dolor #general why here"
-
       - name: Next Steps
         value: >
           + Scroll down to learn more about our family, channels, and roles
-          #botdev #bot #general
-          + Head over to #botdev to start chatting
 
-          + Jump over to #result to find out how to join
+          + Head over to #lounge to start chatting
+
+          + Jump over to #join-our-family to find out how to join
+
+      - name: New & Existing Family Members
+        value: >
+          + If you've had roles before, head to #bot-commands and use !auditme
+          + If you've just joined our family in-game and need roles, please request them in #join-our-family
+  - title: Join Our Family
+    description: >
+      The RoyaleAPI Clan Family was originally known as the Reddit Alpha Clan Family
+      and then briefly as the 100 Thieves Clan Family. Home to professional players
+      that eventually moved on to play at CRNAO, King’s Cup, and CRL, our family
+      fosters an environment where casual and competitive styles of play can both flourish.
+
+
+      Our clan family boasts a top 25 global flagship clan and a system of
+      "feeder" clans where we help our players learn, grow, and enhance their skills
+      through a highly active & supportive discord server.
+    fields:
+      - name: Interested in joining?
+        value: >
+          Let us know in the #welcome channel.
+          Simply tell us your player tag and which game you want to join us in
+          (Clash Royale or Brawl Stars) and we’ll take it from there
+  - title: Channels
+    fields:
+      - name: General RoyaleAPI.com Users
+        value: >
+          #leader-lounge - hang out and chat with a variety of Clash Royale players that enjoy our community and service
+
+          #website-requests - have an idea for the website? Chat about it here! All formal requests must still be made through GitHub
+
+          #bot-commands - take advantage of our awesome robot ninja :robot: - brought to you by RoyaleAPI.com
+
+          #friendlinks - post your Clash Royale & Brawl Stars friend links to connect with players in our community
+
+          #decks-family - decks that our family players are using to win challenges
+
+      - name: Royale Rating / RoyaleAPI Ladder Series
+        value: >
+          #rr-matches - displays all current Royale-Rating matches -- click the link on your mobile device to spectate live!
+
+          Read the docs here: https://royalerating.royaleapi.com
+      - name: Family-Only Channels
+        value: >
+          #family-chat - highly active; general family chat for all games
+
+          #food - join our top chefs in exploring the culinary world (warning: will make you hangry)
+
+          #rant - blow off some steam (and post it to twitter if you want)
+
+          #discordgram - our version of family instagram, but on Discord
+
+      - name: Clash Royale Channels (Family Only!)
+        value: >
+          This family-only category includes social channels, trade channels, and the following:
+
+          #cr-strategy - tips, tricks, and advice from players across the family
+
+          #decks - posts decks from every GC win across the game
+
+      - name: Brawl Stars Channels (Family Only!)
+        value: >
+          This family-only category includes social channels and our #bs-strategy channel where you can talk about the latest balance changes and get tips & tricks from our top BS players.
+  - title: Documentation
+    description: >
+      If you require further assitance with our Discord server,
+      you can read the docs at https://fam.royaleapi.com
