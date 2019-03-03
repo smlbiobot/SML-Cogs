@@ -26,3 +26,15 @@ embeds:
 
           **Failure to comply with these simple requests to
           keep our community happy & healthy may result in your removal.**
+  - title: Next Steps
+    fields:
+      - name: channels
+        value: "hi there #bot Lorem ipsum dolor #general why here"
+
+      - name: Next Steps
+        value: >
+          + Scroll down to learn more about our family, channels, and roles
+          #botdev #bot #general
+          + Head over to #botdev to start chatting
+
+          + Jump over to #result to find out how to join

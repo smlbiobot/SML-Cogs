@@ -22,21 +22,16 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import argparse
-import itertools
-import os
 from collections import defaultdict
-from random import choice
 
+import argparse
 import discord
+import os
+import re
+import yaml
 from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from discord.ext.commands import Context
-
-import yaml
 
 PATH = os.path.join("data", "post")
 JSON = os.path.join(PATH, "settings.json")
@@ -67,9 +62,22 @@ class Post:
 
         return p
 
+    def parse_mentions(self, value, server=None):
+        """Parse channel mentions"""
+
+        def channel_repl(matchobj):
+            name = matchobj.group(1)
+            channel = discord.utils.get(server.channels, name=name)
+            if channel:
+                return channel.mention
+            else:
+                return "#{}".format(name)
+
+        return re.sub('#([A-Za-z0-9\-]+)', channel_repl, value)
+
     @checks.mod_or_permissions()
     @commands.command(name="post", pass_context=True, no_pm=True)
-    async def post(self, ctx, channel:discord.Channel, *args):
+    async def post(self, ctx, channel: discord.Channel, *args):
         """Post things to channel"""
         parser = self.parser()
 
@@ -90,18 +98,24 @@ class Post:
 
         for d in data.get('embeds', []):
             em = discord.Embed(**d)
+
             image_url = d.get('image', {}).get('url')
             if image_url:
                 em.set_image(url=image_url)
+
             fields = d.get('fields', [])
             if fields:
                 for f in fields:
                     name = f.get('name')
                     value = f.get('value')
+                    value = self.parse_mentions(value, server=ctx.message.server)
+                    # s = '<#275772768799162368>'
                     em.add_field(name=name, value=value)
 
-            await self.bot.say(embed=em)
-
+            try:
+                await self.bot.say(embed=em)
+            except Exception as e:
+                print(e)
 
 
 def check_folder():
