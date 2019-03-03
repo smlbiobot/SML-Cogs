@@ -127,7 +127,7 @@ class Post:
                     em.add_field(name=name, value=value)
 
             try:
-                await self.bot.say(embed=em)
+                await self.bot.send_message(channel, embed=em)
             except Exception as e:
                 print(e)
 
