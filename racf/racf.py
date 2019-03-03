@@ -575,16 +575,16 @@ class RACF:
 
         server = ctx.message.server
 
-        async def add_visitor():
-            added_roles = await self.add_roles(server, member, ['Visitor'])
-            await self.bot.say(
-                "Added {} to {}".format(
-                    ", ".join(added_roles),
-                    member
-                )
-            )
-
-            await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
+        # async def add_visitor():
+        #     added_roles = await self.add_roles(server, member, ['Visitor'])
+        #     await self.bot.say(
+        #         "Added {} to {}".format(
+        #             ", ".join(added_roles),
+        #             member
+        #         )
+        #     )
+        #
+        #     await ctx.invoke(self.dmusers, self.config.messages.visitor_rules, member)
 
         if player_clan_tag in CLAN_PERMISSION.keys():
             # - Check allow role assignment
@@ -593,11 +593,8 @@ class RACF:
                 await self.bot.say('User belong to a clan that requires roster verifications.')
                 return
 
-            # - Assign role - not members
-            if not perm['member']:
-                await add_visitor()
-                channel = discord.utils.get(channels, name="visitors")
-            else:
+            # - Assign role - members
+            if perm['member']:
                 # remove all clan roles
                 to_remove = CLAN_ROLES + VISITOR_ROLES + RECRUIT_ROLES
                 to_add = MEMBER_ROLES + [perm['role']]
@@ -615,13 +612,13 @@ class RACF:
                 channel = discord.utils.get(channels, name="family-chat")
                 await ctx.invoke(self.dmusers, self.config.messages.member, member)
 
-            if channel is not None:
-                await self.bot.say(
-                    "{} Welcome! You may now chat at {} — enjoy!".format(
-                        member.mention, channel.mention))
+                if channel is not None:
+                    await self.bot.say(
+                        "{} Welcome! You may now chat at {} — enjoy!".format(
+                            member.mention, channel.mention))
 
-        else:
-            await add_visitor()
+        # else:
+        #     await add_visitor()
 
     async def royaleapi_verify(self, ctx, member: discord.Member, tag):
         """Verify CR members by player tag."""
