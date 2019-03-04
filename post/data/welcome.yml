@@ -36,15 +36,24 @@ embeds:
           Let us know in the #join-our-family channel. Simply tell us your player tag and which game you want to join us in (Clash Royale or Brawl Stars) and we’ll take it from there!
 
   - title: >
-      :crossed_swords: Royale Rating
+      :crossed_swords: RoyaleAPI Ladder Series (RLS)
     description: >
-      Royale Rating (RR), developed by RoyaleAPI, aims to give each player a score related to their skill. The rating system tackles several disadvantage of Elo and is able to quickly hone into an individual’s true skill rating in a short amount of time. Additionally, the system can calculate ratings for individual players even when they participate in multi-player settings, e.g. 2v2 and more.  More information can be found in our documentation.
+      We have partnered with Team Liquid to help bring a new experience to the Royale Rating system! Introducing RoyaleAPI Ladder Series (RLS), a fully fledged rated matchmaking system! Progress through the ranks, work your way up the leaderboards, and make a name for yourself in the competitive community.
+    image:
+      url: https://pbs.twimg.com/media/D00xPQjV4AI-N4F.jpg:large
     fields:
-      - name: >
-          :trophy: Royale Rating Events
+      - name: Royale Rating (RR)
         value: >
-          We’re working on some exclusive events that leverage our Royale Rating.  If you want to be a part of that, you should head over to #rr-instructions and verify your account.
-
+          Developed by RoyaleAPI, Royale Rating (RR) aims to give each player a score related to their skill. The rating system tackles several disadvantage of Elo and is able to quickly hone into an individual’s true skill rating in a short amount of time. Additionally, the system can calculate ratings for individual players even when they participate in multi-player settings, e.g. 2v2 and more.  More information can be found in our documentation. https://royalerating.royaleapi.com
+      - name: How to register
+        value: >
+          Please read #rr-instructions and complete step 1 verify and step 2 registration at #rr-bot
+      - name: How to play
+        value: >
+          After you have completed the two steps above, head over to #rr-play-seek
+      - name: Test Season
+        value: >
+          Test season begins on March 6 9am EST. Everyone’s rating will be reset to 0. For now, you can get a feel of how the system work by playing in the series `a2`.
   - title: >
       :helmet_with_cross: Need Help?
     description: >
