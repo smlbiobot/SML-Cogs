@@ -110,7 +110,6 @@ class Post:
         return re.sub(':([A-Za-z0-9\-_]+):', emoji_repl, value)
 
 
-
     @checks.mod_or_permissions()
     @commands.command(name="post", pass_context=True, no_pm=True)
     async def post(self, ctx, channel: discord.Channel, *args):
