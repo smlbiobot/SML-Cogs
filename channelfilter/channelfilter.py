@@ -195,8 +195,7 @@ class ChannelFilter:
                 reason = channel_settings[word].get('reason', 'that')
                 await self.bot.send_message(
                     channel,
-                    "{} {}. "
-                    "Repeat offenders will be kicked/banned.".format(
+                    "{} {}.".format(
                         author.mention,
                         reason
                     ))
