@@ -170,36 +170,37 @@ class ChannelFilter:
 
     async def on_message(self, message):
         """Filter words by channel."""
-        server = message.server
-        channel = message.channel
-        author = message.author
-        if server is None or self.bot.user == author:
-            return
+        if self == self.bot.get_cog("ChannelFilter"):
+            server = message.server
+            channel = message.channel
+            author = message.author
+            if server is None or self.bot.user == author:
+                return
 
-        valid_user = isinstance(author, discord.Member) and not author.bot
+            valid_user = isinstance(author, discord.Member) and not author.bot
 
-        # Ignore bots
-        if not valid_user:
-            return
+            # Ignore bots
+            if not valid_user:
+                return
 
-        # Ignore people with manage server perms
-        if author.server_permissions.manage_server:
-            return
+            # Ignore people with manage server perms
+            if author.server_permissions.manage_server:
+                return
 
-        channel_settings = self.get_channel_settings(server, channel)
-        if not isinstance(channel_settings, dict):
-            return
+            channel_settings = self.get_channel_settings(server, channel)
+            if not isinstance(channel_settings, dict):
+                return
 
-        for word in channel_settings.keys():
-            if word.lower() in message.content.lower():
-                reason = channel_settings[word].get('reason', 'that')
-                await self.bot.send_message(
-                    channel,
-                    "{} {}.".format(
-                        author.mention,
-                        reason
-                    ))
-                await self.bot.delete_message(message)
+            for word in channel_settings.keys():
+                if word.lower() in message.content.lower():
+                    reason = channel_settings[word].get('reason', 'that')
+                    await self.bot.send_message(
+                        channel,
+                        "{} {}.".format(
+                            author.mention,
+                            reason
+                        ))
+                    await self.bot.delete_message(message)
 
 
 def check_folder():
