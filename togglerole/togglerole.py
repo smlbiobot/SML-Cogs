@@ -39,6 +39,7 @@ DATA_PATH = os.path.join("data", "SML-Cogs", "togglerole")
 SETTINGS_JSON = os.path.join(DATA_PATH, "settings.json")
 
 TASK_DELAY = dt.timedelta(hours=2).total_seconds()
+# TASK_DELAY = dt.timedelta(seconds=5).total_seconds()
 
 server_defaults = {
     "_everyone": []
@@ -61,6 +62,15 @@ class ToggleRole:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(SETTINGS_JSON))
+        loop = asyncio.get_event_loop()
+        self.task = loop.create_task(self.post_togglerole_task())
+
+    async def stop(self):
+        """Stop looping"""
+        self.task.cancel()
+
+    def __unload(self):
+        self.task.cancel()
 
     @commands.group(pass_context=True, no_pm=True)
     async def toggleroleset(self, ctx):
@@ -300,25 +310,29 @@ class ToggleRole:
 
     async def post_togglerole_task(self):
         """Auto post tasks."""
-        while self == self.bot.get_cog("ToggleRole"):
+        if self == self.bot.get_cog("ToggleRole"):
             try:
-                for server_id, settings in self.settings.items():
-                    server = self.bot.get_server(server_id)
-                    if server is None:
-                        continue
-                    self.check_server_settings(server)
-                    if self.settings[server.id].get("AUTO", {}).get("on_off", False):
-                        channel_id = self.settings.get(server.id, {}).get("AUTO", {}).get("channel_id")
-                        if channel_id is None:
-                            continue
-                        channel = server.get_channel(channel_id)
-                        if channel is None:
-                            continue
-                        await self.post_togglerole_embeds(server, channel)
-            except Exception:
+                while True:
+                    try:
+                        for server_id, settings in self.settings.items():
+                            server = self.bot.get_server(server_id)
+                            if server is None:
+                                continue
+                            self.check_server_settings(server)
+                            if self.settings[server.id].get("AUTO", {}).get("on_off", False):
+                                channel_id = self.settings.get(server.id, {}).get("AUTO", {}).get("channel_id")
+                                if channel_id is None:
+                                    continue
+                                channel = server.get_channel(channel_id)
+                                if channel is None:
+                                    continue
+                                await self.post_togglerole_embeds(server, channel)
+                    except Exception:
+                        pass
+                    finally:
+                        await asyncio.sleep(TASK_DELAY)
+            except asyncio.CancelledError:
                 pass
-            finally:
-                await asyncio.sleep(TASK_DELAY)
 
     async def on_reaction_add(self, reaction: discord.Reaction, user):
         await self.on_reaction(reaction, user)
@@ -467,4 +481,4 @@ def setup(bot):
     check_file()
     n = ToggleRole(bot)
     bot.add_cog(n)
-    bot.loop.create_task(n.post_togglerole_task())
+    # bot.loop.create_task(n.post_togglerole_task())
