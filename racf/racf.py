@@ -506,9 +506,13 @@ class RACF:
     async def racf_verify(self, ctx, member: discord.Member, tag, grant_permission=False):
         """Verify CR members by player tag."""
 
+        ROYALEAPI_DEV_ID = '351290254830862337'
+        ROYALEAPI_USER_ID = '528327242875535372'
+
         if not grant_permission:
             # verify for RoyaleAPI server
-            if ctx.message.server.name == 'RoyaleAPI':
+
+            if ctx.message.server.id == ROYALEAPI_DEV_ID:
                 await self.royaleapi_verify(ctx, member, tag)
                 return
 
