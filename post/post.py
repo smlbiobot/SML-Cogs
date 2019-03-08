@@ -34,6 +34,7 @@ from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from io import StringIO
+import asyncio
 
 PATH = os.path.join("data", "post")
 JSON = os.path.join(PATH, "settings.json")
@@ -52,6 +53,17 @@ class Post:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
+        self._session = None
+
+    async def get_session(self):
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+        return self._session
+
+    def __unload(self):
+        if self._session is not None:
+            loop = asyncio.get_event_loop()
+            loop.create_task(self._session.close())
 
     def parser(self):
         p = argparse.ArgumentParser('[p]post')
@@ -127,11 +139,11 @@ class Post:
                 data = yaml.load(f)
 
         elif pa.url:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(pa.url) as resp:
-                    s = await resp.text()
-                    with StringIO(s) as f:
-                        data = yaml.load(f)
+            session = await self.get_session()
+            async with session.get(pa.url) as resp:
+                s = await resp.text()
+                with StringIO(s) as f:
+                    data = yaml.load(f)
 
         elif pa.path:
             with open(pa.path) as f:
@@ -145,10 +157,17 @@ class Post:
             title = self.parse_emoji(d.get('title'))
             description = self.parse_emoji(d.get('description'))
 
+            color = discord.Color.dark_blue()
+            d_color = d.get('color')
+            if d_color is not None:
+                c = getattr(discord.Color, d_color)
+                if c:
+                    color = c()
+
             em = discord.Embed(
                 title=title,
                 description=description,
-                color=discord.Color.dark_blue()
+                color=color
             )
 
             image_url = d.get('image', {}).get('url')

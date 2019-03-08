@@ -1,0 +1,13 @@
+embeds:
+  - image:
+      url: https://royalerating.royaleapi.com/img/tut/rls-tut-003-es.png
+    color: dark_purple
+  - image:
+      url: https://royalerating.royaleapi.com/img/tut/rls-tut-003-es2.png
+    color: dark_purple
+  - image:
+      url: https://royalerating.royaleapi.com/img/tut/rls-tut-003-es3.png
+    color: dark_purple
+  - image:
+      url: https://royalerating.royaleapi.com/img/tut/rls-tut-003-es4.png
+    color: dark_purple
