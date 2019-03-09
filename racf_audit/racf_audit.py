@@ -975,19 +975,27 @@ class RACFAudit:
         async def exec_add_roles(d_member, roles, channel=None):
             # print("add roles", d_member, [r.name for r in roles])
             # await asyncio.sleep(0)
-            await self.bot.add_roles(d_member, *roles)
-            if channel is not None:
-                await self.bot.send_message(channel,
-                                            "Add {} to {}".format(", ".join([r.name for r in roles]), d_member))
+            try:
+                await self.bot.add_roles(d_member, *roles)
+            except discord.DiscordException as e:
+                pass
+            else:
+                if channel is not None:
+                    await self.bot.send_message(channel,
+                                                "Add {} to {}".format(", ".join([r.name for r in roles]), d_member))
 
         async def exec_remove_roles(d_member, roles, channel=None):
             # print("remove roles", d_member, [r.name for r in roles])
             # await asyncio.sleep(0)
-            await self.bot.remove_roles(d_member, *roles)
-            if channel is not None:
-                await self.bot.send_message(channel,
-                                            "Remove {} from {}".format(", ".join([r.name for r in roles]),
-                                                                       d_member))
+            try:
+                await self.bot.remove_roles(d_member, *roles)
+            except discord.DiscordException as e:
+                pass
+            else:
+                if channel is not None:
+                    await self.bot.send_message(channel,
+                                                "Remove {} from {}".format(", ".join([r.name for r in roles]),
+                                                                           d_member))
 
         # change clan roles
         for result in audit_results["no_clan_role"]:
