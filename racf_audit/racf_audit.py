@@ -1052,7 +1052,10 @@ class RACFAudit:
                     to_remove_roles = [discord.utils.get(server.roles, name=rname) for rname in user_member_role_names]
                     to_remove_roles = [r for r in to_remove_roles if r is not None]
                     if to_remove_roles:
-                        await exec_remove_roles(user, to_remove_roles, channel=channel)
+                        try:
+                            await exec_remove_roles(user, to_remove_roles, channel=channel)
+                        except Exception as e:
+                            pass
 
         await self.bot.send_message(channel, "Audit finished.")
 
