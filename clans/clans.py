@@ -779,6 +779,7 @@ class Clans:
             )
         )
 
+
         # Badge
         badge_url = config.badge_url
 
