@@ -283,10 +283,9 @@ class ClashRoyaleAPI:
             'Authorization': 'Bearer {}'.format(self.token)
         }
         async with session.get(url, headers=headers) as resp:
-            async with aiohttp.Timeout(timeout):
-                body = await resp.json()
-                if resp.status != 200:
-                    raise ClashRoyaleAPIError(status=resp.status, message=resp.reason)
+            body = await resp.json()
+            if resp.status != 200:
+                raise ClashRoyaleAPIError(status=resp.status, message=resp.reason)
         return body
 
     async def fetch(self, url):
