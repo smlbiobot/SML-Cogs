@@ -1007,19 +1007,15 @@ class RACFAudit:
             except KeyError:
                 pass
 
-        # Add visitor to people without roles
-        # member_role = discord.utils.get(server.roles, name='Member')
-        # visitor_role = discord.utils.get(server.roles, name='Visitor')
-        # for discord_member in audit_results["no_member_role"]:
-        #     try:
-        #         if member_role is not None:
-        #             await exec_add_roles(discord_member, [member_role], channel=channel)
-        #
-        #         if visitor_role is not None:
-        #             await exec_remove_roles(discord_member, [visitor_role], channel=channel)
-        #
-        #     except KeyError:
-        #         pass
+        # Add member role
+        member_role = discord.utils.get(server.roles, name='Member')
+        for discord_member in audit_results["no_member_role"]:
+            try:
+                if member_role is not None:
+                    await exec_add_roles(discord_member, [member_role], channel=channel)
+
+            except KeyError:
+                pass
 
         # remove member roles from people who are not in our clans
         for result in audit_results['not_in_our_clans']:
@@ -1045,7 +1041,8 @@ class RACFAudit:
 
         # Remove clan roles from visitors
         member_role = discord.utils.get(server.roles, name='Member')
-        for user in server.members:
+        server_members = server.members.copy()
+        for user in server_members:
             # not a member
             if member_role not in user.roles:
                 user_role_names = [r.name for r in user.roles]
