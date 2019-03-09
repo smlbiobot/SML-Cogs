@@ -28,7 +28,6 @@ import re
 from discord import Message
 from discord.ext import commands
 
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 
@@ -75,7 +74,7 @@ class Discordgram:
     async def setdiscordgram(self, ctx):
         """Set Discordgram settings."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @setdiscordgram.command(name="channel", pass_context=True)
     async def setdiscordgram_channel(self, ctx):
