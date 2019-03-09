@@ -24,12 +24,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import asyncio
 from collections import defaultdict
 
 import aiohttp
 import argparse
 import arrow
-import asyncio
 import datetime as dt
 import discord
 import humanfriendly
@@ -39,12 +39,11 @@ import re
 import unidecode
 import yaml
 from box import Box
-from discord.ext import commands
-
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify
 from cogs.utils.chat_formatting import bold
+from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "clans")
 JSON = os.path.join(PATH, "settings.json")
@@ -146,8 +145,6 @@ def wrap_inline(str):
 class APIError(Exception):
     def __init__(self, message):
         self.message = message
-
-
 
 
 class Clans:
@@ -752,8 +749,6 @@ class Clans:
                     )
                 ]
 
-
-
         return '\n'.join(o)
 
     def clanwars_embed(self, clans):
@@ -931,11 +926,10 @@ class Clans:
         self.task = self.bot.loop.create_task(self.update_cw_message(message, count_down=count_down))
 
     async def fetch(self, session, url):
-        with aiohttp.Timeout(10):
-            async with session.get(url) as response:
-                if response.status != 200:
-                    response.raise_for_status()
-                return await response.json()
+        async with session.get(url) as response:
+            if response.status != 200:
+                response.raise_for_status()
+            return await response.json()
 
     async def get_clanwars(self):
         # official
@@ -952,7 +946,7 @@ class Clans:
             url = war_url_fmt.format(tag=tag)
             urls.append(url)
 
-        with aiohttp.ClientSession(loop=self.bot.loop, headers=headers) as session:
+        async with aiohttp.ClientSession(loop=self.bot.loop, headers=headers) as session:
             clans = await asyncio.gather(
                 *[self.bot.loop.create_task(
                     self.fetch(session, url)
