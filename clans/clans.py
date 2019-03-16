@@ -158,6 +158,7 @@ class Clans:
         self.badges = dataIO.load_json(BADGES)
         self._auth = None
         self.task = None
+        self._tasks = []
 
         provider = self.settings.get('provider')
         if provider is None:
@@ -166,6 +167,12 @@ class Clans:
     def __unload(self):
         """Remove task when unloaded."""
         self.task.cancel()
+        for task in self._tasks:
+            if task:
+                try:
+                    task.cancel()
+                except:
+                    pass
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
@@ -360,7 +367,11 @@ class Clans:
         """Task: post embed to channel."""
         while self == self.bot.get_cog("Clans"):
             try:
-                await self.post_auto_clans()
+                loop = asyncio.get_event_loop()
+                task = await loop.create_task(
+                    self.post_auto_clans()
+                )
+                self._tasks.append(task)
             except Exception:
                 pass
             finally:
@@ -1060,7 +1071,11 @@ class Clans:
         """Task: post embed to channel."""
         while self == self.bot.get_cog("Clans"):
             try:
-                await self.post_clanwars()
+                loop = asyncio.get_event_loop()
+                task = await loop.create_task(
+                    self.post_clanwars()
+                )
+                self._tasks.append(task)
             except Exception:
                 pass
             finally:
