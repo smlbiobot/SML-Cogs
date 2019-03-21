@@ -189,39 +189,7 @@ class RACFDecks:
             clan_name = deck.get('clan_name', '')
             ts = deck.get('timestamp_epoch_millis')
             timestamps.append(ts)
-            # ts_dt = dt.datetime.fromtimestamp(ts / 1000).strftime("%Y-%m-%d %H:%M UTC")
             cc = deck.get('cc', False)
-            gc_star = ':star: ' if fam and not cc else ''
-            # message = "{}**12-win {} deck by {}**, {}\n{}".format(
-            #     gc_star,
-            #     'CC' if cc else 'GC',
-            #     player_name,
-            #     clan_name,
-            #     ts_dt
-            # )
-            # deck_img_name = player_name
-            # await self.bot.send_message(
-            #     channel,
-            #     message
-            # )
-            #
-            # deck_image = await self.bot.loop.run_in_executor(
-            #     self.threadex,
-            #     deck_cog.get_deck_image,
-            #     card_keys, deck_img_name, self.bot.user
-            # )
-            #
-            # # construct a filename using first three letters of each card
-            # filename = "deck-{}.png".format("-".join([card[:3] for card in deck]))
-            #
-            # with io.BytesIO() as f:
-            #     deck_image.save(f, "PNG")
-            #     f.seek(0)
-            #     await self.bot.send_file(
-            #         channel, f,
-            #         filename=filename, content="")
-            #
-            # await self.bot.send_message(channel, embed=await deck_cog.decklink_embed(card_keys))
 
             if cc:
                 color = discord.Color.green()
