@@ -391,7 +391,9 @@ class CRPlayerModel:
     def clan_tag(self):
         """Clan tag."""
         if self.clan is not None:
-            return self.clan.get("tag", None)
+            t = self.clan.get("tag", None)
+            t = t.replace('#', '')
+            return t
         return None
 
     @property
@@ -1771,6 +1773,10 @@ class CRProfile:
         return embeds
 
     async def on_message(self, msg):
+        """Do transforms."""
+        await self.transform_friendlink(msg)
+
+    async def transform_friendlink(self, msg):
         """Convert friend invite links to embeds.
 
         https://link.clashroyale.com/invite/friend/en?tag={tag}&token={token}&platform={platform}
@@ -1790,19 +1796,37 @@ class CRProfile:
         except APIError as e:
             return
 
+        profile = 'https://royaleapi.com/player/{}'.format(p.tag)
+        battles = 'https://royaleapi.com/player/{}/battles'.format(p.tag)
+        decks = 'https://royaleapi.com/player/{}/decks'.format(p.tag)
+        links = '[Profile]({}) • [Battles]({}) • [Decks]({})'.format(
+            profile, battles, decks
+        )
+        misc = "Level {} • {} total games".format(
+            p.level, p.total_games
+        )
+        trophies = "{} / {} PB".format(p.trophy_current, p.trophy_highest)
+        challenge = "{} max wins / {} cards".format(p.challenge_max_wins, p.challenge_cards_won)
+
+        if not p.not_in_clan:
+            clan = "{}, [{}]({})".format(
+                p.clan_role.title(),
+                p.clan_name,
+                'https://royaleapi.com/clan/{}'.format(p.clan_tag)
+            )
+        else:
+            clan = "Not in clan"
+
         em = discord.Embed(
             title="Friend Request - Clash Royale",
-            description="{} #{}".format(p.name, p.tag),
+            description="**{name}** #{tag}\n{clan}\n{trophies}\n{misc}\n{challenge}\n{links}".format(
+                name=p.name, tag=p.tag, links=links, misc=misc, trophies=trophies, clan=clan,
+                challenge=challenge
+            ),
             url=url,
             color=discord.Color.blue()
         )
 
-        em.add_field(name="Trophies", value="{} / {} PB".format(p.trophy_current, p.trophy_highest))
-        em.add_field(name="Clan", value="{}, {}".format(p.clan_role.title(), p.clan_name))
-        em.add_field(name="Challenge Max Wins", value=p.challenge_max_wins)
-        em.add_field(name="Challenge Cards Won", value=p.challenge_cards_won)
-        em.add_field(name="Level", value=p.level)
-        em.add_field(name="Total Games", value=p.total_games)
         em.add_field(name="Current Deck", value=p.deck_list(self.bot_emoji), inline=False)
         em.set_footer(
             text=p.profile_url,
