@@ -1544,7 +1544,7 @@ class RACF:
     async def recruit(self, ctx, member: discord.Member = None, tag=None):
         """Add recruit tag."""
         if member is None:
-            await self.bot.send_cmd_help()
+            await self.bot.send_cmd_help(ctx)
             return
 
         verified = await check_manage_roles(ctx, self.bot)
@@ -1606,7 +1606,7 @@ class RACF:
             return
 
         if member is None:
-            await self.bot.send_cmd_help()
+            await self.bot.send_cmd_help(ctx)
             return
 
         # remove roles
