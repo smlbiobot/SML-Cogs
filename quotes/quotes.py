@@ -37,6 +37,7 @@ PATH = os.path.join("data", "quotes")
 JSON = os.path.join(PATH, "settings.json")
 
 BOTCOMMANDER_ROLES = ["Bot Commander", "MOD", "AlphaFamilyLead"]
+MEMBER_ROLES = ["Member", "BS-Member"]
 
 
 def nested_dict():
@@ -117,6 +118,7 @@ class Quotes:
             await self.bot.say(page)
 
     @commands.command(aliases=['q'], pass_context=True, no_pm=True)
+    @commands.has_any_role(*MEMBER_ROLES)
     async def quote(self, ctx, name):
         """Show quotes by name.
         
