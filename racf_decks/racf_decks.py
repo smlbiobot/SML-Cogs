@@ -217,26 +217,27 @@ class RACFDecks:
             dataIO.save_json(JSON, self.settings)
 
     async def update_decks(self):
-        while self == self.bot.get_cog("RACFDecks"):
-            server = None
-            server_id = self.settings.get("server_id")
-            if server_id:
-                server = self.bot.get_server(server_id)
+        while True:
+            if self == self.bot.get_cog("RACFDecks"):
+                server = None
+                server_id = self.settings.get("server_id")
+                if server_id:
+                    server = self.bot.get_server(server_id)
 
-            if server:
-                family_auto = self.settings.get('family_auto')
-                family_channel_id = self.settings.get('family_channel_id')
-                if family_auto and family_channel_id:
-                    channel = discord.utils.get(server.channels, id=family_channel_id)
-                    if channel:
-                        await self.post_decks(channel, fam=True, show_empty=False)
+                if server:
+                    family_auto = self.settings.get('family_auto')
+                    family_channel_id = self.settings.get('family_channel_id')
+                    if family_auto and family_channel_id:
+                        channel = discord.utils.get(server.channels, id=family_channel_id)
+                        if channel:
+                            await self.post_decks(channel, fam=True, show_empty=False)
 
-                gc_auto = self.settings.get('gc_auto')
-                gc_channel_id = self.settings.get('gc_channel_id')
-                if gc_auto and gc_channel_id:
-                    channel = discord.utils.get(server.channels, id=gc_channel_id)
-                    if channel:
-                        await self.post_decks(channel, fam=False, show_empty=False)
+                    gc_auto = self.settings.get('gc_auto')
+                    gc_channel_id = self.settings.get('gc_channel_id')
+                    if gc_auto and gc_channel_id:
+                        channel = discord.utils.get(server.channels, id=gc_channel_id)
+                        if channel:
+                            await self.post_decks(channel, fam=False, show_empty=False)
 
             await asyncio.sleep(DELAY)
 
