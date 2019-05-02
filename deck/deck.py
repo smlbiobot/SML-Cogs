@@ -24,14 +24,16 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import aiohttp
 import datetime
 import datetime as dt
-import discord
 import io
 import os
 import re
 import string
+from concurrent.futures import ThreadPoolExecutor
+
+import aiohttp
+import discord
 import yaml
 from PIL import Image
 from PIL import ImageDraw
@@ -39,7 +41,6 @@ from PIL import ImageFont
 from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
-from concurrent.futures import ThreadPoolExecutor
 from discord.ext import commands
 
 SETTINGS_PATH = os.path.join("data", "deck", "settings.json")
