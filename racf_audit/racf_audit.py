@@ -394,7 +394,7 @@ class RACFAudit:
         dataIO.save_json(PLAYERS, self._players)
 
         with open('data/racf_audit/family_config.yaml') as f:
-            self.config = yaml.load(f)
+            self.config = yaml.load(f, Loader=yaml.FullLoader)
 
     @property
     def players(self):
@@ -568,6 +568,7 @@ class RACFAudit:
         api = ClashRoyaleAPI(self.auth)
         tags = self.clan_tags()
         clan_models = await api.fetch_clan_list(tags)
+        # print(clan_models)
         members = []
         for clan_model in clan_models:
             for member_model in clan_model.get('memberList'):

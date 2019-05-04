@@ -86,7 +86,7 @@ class Deck:
         self.cards_abbrev = {}
 
         with open(AKA_PATH) as f:
-            aka = yaml.load(f)
+            aka = yaml.load(f, Loader=yaml.FullLoader)
 
         for k, v in aka.items():
             for value in v:
