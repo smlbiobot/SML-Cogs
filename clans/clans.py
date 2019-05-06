@@ -24,18 +24,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import asyncio
-from collections import defaultdict
-
-import aiohttp
 import argparse
-import arrow
+import asyncio
 import datetime as dt
-import discord
-import humanfriendly
 import json
 import os
 import re
+from collections import defaultdict
+
+import aiohttp
+import arrow
+import discord
+import humanfriendly
 import unidecode
 import yaml
 from box import Box
@@ -43,6 +43,7 @@ from cogs.utils import checks
 from cogs.utils.chat_formatting import bold
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from discord import DiscordException
 from discord.ext import commands
 
 PATH = os.path.join("data", "clans")
@@ -57,6 +58,8 @@ CLAN_WARS_SLEEP = 10
 CLAN_WARS_CACHE = os.path.join(PATH, "clan_wars_cache.json")
 
 EMOJI_CW_TROPHY = '<:cwtrophy:450878327880941589>'
+
+TASK_INTERVAL = 57
 
 
 def nested_dict():
@@ -244,7 +247,7 @@ class Clans:
     def clans_config(self):
         if os.path.exists(CONFIG_YAML):
             with open(CONFIG_YAML) as f:
-                config = Box(yaml.load(f), default_box=True)
+                config = Box(yaml.safe_load(f), default_box=True)
             return config
         return None
 
@@ -253,7 +256,7 @@ class Clans:
         if self._auth is None:
             if os.path.exists(AUTH_YAML):
                 with open(AUTH_YAML) as f:
-                    config = yaml.load(f)
+                    config = yaml.safe_load(f)
                     if self.api_provider == 'cr-api':
                         self._auth = config.get('token')
                     else:
@@ -365,19 +368,20 @@ class Clans:
 
     async def post_auto_clans_task(self):
         """Task: post embed to channel."""
-        while self == self.bot.get_cog("Clans"):
-            try:
-                loop = asyncio.get_event_loop()
-                task = await loop.create_task(
-                    self.post_auto_clans()
-                )
-                self._tasks.append(task)
-            except Exception:
-                pass
-            finally:
-                await asyncio.sleep(57)
+        message = None
+        try:
+            while True:
+                if self == self.bot.get_cog("Clans"):
+                    try:
+                        await self.post_auto_clans()
 
-    async def post_auto_clans(self):
+                    except DiscordException:
+                        pass
+                    await asyncio.sleep(TASK_INTERVAL)
+        except asyncio.CancelledError:
+            pass
+
+    async def post_auto_clans(self, message=None):
         self.check_settings()
         for server_id, v in self.settings['auto_clan']['servers'].items():
             if v.get('auto'):
@@ -389,13 +393,12 @@ class Clans:
                     if message_id is not None:
                         try:
                             msg = await self.bot.get_message(channel, message_id)
-                        except (discord.NotFound, discord.Forbidden, discord.HTTPException):
-                            msg = None
+                        except DiscordException:
+                            pass
                     message = await self.post_clans(channel, msg=msg)
                     v['message_id'] = message.id
 
-                    # delete channel messages
-                    await self.bot.purge_from(channel, limit=5, before=message)
+        dataIO.save_json(JSON, self.settings)
 
     async def post_clans(self, channel, *args, msg=None):
         """Post clans to channel."""
@@ -527,6 +530,8 @@ class Clans:
             )
 
         if msg is None:
+            # delete channel messages
+            await self.bot.purge_from(channel, limit=5, before=msg)
             msg = await self.bot.send_message(channel, embed=em)
         else:
             await self.bot.edit_message(msg, embed=em)
@@ -790,8 +795,6 @@ class Clans:
             timestamp=dt.datetime.utcnow()
         )
 
-
-
         # clan list
         STATES = {
             'collectionDay': 'Coll',
@@ -846,65 +849,6 @@ class Clans:
 
             else:
                 value = wrap_inline(STATES.get(state, 'ERR'))
-
-            # clan = Box(c, default_box=True)
-            # state = clan.state
-            # timespan = None
-            # wins = clan.clan.wins
-            # crowns = clan.clan.crowns
-            # battles_played = clan.clan.battlesPlayed
-            #
-            # if state == 'collectionDay':
-            #     end_time = clan.get('collectionEndTime')
-            # elif state == 'warDay':
-            #     end_time = clan.get('warEndTime')
-            # else:
-            #     end_time = None
-            #
-            # if end_time is not None:
-            #     dt = arrow.get(end_time, 'YYYYMMDDTHHmmss.SSS').datetime
-            #     now = arrow.utcnow().datetime
-            #     span = dt - now
-            #     timespan = format_timespan(int(span.total_seconds()), short=True, pad=True)
-            #
-            # clan_name = cf.name
-            # clan_score = clan.clan.clanScore
-            # name = '{}'.format(clan_name, clan_score)
-            # state = clan.get('state', 'ERR')
-            # if state in ['collectionDay', 'warDay']:
-            #     box_value = (
-            #         "`{state:<5}{timespan: >11}`\n"
-            #         "{wins} "
-            #         "{crowns} "
-            #         "{battles_played}"
-            #         "{trophies}").format(
-            #         state=STATES.get(state, 'ERR'),
-            #         timespan=timespan or '',
-            #         wins=emoji_value('win', wins),
-            #         crowns=emoji_value('crown', crowns),
-            #         battles_played=emoji_value('battle', battles_played),
-            #         trophies=emoji_value('trophy', clan_score)
-            #     )
-            # else:
-            #     box_value = STATES.get(state, 'ERR')
-
-            # participants
-            # if state == 'collectionDay':
-            #     p_value = ' '.join([
-            #         '<:cwbattle:450889588215513089>{}: {} '.format(p.name, p.wins, 3 - p.battlesPlayed) for p in
-            #         clan.participants
-            #         if p.battlesPlayed < 3
-            #     ])
-            # elif state == 'warDay':
-            #     p_value = ' '.join([
-            #         '<:cwbattle:450889588215513089>{}: {} '.format(p.name, p.wins, 3 - p.battlesPlayed) for p in
-            #         clan.participants
-            #         if p.battlesPlayed < 1
-            #     ])
-            # else:
-            #     p_value = ''
-            #
-            # p_value = smart_truncate(p_value, length=400)
 
             em.add_field(name=clan_name, value=value, inline=False)
 
@@ -961,16 +905,6 @@ class Clans:
             clans = dataIO.load_json(CLAN_WARS_CACHE)
         else:
             clans = await self.get_clanwars()
-
-        # em = self.clanwars_embed(clans)
-        #
-        # if new_message:
-        #     channel = message.channel
-        #     await self.bot.delete_message(message)
-        #     message = await self.bot.send_message(channel, embed=em)
-        #     await self.set_clanwars_message_id(message)
-        # else:
-        #     await self.bot.edit_message(message, embed=em)
 
         s = self.clanwars_str(clans)
 
@@ -1116,17 +1050,16 @@ class Clans:
 
     async def post_clanwars_task(self):
         """Task: post embed to channel."""
-        while self == self.bot.get_cog("Clans"):
-            try:
-                loop = asyncio.get_event_loop()
-                task = await loop.create_task(
-                    self.post_clanwars()
-                )
-                self._tasks.append(task)
-            except Exception:
-                pass
-            finally:
-                await asyncio.sleep(57)
+        try:
+            while True:
+                if self == self.bot.get_cog("Clans"):
+                    try:
+                        await self.post_clanwars()
+                    except DiscordException as e:
+                        pass
+                    await asyncio.sleep(TASK_INTERVAL)
+        except asyncio.CancelledError:
+            pass
 
     async def post_clanwars(self):
         """Post embbed to channel."""
@@ -1143,19 +1076,21 @@ class Clans:
                         pass
                     else:
                         em = self.clanwars_embed(clans)
-                        message = await self.bot.send_message(channel, embed=em)
+                        message_id = v.get('message_id')
+                        message = None
+                        if message_id is not None:
+                            try:
+                                message = await self.bot.get_message(channel, message_id)
+                            except DiscordException:
+                                pass
 
-                        # s = self.clanwars_str(clans)
-                        # messages = []
-                        # for page in pagify(s):
-                        #     messages.append(
-                        #         await self.bot.send_message(channel, page)
-                        #     )
-                        #
-                        # message = messages[0]
-
-                        # delete channel messages
-                        await self.bot.purge_from(channel, limit=5, before=message)
+                        if message is None:
+                            await self.bot.purge_from(channel, limit=10)
+                            message = await self.bot.send_message(channel, embed=em)
+                            v["message_id"] = message.id
+                            dataIO.save_json(JSON, self.settings)
+                        else:
+                            await self.bot.edit_message(message, embed=em)
 
 
 def check_folder():
