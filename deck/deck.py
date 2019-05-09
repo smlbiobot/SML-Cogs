@@ -919,44 +919,16 @@ class Deck:
                 if card_keys is None:
                     return
 
-                # CTX = namedtuple("CTX", ['bot', 'message'])
-                # ctx = CTX(self.bot, msg)
-                # deck = card_keys
-                # deck_name = ''
-                # member = msg.author
                 await self.post_deck(
                     channel=msg.channel,
                     card_keys=card_keys,
                     deck_author=msg.author
                 )
 
-                # if image server is set, upload as embed
-                # has_image_server = False
-                # img_server_id = self.settings.get('ImageServer', {}).get('server_id')
-                # img_channel_id = self.settings.get('ImageServer', {}).get('channel_id')
-                # if img_server_id and img_channel_id:
-                #     img_server = discord.utils.get(self.bot.servers, id=img_server_id)
-                #     img_channel = discord.utils.get(img_server.channels, id=img_channel_id)
-                #     if img_channel:
-                #         img_msg = await self.upload_deck_image_to(img_channel, deck, deck_name, member)
-                #         has_image_server = True
-                #         img_url = img_msg.attachments[0].get('url')
-                #         em = discord.Embed(
-                #             title="Copy Deck",
-                #             color=discord.Color.blue(),
-                #             url=await self.decklink_url(card_keys),
-                #         )
-                #         em.set_image(url=img_url)
-                #         await self.bot.send_message(
-                #             msg.channel, embed=em
-                #         )
-                #
-                #
-                # if not has_image_server:
-                #     await self.upload_deck_image(ctx, deck, deck_name, member)
-                #     await self.bot.send_message(msg.channel, embed=await self.decklink_embed(card_keys))
-
-                await self.bot.delete_message(msg)
+                try:
+                    await self.bot.delete_message(msg)
+                except discord.DiscordException:
+                    pass
 
     async def post_deck(self, channel=None, title=None, description=None, timestamp=None, card_keys=None,
                         deck_name=None, deck_author=None, color=None):
