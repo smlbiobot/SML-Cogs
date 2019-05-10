@@ -1,14 +1,14 @@
 # SML-Cogs
 
-This repo hosts a variety of cogs (aka modules) for use with the **Red Discord Bot** ([source](https://github.com/Twentysix26/Red-DiscordBot) / [documentation](https://twentysix26.github.io/Red-Docs/)). Most of them are in active development and are developed specifically for the **100 Thieves Clan Family** (100T Clash Royale) Discord server.
+This repo hosts a variety of cogs (aka modules) for use with the **Red Discord Bot** ([source](https://github.com/Twentysix26/Red-DiscordBot) / [documentation](https://twentysix26.github.io/Red-Docs/)). Most of them are in active development and are developed specifically for the **RoyaleAPI Discord server**.
 
 While some of these cogs can theoretically be used for any Discord server, many contain codes which are 100T-specific.
 
-If you would like to see most of these in action, you can join the RACF Discord server with this invite code: [http://discord.gg/100t](http://discord.gg/100t)
+If you would like to see most of these in action, you can join the RACF Discord server with this invite code: [http://discord.royaleapi.com](http://discord.royaleapi.com)
 
 You are welcome to log any issues in the Issues tab, or try to find me on either the 100T Discord server or my own Discord server at [http://discord.me/sml](http://discord.me/sml)
 
-There are no extensive documentation on these cogs. However, usage for many of these commands can be found on the documentation site for the 100T server, since these cogs were mostly written for it: http://docs.100talpha.com
+There are no extensive documentation on these cogs. However, usage for many of these commands can be found on the documentation site for the 100T server, since these cogs were mostly written for it: http://fam.royaleapi.com
 
 # Table of Contents
 
