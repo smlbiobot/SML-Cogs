@@ -1049,7 +1049,7 @@ class RACFAudit:
 
         # Remove clan roles from visitors
         member_role = discord.utils.get(server.roles, name='Member')
-        server_members = server.members.copy()
+        server_members = list(server.members).copy()
         for user in server_members:
             # not a member
             if member_role not in user.roles:
