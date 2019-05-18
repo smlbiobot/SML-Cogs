@@ -24,7 +24,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-
 import datetime
 import datetime as dt
 import io
@@ -929,8 +928,6 @@ class Deck:
                     await self.bot.delete_message(msg)
                 except discord.DiscordException:
                     pass
-
-
 
     async def post_deck(self, channel=None, title=None, description=None, timestamp=None, card_keys=None,
                         deck_name=None, deck_author=None, color=None):
