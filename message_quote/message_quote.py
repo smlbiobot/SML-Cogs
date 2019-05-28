@@ -60,7 +60,7 @@ class MessageQuote:
             await self.bot.say("I do not have permissions to fetch the message")
             return
         except discord.HTTPException:
-            await self.bot.say("Retrieving message faild")
+            await self.bot.say("Retrieving message failed")
             return
 
         if not msg:
