@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "Message Quote",
+	"DESCRIPTION": "Quoting a message by ID",
+	"DISABLED": false,
+	"NAME": "MessageQuote",
+	"REQUIREMENTS": [],
+	"TAGS": ["role", "member", "management", "utility", "util"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: http://github.com/smlbiobot/SML-Cogs or my Discord server: http://discord.me/sml"
+}
