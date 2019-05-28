@@ -24,24 +24,15 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-import asyncio
-import itertools
-from collections import defaultdict
-
-import argparse
-import discord
 import os
-from cogs.utils import checks
-from cogs.utils.chat_formatting import box
-from cogs.utils.chat_formatting import pagify
+
+import discord
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from discord.ext.commands import Context
-from random import choice
-import datetime as dt
 
 PATH = os.path.join("data", "message_quote")
 JSON = os.path.join(PATH, "settings.json")
+
 
 class MessageQuote:
     """Member Management plugin for Red Discord bot."""
@@ -51,7 +42,7 @@ class MessageQuote:
         self.bot = bot
 
     @commands.command(name="mq", pass_context=True)
-    async def message_quote(self, ctx, message_id, channel:discord.Channel=None):
+    async def message_quote(self, ctx, message_id, channel: discord.Channel = None):
         """Quote a message by ID
 
         !mq 582794656560054272 #family-chat
@@ -90,8 +81,6 @@ class MessageQuote:
         )
 
         await self.bot.say(embed=em)
-
-
 
 
 def check_folder():
