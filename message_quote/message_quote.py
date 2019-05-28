@@ -51,7 +51,15 @@ class MessageQuote:
         self.bot = bot
 
     @commands.command(name="mq", pass_context=True)
-    async def message_quote(self, ctx, channel:discord.Channel, message_id):
+    async def message_quote(self, ctx, message_id, channel:discord.Channel=None):
+        """Quote a message by ID
+
+        !mq 582794656560054272 #family-chat
+        If channel is omitted, use current channel
+        """
+        if channel is None:
+            channel = ctx.message.channel
+
         try:
             msg = await self.bot.get_message(channel, message_id)
         except discord.NotFound:
