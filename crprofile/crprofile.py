@@ -25,26 +25,26 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import asyncio
-import itertools
-import math
-from collections import OrderedDict
-from collections import defaultdict
-
-import aiohttp
 import datetime as dt
-import discord
-import inflect
+import itertools
 import json
+import math
 import os
 import re
-import requests
 import socket
 import urllib.request
+from collections import OrderedDict
+from collections import defaultdict
+from datetime import timedelta
+from random import choice
+
+import aiohttp
+import discord
+import inflect
+import requests
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
-from datetime import timedelta
 from discord.ext import commands
-from random import choice
 
 PATH = os.path.join("data", "crprofile")
 PATH_PLAYERS = os.path.join(PATH, "players")
