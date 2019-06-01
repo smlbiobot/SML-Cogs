@@ -579,7 +579,7 @@ class BrawlStars:
 
         # if member in clubs, add member roles and remove visitor roles
         if player.club and player.club.tag in club_tags:
-            to_remove_roles += server.visitor_roles
+            # to_remove_roles += server.visitor_roles
             to_add_roles += server.member_roles
 
             for b in server.clubs:
@@ -589,7 +589,7 @@ class BrawlStars:
         # add visitor roles if member not in club
         else:
             to_remove_roles += server.member_roles
-            to_add_roles += server.visitor_roles
+            # to_add_roles += server.visitor_roles
 
         # change nickname to match IGN
         player_name = remove_color_tags(player.name)
@@ -603,20 +603,30 @@ class BrawlStars:
         # add roles
         try:
             roles = [r for r in ctx_server.roles if r.name in to_add_roles]
-            await self.bot.add_roles(member, *roles)
-            await self.bot.say(
-                "Added {roles} to {member}".format(roles=", ".join(to_add_roles), member=member))
+            if roles:
+                await self.bot.add_roles(member, *roles)
+                await self.bot.say(
+                    "Added {roles} to {member}".format(roles=", ".join(to_add_roles), member=member))
         except discord.errors.Forbidden:
             await self.bot.say("Error: I don’t have permission to add roles.")
 
         # remove roles
         try:
             roles = [r for r in ctx_server.roles if r.name in to_remove_roles]
-            await self.bot.remove_roles(member, *roles)
-            await self.bot.say(
-                "Removed {roles} from {member}".format(roles=", ".join(to_remove_roles), member=member))
+            if roles:
+                await self.bot.remove_roles(member, *roles)
+                await self.bot.say(
+                    "Removed {roles} from {member}".format(roles=", ".join(to_remove_roles), member=member))
         except discord.errors.Forbidden:
             await self.bot.say("Error: I don’t have permission to add roles.")
+
+        # welcome user
+        channel = discord.utils.get(ctx.message.server.channels, name="family-chat")
+
+        if channel is not None:
+            await self.bot.say(
+                "{} Welcome! You may now chat at {} — enjoy!".format(
+                    member.mention, channel.mention))
 
     async def _get_clubs(self, server_id, query=None):
         """Return clubs."""
