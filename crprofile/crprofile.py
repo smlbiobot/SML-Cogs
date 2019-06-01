@@ -665,15 +665,18 @@ class CRPlayerModel:
     @property
     def arena(self):
         """League. Can be either Arena or league."""
+        o = None
         if self.api_provider == 'official':
             a_id = self.info_data.get('arena', {}).get('id')
-            if a_id is None:
-                return None
-            return Constants.get_instance().get_arena(id=a_id)
-        try:
-            return self.info_data.get('arena', {}).get('arena')
-        except KeyError:
-            return None
+            if a_id:
+                o = Constants.get_instance().get_arena(id=a_id)
+        else:
+            try:
+                o = self.info_data.get('arena', {}).get('arena')
+            except KeyError:
+                pass
+
+        return o
 
     @property
     def arena_text(self):
@@ -703,11 +706,6 @@ class CRPlayerModel:
 
         else:
             return self.info_data.get('arena', {}).get('arenaID')
-
-    @property
-    def arean_url(self):
-        """Arena image URL"""
-        return 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena_arena)
 
     @property
     def profile_url(self):
@@ -743,11 +741,12 @@ class CRPlayerModel:
     def arena_url(self):
         """Arena Icon URL."""
         if self.api_provider == 'official':
-            return 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena_arena)
-        if self.league > 0:
-            url = 'https://royaleapi.github.io/cr-api-assets/arenas/league{}.png'.format(self.league)
+            url = 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png?3'.format(self.arena_arena)
+        elif self.league > 0:
+            url = 'https://royaleapi.github.io/cr-api-assets/arenas/league{}.png?3'.format(self.league)
         else:
-            url = 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png'.format(self.arena.Arena)
+            url = 'https://royaleapi.github.io/cr-api-assets/arenas/arena{}.png?3'.format(self.arena.Arena)
+
         return url
 
     def deck_list(self, bot_emoji: BotEmoji):
