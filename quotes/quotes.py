@@ -90,7 +90,7 @@ class Quotes:
         await self.bot.say("Quote saved.")
 
     @quoteset.command(name="remove", aliases=['r', 'rm'], pass_context=True, no_pm=True)
-    @checks.mod_or_permissions(manage_roles=True)
+    @commands.has_any_role(*BOTCOMMANDER_ROLES)
     async def quoteset_remove(self, ctx, name):
         """Remove a quote."""
         server = ctx.message.server
