@@ -76,8 +76,26 @@ class MessageQuote:
             )
         ]
 
+        link = 'https://discordapp.com/channels/{server_id}/{channel_id}/{message_id}'.format(
+            server_id=msg.server.id,
+            channel_id=msg.channel.id,
+            message_id=msg.id
+        )
+
         em = discord.Embed(
-            description="\n".join(out)
+            title="Quote",
+            description="\n".join(out),
+            url=link
+        )
+
+        if msg.attachments:
+            url = msg.attachments[0].get('url')
+            if url:
+                em.set_image(url=url)
+
+        em.set_footer(
+            text=msg.server.name,
+            icon_url=msg.server.icon_url
         )
 
         await self.bot.say(embed=em)
