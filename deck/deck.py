@@ -930,7 +930,7 @@ class Deck:
                     pass
 
     async def post_deck(self, channel=None, title=None, description=None, timestamp=None, card_keys=None,
-                        deck_name=None, deck_author=None, color=None):
+                        deck_name=None, deck_author=None, color=None, player_tag=None):
         """Post a deck to destination channel.
 
         If image server is set, post as an embed.
@@ -957,19 +957,29 @@ class Deck:
                     url=await self.decklink_url(card_keys),
                     timestamp=timestamp or dt.datetime.utcnow(),
                 )
+
+                link_values = [
+                    "[Deck Stats]({})".format(
+                        'https://royaleapi.com/decks/stats/{}'.format(','.join(card_keys))
+                    ),
+                    "[Copy Deck]({})".format(
+                        await self.decklink_url(card_keys)
+                    ),
+                    "[War]({})".format(
+                        await self.decklink_url(card_keys, war=True)
+                    )
+                ]
+
+                if player_tag is not None:
+                    link_values.append(
+                        "[Battle Log]({})".format(
+                            'https://royaleapi.com/player/{}/battles'.format(player_tag)
+                        )
+                    )
+
                 em.add_field(
                     name="Avg Elixir: {}".format(self.get_deck_elxiir(card_keys)),
-                    value=" • ".join([
-                        "[Deck Stats]({})".format(
-                            'https://royaleapi.com/decks/stats/{}'.format(','.join(card_keys))
-                        ),
-                        "[Copy Deck]({})".format(
-                            await self.decklink_url(card_keys)
-                        ),
-                        "[War]({})".format(
-                            await self.decklink_url(card_keys, war=True)
-                        )
-                    ])
+                    value=" • ".join(link_values)
                 )
                 em.set_image(url=img_url)
                 msg = await self.bot.send_message(

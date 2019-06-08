@@ -22,20 +22,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
-from collections import defaultdict
-
-import aiohttp
 import asyncio
 import datetime as dt
-import discord
-import io
 import os
 import socket
+from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor
-from discord.ext import commands
 
+import aiohttp
+import discord
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "racf_decks")
 JSON = os.path.join(PATH, "settings.json")
@@ -90,6 +88,7 @@ async def fetch_decks(time=None, fam=True, auth=None, cc=False):
             timestamp_epoch_millis=_source.get('battleTime_timestamp_epoch_millis', 0),
             deck_name=team.get('deck', {}).get('name'),
             player_name=team.get('name'),
+            player_tag=team.get('tag'),
             clan_name=team.get('clan', {}).get('name', ''),
             cc=cc
         )
@@ -186,6 +185,7 @@ class RACFDecks:
         for deck in decks:
             card_keys = deck.get('deck_name').split(',')
             player_name = deck.get('player_name', '')
+            player_tag = deck.get('player_tag')
             clan_name = deck.get('clan_name', '')
             ts = deck.get('timestamp_epoch_millis')
             timestamps.append(ts)
@@ -196,7 +196,6 @@ class RACFDecks:
             else:
                 color = discord.Color.gold()
 
-
             await deck_cog.post_deck(
                 channel=channel,
                 title="12-win {} deck".format('CC' if cc else 'GC'),
@@ -204,7 +203,8 @@ class RACFDecks:
                 card_keys=card_keys,
                 deck_author=player_name,
                 timestamp=dt.datetime.utcfromtimestamp(ts / 1000),
-                color=color
+                color=color,
+                player_tag=player_tag,
             )
 
         # store latest timestamp
