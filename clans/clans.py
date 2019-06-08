@@ -161,7 +161,6 @@ class Clans:
         self.badges = dataIO.load_json(BADGES)
         self._auth = None
         self.task = None
-        self._tasks = []
 
         provider = self.settings.get('provider')
         if provider is None:
@@ -177,13 +176,6 @@ class Clans:
             self.task.cancel()
         except Exception:
             pass
-
-        for task in self._tasks:
-            if task:
-                try:
-                    task.cancel()
-                except:
-                    pass
 
     async def auto_tasks(self):
         try:
