@@ -167,15 +167,39 @@ class Clans:
         if provider is None:
             provider = 'cr-api'
 
+        # add auto tasks
+        loop = asyncio.get_event_loop()
+        self.task = loop.create_task(self.auto_tasks())
+
     def __unload(self):
         """Remove task when unloaded."""
-        self.task.cancel()
+        try:
+            self.task.cancel()
+        except Exception:
+            pass
+
         for task in self._tasks:
             if task:
                 try:
                     task.cancel()
                 except:
                     pass
+
+    async def auto_tasks(self):
+        try:
+            while True:
+                if self == self.bot.get_cog("Clans"):
+                    loop = asyncio.get_event_loop()
+                    loop.create_task(
+                        self.post_auto_clans()
+                    )
+                    loop.create_task(
+                        self.post_clanwars()
+                    )
+
+                    await asyncio.sleep(TASK_INTERVAL)
+        except asyncio.CancelledError:
+            pass
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True)
@@ -300,7 +324,6 @@ class Clans:
                 async with aiohttp.ClientSession() as session:
                     for url in urls:
                         async with session.get(url, headers=headers, timeout=30) as resp:
-                            await asyncio.sleep(0)
                             data.append(await resp.json())
             else:
                 url = 'http://api.royaleapi.com/clan/{}'.format(",".join(tags))
@@ -365,20 +388,6 @@ class Clans:
         self.disable_clanwars(server, channel)
 
         await self.bot.say("Auto clan update stopped.")
-
-    async def post_auto_clans_task(self):
-        """Task: post embed to channel."""
-        try:
-            while True:
-                if self == self.bot.get_cog("Clans"):
-                    try:
-                        await self.post_auto_clans()
-
-                    except DiscordException:
-                        pass
-                    await asyncio.sleep(TASK_INTERVAL)
-        except asyncio.CancelledError:
-            pass
 
     async def post_auto_clans(self, message=None):
         self.check_settings()
@@ -886,8 +895,6 @@ class Clans:
         dataIO.save_json(JSON, self.settings)
 
     async def update_cw_message(self, message, count_down=None):
-        await asyncio.sleep(10)
-
         # Only update if in settings
         try:
             server = message.server
@@ -1051,18 +1058,18 @@ class Clans:
 
         await self.bot.say("Auto clan wars update stopped.")
 
-    async def post_clanwars_task(self):
-        """Task: post embed to channel."""
-        try:
-            while True:
-                if self == self.bot.get_cog("Clans"):
-                    try:
-                        await self.post_clanwars()
-                    except DiscordException as e:
-                        pass
-                    await asyncio.sleep(TASK_INTERVAL)
-        except asyncio.CancelledError:
-            pass
+    # async def post_clanwars_task(self):
+    #     """Task: post embed to channel."""
+    #     try:
+    #         while True:
+    #             if self == self.bot.get_cog("Clans"):
+    #                 try:
+    #                     await self.post_clanwars()
+    #                 except DiscordException as e:
+    #                     pass
+    #                 await asyncio.sleep(TASK_INTERVAL)
+    #     except asyncio.CancelledError:
+    #         pass
 
     async def post_clanwars(self):
         """Post embbed to channel."""
@@ -1113,5 +1120,3 @@ def setup(bot):
     check_file()
     n = Clans(bot)
     bot.add_cog(n)
-    bot.loop.create_task(n.post_clanwars_task())
-    bot.loop.create_task(n.post_auto_clans_task())
