@@ -368,7 +368,6 @@ class Clans:
 
     async def post_auto_clans_task(self):
         """Task: post embed to channel."""
-        message = None
         try:
             while True:
                 if self == self.bot.get_cog("Clans"):
@@ -395,8 +394,12 @@ class Clans:
                             msg = await self.bot.get_message(channel, message_id)
                         except DiscordException:
                             pass
-                    message = await self.post_clans(channel, msg=msg)
-                    v['message_id'] = message.id
+                    try:
+                        message = await self.post_clans(channel, msg=msg)
+                    except DiscordException:
+                        pass
+                    else:
+                        v['message_id'] = message.id
 
         dataIO.save_json(JSON, self.settings)
 
