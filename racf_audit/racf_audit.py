@@ -597,10 +597,12 @@ class RACFAudit:
         # print(clan_models)
         members = []
         for clan_model in clan_models:
-            for member_model in clan_model.get('memberList'):
-                member_model['tag'] = clean_tag(member_model.get('tag'))
-                member_model['clan'] = clan_model
-                members.append(member_model)
+            for member_model in clan_model.get('memberList', []):
+                tag = member_model.get('tag')
+                if tag:
+                    member_model['tag'] = clean_tag(tag)
+                    member_model['clan'] = clan_model
+                    members.append(member_model)
         return members
 
     @racfaudit.command(name="tag2member", pass_context=True, aliases=['t2m'])
