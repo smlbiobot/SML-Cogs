@@ -224,6 +224,8 @@ class DiscordUsers:
 
 def clean_tag(tag):
     """clean up tag."""
+    if not tag:
+        return tag
     t = tag.upper()
     t = t.replace('B', '8').replace('O', '0')
     t = re.sub(r'[^0289CGJLPQRUVY]+', '', t)
