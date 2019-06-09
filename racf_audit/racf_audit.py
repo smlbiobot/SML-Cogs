@@ -24,22 +24,22 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import argparse
 import asyncio
+import csv
+import datetime as dt
+import io
 import itertools
+import json
+import os
+import re
 from collections import OrderedDict
 from collections import defaultdict
 from collections import namedtuple
 
 import aiohttp
-import argparse
-import csv
-import datetime as dt
 import discord
 import humanfriendly
-import io
-import json
-import os
-import re
 import unidecode
 import yaml
 from addict import Dict
@@ -395,6 +395,30 @@ class RACFAudit:
 
         with open('data/racf_audit/family_config.yaml') as f:
             self.config = yaml.load(f, Loader=yaml.FullLoader)
+
+        loop = asyncio.get_event_loop()
+        self.task = loop.create_task(self.loop_task())
+
+    def __unload(self):
+        """Remove task when unloaded."""
+        try:
+            if self.task:
+                self.task.cancel()
+        except Exception:
+            pass
+
+    async def loop_task(self):
+        """Loop."""
+        try:
+            while True:
+                if self == self.bot.get_cog("RACFAudit"):
+                    loop = asyncio.get_event_loop()
+                    loop.create_task(self.run_audit_task())
+
+                    interval = int(dt.timedelta(hours=4).total_seconds())
+                    await asyncio.sleep(interval)
+        except asyncio.CancelledError:
+            pass
 
     @property
     def players(self):
@@ -1507,23 +1531,16 @@ class RACFAudit:
 
     async def run_audit_task(self):
         """Auto run audit."""
-        while self == self.bot.get_cog("RACFAudit"):
-            try:
-                for server_id, v in self.settings.get('auto_audit_servers', {}).items():
-                    if server_id in [RACF_SERVER_ID, SML_SERVER_ID]:
-                        channel_id = v.get('channel_id')
-                        enabled = v.get('enabled')
-                        if enabled:
-                            channel = self.bot.get_channel(channel_id)
-                            server = self.bot.get_server(server_id)
-                            if channel is not None:
-                                result = await self.run_racfaudit(server)
-                                await self.exec_racf_audit(channel, audit_results=result.audit_results, server=server)
-            except Exception:
-                pass
-            finally:
-                interval = int(dt.timedelta(hours=4).total_seconds())
-                await asyncio.sleep(interval)
+        for server_id, v in self.settings.get('auto_audit_servers', {}).items():
+            if server_id in [RACF_SERVER_ID, SML_SERVER_ID]:
+                channel_id = v.get('channel_id')
+                enabled = v.get('enabled')
+                if enabled:
+                    channel = self.bot.get_channel(channel_id)
+                    server = self.bot.get_server(server_id)
+                    if channel is not None:
+                        result = await self.run_racfaudit(server)
+                        await self.exec_racf_audit(channel, audit_results=result.audit_results, server=server)
 
     @racfaudit.command(name="nudge", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(kick_members=True)
@@ -1674,4 +1691,3 @@ def setup(bot):
     check_file()
     n = RACFAudit(bot)
     bot.add_cog(n)
-    bot.loop.create_task(n.run_audit_task())

@@ -6,94 +6,98 @@ clans:
     tag: 9PJ82CRC
     role_name: Alpha
     type: Member
-    filters: [alpha]
+    filters: [alpha, a]
   - name: RoyaleAPI Bravo
     tag: 9UQJUJC9
     role_name: Bravo
     type: Member
-    filters: [bravo]
+    filters: [bravo, b]
   - name: RoyaleAPI Coca
     tag: 9G99JQPL
     role_name: Coca
     type: Member
-    filters: [coca]
+    filters: [coca, c]
   - name: RoyaleAPI Delta
     tag: 9G8VYGL0
     role_name: Delta
     type: Member
-    filters: [delta]
+    filters: [delta, d]
   - name: RoyaleAPI Echo
     tag: 9CJ0L9RG
     role_name: Echo
     type: Member
-    filters: [echo]
-  - name: RoyaleAPI Fox
-    tag: 9UQC2P0V
-    role_name: Fox
+    filters: [echo, e]
+#  - name: RoyaleAPI Fox
+#    tag: 9UQC2P0V
+#    role_name: Fox
+#    type: Member
+#    filters: [fox]
+#  - name: RoyaleAPI Golf
+#    tag: 9UG2R2LQ
+#    role_name: Golf
+#    type: Member
+#    filters: [golf]
+#  - name: RoyaleAPI Hotel
+#    tag: 9Y9VR2JR
+#    role_name: Hotel
+#    type: Member
+#    filters: [hotel]
+  - name: RoyaleAPI One
+    role_name: One
     type: Member
-    filters: [fox]
-  - name: RoyaleAPI Golf
-    tag: 9UG2R2LQ
-    role_name: Golf
-    type: Member
-    filters: [golf]
-  - name: RoyaleAPI Hotel
-    tag: 9Y9VR2JR
-    role_name: Hotel
-    type: Member
-    filters: [hotel]
+    filters: [one, o, 1]
 #  - name: 100T YOLO
 #    tag: 9R8GUC0L
   - name: RoyaleAPI Zen
     tag: 9LPVG9UC
     role_name: Zen
     type: Member
-    filters: [zen]
-  - name: RoyaleAPI A
-    tag: PV98LY0P
-    role_name: Alpha
-    type: Member
-    filters: [a]
-  - name: RoyaleAPI B
-    tag: PQGU8RQ0
-    role_name: Bravo
-    type: Member
-    filters: [b]
-  - name: RoyaleAPI C
-    tag: P0VGU80L
-    role_name: Coca
-    type: Member
-    filters: [c]
-  - name: RoyaleAPI D
-    tag: P8VLQPVL
-    role_name: Delta
-    type: Member
-    filters: [d]
-  - name: RoyaleAPI E
-    tag: P2QYLV0V
-    role_name: Echo
-    type: Member
-    filters: [e]
-  - name: RoyaleAPI F
-    tag: PQUGVQU8
-    role_name: Fox
-    type: Member
-    filters: [f]
-  - name: RoyaleAPI G
-    tag: Y2LGRU0Q
-    role_name: Golf
-    type: Member
-    filters: [g]
-  - name: RoyaleAPI T
-    tag: PVYP2PR8
-    role_name: Trade
-    type: Member
-    filters: [t]
-  - name: RoyaleAPI Z
-    tag: P0VPRCRC
-    role_name: Zen
-    type: Member
-    filters: [z]
+    filters: [zen, z]
+#  - name: RoyaleAPI A
+#    tag: PV98LY0P
+#    role_name: Alpha
+#    type: Member
+#    filters: [a]
+#  - name: RoyaleAPI B
+#    tag: PQGU8RQ0
+#    role_name: Bravo
+#    type: Member
+#    filters: [b]
+#  - name: RoyaleAPI C
+#    tag: P0VGU80L
+#    role_name: Coca
+#    type: Member
+#    filters: [c]
+#  - name: RoyaleAPI D
+#    tag: P8VLQPVL
+#    role_name: Delta
+#    type: Member
+#    filters: [d]
+#  - name: RoyaleAPI E
+#    tag: P2QYLV0V
+#    role_name: Echo
+#    type: Member
+#    filters: [e]
+#  - name: RoyaleAPI F
+#    tag: PQUGVQU8
+#    role_name: Fox
+#    type: Member
+#    filters: [f]
+#  - name: RoyaleAPI G
+#    tag: Y2LGRU0Q
+#    role_name: Golf
+#    type: Member
+#    filters: [g]
+#  - name: RoyaleAPI T
+#    tag: PVYP2PR8
+#    role_name: Trade
+#    type: Member
+#    filters: [t]
+#  - name: RoyaleAPI Z
+#    tag: P0VPRCRC
+#    role_name: Zen
+#    type: Member
+#    filters: [z]
   - name: RoyaleAPI
     tag: 9R8G9290
     role_name: Mini
