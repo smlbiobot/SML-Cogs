@@ -188,6 +188,12 @@ CLAN_PERMISSION = {
         'role': 'Zen',
         'assign_role': True,
         'member': True
+    },
+    'Y802UPG9': {
+        'tag': 'Y802UPG9',
+        'role':'One',
+        'assign_role': True,
+        'member': True,
     }
 }
 
