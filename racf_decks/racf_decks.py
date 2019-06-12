@@ -212,16 +212,19 @@ class RACFDecks:
             else:
                 color = discord.Color.gold()
 
-            await deck_cog.post_deck(
-                channel=channel,
-                title="12-win {} deck".format('CC' if cc else 'GC'),
-                description="**{}**, {}".format(player_name, clan_name),
-                card_keys=card_keys,
-                deck_author=player_name,
-                timestamp=dt.datetime.utcfromtimestamp(ts / 1000),
-                color=color,
-                player_tag=player_tag,
-            )
+            try:
+                await deck_cog.post_deck(
+                    channel=channel,
+                    title="12-win {} deck".format('CC' if cc else 'GC'),
+                    description="**{}**, {}".format(player_name, clan_name),
+                    card_keys=card_keys,
+                    deck_author=player_name,
+                    timestamp=dt.datetime.utcfromtimestamp(ts / 1000),
+                    color=color,
+                    player_tag=player_tag,
+                )
+            except discord.DiscordException as e:
+                print(e)
 
         # store latest timestamp
         if len(decks) != 0:

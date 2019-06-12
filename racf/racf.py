@@ -385,7 +385,7 @@ class RACF:
         """Constructor."""
         self.bot = bot
         with open(os.path.join("data", "racf", "config.yaml")) as f:
-            self.config = Box(yaml.load(f))
+            self.config = Box(yaml.load(f, Loader=yaml.FullLoader))
         self.settings = dataIO.load_json(JSON)
 
     @property
