@@ -605,6 +605,7 @@ class RACFAudit:
                     members.append(member_model)
         return members
 
+
     @racfaudit.command(name="tag2member", pass_context=True, aliases=['t2m'])
     async def racfaudit_tag2member(self, ctx, tag):
         """Find member by tag in DB."""

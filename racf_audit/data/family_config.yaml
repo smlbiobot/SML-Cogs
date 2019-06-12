@@ -43,6 +43,7 @@ clans:
 #    type: Member
 #    filters: [hotel]
   - name: RoyaleAPI One
+    tag: Y802UPG9
     role_name: One
     type: Member
     filters: [one, o, 1]

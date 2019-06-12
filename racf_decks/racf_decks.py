@@ -35,10 +35,16 @@ from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 
+import logging
+
 PATH = os.path.join("data", "racf_decks")
 JSON = os.path.join(PATH, "settings.json")
 
 DELAY = dt.timedelta(minutes=5).total_seconds()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 # DELAY = dt.timedelta(seconds=1).total_seconds()
 
 
@@ -226,6 +232,8 @@ class RACFDecks:
                 self.settings["gc_timestamp"] = max_time
             dataIO.save_json(JSON, self.settings)
 
+        logger.info("Posted {count} decks to {channel}".format(count=len(decks), channel=channel.name))
+
     async def update_decks(self):
         try:
             while True:
@@ -236,27 +244,26 @@ class RACFDecks:
                         server = self.bot.get_server(server_id)
 
                     if server:
-                        loop = asyncio.get_event_loop()
+                        try:
 
-                        family_auto = self.settings.get('family_auto')
-                        family_channel_id = self.settings.get('family_channel_id')
-                        if family_auto and family_channel_id:
-                            channel = discord.utils.get(server.channels, id=family_channel_id)
-                            if channel:
-                                loop.create_task(
-                                    self.post_decks(channel, fam=True, show_empty=False)
-                                )
+                            family_auto = self.settings.get('family_auto')
+                            family_channel_id = self.settings.get('family_channel_id')
+                            if family_auto and family_channel_id:
+                                channel = discord.utils.get(server.channels, id=family_channel_id)
+                                if channel:
+                                    await self.post_decks(channel, fam=True, show_empty=False)
 
-                        gc_auto = self.settings.get('gc_auto')
-                        gc_channel_id = self.settings.get('gc_channel_id')
-                        if gc_auto and gc_channel_id:
-                            channel = discord.utils.get(server.channels, id=gc_channel_id)
-                            if channel:
-                                loop.create_task(
-                                    self.post_decks(channel, fam=False, show_empty=False)
-                                )
+                            gc_auto = self.settings.get('gc_auto')
+                            gc_channel_id = self.settings.get('gc_channel_id')
+                            if gc_auto and gc_channel_id:
+                                channel = discord.utils.get(server.channels, id=gc_channel_id)
+                                if channel:
+                                    await self.post_decks(channel, fam=False, show_empty=False)
 
-                    await asyncio.sleep(DELAY)
+                        except discord.DiscordException as e:
+                            print(e)
+
+                        await asyncio.sleep(DELAY)
         except asyncio.CancelledError:
             pass
 
@@ -278,4 +285,3 @@ def setup(bot):
     check_file()
     n = RACFDecks(bot)
     bot.add_cog(n)
-
