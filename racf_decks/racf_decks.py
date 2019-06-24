@@ -239,8 +239,8 @@ class RACFDecks:
 
     async def update_decks(self):
         try:
-            while True:
-                if self == self.bot.get_cog("RACFDecks"):
+            if self == self.bot.get_cog("RACFDecks"):
+                while True:
                     server = None
                     server_id = self.settings.get("server_id")
                     if server_id:
@@ -266,7 +266,7 @@ class RACFDecks:
                         except discord.DiscordException as e:
                             print(e)
 
-                        await asyncio.sleep(DELAY)
+                    await asyncio.sleep(DELAY)
         except asyncio.CancelledError:
             pass
 
