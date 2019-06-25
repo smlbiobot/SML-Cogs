@@ -940,7 +940,7 @@ class RACFAudit:
 
                 if clan_filters:
                     for c in clan_filters:
-                        if c.lower() in clan_name_filters:
+                        if str(c).lower() in clan_name_filters:
                             display_output = True
                 else:
                     display_output = True
