@@ -932,14 +932,15 @@ class RACFAudit:
                 return row
 
             for clan in self.config['clans']:
-                # await self.bot.type()
-                await asyncio.sleep(0)
-
                 display_output = False
+
+                clan_name_filters = []
+                for f in clan.get('filters', []):
+                    clan_name_filters.append(str(f).lower())
 
                 if clan_filters:
                     for c in clan_filters:
-                        if c.lower() in [f.lower() for f in clan.get('filters', [])]:
+                        if c.lower() in clan_name_filters:
                             display_output = True
                 else:
                     display_output = True
