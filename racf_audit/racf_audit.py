@@ -1155,6 +1155,7 @@ class RACFAudit:
 
         Options:
         -startswith search names from the start only
+        -link         link to profiles
         """
         await self.bot.type()
 
@@ -1169,6 +1170,7 @@ class RACFAudit:
         member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
 
         option_startwith = '-startswith' in names
+        option_link = '-link' in names
 
         if option_startwith:
             names = list(names)
@@ -1193,10 +1195,11 @@ class RACFAudit:
                 if add_it:
                     results.append({
                         'index': index,
-                        'member': member_model
+                        'member': member_model,
+                        'clan_name': member_model.get('clan', {}).get('name', '')
                     })
 
-        out = []
+
 
         limit = 20
 
@@ -1204,16 +1207,49 @@ class RACFAudit:
             await self.bot.say("More than {0} results found, showing top {0}…".format(limit))
             results = results[:limit]
 
-        for result in results:
-            index = result['index']
-            member = result['member']
-            out.append('{:<4} {:>4} {}'.format(
-                index, member['trophies'], member['name']
-            ))
+        if results:
+            out = []
+            em = discord.Embed(
+                title="RoyaleAPI Clan Family",
+                url="https://royaleapi.com/f/royaleapi",
+                color=discord.Color.blue()
+            )
+            for result in results:
+                index = result['index']
+                member = result['member']
+                member_name = member.get('name', '')
+                trophies = member.get('trophies', 0)
+                clan_name = result.get('clan_name', '')
+                links = ''
+                if option_link:
+                    tag = member.get('tag', '')
+                    links = (
+                        '\n'
+                        '[Profile](https://royaleapi.com/player/{tag})'
+                        ' • [Log](https://royaleapi.com/player/{tag}/battles)'
+                        ' • [Decks](https://royaleapi.com/player/{tag}/decks)'
 
-        await self.bot.say(
-            box('\n'.join(out), lang='python')
-        )
+                    ).format(tag=tag)
+
+                line = '`\u2800{rank: >3} {trophies:<4}\u2800`**{member_name}** {clan_name} {links}'.format(
+                    rank=index,
+                    member_name=member_name,
+                    clan_name=clan_name,
+                    trophies=trophies,
+                    links=links,
+                )
+                result['line'] = line
+                result['links'] = links
+                out.append(line)
+            em.add_field(name="Ranks", value='\n'.join(out))
+
+            await self.bot.say(embed=em)
+
+            # await self.bot.say(
+            #     box('\n'.join(out), lang='python')
+            # )
+        else:
+            await self.bot.say("No results")
 
     @commands.command(name="racfaudit_top", aliases=["rtop"], pass_context=True)
     async def racfaudit_top(self, ctx, count: int):
