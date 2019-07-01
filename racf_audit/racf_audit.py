@@ -358,6 +358,7 @@ class ClashRoyaleAPI:
             if isinstance(r, ClashRoyaleAPIError):
                 print(r.status_message)
                 results[index] = {}
+                raise ClashRoyaleAPIError(status=r.status, message=r.message)
         return results
 
     async def fetch_clan_leaderboard(self, location=None):
