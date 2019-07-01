@@ -1209,13 +1209,26 @@ class RACFAudit:
             results = results[:limit]
 
         if results:
+            em = await self.result_embed(results, option_link=option_link)
+            await self.bot.say(embed=em)
+
+        else:
+            await self.bot.say("No results")
+
+    async def result_embed(self, results, option_link=False, groups_of=5):
+        """Format a list of member models into a single embed."""
+
+        em = discord.Embed(
+            title="RoyaleAPI Clan Family",
+            url="https://royaleapi.com/f/royaleapi",
+            color=discord.Color.blue()
+        )
+        result_groups = grouper(groups_of, results)
+        for group_id, group in enumerate(result_groups):
             out = []
-            em = discord.Embed(
-                title="RoyaleAPI Clan Family",
-                url="https://royaleapi.com/f/royaleapi",
-                color=discord.Color.blue()
-            )
-            for result in results:
+            for result in group:
+                if not result:
+                    continue
                 index = result['index']
                 member = result['member']
                 member_name = member.get('name', '')
@@ -1242,15 +1255,13 @@ class RACFAudit:
                 result['line'] = line
                 result['links'] = links
                 out.append(line)
-            em.add_field(name="Ranks", value='\n'.join(out))
 
-            await self.bot.say(embed=em)
-
-            # await self.bot.say(
-            #     box('\n'.join(out), lang='python')
-            # )
-        else:
-            await self.bot.say("No results")
+            em.add_field(
+                name="Ranks",
+                value='\n'.join(out),
+                inline=False
+            )
+        return em
 
     @commands.command(name="racfaudit_top", aliases=["rtop"], pass_context=True)
     async def racfaudit_top(self, ctx, count: int):
@@ -1268,23 +1279,20 @@ class RACFAudit:
             count = min(count, 10)
 
         member_models = sorted(member_models, key=lambda x: x['trophies'], reverse=True)
-        results = member_models[:count]
+        results = []
+        for index, m in enumerate(member_models[:count]):
+            r = dict(
+                index=index + 1,
+                member=m,
+                clan_name=m.get('clan', {}).get('name', '')
+            )
+            results.append(r)
 
-        out = []
-
-        def name_to_symbol(name):
-            s = name[10:]
-            if not s:
-                s = 'M'
-            return s
-
-        for index, member in enumerate(results, 1):
-            out.append('{:<4} {:>4} {:<5} {}'.format(
-                index, member['trophies'], name_to_symbol(member['clan']['name']), member['name']
-            ))
-
-        for page in pagify('\n'.join(out)):
-            await self.bot.say(box(page, lang='py'))
+        if results:
+            em = await self.result_embed(results)
+            await self.bot.say(embed=em)
+        else:
+            await self.bot.say("No results")
 
     @racfaudit.command(name="csv", pass_context=True)
     async def racfaudit_csv(self, ctx):
