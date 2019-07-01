@@ -605,7 +605,6 @@ class RACFAudit:
                     members.append(member_model)
         return members
 
-
     @racfaudit.command(name="tag2member", pass_context=True, aliases=['t2m'])
     async def racfaudit_tag2member(self, ctx, tag):
         """Find member by tag in DB."""
@@ -825,7 +824,10 @@ class RACFAudit:
         if pargs.exec:
             channel = ctx.message.channel
             await self.bot.type()
-            await self.exec_racf_audit(channel=channel, audit_results=result.audit_results, server=server)
+            if result.error:
+                await self.bot.send(channel, "Audit aborted because of Clash Royale API error.")
+            else:
+                await self.exec_racf_audit(channel=channel, audit_results=result.audit_results, server=server)
 
         await self.bot.say("Audit finished.")
 
@@ -1199,8 +1201,6 @@ class RACFAudit:
                         'member': member_model,
                         'clan_name': member_model.get('clan', {}).get('name', '')
                     })
-
-
 
         limit = 20
 
@@ -1592,8 +1592,16 @@ class RACFAudit:
                     channel = self.bot.get_channel(channel_id)
                     server = self.bot.get_server(server_id)
                     if channel is not None:
-                        result = await self.run_racfaudit(server)
-                        await self.exec_racf_audit(channel, audit_results=result.audit_results, server=server)
+                        try:
+                            result = await self.run_racfaudit(server)
+                        except ClashRoyaleAPIError:
+                            pass
+                        else:
+                            if result.error:
+                                await self.bot.send(channel, "Audit aborted because of Clash Royale API error.")
+                            else:
+                                await self.exec_racf_audit(channel=channel, audit_results=result.audit_results,
+                                                           server=server)
 
     @racfaudit.command(name="nudge", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(kick_members=True)
