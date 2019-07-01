@@ -24,20 +24,20 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import argparse
 import asyncio
 import itertools
-from collections import defaultdict
-
-import argparse
-import discord
 import os
+from collections import defaultdict
+from random import choice
+
+import discord
 from cogs.utils import checks
 from cogs.utils.chat_formatting import box
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import Context
-from random import choice
 
 BOT_COMMANDER_ROLES = ["Bot Commander", "High-Elder"]
 PATH = os.path.join("data", "mm")
@@ -633,6 +633,33 @@ class MemberManagement:
         tasks = [self.remove_role(member, role, channel=ctx.message.channel) for member in members]
         await self.bot.type()
         await asyncio.gather(*tasks)
+        await self.bot.say("Task completed.")
+
+    @commands.command(pass_context=True, no_pm=True)
+    @checks.mod_or_permissions(manage_roles=True)
+    async def removerolefromall(self, ctx, role_name):
+        """Remove a role from all members with the role."""
+        role = self.get_server_role(ctx.message.server, role_name)
+        if role is None:
+            await self.bot.say("Role not found.")
+            return
+        server = ctx.message.server
+        members = []
+        for member in server.members:
+            if role in member.roles:
+                members.append(member)
+        if not members:
+            await self.bot.say("No members with that role found")
+            return
+        tasks = [
+            self.remove_role(member, role, channel=ctx.message.channel)
+            for member in members
+        ]
+        await self.bot.type()
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        for m, r in zip(members, results):
+            if isinstance(r, Exception):
+                await self.bot.say("Error removing role from {}".format(m))
         await self.bot.say("Task completed.")
 
     @commands.command(pass_context=True, no_pm=True)
