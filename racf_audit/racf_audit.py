@@ -834,7 +834,7 @@ class RACFAudit:
 
     async def run_racfaudit(self, server: discord.Server, clan_filters=None) -> AuditResult:
         """Run audit and return results."""
-        audit_results = {
+        default_audit_results = {
             "elder_promotion_req": [],
             "coleader_promotion_req": [],
             "leader_promotion_req": [],
@@ -843,6 +843,8 @@ class RACFAudit:
             "no_member_role": [],
             "not_in_our_clans": [],
         }
+
+        audit_results = default_audit_results.copy()
 
         error = False
         out = []
@@ -855,143 +857,149 @@ class RACFAudit:
         else:
             out.append("**RACF Family Audit**")
 
-            # associate Discord user to member
-            for member_model in member_models:
-                tag = clean_tag(member_model.get('tag'))
-                try:
-                    discord_id = self.players[tag]["user_id"]
-                except KeyError:
-                    pass
-                else:
-                    member_model['discord_member'] = server.get_member(discord_id)
+            # soemthing went wrong e.g. clash royale error
+            if member_models:
 
-            # find member_models mismatch
-            discord_members = []
-            for member_model in member_models:
-                has_discord = member_model.get('discord_member')
-                if has_discord is None:
-                    audit_results["no_discord"].append(member_model)
+                # associate Discord user to member
+                for member_model in member_models:
+                    tag = clean_tag(member_model.get('tag'))
+                    try:
+                        discord_id = self.players[tag]["user_id"]
+                    except KeyError:
+                        pass
+                    else:
+                        member_model['discord_member'] = server.get_member(discord_id)
 
-                if has_discord:
-                    discord_member = member_model.get('discord_member')
-                    discord_members.append(discord_member)
-                    # promotions
-                    is_elder = False
-                    is_coleader = False
-                    is_leader = False
-                    for r in discord_member.roles:
-                        if r.name.lower() == 'elder':
-                            is_elder = True
-                        if r.name.lower() == 'coleader':
-                            is_coleader = True
-                        if r.name.lower() == 'leader':
-                            is_leader = True
-                    if is_elder:
-                        if member_model.get('role').lower() != 'elder':
-                            audit_results["elder_promotion_req"].append(member_model)
-                    if is_coleader:
-                        if member_model.get('role').lower() != 'coleader':
-                            audit_results["coleader_promotion_req"].append(member_model)
-                    if is_leader:
-                        if member_model.get('role').lower() != 'leader':
-                            audit_results["leader_promotion_req"].append(member_model)
+                # find member_models mismatch
+                discord_members = []
+                for member_model in member_models:
+                    has_discord = member_model.get('discord_member')
+                    if has_discord is None:
+                        audit_results["no_discord"].append(member_model)
 
-                    # no clan role
-                    clan_name = member_model['clan']['name']
-                    clan_role_name = self.clan_roles[clan_name]
-                    if clan_role_name not in [r.name for r in discord_member.roles]:
-                        audit_results["no_clan_role"].append({
-                            "discord_member": discord_member,
-                            "member_model": member_model
-                        })
+                    if has_discord:
+                        discord_member = member_model.get('discord_member')
+                        discord_members.append(discord_member)
+                        # promotions
+                        is_elder = False
+                        is_coleader = False
+                        is_leader = False
+                        for r in discord_member.roles:
+                            if r.name.lower() == 'elder':
+                                is_elder = True
+                            if r.name.lower() == 'coleader':
+                                is_coleader = True
+                            if r.name.lower() == 'leader':
+                                is_leader = True
+                        if is_elder:
+                            if member_model.get('role').lower() != 'elder':
+                                audit_results["elder_promotion_req"].append(member_model)
+                        if is_coleader:
+                            if member_model.get('role').lower() != 'coleader':
+                                audit_results["coleader_promotion_req"].append(member_model)
+                        if is_leader:
+                            if member_model.get('role').lower() != 'leader':
+                                audit_results["leader_promotion_req"].append(member_model)
 
-                    # no member role
-                    discord_role_names = [r.name for r in discord_member.roles]
-                    if 'Member' not in discord_role_names:
-                        audit_results["no_member_role"].append(discord_member)
+                        # no clan role
+                        clan_name = member_model['clan']['name']
+                        clan_role_name = self.clan_roles[clan_name]
+                        if clan_role_name not in [r.name for r in discord_member.roles]:
+                            audit_results["no_clan_role"].append({
+                                "discord_member": discord_member,
+                                "member_model": member_model
+                            })
 
-            # find discord member with roles
-            for user in server.members:
-                user_roles = [r.name for r in user.roles]
-                if 'Member' in user_roles:
-                    if user not in discord_members:
-                        audit_results['not_in_our_clans'].append(user)
+                        # no member role
+                        discord_role_names = [r.name for r in discord_member.roles]
+                        if 'Member' not in discord_role_names:
+                            audit_results["no_member_role"].append(discord_member)
 
-            # show results
-            def list_member(member_model):
-                """member row"""
-                clan = member_model.get('clan')
-                clan_name = None
-                if clan is not None:
-                    clan_name = clan.get('name')
+                # find discord member with roles
+                for user in server.members:
+                    user_roles = [r.name for r in user.roles]
+                    if 'Member' in user_roles:
+                        if user not in discord_members:
+                            audit_results['not_in_our_clans'].append(user)
 
-                row = "**{name}** #{tag}, {clan_name}, {role}, {trophies}".format(
-                    name=member_model.get('name'),
-                    tag=member_model.get('tag'),
-                    clan_name=clan_name,
-                    role=get_role_name(member_model.get('role')),
-                    trophies=member_model.get('trophies')
-                )
-                return row
+                # show results
+                def list_member(member_model):
+                    """member row"""
+                    clan = member_model.get('clan')
+                    clan_name = None
+                    if clan is not None:
+                        clan_name = clan.get('name')
 
-            for clan in self.config['clans']:
-                display_output = False
+                    row = "**{name}** #{tag}, {clan_name}, {role}, {trophies}".format(
+                        name=member_model.get('name'),
+                        tag=member_model.get('tag'),
+                        clan_name=clan_name,
+                        role=get_role_name(member_model.get('role')),
+                        trophies=member_model.get('trophies')
+                    )
+                    return row
 
-                clan_name_filters = []
-                for f in clan.get('filters', []):
-                    clan_name_filters.append(str(f).lower())
+                for clan in self.config['clans']:
+                    display_output = False
 
-                if clan_filters:
-                    for c in clan_filters:
-                        if str(c).lower() in clan_name_filters:
-                            display_output = True
-                else:
-                    display_output = True
+                    clan_name_filters = []
+                    for f in clan.get('filters', []):
+                        clan_name_filters.append(str(f).lower())
 
-                if not display_output:
-                    continue
+                    if clan_filters:
+                        for c in clan_filters:
+                            if str(c).lower() in clan_name_filters:
+                                display_output = True
+                    else:
+                        display_output = True
 
-                if clan['type'] == 'Member':
-                    out.append("-" * 40)
-                    out.append(inline(clan.get('name')))
-                    # no discord
-                    out.append(underline("Members without discord"))
-                    for member_model in audit_results["no_discord"]:
-                        try:
-                            if member_model['clan']['name'] == clan.get('name'):
-                                out.append(list_member(member_model))
-                        except KeyError:
-                            pass
-                    # elders
-                    out.append(underline("Elders need promotion"))
-                    for member_model in audit_results["elder_promotion_req"]:
-                        try:
-                            if member_model['clan']['name'] == clan.get('name'):
-                                out.append(list_member(member_model))
-                        except KeyError:
-                            pass
-                    # coleaders
-                    out.append(underline("Co-Leaders need promotion"))
-                    for member_model in audit_results["coleader_promotion_req"]:
-                        try:
-                            if member_model['clan']['name'] == clan.get('name'):
-                                out.append(list_member(member_model))
-                        except KeyError:
-                            pass
-                    # clan role
-                    out.append(underline("No clan role"))
-                    for result in audit_results["no_clan_role"]:
-                        try:
-                            if result["member_model"]['clan']['name'] == clan.get('name'):
-                                out.append(result['discord_member'].mention)
-                        except KeyError:
-                            pass
+                    if not display_output:
+                        continue
 
-            # not in our clans
-            out.append("-" * 40)
-            out.append(underline("Discord users not in our clans but with member roles"))
-            for result in audit_results['not_in_our_clans']:
-                out.append('`{}` {}'.format(result, result.id))
+                    if clan['type'] == 'Member':
+                        out.append("-" * 40)
+                        out.append(inline(clan.get('name')))
+                        # no discord
+                        out.append(underline("Members without discord"))
+                        for member_model in audit_results["no_discord"]:
+                            try:
+                                if member_model['clan']['name'] == clan.get('name'):
+                                    out.append(list_member(member_model))
+                            except KeyError:
+                                pass
+                        # elders
+                        out.append(underline("Elders need promotion"))
+                        for member_model in audit_results["elder_promotion_req"]:
+                            try:
+                                if member_model['clan']['name'] == clan.get('name'):
+                                    out.append(list_member(member_model))
+                            except KeyError:
+                                pass
+                        # coleaders
+                        out.append(underline("Co-Leaders need promotion"))
+                        for member_model in audit_results["coleader_promotion_req"]:
+                            try:
+                                if member_model['clan']['name'] == clan.get('name'):
+                                    out.append(list_member(member_model))
+                            except KeyError:
+                                pass
+                        # clan role
+                        out.append(underline("No clan role"))
+                        for result in audit_results["no_clan_role"]:
+                            try:
+                                if result["member_model"]['clan']['name'] == clan.get('name'):
+                                    out.append(result['discord_member'].mention)
+                            except KeyError:
+                                pass
+
+                # not in our clans
+                out.append("-" * 40)
+                out.append(underline("Discord users not in our clans but with member roles"))
+                for result in audit_results['not_in_our_clans']:
+                    out.append('`{}` {}'.format(result, result.id))
+
+            else:
+                out.append('Error from Clash Royale API. Aborting audit…')
 
         return AuditResult(
             audit_results=audit_results,
@@ -1004,6 +1012,8 @@ class RACFAudit:
 
         await self.bot.send_message(channel, "**RACF Family Audit**")
         await self.bot.send_typing(channel)
+
+
 
         async def exec_add_roles(d_member, roles, channel=None):
             # print("add roles", d_member, [r.name for r in roles])
