@@ -1256,8 +1256,11 @@ class RACFAudit:
                 result['links'] = links
                 out.append(line)
 
+            r_index_first = group_id * groups_of + 1
+            r_index_last = r_index_first + len(out) - 1
+            field_name = "{} - {}".format(r_index_first, r_index_last)
             em.add_field(
-                name="Ranks",
+                name=field_name,
                 value='\n'.join(out),
                 inline=False
             )
