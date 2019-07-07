@@ -1575,8 +1575,8 @@ class CRProfile:
         for em in self.embeds_profile(player_data, server=server, **kwargs):
             try:
                 await self.bot.say(embed=em)
-            except:
-                await self.bot.say("Unknown error")
+            except discord.DiscordException as e:
+                await self.bot.say("Discord error: {e}".format(e=e))
 
     def embed_profile_overview(self, player: CRPlayerModel, server=None, color=None):
         """Discord Embed: profile overview."""
@@ -1734,16 +1734,23 @@ class CRProfile:
             url=decklink_url)
         # cards = player.card_collection(self.bot_emoji)
         trade_list = player.trade_list(self.bot_emoji)
+
         for rarity in ['Legendary', 'Epic', 'Rare', 'Common']:
-            em.add_field(
-                name="Trade: {}".format(rarity),
-                value=' '.join(trade_list[rarity]),
-                inline=False
-            )
+            value = ' '.join(trade_list[rarity])
+            value = value.strip()
+            if value:
+                # don’t show empty fields
+                em.add_field(
+                    name="Trade: {}".format(rarity),
+                    value=value,
+                    inline=False
+                )
+
         # em.add_field(name="Trade", value=player.trade_list(self.bot_emoji), inline=False)
         em.set_footer(
             text=profile_url,
             icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
+
         return em
 
     def embeds_profile(self, player: CRPlayerModel, server=None, sections=('overview', 'stats')):
