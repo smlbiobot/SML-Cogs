@@ -28,8 +28,8 @@ import io
 import json
 import os
 from collections import defaultdict
+import discord
 
-from __main__ import send_cmd_help
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
@@ -57,7 +57,7 @@ class SML:
     async def sml(self, ctx):
         """SML"""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @sml.command(name="copypin", pass_context=True, no_pm=True)
     async def sml_copypin(self, ctx):
@@ -100,6 +100,17 @@ class SML:
                 await self.bot.say(2)
             elif args[1] == 'this':
                 await self.bot.say(3)
+
+    @commands.command(pass_context=True)
+    async def testinlinelink(self, ctx):
+        desc = "[`inline block`](http://google.com)"
+        em = discord.Embed(
+            title="Test",
+            description=desc
+        )
+        await self.bot.say(embed=em)
+
+
 
 
 def check_folder():

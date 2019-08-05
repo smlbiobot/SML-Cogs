@@ -1688,7 +1688,11 @@ class CRProfile:
                         value.append(
                             "{}{}".format(
                                 card['emoji'], normalized_card_level(card)))
-            em.add_field(name=rarity, value=' '.join(value))
+
+            if value:
+                em.add_field(name=rarity, value=' '.join(value))
+            else:
+                em.add_field(name=rarity, value='None')
 
         em.set_footer(
             text=profile_url,
@@ -1745,6 +1749,14 @@ class CRProfile:
                     value=value,
                     inline=False
                 )
+
+        print(len(em.fields))
+        if len(em.fields) == 0:
+            em.add_field(
+                name="No tradable cards",
+                value="N/A"
+            )
+
 
         # em.add_field(name="Trade", value=player.trade_list(self.bot_emoji), inline=False)
         em.set_footer(
