@@ -1094,6 +1094,58 @@ class Clans:
                         else:
                             await self.bot.edit_message(message, embed=em)
 
+    async def on_message(self, msg):
+        """Auto expand clan invite.
+
+
+        """
+        s = msg.content
+        m = re.search(
+            'https://link.clashroyale.com/invite/clan/..\?tag=(.+)&token=.+&platform=(iOS|android)',
+            s
+        )
+        if not m:
+            return
+
+        url = m.group(0)
+        tag = m.group(1)
+
+        clan = await self.get_clan(tag)
+        clan = Box(clan)
+
+        info_link = "https://royaleapi.com/clan/{tag}".format(tag=tag)
+        war_link = "https://royaleapi.com/clan/{tag}/war".format(tag=tag)
+        analytics_link = "https://royaleapi.com/clan/{tag}/war/analytics".format(tag=tag)
+
+        title = "Clan Invitation - Clash Royale"
+        description = "\n".join([
+            "**{name}** #{tag}".format(name=clan.name, tag=tag),
+            "{trophies}".format(
+                trophies=emoji_value("laddertrophy", clan.clanScore)
+            ),
+            "{cwtrophies}".format(
+                cwtrophies=emoji_value("cwtrophy", clan.clanWarTrophies)
+            ),
+            "{}".format(clan.description),
+            " • ".join([
+                "[Info]({info_link})".format(info_link=info_link),
+                "[War]({war_link})".format(war_link=war_link),
+                "[Analytics]({analytics_link})".format(analytics_link=analytics_link),
+            ]),
+        ])
+
+
+        em = discord.Embed(
+            title=title,
+            description=description,
+            url=url,
+        )
+        em.set_footer(text=info_link)
+
+        await self.bot.delete_message(msg)
+        await self.bot.send_message(msg.channel, embed=em)
+
+
 
 def check_folder():
     """Check folder."""
