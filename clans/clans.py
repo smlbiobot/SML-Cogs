@@ -1134,7 +1134,6 @@ class Clans:
             ]),
         ])
 
-
         em = discord.Embed(
             title=title,
             description=description,
@@ -1144,7 +1143,6 @@ class Clans:
 
         await self.bot.delete_message(msg)
         await self.bot.send_message(msg.channel, embed=em)
-
 
 
 def check_folder():
