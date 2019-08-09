@@ -27,11 +27,11 @@ clans:
     role_name: Echo
     type: Member
     filters: [echo, e]
-#  - name: RoyaleAPI Fox
-#    tag: 9UQC2P0V
-#    role_name: Fox
-#    type: Member
-#    filters: [fox]
+  - name: RoyaleAPI Fox
+    tag: 9UQC2P0V
+    role_name: Fox
+    type: Member
+    filters: [fox, f]
 #  - name: RoyaleAPI Golf
 #    tag: 9UG2R2LQ
 #    role_name: Golf
