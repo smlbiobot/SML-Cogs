@@ -97,9 +97,7 @@ class BrawlStars:
         self._save_settings()
         await self.bot.say("Associated {tag} with {member}".format(tag=tag, member=member))
 
-        to_add_roles = [
-            discord.utils.get(name) for name in ['Rush-Wars', 'RW-Member']
-        ]
+        to_add_roles = ['Rush-Wars', 'RW-Member']
 
         # add roles
         try:
