@@ -116,8 +116,8 @@ class RACFDecks:
         self.task = None
         self.threadex = ThreadPoolExecutor(max_workers=2)
 
-        loop = asyncio.get_event_loop()
-        self.task = loop.create_task(self.update_decks())
+        self.loop = asyncio.get_event_loop()
+        self.task = self.loop.create_task(self.update_decks())
 
     def __unload(self):
         """Remove task when unloaded."""
@@ -248,24 +248,30 @@ class RACFDecks:
 
                     if server:
                         try:
-
                             family_auto = self.settings.get('family_auto')
                             family_channel_id = self.settings.get('family_channel_id')
                             if family_auto and family_channel_id:
                                 channel = discord.utils.get(server.channels, id=family_channel_id)
                                 if channel:
-                                    await self.post_decks(channel, fam=True, show_empty=False)
+                                    self.loop.create_task(
+                                        self.post_decks(channel, fam=True, show_empty=False)
+                                    )
+                                    # await self.post_decks(channel, fam=True, show_empty=False)
 
                             gc_auto = self.settings.get('gc_auto')
                             gc_channel_id = self.settings.get('gc_channel_id')
                             if gc_auto and gc_channel_id:
                                 channel = discord.utils.get(server.channels, id=gc_channel_id)
                                 if channel:
-                                    await self.post_decks(channel, fam=False, show_empty=False)
+                                    self.loop.create_task(
+                                        self.post_decks(channel, fam=False, show_empty=False)
+                                    )
+                                    # await self.post_decks(channel, fam=False, show_empty=False)
 
                         except discord.DiscordException as e:
                             print(e)
 
+                    # await asyncio.sleep(3)
                     await asyncio.sleep(DELAY)
         except asyncio.CancelledError:
             pass
