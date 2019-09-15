@@ -39,6 +39,7 @@ from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import MemberConverter
 from discord.ext.commands.errors import BadArgument
+from collections import namedtuple
 
 PATH = os.path.join("data", "rushwars")
 JSON = os.path.join(PATH, "settings.json")
@@ -83,6 +84,7 @@ class APITimeoutError(RushWarsAPIError):
 class APIServerError(RushWarsAPIError):
     pass
 
+TeamResults = namedtuple("TeamResults", ["results", "team_tags"])
 
 class RWModel:
     def __init__(self, *args, **kwargs):
@@ -149,8 +151,9 @@ class RushWarsAPI:
             auth = self._auth
 
         session = await self._get_session()
+        headers = dict(Authorization=auth)
         try:
-            async with session.get(url, headers=dict(Authorization=auth), timeout=10) as resp:
+            async with session.get(url, headers=headers, timeout=10) as resp:
                 if str(resp.status).startswith('4'):
                     raise APIRequestError()
 
@@ -241,6 +244,35 @@ class RushWars:
             if str(server.get('id')) == str(server_id):
                 return server
         return None
+
+    async def _get_clubs(self, server_id, query=None):
+        """Return clubs."""
+        cfg = Box(await self._get_team_config())
+        server = None
+        for s in cfg.servers:
+            if str(s.id) == str(server_id):
+                server = s
+                break
+
+        if server is None:
+            await self.bot.say("No config for this server found.")
+            return
+
+        if query is None:
+            team_tags = [t.tag for t in server.teams]
+        else:
+            team_tags = []
+            for b in server.clubs:
+                if query.lower() in b.name.lower():
+                    team_tags.append(b.tag)
+
+        tasks = [
+            self.api.fetch_team(tag=tag)
+            for tag in team_tags
+        ]
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        return TeamResults(results=results, team_tags=team_tags)
 
     async def send_error_message(self, ctx):
         channel = ctx.message.channel
@@ -427,6 +459,77 @@ class RushWars:
             await self.bot.say(
                 "{} Welcome! You may now chat at {} — enjoy!".format(
                     member.mention, channel.mention))
+
+    async def _get_teams(self, server_id, query=None):
+        """Return clubs."""
+        cfg = Box(await self._get_team_config())
+        server = None
+        for s in cfg.servers:
+            if str(s.id) == str(server_id):
+                server = s
+                break
+
+        if server is None:
+            await self.bot.say("No config for this server found.")
+            return
+
+        if query is None:
+            team_tags = [t.tag for t in server.teams]
+        else:
+            team_tags = []
+            for t in server.teams:
+                if query.lower() in t.name.lower():
+                    team_tags.append(t.tag)
+
+        tasks = [
+            self.api.fetch_team(tag=tag)
+            for tag in team_tags
+        ]
+
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        return TeamResults(results=results, team_tags=team_tags)
+
+    @rw.command(name="search", aliases=['s'], pass_context=True)
+    async def bs_search(self, ctx, query: str):
+        """Search for member name in configured clubs."""
+        r = await self._get_teams(ctx.message.server.id)
+
+        results = r.results
+        team_tags = r.team_tags
+
+        found = []
+
+        for tag, team in zip(team_tags, results):
+            if isinstance(team, RushWarsAPIError):
+                await self.bot.say("Error fetching team info for {}".format(tag))
+                await self.send_error_message(ctx)
+                continue
+
+            members = team.members
+
+            for member in members:
+                if query.lower() in member.get('name', '').lower():
+                    member.update(dict(
+                        clan_name=team.name,
+                        clan_tag=team.tag
+                    ))
+                    found.append(member)
+
+        if not found:
+            await self.bot.say("Cannot find anyone named `{}` in our teams".format(query))
+            return
+
+        o = [
+            "{name} #{tag}, {role}, {clan}, {stars}".format(
+                name=m.get('name', ''),
+                tag=m.get('tag', ''),
+                role=m.get('role', '').title(),
+                stars=m.get('stars', 0),
+                clan=m.get('clan_name')
+            ) for m in found
+        ]
+
+        await self.bot.say("\n".join(o))
 
 
 def check_folder():
