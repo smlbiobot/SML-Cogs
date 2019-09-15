@@ -25,9 +25,11 @@ DEALINGS IN THE SOFTWARE.
 import asyncio
 import json
 import os
+import re
 import socket
 from collections import defaultdict
-import re
+from collections import namedtuple
+from random import choice
 
 import aiofiles
 import aiohttp
@@ -39,7 +41,6 @@ from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import MemberConverter
 from discord.ext.commands.errors import BadArgument
-from collections import namedtuple
 
 PATH = os.path.join("data", "rushwars")
 JSON = os.path.join(PATH, "settings.json")
@@ -65,9 +66,18 @@ def clean_tag(tag):
     t = t.replace('#', '')
     return t
 
+
 def remove_color_tags(s):
     """Clean string and remove color tags from string"""
     return re.sub("<[^>]*>", "", s)
+
+
+def random_discord_color():
+    """Return random color as an integer."""
+    color = ''.join([choice('0123456789ABCDEF') for x in range(6)])
+    color = int(color, 16)
+    return discord.Color(value=color)
+
 
 class RushWarsAPIError(Exception):
     pass
@@ -84,7 +94,9 @@ class APITimeoutError(RushWarsAPIError):
 class APIServerError(RushWarsAPIError):
     pass
 
+
 TeamResults = namedtuple("TeamResults", ["results", "team_tags"])
+
 
 class RWModel:
     def __init__(self, *args, **kwargs):
@@ -112,15 +124,33 @@ class RWEmbed:
     """Rush Wars Embeds"""
 
     @staticmethod
-    def player(p: RWPlayer):
+    def player(p: RWPlayer, color=None):
+        if color is None:
+            color = random_discord_color()
         em = discord.Embed(
             title=p.name,
-            description="#{0.tag}".format(p)
+            description="#{0.tag}".format(p),
+            color=color
         )
         em.add_field(
             name="Team",
             value="[{0.team.name} #{0.team.tag}](https://link.rushwarsgame.com/?clanInfo?id={0.team.tag})".format(p)
         )
+        return em
+
+    @staticmethod
+    def team(team: RWTeam, color=None):
+        if color is None:
+            color = random_discord_color()
+        em = discord.Embed(
+            title=team.name,
+            description=remove_color_tags(team.description),
+            color=color
+        )
+        em.set_thumbnail(url=team.badgeUrl)
+        em.add_field(name="Tag", value="#{0.tag}".format(team))
+        em.add_field(name="Trophies", value="{0.score} Req: {0.requiredScore}".format(team))
+        em.add_field(name="Members", value="{0.membersCount} / 25 ".format(team))
         return em
 
 
@@ -244,35 +274,6 @@ class RushWars:
             if str(server.get('id')) == str(server_id):
                 return server
         return None
-
-    async def _get_clubs(self, server_id, query=None):
-        """Return clubs."""
-        cfg = Box(await self._get_team_config())
-        server = None
-        for s in cfg.servers:
-            if str(s.id) == str(server_id):
-                server = s
-                break
-
-        if server is None:
-            await self.bot.say("No config for this server found.")
-            return
-
-        if query is None:
-            team_tags = [t.tag for t in server.teams]
-        else:
-            team_tags = []
-            for b in server.clubs:
-                if query.lower() in b.name.lower():
-                    team_tags.append(b.tag)
-
-        tasks = [
-            self.api.fetch_team(tag=tag)
-            for tag in team_tags
-        ]
-
-        results = await asyncio.gather(*tasks, return_exceptions=True)
-        return TeamResults(results=results, team_tags=team_tags)
 
     async def send_error_message(self, ctx):
         channel = ctx.message.channel
@@ -530,6 +531,27 @@ class RushWars:
         ]
 
         await self.bot.say("\n".join(o))
+
+    """
+    Teams
+    """
+
+    @rw.command(name="teams", aliases=["t"], pass_context=True)
+    async def rw_teams(self, ctx, query=None):
+        """List clubs."""
+        r = await self._get_teams(ctx.message.server.id, query=query)
+        results = r.results
+        team_tags = r.team_tags
+
+        color = random_discord_color()
+
+        for team, team_tag in zip(results, team_tags):
+            if isinstance(r, Exception):
+                await self.bot.say("Error fetching club info for {}".format(team_tag))
+                continue
+            await self.bot.say(
+                embed=RWEmbed.team(team, color=color)
+            )
 
 
 def check_folder():
