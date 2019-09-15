@@ -145,7 +145,8 @@ class RWEmbed:
         em = discord.Embed(
             title=team.name,
             description=remove_color_tags(team.description),
-            color=color
+            color=color,
+            url="https://link.rushwarsgame.com/?clanInfo?id={0.tag}".format(team)
         )
         em.set_thumbnail(url=team.badgeUrl)
         em.add_field(name="Tag", value="#{0.tag}".format(team))
