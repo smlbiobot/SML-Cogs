@@ -305,6 +305,11 @@ class RushWars:
             self._api = RushWarsAPI(self.settings['api_token'])
         return self._api
 
+    def tag_to_id(self, server_id):
+        """RW player tag to discord user id."""
+        server_members = self.settings.get(server_id, {})
+        return {v: k for k, v in server_members.items()}
+
     def _save_settings(self):
         dataIO.save_json(JSON, self.settings)
         return True
@@ -623,6 +628,178 @@ class RushWars:
                     server_members=self.settings.get(server.id, {})
                 )
             )
+
+    """
+    Rush Wars Audit
+    """
+
+    @rw.command(name="audit", aliases=['a'], pass_context=True)
+    @commands.has_any_role(*MANAGE_ROLE_ROLES)
+    async def rw_audit(self, ctx):
+        """Run audit against the entire server."""
+        server = ctx.message.server
+        channel = ctx.message.channel
+        audit = BrawlStarsAudit(cog=self)
+        try:
+            await audit.run(server, status_channel=channel)
+        except RushWarsAuditException:
+            await self.bot.say("Audit failed because of API error.")
+
+    @rw.command(name="auditexec", aliases=['ax'], pass_context=True)
+    @commands.has_any_role(*MANAGE_ROLE_ROLES)
+    async def rw_audit_exec(self, ctx):
+        """Run audit against the entire server."""
+        server = ctx.message.server
+        channel = ctx.message.channel
+        audit = BrawlStarsAudit(cog=self)
+        try:
+            await audit.run(server, status_channel=channel, exec=True)
+        except RushWarsAuditException:
+            await self.bot.say("Audit failed because of API error.")
+
+class RushWarsAuditException(Exception):
+    pass
+
+
+class BrawlStarsAudit:
+    """Audit Brawl Stars member roles on server."""
+
+    def __init__(self, cog: RushWars = None):
+        """Init."""
+        self.cog = cog
+
+    async def exec_add_roles(self, d_member, roles, channel=None):
+        try:
+            await self.cog.bot.add_roles(d_member, *roles)
+        except Exception as e:
+            pass
+        else:
+            if channel is not None:
+                await self.cog.bot.send_message(
+                    channel,
+                    "Add {} to {}".format(
+                        ", ".join(
+                            [r.name for r in roles]
+                        ),
+                        d_member
+                    )
+                )
+
+    async def exec_remove_roles(self, d_member, roles, channel=None):
+        try:
+            await self.cog.bot.remove_roles(d_member, *roles)
+        except Exception as e:
+            pass
+        else:
+            if channel is not None:
+                await self.cog.bot.send_message(
+                    channel,
+                    "Remove {} from {}".format(
+                        ", ".join(
+                            [r.name for r in roles]
+                        ),
+                        d_member
+                    )
+                )
+
+    async def run(self, server: discord.Server = None, exec=False, status_channel=None):
+        """Run audit against server."""
+        results = dict()
+        # Fetch club info
+        teams = await self.cog._get_teams(server.id)
+        for r, team_tag, in zip(teams.results, teams.team_tags):
+            if isinstance(r, Exception):
+                raise RushWarsAuditException()
+
+            results[team_tag] = r
+
+        tag2id = self.cog.tag_to_id(server_id=server.id)
+
+        member_ids = []
+
+        # for each member, find discord user id
+        for team_tag, team in results.items():
+            for member in team.members:
+                member_tag = member.get('tag')
+                if member_tag is not None:
+                    user_id = tag2id.get(member_tag)
+                    member_ids.append(user_id)
+                    member["discord_user_id"] = user_id
+
+        # non members
+        non_member_ids = [m.id for m in server.members if m.id not in member_ids]
+
+        cfg = await self.cog._get_server_config(server_id=server.id)
+
+        team_tag_to_team_roles = {}
+        team_role_names = []
+        for team in cfg.get('teams', []):
+            team_tag_to_team_roles[team.get('tag')] = [
+                discord.utils.get(server.roles, name=name) for name in
+                team.get('roles', [])
+            ]
+            team_role_names += team.get('roles')
+
+        all_team_roles = [
+            discord.utils.get(server.roles, name=name) for name in team_role_names
+        ]
+
+        rw_member_role = discord.utils.get(server.roles, name="RW-Member")
+        rw_members_roles = [rw_member_role] + all_team_roles
+
+        if status_channel:
+            for member_id in non_member_ids:
+                user = server.get_member(member_id)
+                if user is not None:
+                    if rw_member_role in user.roles:
+                        await self.cog.bot.send_message(status_channel, "{} is not in our teams".format(user))
+                        if exec:
+                            await self.exec_remove_roles(user, rw_members_roles, channel=status_channel)
+
+            for member_id in member_ids:
+                user = server.get_member(member_id)
+                if user is not None:
+                    if rw_member_role not in user.roles:
+                        await self.cog.bot.send_message(status_channel, "{} is in our teams".format(user))
+                        if exec:
+                            await self.exec_add_roles(user, [rw_member_role], channel=status_channel)
+
+        # teams
+        for team_tag, team in results.items():
+            team_member_ids = []
+            for member in team.members:
+                user_id = member.get('discord_user_id')
+                if user_id is not None:
+                    team_member_ids.append(user_id)
+
+            non_team_member_ids = [m.id for m in server.members if m.id not in team_member_ids]
+
+            team_roles = team_tag_to_team_roles[team_tag]
+            team_role = team_roles[0]
+
+            # members
+            for user_id in team_member_ids:
+                user = server.get_member(user_id)
+                if user is not None:
+                    if team_role not in user.roles:
+                        await self.cog.bot.send_message(
+                            status_channel,
+                            "{} is in {}".format(user, team.name))
+                        if exec:
+                            await self.exec_add_roles(user, [team_role], channel=status_channel)
+
+            for user_id in non_team_member_ids:
+                user = server.get_member(user_id)
+                if user is not None:
+                    if team_role in user.roles:
+                        await self.cog.bot.send_message(
+                            status_channel,
+                            "{} is not in {}".format(user, team.name))
+                        if exec:
+                            await self.exec_remove_roles(user, [team_role], channel=status_channel)
+
+        # print_json(results)
+        await self.cog.bot.send_message(status_channel, "Audit finished")
 
 
 def check_folder():
