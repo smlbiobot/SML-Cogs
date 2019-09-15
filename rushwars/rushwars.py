@@ -27,6 +27,7 @@ import json
 import os
 import socket
 from collections import defaultdict
+import re
 
 import aiofiles
 import aiohttp
@@ -63,6 +64,9 @@ def clean_tag(tag):
     t = t.replace('#', '')
     return t
 
+def remove_color_tags(s):
+    """Clean string and remove color tags from string"""
+    return re.sub("<[^>]*>", "", s)
 
 class RushWarsAPIError(Exception):
     pass
@@ -80,47 +84,80 @@ class APIServerError(RushWarsAPIError):
     pass
 
 
-class RWPlayer(Box):
+class RWModel:
+    def __init__(self, *args, **kwargs):
+        self._box = Box(*args, default_box=True, **kwargs)
+
+    def __getattr__(self, item):
+        return self._box.get(item)
+
+
+class RWPlayer(RWModel):
     """Player model"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 
-class RWTeam(Box):
+class RWTeam(RWModel):
     """Team model"""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 
+class RWEmbed:
+    """Rush Wars Embeds"""
+
+    @staticmethod
+    def player(p: RWPlayer):
+        em = discord.Embed(
+            title=p.name,
+            description="#{0.tag}".format(p)
+        )
+        em.add_field(
+            name="Team",
+            value="[{0.team.name} #{0.team.tag}](https://link.rushwarsgame.com/?clanInfo?id={0.team.tag})".format(p)
+        )
+        return em
+
+
 class RushWarsAPI:
     """Rush Wars API"""
 
-    def __init__(self, auth):
+    def __init__(self, auth, session=None):
         self._auth = auth
+        self._session = session
+
+    async def shutdown(self):
+        if self._session:
+            await self._session.close()
+
+    async def _get_session(self):
+        if self._session is None:
+            conn = aiohttp.TCPConnector(
+                family=socket.AF_INET,
+                verify_ssl=False,
+            )
+            self._session = aiohttp.ClientSession(connector=conn)
+        return self._session
 
     async def fetch(self, url=None, auth=None):
         """Fetch from API"""
-        conn = aiohttp.TCPConnector(
-            family=socket.AF_INET,
-            verify_ssl=False,
-        )
+
         if auth is None:
             auth = self._auth
 
-        print("auth", auth)
+        session = await self._get_session()
         try:
-            async with aiohttp.ClientSession(connector=conn) as session:
-                async with session.get(url, headers=dict(Authorization=auth), timeout=10) as resp:
-                    print(resp.status)
-                    if str(resp.status).startswith('4'):
-                        raise APIRequestError()
+            async with session.get(url, headers=dict(Authorization=auth), timeout=10) as resp:
+                if str(resp.status).startswith('4'):
+                    raise APIRequestError()
 
-                    if str(resp.status).startswith('5'):
-                        raise APIServerError()
+                if str(resp.status).startswith('5'):
+                    raise APIServerError()
 
-                    data = await resp.json()
+                data = await resp.json()
         except asyncio.TimeoutError:
             raise APITimeoutError()
 
@@ -173,6 +210,13 @@ class RushWars:
         self.settings.update(dataIO.load_json(JSON))
         self._team_config = None
         self._api = None
+        self.loop = asyncio.get_event_loop()
+
+    def __unload(self):
+        if self._api:
+            self.loop.create_task(
+                self._api.shutdown()
+            )
 
     @property
     def api(self):
@@ -185,11 +229,11 @@ class RushWars:
         return True
 
     async def _get_team_config(self, force_update=False):
-        if force_update or self._club_config is None:
+        if force_update or self._team_config is None:
             async with aiofiles.open(TEAM_CONFIG_YML) as f:
                 contents = await f.read()
-                self._club_config = yaml.load(contents, Loader=yaml.FullLoader)
-        return self._club_config
+                self._team_config = yaml.load(contents, Loader=yaml.FullLoader)
+        return self._team_config
 
     async def _get_server_config(self, server_id=None):
         cfg = await self._get_team_config()
@@ -268,52 +312,93 @@ class RushWars:
             await self.bot.send_cmd_help(ctx)
 
     @rw.command(name="player", aliases=['p', 'profile'], pass_context=True)
-    async def rw_player(self, ctx, player):
+    async def rw_player(self, ctx, player=None):
         """Player profile.
 
         player can be a player tag or a Discord member.
         """
         server = ctx.message.server
+        author = ctx.message.author
         member = None
         tag = None
-        try:
-            cvt = MemberConverter(ctx, player)
-            member = cvt.convert()
-        except BadArgument:
-            # cannot convert to member. Assume argument is a tag
-            tag = clean_tag(player)
+
+        if player is None:
+            tag = self.settings.get(server.id, {}).get(author.id)
         else:
-            tag = self.settings.get(server.id, {}).get(member.id)
-            if tag is None:
-                await self.bot.say("Can’t find tag associated with user.")
-                return
+            try:
+                cvt = MemberConverter(ctx, player)
+                member = cvt.convert()
+            except BadArgument:
+                # cannot convert to member. Assume argument is a tag
+                tag = clean_tag(player)
+            else:
+                tag = self.settings.get(server.id, {}).get(member.id)
+
+        if tag is None:
+            await self.bot.say("Can’t find tag associated with user.")
+            return
 
         try:
             p = await self.api.fetch_player(tag)
         except RushWarsAPIError as e:
             await self.bot.say("RushWarsAPIError")
         else:
-            await self.bot.say(
-                "{name} {tag} Stars:{stars}".format(
-                    name=p.name,
-                    tag=p.tag,
-                    stars=p.stars
-                )
-            )
-
-
+            await self.bot.say(embed=RWEmbed.player(p))
 
     @rw.command(name="verify", aliases=['v'], pass_context=True)
     @commands.has_any_role(*MANAGE_ROLE_ROLES)
     async def rw_verify(self, ctx, member: discord.Member, tag=None):
-        tag = clean_tag(tag)
+        """Verify members"""
+        cfg = Box(await self._get_team_config())
+        server = None
         ctx_server = ctx.message.server
+        for s in cfg.servers:
+            if str(s.id) == str(ctx.message.server.id):
+                server = s
+                break
 
+        if server is None:
+            await self.bot.say("No config for this server found.")
+            return
+
+        tag = clean_tag(tag)
         self.settings[ctx_server.id][member.id] = tag
         self._save_settings()
         await self.bot.say("Associated {tag} with {member}".format(tag=tag, member=member))
 
-        to_add_roles = ['Rush-Wars', 'RW-Member']
+        try:
+            player = await self.api.fetch_player(tag=tag)
+        except RushWarsAPIError:
+            await self.send_error_message(ctx)
+            return
+
+        await self.bot.say(embed=RWEmbed.player(player))
+
+        team_tags = [t.tag for t in server.teams]
+
+        to_add_roles = []
+        to_remove_roles = []
+
+        to_add_roles += server.everyone_roles
+
+        # if member in clubs, add member roles
+        if player.team and player.team.tag in team_tags:
+            to_add_roles += server.member_roles
+
+            for t in server.teams:
+                if t.tag == player.team.tag:
+                    to_add_roles += t.roles
+        else:
+            to_remove_roles += server.member_roles
+
+        # change nick to match IGN
+        player_name = remove_color_tags(player.name)
+        try:
+            await self.bot.change_nickname(member, player_name)
+            await self.bot.say(
+                "Change {member} to {nick} to match IGN".format(member=member.mention, nick=player_name))
+        except discord.errors.Forbidden:
+            await self.bot.say("Error: I don’t have permission to change nick for this user.")
 
         # add roles
         try:
@@ -322,6 +407,16 @@ class RushWars:
                 await self.bot.add_roles(member, *roles)
                 await self.bot.say(
                     "Added {roles} to {member}".format(roles=", ".join(to_add_roles), member=member))
+        except discord.errors.Forbidden:
+            await self.bot.say("Error: I don’t have permission to add roles.")
+
+        # remove roles
+        try:
+            roles = [r for r in ctx_server.roles if r.name in to_remove_roles]
+            if roles:
+                await self.bot.remove_roles(member, *roles)
+                await self.bot.say(
+                    "Removed {roles} from {member}".format(roles=", ".join(to_remove_roles), member=member))
         except discord.errors.Forbidden:
             await self.bot.say("Error: I don’t have permission to add roles.")
 

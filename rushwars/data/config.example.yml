@@ -1,7 +1,7 @@
 servers:
   - name: RoyaleAPI Clan Family
     id: 528327242875535372
-    clubs:
+    teams:
       - name: RACF Alpha
         tag: PULRC
         roles:
@@ -16,7 +16,7 @@ servers:
       - RW-Member
   - name: SML
     id: 275395656955330560
-    clubs:
+    teams:
       - name: RACF Alpha
         tag: PULRC
         roles:
