@@ -30,7 +30,7 @@ import socket
 from collections import defaultdict
 from collections import namedtuple
 from random import choice
-
+from itertools import zip_longest
 import aiofiles
 import aiohttp
 import discord
@@ -65,6 +65,12 @@ def clean_tag(tag):
     t = t.replace('B', '8')
     t = t.replace('#', '')
     return t
+
+def grouper(iterable, n, fillvalue=None):
+    "Collect data into fixed-length chunks or blocks"
+    # grouper('ABCDEFG', 3, 'x') --> ABC DEF Gxx"
+    args = [iter(iterable)] * n
+    return zip_longest(*args, fillvalue=fillvalue)
 
 
 def remove_color_tags(s):
@@ -154,6 +160,47 @@ class RWEmbed:
         em.add_field(name="Members", value="{0.membersCount} / 25 ".format(team))
         return em
 
+    @staticmethod
+    def team_members(
+            team:RWTeam,
+            color=None,
+            server:discord.Server=None,
+            server_members:dict=None
+    ):
+        if color is None:
+            color = random_discord_color()
+
+        em = discord.Embed(
+            title=team.name,
+            description='#{}'.format(team.tag),
+            color=color
+        )
+
+        tag2id = {v: k for k, v in server_members.items()}
+        o = []
+        for m in team.members:
+            user_id = tag2id.get(m.tag)
+            user = None
+            if user_id is not None:
+                user = server.get_member(user_id)
+            o.append(
+                "{name} #{tag}, {role}, {trophies} {d_name}".format(
+                    name=remove_color_tags(m.name),
+                    tag=m.tag,
+                    role=m.role,
+                    trophies=m.stars,
+                    d_name=user if user else "----"
+                )
+            )
+
+        count = 10
+        pagified = grouper(o, count)
+        for index, page in enumerate(pagified):
+            v = [line for line in page if line is not None]
+            em.add_field(name="Members {}-{}".format(index * 10 + 1, index * 10 + len(v)), value='\n'.join(v))
+
+
+        return em
 
 class RushWarsAPI:
     """Rush Wars API"""
@@ -552,6 +599,29 @@ class RushWars:
                 continue
             await self.bot.say(
                 embed=RWEmbed.team(team, color=color)
+            )
+
+    @rw.command(name="members", aliases=['m'], pass_context=True)
+    @commands.has_any_role(*MANAGE_ROLE_ROLES)
+    async def bs_members(self, ctx, query: str = None):
+        """List all members in clubs."""
+        teams = await self._get_teams(ctx.message.server.id, query=query)
+
+        color = random_discord_color()
+        server = ctx.message.server
+
+        for team, team_tag in zip(teams.results, teams.team_tags):
+            if isinstance(team, Exception):
+                await self.bot.say("Error fetching club info for {}".format(team_tag))
+                continue
+
+            await self.bot.say(
+                embed=RWEmbed.team_members(
+                    team,
+                    color=color,
+                    server=server,
+                    server_members=self.settings.get(server.id, {})
+                )
             )
 
 
