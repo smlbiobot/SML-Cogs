@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "RushWars",
+	"DESCRIPTION": "RushWars players and teams",
+	"DISABLED": false,
+	"NAME": "BrawlStars",
+	"REQUIREMENTS": ["python-box", "stringcase", "pyyaml", "aiofiles"],
+	"TAGS": ["rushwars"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: <http://github.com/smlbiobot/SML-Cogs> or my Discord server: <http://discord.me/sml>"
+}

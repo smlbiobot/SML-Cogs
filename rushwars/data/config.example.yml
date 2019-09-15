@@ -1,0 +1,35 @@
+servers:
+  - name: RoyaleAPI Clan Family
+    id: 528327242875535372
+    clubs:
+      - name: RACF Alpha
+        tag: PULRC
+        roles:
+          - RW-Alpha
+      - name: RACF Bravo
+        tag: 8YCCCP
+        roles:
+          - RW-Bravo
+    everyone_roles:
+      - RushWars
+    member_roles:
+      - RW-Member
+  - name: SML
+    id: 275395656955330560
+    clubs:
+      - name: RACF Alpha
+        tag: PULRC
+        roles:
+          - RW-Alpha
+      - name: RACF Bravo
+        tag: 8YCCCP
+        roles:
+          - RW-Bravo
+      everyone_roles:
+        - RushWars
+      member_roles:
+        - RW-Member
+    everyone_roles:
+      - RushWars
+    member_roles:
+      - RW-Member
