@@ -100,9 +100,6 @@ class RushWarsAPI:
     def __init__(self, auth):
         self._auth = auth
 
-    def set_auth(self, auth):
-        self._auth = auth
-
     async def fetch(self, url=None, auth=None):
         """Fetch from API"""
         conn = aiohttp.TCPConnector(
@@ -111,10 +108,12 @@ class RushWarsAPI:
         )
         if auth is None:
             auth = self._auth
+
+        print("auth", auth)
         try:
             async with aiohttp.ClientSession(connector=conn) as session:
                 async with session.get(url, headers=dict(Authorization=auth), timeout=10) as resp:
-
+                    print(resp.status)
                     if str(resp.status).startswith('4'):
                         raise APIRequestError()
 
@@ -129,7 +128,7 @@ class RushWarsAPI:
 
     async def fetch_player(self, tag=None, auth=None, **kwargs):
         """Fetch player"""
-        url = 'https://api.brawlapi.cf/v1/player?tag={}'.format(clean_tag(tag))
+        url = 'https://api.rushstats.com/v1/player/{}'.format(clean_tag(tag))
         fn = os.path.join(CACHE_PLAYER_PATH, "{}.json".format(tag))
         try:
             data = await self.fetch(url=url, auth=auth)
@@ -147,7 +146,7 @@ class RushWarsAPI:
 
     async def fetch_team(self, tag=None, auth=None, **kwargs):
         """Fetch player"""
-        url = 'https://api.brawlapi.cf/v1/club?tag={}'.format(clean_tag(tag))
+        url = 'https://api.rushstats.com/v1/team/{}'.format(clean_tag(tag))
         fn = os.path.join(CACHE_TEAM_PATH, "{}.json".format(tag))
         try:
             data = await self.fetch(url=url, auth=auth)
@@ -173,6 +172,13 @@ class RushWars:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
         self._team_config = None
+        self._api = None
+
+    @property
+    def api(self):
+        if self._api is None:
+            self._api = RushWarsAPI(self.settings['api_token'])
+        return self._api
 
     def _save_settings(self):
         dataIO.save_json(JSON, self.settings)
@@ -224,6 +230,7 @@ class RushWars:
     async def _rwset_auth(self, ctx, token):
         """Authorization (token)."""
         self.settings['api_token'] = token
+        self._api = RushWarsAPI(token)
         if self._save_settings():
             await self.bot.say("Authorization (token) updated.")
         await self.bot.delete_message(ctx.message)
@@ -281,7 +288,20 @@ class RushWars:
                 await self.bot.say("Can’t find tag associated with user.")
                 return
 
-        await self.bot.say("{member} {tag}".format(member=member, tag=tag))
+        try:
+            p = await self.api.fetch_player(tag)
+        except RushWarsAPIError as e:
+            await self.bot.say("RushWarsAPIError")
+        else:
+            await self.bot.say(
+                "{name} {tag} Stars:{stars}".format(
+                    name=p.name,
+                    tag=p.tag,
+                    stars=p.stars
+                )
+            )
+
+
 
     @rw.command(name="verify", aliases=['v'], pass_context=True)
     @commands.has_any_role(*MANAGE_ROLE_ROLES)
