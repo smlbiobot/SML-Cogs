@@ -10,6 +10,7 @@ from collections import defaultdict
 import discord
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
+import re
 
 PATH = os.path.join("data", "messager")
 JSON = os.path.join(PATH, "settings.json")
@@ -66,6 +67,12 @@ class Messager:
         em.set_footer(
             text="#{channel}".format(channel=fr_channel)
         )
+
+        # expand image if found
+        match = re.search("(http(s?):)([/|.|\w|\s|-])*\.(?:jpg|gif|png)", message)
+        if match:
+            img_url = match.group()
+            em.set_image(url=img_url)
 
         await self.bot.send_message(to_channel, embed=em)
 
