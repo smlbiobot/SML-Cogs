@@ -23,7 +23,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
-
+import asyncio
 import io
 import json
 import os
@@ -109,6 +109,32 @@ class SML:
             description=desc
         )
         await self.bot.say(embed=em)
+
+    @commands.command(pass_context=True)
+    async def snap(self, ctx, *, msg):
+        """Delete message after timeout
+
+        !snap send message here (remove in 60 seconds)
+        !snap 15 send message (remove in 15 seconds)
+        """
+        timeout = 15
+        parts = str(msg).split(' ')
+        if parts[0].isdigit():
+            timeout = int(parts[0])
+            msg = " ".join(parts[1:])
+
+        await self.bot.delete_message(ctx.message)
+        m = await self.bot.say(
+            "{author} said: {message}".format(
+                author=ctx.message.author.mention,
+                message=msg,
+            )
+        )
+        await asyncio.sleep(timeout)
+        try:
+            await self.bot.delete_message(m)
+        except:
+            pass
 
 
 
