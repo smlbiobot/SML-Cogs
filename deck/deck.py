@@ -996,6 +996,7 @@ class Deck:
         return msg
 
 
+
 def check_folder():
     """Verify folders exist."""
     folders = [

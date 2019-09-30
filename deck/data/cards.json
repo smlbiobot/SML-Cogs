@@ -674,7 +674,7 @@
         "key": "fisherman",
         "name": "Fisherman",
         "sc_key": "Fisherman",
-        "elixir": 4,
+        "elixir": 3,
         "type": "Troop",
         "rarity": "Legendary",
         "arena": 10,
@@ -702,6 +702,17 @@
         "arena": 11,
         "description": "Spits out bolts of electricity hitting up to three targets. Suffers from middle child syndrome to boot.",
         "id": 26000063
+    },
+    {
+        "key": "elixir-golem",
+        "name": "Elixir Golem",
+        "sc_key": "ElixirGolem",
+        "elixir": 3,
+        "type": "Troop",
+        "rarity": "Rare",
+        "arena": 12,
+        "description": "Splits into two Elixir Golemites when destroyed, which split into two sentient Blobs when defeated. A Blob gives your opponent 1 Elixir when destroyed!",
+        "id": 26000067
     },
     {
         "key": "cannon",
