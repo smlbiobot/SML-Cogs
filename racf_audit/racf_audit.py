@@ -74,6 +74,8 @@ MEMBER_ROLE_NAMES = [
     'Echo',
     'Fox',
     'Golf',
+    'Hotel',
+    'One',
     'Trade',
     'Zen',
     'Mini',
