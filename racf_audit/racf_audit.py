@@ -1196,8 +1196,10 @@ class RACFAudit:
                 add_it = False
                 if name.lower() in member_model.get('name').lower():
                     if option_startwith:
-                        # strip all non alphanumeric characters
                         m_name = member_model.get('name', '').lower()
+                        # strip color code
+                        m_name = re.sub(r'^(\<.+\>)', '', m_name)
+                        # strip all non alphanumeric characters
                         m_name = ''.join(re.findall(r'[a-z0-9]+', m_name))
                         if m_name.startswith(name):
                             add_it = True
