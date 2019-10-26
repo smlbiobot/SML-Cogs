@@ -341,7 +341,7 @@ class Clans:
         """
         await self.bot.type()
         channel = ctx.message.channel
-        await self.post_clans(channel, *args)
+        await self.post_clans(channel, *args, delete_messages=False)
 
     def enable_auto_clan(self, server, channel):
         self.check_settings(server)
@@ -404,7 +404,7 @@ class Clans:
 
         dataIO.save_json(JSON, self.settings)
 
-    async def post_clans(self, channel, *args, msg=None):
+    async def post_clans(self, channel, *args, msg=None, delete_messages=True):
         """Post clans to channel."""
         config = self.clans_config
         clan_tags = [clan.tag for clan in config.clans if not clan.hide]
@@ -535,7 +535,8 @@ class Clans:
 
         if msg is None:
             # delete channel messages
-            await self.bot.purge_from(channel, limit=5, before=msg)
+            if delete_messages:
+                await self.bot.purge_from(channel, limit=5, before=msg)
             msg = await self.bot.send_message(channel, embed=em)
         else:
             await self.bot.edit_message(msg, embed=em)
