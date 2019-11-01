@@ -154,7 +154,7 @@ async def api_fetch(url=None, auth=None):
 
 async def api_fetch_player(tag=None, auth=None, **kwargs):
     """Fetch player"""
-    url = 'https://api.brawlapi.cf/v1/player?tag={}'.format(clean_tag(tag))
+    url = 'https://api.starlist.pro/v1/player?tag={}'.format(clean_tag(tag))
     fn = os.path.join(CACHE_PLAYER_PATH, "{}.json".format(tag))
     try:
         data = await api_fetch(url=url, auth=auth)
@@ -173,7 +173,7 @@ async def api_fetch_player(tag=None, auth=None, **kwargs):
 
 async def api_fetch_club(tag=None, auth=None, **kwargs):
     """Fetch player"""
-    url = 'https://api.brawlapi.cf/v1/club?tag={}'.format(clean_tag(tag))
+    url = 'https://api.starlist.pro/v1/club?tag={}'.format(clean_tag(tag))
     fn = os.path.join(CACHE_CLUB_PATH, "{}.json".format(tag))
     try:
         data = await api_fetch(url=url, auth=auth)
@@ -272,7 +272,7 @@ class BrawlStars:
 
         # footer
         em.set_footer(
-            text="Data by BrawlAPI https://brawlapi.cf"
+            text="Data by BrawlAPI https://api.starlist.pro"
         )
         return em
 
@@ -321,7 +321,7 @@ class BrawlStars:
 
         # footer
         em.set_footer(
-            text="Data by BrawlAPI https://brawlapi.cf"
+            text="Data by BrawlAPI https://api.starlist.pro"
         )
         return em
 
