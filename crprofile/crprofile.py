@@ -1587,7 +1587,10 @@ class CRProfile:
             mention = member.mention
 
         profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag.lstrip('#'))
-        clan_url = 'http://RoyaleAPI.com/clan/{}'.format(player.clan_tag.lstrip('#'))
+        if player.clan_tag:
+            clan_url = 'http://RoyaleAPI.com/clan/{}'.format(player.clan_tag.lstrip('#'))
+        else:
+            clan_url = None
 
         # header
         title = player.name
