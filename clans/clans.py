@@ -359,6 +359,46 @@ class Clans:
         ))
         self.save_settings()
 
+    @commands.command(pass_context=True)
+    async def clan(self, ctx, params):
+        """Open clan info in-app"""
+        await self.bot.type()
+        config = self.clans_config
+        tag = None
+        for clan in config.get('clans', []):
+            # search to see if params match abbreviations
+             if params.lower() in clan.get('abbreviations', []):
+                tag = clan.get('tag')
+                break
+
+        if tag is None:
+            tag = params
+
+        if not tag:
+            await self.bot.say("Invalid clan tag or name.")
+            return
+
+        await self.post_clan_link(ctx, tag)
+
+    async def post_clan_link(self, ctx, tag):
+        clan = await self.get_clan(tag)
+        clan_score_cw_trophies = "{trophy}{cw_trophy}".format(
+            trophy=emoji_value('laddertrophy', clan.get('clanScore', 0), 5),
+            cw_trophy=emoji_value('cwtrophy', clan.get('clanWarTrophies', 0), 5),
+        )
+        desc = [
+            "{} {}".format(clan.get('name', ''), clan.get('tag')),
+            '{} / 50 Members'.format(clan.get('members', '0')),
+            clan_score_cw_trophies,
+        ]
+        em = discord.Embed(
+            title="Open in Clash Royale",
+            url="https://link.clashroyale.com/en?clanInfo?id={}".format(tag),
+            description="\n".join(desc),
+        )
+        await self.bot.send_message(ctx.message.channel, embed=em)
+
+
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, no_pm=True, aliases=['auto_clans', 'autoclans'])
     async def auto_clan(self, ctx):
