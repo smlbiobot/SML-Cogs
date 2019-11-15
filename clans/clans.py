@@ -508,7 +508,8 @@ class Clans:
             # clan tag
             clan_tag = ''
             if show_clan_tag:
-                clan_tag = ', {}'.format(clan.get('tag'))
+                ct = clean_tag(clan.get('tag'))
+                clan_tag = '[#{ct}](https://link.clashroyale.com/en?clanInfo?id={ct})'.format(ct=ct)
 
             # cw coverage
             cw = ""
@@ -541,7 +542,7 @@ class Clans:
                         aux = '\n{}'.format(c.get('aux'))
 
             # embed value
-            value = '`{trophies}{pb}{psf}{member_count}{clan_tag}`{cw}{aux}\n{clan_score_cw_trophies}'.format(
+            value = '`{trophies}{pb}{psf}{member_count}`, {clan_tag}{cw}{aux}\n{clan_score_cw_trophies}'.format(
                 clan_tag=clan_tag,
                 member_count=member_count,
                 trophies=trophies,
