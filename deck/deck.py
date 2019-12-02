@@ -996,7 +996,6 @@ class Deck:
         return msg
 
 
-
 def check_folder():
     """Verify folders exist."""
     folders = [
@@ -1026,4 +1025,3 @@ def setup(bot):
     check_file()
     n = Deck(bot)
     bot.add_cog(n)
-
