@@ -749,17 +749,48 @@ class CRPlayerModel:
 
         return url
 
-    def deck_list(self, bot_emoji: BotEmoji):
-        """Deck with emoji"""
+    @property
+    def deck_card_keys(self):
         if self.api_provider == 'official':
             deck_data = self.info_data.get('currentDeck')
             cards = [Constants.get_instance().get_card(name=c.get('name')).get('key') for c in deck_data]
         else:
             cards = [card.get('key') for card in self.info_data.get("currentDeck")]
-        cards = [bot_emoji.name(key.replace('-', '')) for key in cards]
-        levels = [normalized_card_level(card) for card in self.info_data.get("currentDeck")]
-        deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
-        return ' '.join(deck)
+        return cards
+
+    @property
+    def deck_card_ids(self):
+        if self.api_provider == 'official':
+            deck_data = self.info_data.get('currentDeck')
+            cards = [Constants.get_instance().get_card(name=c.get('name')).get('id') for c in deck_data]
+        else:
+            cards = [card.get('id') for card in self.info_data.get("currentDeck")]
+        return cards
+
+    def deck_list(self, bot_emoji: BotEmoji):
+        """Deck with emoji"""
+        # if self.api_provider == 'official':
+        #     deck_data = self.info_data.get('currentDeck')
+        #     cards = [Constants.get_instance().get_card(name=c.get('name')).get('key') for c in deck_data]
+        # else:
+        #     cards = [card.get('key') for card in self.info_data.get("currentDeck")]
+
+        o = ' '
+        cards = self.deck_card_keys
+        if cards:
+            cards = [bot_emoji.name(key.replace('-', '')) for key in cards]
+            levels = [normalized_card_level(card) for card in self.info_data.get("currentDeck")]
+            deck = ['{0[0]}{0[1]}'.format(card) for card in zip(cards, levels)]
+            o = ' '.join(deck)
+        return o
+
+    @property
+    def deck_stats_url(self):
+        if self.deck_card_keys:
+            return "https://royaleapi.com/decks/stats/{cards}".format(
+                cards=",".join([c for c in self.deck_card_keys])
+            )
+        return
 
     def trade_list(self, bot_emoji: BotEmoji):
         """Trade list"""
@@ -817,8 +848,13 @@ class CRPlayerModel:
         return ret
 
     @property
-    def decklink(self):
-        return self.info_data.get('deckLink', '')
+    def deck_link(self):
+        url = None
+        if self.deck_card_ids:
+            url = "https://link.clashroyale.com/deck/en?deck={ids}".format(
+                ids=";".join([str(c) for c in self.deck_card_ids])
+            )
+        return url
 
     def api_cardname_to_emoji(self, name, bot_emoji: BotEmoji):
         """Convert api card id to card emoji."""
@@ -1718,12 +1754,20 @@ class CRProfile:
 
     def embed_profile_deck(self, player: CRPlayerModel, color=None):
         """Current deck."""
-        decklink_url = player.decklink
-        profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag.lstrip('#'))
+        profile_url = 'https://RoyaleAPI.com/player/{}'.format(player.tag.lstrip('#'))
+        desc_copy = "[Copy deck]({url})".format(url=player.deck_link)
+        desc_stats = "[Deck stats]({url})".format(url=player.deck_stats_url)
+        desc_log = "[Battle Log](https://RoyaleAPI.com/player/{tag})".format(tag=player.tag.lstrip('#'))
+        desc = " • ".join([
+            desc_copy,
+            desc_stats,
+            desc_log,
+        ])
         em = discord.Embed(
             title="{} #{}".format(player.name, player.tag),
+            description=desc,
             color=color,
-            url=decklink_url)
+        )
         # cards = player.card_collection(self.bot_emoji)
         em.add_field(name="Deck", value=player.deck_list(self.bot_emoji), inline=False)
         em.set_footer(
@@ -1733,7 +1777,7 @@ class CRProfile:
 
     def embed_profile_trade(self, player: CRPlayerModel, color=None):
         """Current deck."""
-        decklink_url = player.decklink
+        decklink_url = player.deck_link
         profile_url = 'http://RoyaleAPI.com/player/{}'.format(player.tag.lstrip('#'))
         em = discord.Embed(
             title="{} #{}".format(player.name, player.tag),
@@ -1759,7 +1803,6 @@ class CRProfile:
                 name="No tradable cards",
                 value="N/A"
             )
-
 
         # em.add_field(name="Trade", value=player.trade_list(self.bot_emoji), inline=False)
         em.set_footer(
