@@ -1,0 +1,10 @@
+{
+	"AUTHOR": "SML",
+	"SHORT": "DiscordgramCCS",
+	"DESCRIPTION": "Monitor channelf for image posts and allow threaded comments + replies",
+	"DISABLED": false,
+	"NAME": "DiscordgramCCS",
+	"REQUIREMENTS": [],
+	"TAGS": ["discordgram", "admin", "images"],
+	"INSTALL_MSG": "Thanks for installing. If you need help, please create new issue on my Github repo: http://github.com/smlbiobot/SML-Cogs or my Discord server: http://discord.me/sml"
+}
