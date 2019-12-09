@@ -71,13 +71,13 @@ class DiscordgramCCS:
 
     @checks.mod_or_permissions()
     @commands.group(pass_context=True, aliases=['sdgccs'])
-    async def setdiscordgram(self, ctx):
+    async def setdiscordgram_ccs(self, ctx):
         """Set Discordgram settings."""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
 
-    @setdiscordgram.command(name="channel", pass_context=True)
-    async def setdiscordgram_channel(self, ctx):
+    @setdiscordgram_ccs.command(name="channel", pass_context=True)
+    async def setdiscordgram_ccs_channel(self, ctx):
         """Set Discordgram channel.
 
         Running in enabled channel will disable the channel.
