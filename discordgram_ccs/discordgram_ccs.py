@@ -70,7 +70,7 @@ class DiscordgramCCS:
         self.settings = dataIO.load_json(JSON)
 
     @checks.mod_or_permissions()
-    @commands.group(pass_context=True, aliases=['sdg'])
+    @commands.group(pass_context=True, aliases=['sdgccs'])
     async def setdiscordgram(self, ctx):
         """Set Discordgram settings."""
         if ctx.invoked_subcommand is None:
@@ -126,7 +126,7 @@ class DiscordgramCCS:
         dgm_id = len(self.settings[server.id]["MESSAGES"])
 
         footer_text = (
-            ":: Type `!dgr {} <reply message>` "
+            ":: Type `!ccs {} <reply message>` "
             "to reply to {}’s post.".format(
                 dgm_id, author.display_name)
         )
@@ -146,8 +146,8 @@ class DiscordgramCCS:
 
     @commands.command(
         pass_context=True,
-        name="discordgramreply", aliases=["dgreply", "dgr"])
-    async def discordgramreply(self, ctx, id, *, msg):
+        name="discordgramccsreply", aliases=["ccs"])
+    async def discordgramccsreply(self, ctx, id, *, msg):
         """Reply to a Discordgram by ID."""
         author = ctx.message.author
         server = ctx.message.server
