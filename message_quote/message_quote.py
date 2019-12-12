@@ -29,6 +29,7 @@ import os
 import discord
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
+from cogs.utils import checks
 
 PATH = os.path.join("data", "message_quote")
 JSON = os.path.join(PATH, "settings.json")
@@ -53,6 +54,7 @@ class MessageQuote:
 
         await self._show_message(ctx, channel, message_id)
 
+    @checks.mod_or_permissions()
     @commands.command(name="mqs", pass_context=True)
     async def message_quote_server(self, ctx, server_name, channel_name, message_id):
         """Quote a message from another server"""
