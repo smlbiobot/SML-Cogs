@@ -51,6 +51,25 @@ class MessageQuote:
         if channel is None:
             channel = ctx.message.channel
 
+        await self._show_message(ctx, channel, message_id)
+
+    @commands.command(name="mqs", pass_context=True)
+    async def message_quote_server(self, ctx, server_name, channel_name, message_id):
+        """Quote a message from another server"""
+        channel = None
+        for server in self.bot.servers:
+            if server.name != server_name:
+                continue
+            for ch in server.channels:
+                if ch.name == channel_name:
+                    channel = ch
+        if channel is None:
+            await self.bot.say("Cannot find channel.")
+            return
+
+        await self._show_message(ctx, channel, message_id)
+
+    async def _show_message(self, ctx, channel: discord.Channel, message_id):
         try:
             msg = await self.bot.get_message(channel, message_id)
         except discord.NotFound:
@@ -98,7 +117,7 @@ class MessageQuote:
             icon_url=msg.server.icon_url
         )
 
-        await self.bot.say(embed=em)
+        await self.bot.send_message(ctx.message.channel, embed=em)
 
 
 def check_folder():
