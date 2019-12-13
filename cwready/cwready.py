@@ -400,7 +400,8 @@ class CWReady:
                 em.add_field(
                     name='Win %',
                     value='Last 10: {last_10:.0%}, Last 20: {last_20:.0%}, Lifetime: {lifetime:.0%}'.format(
-                        **hist.get('win_rate'))
+                        **hist.get('win_rate')),
+                    inline=False,
                 )
 
             battles = hist.get('battles')
@@ -434,7 +435,8 @@ class CWReady:
 
                 em.add_field(
                     name='Last 20 Battles : {mia_str}'.format(mia_str=mia_str),
-                    value=' '.join(battle_list)
+                    value=' '.join(battle_list),
+                    inline=False,
                 )
         else:
             em.add_field(
@@ -442,7 +444,8 @@ class CWReady:
                 value=(
                     'RoyaleAPI does not have this player’s history in database. '
                     'This simply means that his/her clans have not accessed their CW analytics before.'
-                )
+                ),
+                inline=False,
             )
 
         em.set_footer(text=player_url, icon_url='https://smlbiobot.github.io/img/cr-api/cr-api-logo.png')
