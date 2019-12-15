@@ -25,14 +25,15 @@ DEALINGS IN THE SOFTWARE.
 """
 import asyncio
 import itertools
+import json
+import logging
+import os
 from itertools import zip_longest
+from random import choice
 
 import aiohttp
 import cogs
 import discord
-import json
-import logging
-import os
 import yaml
 from box import Box
 from cogs.utils import checks
@@ -41,7 +42,6 @@ from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import Context
-from random import choice
 
 logger = logging.getLogger(__name__)
 
@@ -191,7 +191,7 @@ CLAN_PERMISSION = {
     },
     'Y802UPG9': {
         'tag': 'Y802UPG9',
-        'role':'One',
+        'role': 'One',
         'assign_role': True,
         'member': True,
     }
@@ -1622,31 +1622,18 @@ class RACF:
         removed = await self.remove_roles(server, member, role_names)
         await self.bot.say("Removed {} from {}".format(", ".join(removed), member))
 
-        # send removal message
-        # await ctx.invoke(self.dmusers, self.config.messages.remove_recruit, member)
-
-        # skip message delete
-        # delete messages from recruit channel
-        # recruit_channel = discord.utils.get(ctx.message.server.channels, name='recruit')
-        # tmp = ctx.message
-        # to_delete = [ctx.message]
-        # async for message in self.bot.logs_from(recruit_channel, limit=200, before=tmp):
-        #     if message.author == member:
-        #         to_delete.append(message)
-        #
-        # for message in to_delete:
-        #     try:
-        #         await self.bot.delete_message(message)
-        #     except:
-        #         pass
-
     @commands.command(pass_context=True, no_pm=True)
-    async def reject(self, ctx, member: discord.Member):
+    async def reject(self, ctx, member: discord.Member, *, message=None):
         """Remove recruit."""
         verified = await check_manage_roles(ctx, self.bot)
         if not verified:
             return
-        await ctx.invoke(self.dmusers, self.config.messages.reject, member)
+        if message is None:
+            message = ''
+        else:
+            message = '**' + message + '**\n\n'
+        message += self.config.messages.reject
+        await ctx.invoke(self.dmusers, message, member)
         await ctx.invoke(self.rmrecruit, member)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['are'])
