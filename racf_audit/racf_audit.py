@@ -1658,7 +1658,7 @@ class RACFAudit:
                 await self.bot.say(msg)
 
             if war_day == 'War Day':
-                await self.bot.say("Note: we cannot detect members who have more than one battles to play.")
+                await self.bot.say("Note: we cannot detect members who have more than one battle to play.")
 
         # helper: not on discord:
         async def send_not_on_discord(member_tag):
