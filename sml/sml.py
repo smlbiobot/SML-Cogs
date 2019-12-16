@@ -28,8 +28,8 @@ import io
 import json
 import os
 from collections import defaultdict
-import discord
 
+import discord
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
@@ -136,7 +136,38 @@ class SML:
         except:
             pass
 
+    @commands.command(pass_context=True)
+    async def list_members(self, ctx, *args):
+        """List members.
 
+        list according to time joint
+        """
+        em = discord.Embed(
+            title="Server Members"
+        )
+        server = ctx.message.server
+        import datetime as dt
+        now = dt.datetime.utcnow()
+        def rel_date(time):
+            days = (now - time).days
+            return days
+        out = "\n".join([
+            "`{:3d}` **{}** {} days".format(index, m, rel_date(m.joined_at))
+            for index, m in
+            enumerate(
+                sorted(
+                    server.members,
+                    key=lambda x: x.joined_at
+                )[:30],
+                1
+            )
+        ])
+
+        em.add_field(
+            name="Members",
+            value=out
+        )
+        await self.bot.say(embed=em)
 
 
 def check_folder():
