@@ -137,37 +137,55 @@ class SML:
             pass
 
     @commands.command(pass_context=True, aliases=['lm'])
-    async def list_members(self, ctx, *args):
+    async def list_members(self, ctx, *, roles=None):
         """List members.
 
         list according to time joint
         """
-        em = discord.Embed(
-            title="Server Members"
-        )
+
         server = ctx.message.server
         import datetime as dt
         now = dt.datetime.utcnow()
-        def rel_date(time):
-            days = (now - time).days
-            return days
-        out = "\n".join([
-            "`{:3d}` **{}** {} days".format(index, m, rel_date(m.joined_at))
-            for index, m in
-            enumerate(
-                sorted(
-                    server.members,
-                    key=lambda x: x.joined_at
-                )[:30],
-                1
-            )
-        ])
 
-        em.add_field(
-            name="Members",
-            value=out
-        )
-        await self.bot.say(embed=em)
+        members = server.members
+        if roles:
+            roles = roles.split(" ")
+            for role in roles:
+                r = discord.utils.get(server.roles, name=role)
+                if r:
+                    members = [m for m in members if r in m.roles]
+
+        if members:
+            desc = "All"
+            if roles:
+                desc = "with Roles: {}".format(", ".join(roles))
+            em = discord.Embed(
+                title="Server Members",
+                description=desc
+            )
+
+            def rel_date(time):
+                days = (now - time).days
+                return days
+            out = "\n".join([
+                "`{:3d}` **{}** {} days".format(index, m, rel_date(m.joined_at))
+                for index, m in
+                enumerate(
+                    sorted(
+                        members,
+                        key=lambda x: x.joined_at
+                    )[:30],
+                    1
+                )
+            ])
+
+            em.add_field(
+                name="Members",
+                value=out
+            )
+            await self.bot.say(embed=em)
+        else:
+            await self.bot.say("No members found with those roles")
 
 
 def check_folder():
