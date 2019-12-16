@@ -910,8 +910,19 @@ class CRPlayerModel:
             'epic': 3,
             'legendary': 4
         }
+        sort_type = dict(
+            Troop=1,
+            Building=2,
+            Spell=3,
+        )
         cards = self.cards
-        cards = sorted(cards, key=lambda x: (sort_rarities[x.get('rarity', '').lower()] or 0, x.get('elixir', 0)))
+        cards = sorted(
+            cards, key=lambda x: (
+                sort_rarities[x.get('rarity', '').lower()] or 0,
+                sort_type.get(x.get('type'), 0),
+                x.get('elixir', 0)
+            )
+        )
 
         out = []
         for card in cards.copy():
@@ -923,7 +934,10 @@ class CRPlayerModel:
                 'emoji': bot_emoji.name(key),
                 'level': card['level'],
                 'count': card['count'],
-                'rarity': card['rarity']
+                'rarity': card['rarity'],
+                'elixir': card['elixir'],
+                'type': card.get('type'),
+                'type_sort': sort_type.get(card.get('type')),
             })
 
         return out
@@ -1719,6 +1733,11 @@ class CRProfile:
             color=color,
             url=profile_url)
         cards = player.card_collection(self.bot_emoji)
+        cards.sort(key=lambda x: (
+            -normalized_card_level(x),
+            x.get('type_sort', 0),
+            -x.get('elixir')
+        ))
         for rarity in ['Common', 'Rare', 'Epic', 'Legendary']:
             value = []
             for card in cards:
@@ -1729,9 +1748,9 @@ class CRProfile:
                                 card['emoji'], normalized_card_level(card)))
 
             if value:
-                em.add_field(name=rarity, value=' '.join(value))
+                em.add_field(name=rarity, value=' '.join(value), inline=False)
             else:
-                em.add_field(name=rarity, value='None')
+                em.add_field(name=rarity, value='None', inline=False)
 
         em.set_footer(
             text=profile_url,
