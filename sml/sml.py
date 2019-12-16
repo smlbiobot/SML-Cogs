@@ -136,7 +136,7 @@ class SML:
         except:
             pass
 
-    @commands.command(pass_context=True)
+    @commands.command(pass_context=True, aliases=['lm'])
     async def list_members(self, ctx, *args):
         """List members.
 
