@@ -227,7 +227,7 @@ class BrawlStars:
 
     def get_emoji(self, name):
         for emoji in self.bot.get_all_emojis():
-            if emoji.name == str(name):
+            if emoji.name == str(str(name).replace('-', '')):
                 return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
@@ -529,7 +529,10 @@ class BrawlStars:
             await self.send_error_message(ctx)
         else:
             # await self.bot.say(embed=self._player_embed_2(player))
-            await self.bot.say(self._player_str(player, sort=sort))
+            s = self._player_str(player, sort=sort)
+            ss = s.split('\n')
+            await self.bot.say("\n".join(ss[:20]))
+            await self.bot.say("\n".join(ss[20:]))
 
     @bs.command(name="profiletag", aliases=['pt'], pass_context=True)
     async def bs_profile_tag(self, ctx, tag=None):
