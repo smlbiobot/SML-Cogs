@@ -1192,11 +1192,10 @@ class RACFAudit:
             names = list(names)
             names.remove('-startswith')
 
+        if option_mini:
+            member_models = [m for m in member_models if m.get('clan', {}).get('tag') != '#9R8G9290']
+
         for index, member_model in enumerate(member_models, 1):
-            # exclude mini
-            if option_mini:
-                if member_model.get('clan', {}).get('tag') == '9R8G9290':
-                    continue
             # simple search
             for name in names:
                 add_it = False
