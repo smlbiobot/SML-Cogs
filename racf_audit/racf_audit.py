@@ -1085,6 +1085,8 @@ class RACFAudit:
                 continue
             if 'Bot Commander' in result_role_names:
                 continue
+            if 'MOD' in result_role_names:
+                continue
 
             to_remove_role_names = []
             for role_name in MEMBER_ROLE_NAMES:
