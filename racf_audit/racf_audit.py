@@ -1168,8 +1168,9 @@ class RACFAudit:
         """Look up member rank within the family.
 
         Options:
-        -startswith search names from the start only
+        -startswith   search names from the start only
         -link         link to profiles
+        -mini         exclude mini clan
         """
         await self.bot.type()
 
@@ -1185,12 +1186,17 @@ class RACFAudit:
 
         option_startwith = '-startswith' in names
         option_link = '-link' in names
+        option_mini = '-mini' in names
 
         if option_startwith:
             names = list(names)
             names.remove('-startswith')
 
         for index, member_model in enumerate(member_models, 1):
+            # exclude mini
+            if option_mini:
+                if member_model.get('clan', {}).get('tag') == '9R8G9290':
+                    continue
             # simple search
             for name in names:
                 add_it = False
