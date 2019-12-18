@@ -1068,6 +1068,7 @@ class RACFAudit:
             except KeyError:
                 pass
 
+
         # remove member roles from people who are not in our clans
         for result in audit_results['not_in_our_clans']:
             result_role_names = [r.name for r in result.roles]
@@ -1077,6 +1078,12 @@ class RACFAudit:
             if 'Keep-Member' in result_role_names:
                 continue
             if 'Leader-Emeritus' in result_role_names:
+                continue
+            if 'FamilyLead' in result_role_names:
+                continue
+            if 'BS-FamilyLead' in result_role_names:
+                continue
+            if 'Bot Commander' in result_role_names:
                 continue
 
             to_remove_role_names = []
