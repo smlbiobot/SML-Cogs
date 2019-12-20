@@ -299,13 +299,34 @@ class BrawlStarsOfficial:
         em.add_field(name=player.club.name, value=player.club.tag, inline=False)
 
         # fields
-        em.add_field(name='Trophies', value="{} / {} PB".format(player.trophies, player.highestTrophies))
-        em.add_field(name='Big Brawler', value="{}".format(format_time(player.bestTimeAsBigBrawler or 0)))
-        em.add_field(name='Robo Rumble', value="{}".format(format_time(player.bestRoboRumbleTime or 0)))
-        em.add_field(name='XP', value="{}".format(player.expLevel or ''))
-        em.add_field(name='Victories', value="{}".format(player['3vs3Victories'] or ''))
-        em.add_field(name='Solo SD', value="{}".format(player.soloVictories or ''))
-        em.add_field(name='Duo SD', value="{}".format(player.duoVictories or ''))
+        em.add_field(
+            name='Trophies',
+            value="{} / {} PB \n{} XP".format(
+                player.trophies or 0,
+                player.highestTrophies or 0,
+                player.expLevel or 0,
+            ),
+            inline=False
+        )
+        em.add_field(
+            name='Time',
+            value="Big Brawler: {} \nRobo Rumble: {}".format(
+                format_time(player.bestTimeAsBigBrawler or 0),
+                format_time(player.bestRoboRumbleTime or 0),
+            ),
+            inline=False
+        )
+
+        em.add_field(name="Brawlers Unlocked", value=str(len(player.brawlers)))
+        em.add_field(
+            name='Victories',
+            value="**{}** 3v3, **{}** Solo SD, **{}** Duo SD".format(
+                player['3vs3Victories'] or 0,
+                player.soloVictories or 0,
+                player.duoVictories or 0
+            ),
+            inline=False
+        )
 
         # brawlers
         brawlers = sorted(
@@ -316,7 +337,6 @@ class BrawlStarsOfficial:
             ),
             reverse=True,
         )
-        em.add_field(name="Brawlers Unlocked", value=str(len(player.brawlers)), inline=False)
 
         o = []
         for b in brawlers or []:
