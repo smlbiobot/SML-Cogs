@@ -355,9 +355,10 @@ class BrawlStarsOfficial:
         for index, group in enumerate(grouper(o, f)):
             i0 = (index * f) + 1
             i1 = (index + 1) * f
+            grp = [g for g in group if g]
             em.add_field(
                 name="Brawlers {}-{}".format(i0, i1),
-                value='\n'.join(group),
+                value='\n'.join(grp),
                 inline=False,
             )
 
@@ -593,7 +594,8 @@ class BrawlStarsOfficial:
         except APIError:
             await self.send_error_message(ctx)
         else:
-            await self.bot.say(self._player_str(player))
+            # await self.bot.say(self._player_str(player))
+            await self.bot.say(embed=self._player_embed_2(player=player))
 
     @bs.command(name="verify", aliases=['v'], pass_context=True)
     @commands.has_any_role(*MANAGE_ROLE_ROLES)
