@@ -23,24 +23,25 @@ DEALINGS IN THE SOFTWARE.
 """
 
 import asyncio
-from collections import defaultdict
-from collections import namedtuple
-from itertools import zip_longest
-
-import aiofiles
-import aiohttp
-import discord
 import json
 import os
 import re
 import socket
+from collections import defaultdict
+from collections import namedtuple
+from itertools import zip_longest
+from random import choice
+
+import aiofiles
+import aiohttp
+import discord
+import stringcase
 import yaml
 from cogs.utils import checks
 from cogs.utils.chat_formatting import bold
 from cogs.utils.chat_formatting import inline
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
-from random import choice
 
 PATH = os.path.join("data", "brawlstars_official")
 JSON = os.path.join(PATH, "settings.json")
@@ -135,8 +136,8 @@ async def api_fetch(url=None, auth=None):
         family=socket.AF_INET,
         verify_ssl=False,
     )
-    headers=dict(
-        Authorization="Bearer: "+auth
+    headers = dict(
+        Authorization="Bearer: " + auth
     )
     try:
         async with aiohttp.ClientSession(connector=conn) as session:
@@ -213,6 +214,11 @@ def normalized_trophy_by_level(trophy, level, count=1):
     """
     return trophy / (1 * count + 0.05 * (level - 1))
 
+def format_time(sec):
+    mins, secs = divmod(sec, 60)
+    return '{}m {}s'.format(mins, secs)
+
+
 
 class BrawlStarsOfficial:
     """Brawl Stars API"""
@@ -281,11 +287,7 @@ class BrawlStarsOfficial:
 
     def _player_embed_2(self, player: BSPlayer):
         """New player embed."""
-        if player.avatarId:
-            avatar = self.get_avatar(player)
-            description = '{} #{}'.format(avatar, player.tag.upper())
-        else:
-            description = '#{}'.format(player.tag.upper())
+        description = '{}'.format(player.tag.upper())
 
         em = discord.Embed(
             title=player.name,
@@ -294,38 +296,51 @@ class BrawlStarsOfficial:
         )
 
         # club
-        em.add_field(name=player.club.name, value=player.club.role, inline=False)
+        em.add_field(name=player.club.name, value=player.club.tag, inline=False)
 
         # fields
         em.add_field(name='Trophies', value="{} / {} PB".format(player.trophies, player.highestTrophies))
-        em.add_field(name='Boss', value="{}".format(player.bestTimeAsBoss or ''))
-        em.add_field(name='Robo Rumble', value="{}".format(player.bestRoboRumbleTime or ''))
-        em.add_field(name='XP', value="{}".format(player.totalExp or ''))
-        em.add_field(name='Victories', value="{}".format(player.victories or ''))
-        em.add_field(name='Solo SD', value="{}".format(player.soloShowdownVictories or ''))
-        em.add_field(name='Duo SD', value="{}".format(player.duoShowdownVictories or ''))
+        em.add_field(name='Big Brawler', value="{}".format(format_time(player.bestTimeAsBigBrawler or 0)))
+        em.add_field(name='Robo Rumble', value="{}".format(format_time(player.bestRoboRumbleTime or 0)))
+        em.add_field(name='XP', value="{}".format(player.expLevel or ''))
+        em.add_field(name='Victories', value="{}".format(player['3vs3Victories'] or ''))
+        em.add_field(name='Solo SD', value="{}".format(player.soloVictories or ''))
+        em.add_field(name='Duo SD', value="{}".format(player.duoVictories or ''))
 
         # brawlers
-        em.add_field(name="Brawlers Unlocked", value=player.brawlersUnlocked, inline=False)
+        brawlers = sorted(
+            player.brawlers,
+            key=lambda x:(
+                x.get('trophies', 0),
+                x.get('highestTrophies', 0)
+            ),
+            reverse=True,
+        )
+        em.add_field(name="Brawlers Unlocked", value=str(len(player.brawlers)), inline=False)
 
         o = []
-        for b in player.brawlers or []:
+        for b in brawlers or []:
+            emoji = self.get_emoji(b.name.lower().replace(' ', ''))
             o.append(
-                '{emoji} `{trophies: >3} / {pb: >3} Lvl {level: >2}\u2800` {name}'.format(
-                    emoji=self.get_emoji(b.name.lower().replace(' ', '')),
+                '{emoji} `{trophies: >3} / {pb: >3} Lvl {level: >2}`\u2800  {name}'.format(
+                    emoji=emoji,
                     trophies=b.trophies,
                     pb=b.highestTrophies,
                     level=b.power,
-                    name=b.name
+                    name=stringcase.titlecase(b.name.lower()),
                 )
             )
 
-        em.add_field(name="Brawlers {}/22".format(len(player.brawlers)), value='\n'.join(o))
+        f = 5
+        for index, group in enumerate(grouper(o, f)):
+            i0 = (index * f) + 1
+            i1 = (index + 1) * f
+            em.add_field(
+                name="Brawlers {}-{}".format(i0, i1),
+                value='\n'.join(group),
+                inline=False,
+            )
 
-        # footer
-        em.set_footer(
-            text="Data by BrawlAPI https://api.starlist.pro"
-        )
         return em
 
     def _player_mini_str(self, player: BSPlayer):
@@ -542,10 +557,12 @@ class BrawlStarsOfficial:
             await self.send_error_message(ctx)
         else:
             # await self.bot.say(embed=self._player_embed_2(player))
-            s = self._player_str(player, sort=sort)
-            ss = s.split('\n')
-            await self.bot.say("\n".join(ss[:20]))
-            await self.bot.say("\n".join(ss[20:]))
+            # s = self._player_str(player, sort=sort)
+            # ss = s.split('\n')
+            # await self.bot.say("\n".join(ss[:20]))
+            # await self.bot.say("\n".join(ss[20:]))
+
+            await self.bot.say(embed=self._player_embed_2(player=player))
 
     @bs.command(name="profiletag", aliases=['pt'], pass_context=True)
     async def bs_profile_tag(self, ctx, tag=None):
