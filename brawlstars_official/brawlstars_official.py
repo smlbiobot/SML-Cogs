@@ -214,10 +214,10 @@ def normalized_trophy_by_level(trophy, level, count=1):
     """
     return trophy / (1 * count + 0.05 * (level - 1))
 
+
 def format_time(sec):
     mins, secs = divmod(sec, 60)
     return '{}m {}s'.format(mins, secs)
-
 
 
 class BrawlStarsOfficial:
@@ -310,7 +310,7 @@ class BrawlStarsOfficial:
         # brawlers
         brawlers = sorted(
             player.brawlers,
-            key=lambda x:(
+            key=lambda x: (
                 x.get('trophies', 0),
                 x.get('highestTrophies', 0)
             ),
