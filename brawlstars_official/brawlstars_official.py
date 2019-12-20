@@ -423,7 +423,7 @@ class BrawlStarsOfficial:
 
     async def send_error_message(self, ctx):
         channel = ctx.message.channel
-        await self.bot.send_message(channel, "BrawlAPI Error. Please try again later…")
+        await self.bot.send_message(channel, "BrawlStarsAPI Error. Please try again later…")
 
     async def _api_fetch(self, section=None, **kwargs):
         data = dict()
@@ -439,7 +439,7 @@ class BrawlStarsOfficial:
     async def bsset(self, ctx):
         """Set Brawl Stars API settings.
 
-        Require https://brawlapi.cf/api
+        Require https://api.brawlstars.com
         """
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
