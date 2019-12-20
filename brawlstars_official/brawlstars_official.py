@@ -332,7 +332,7 @@ class BrawlStarsOfficial:
         """Minimal player profile for verification."""
         avatar = self.get_avatar(player)
         o = [
-            '{}'.format(avatar),
+            # '{}'.format(avatar),
             '{} {}'.format(bold(player.name), player.tag),
             '{} {}'.format(player.club.name, player.club.tag) if player.club else 'No Clan',
             '{} {} / {}'.format(self.get_emoji('bstrophy'), player.trophies, player.highestTrophies),
@@ -344,7 +344,7 @@ class BrawlStarsOfficial:
         avatar = self.get_avatar(player)
 
         o = [
-            '{}'.format(avatar),
+            # '{}'.format(avatar),
             '{} {}'.format(bold(player.name), player.tag),
             # '{}, {} #{}'.format(player.club.role, player.club.name, player.club.tag) if player.club else 'No Clan',
             '{} {}'.format(player.club.name, player.club.tag) if player.club else 'No Clan',
