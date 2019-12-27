@@ -38,6 +38,8 @@ from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import Context
+from discord.ext.commands.converter import MemberConverter
+from discord.ext.commands.converter import BadArgument
 
 BOT_COMMANDER_ROLES = ["Bot Commander", "High-Elder"]
 PATH = os.path.join("data", "mm")
@@ -600,7 +602,7 @@ class MemberManagement:
 
     @commands.command(pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_roles=True)
-    async def multiaddrole(self, ctx, role_name, *members: discord.Member):
+    async def multiaddrole(self, ctx, role_name, *members):
         """Add a role to multiple users.
 
         !multiaddrole rolename User1 User2 User3
@@ -609,7 +611,20 @@ class MemberManagement:
         if role is None:
             await self.bot.say("Role not found.")
             return
-        tasks = [self.add_role(member, role, channel=ctx.message.channel) for member in members]
+
+        # check for valid members
+        valid_members = []
+
+        for member in members:
+            try:
+                cvt = MemberConverter(ctx, member)
+                m = cvt.convert()
+            except BadArgument as e:
+                await self.bot.say("{} is not a valid member".format(member))
+            else:
+                valid_members.append(m)
+
+        tasks = [self.add_role(member, role, channel=ctx.message.channel) for member in valid_members]
         await self.bot.type()
         await asyncio.gather(*tasks)
         await self.bot.say("Task completed.")
