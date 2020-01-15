@@ -90,8 +90,7 @@ class BSPlayer(Box):
     """Player model"""
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-
+        super().__init__(*args, default_box=True)
 
 class BSClub(Box):
     """Player model"""
@@ -259,7 +258,15 @@ class BrawlStarsOfficial:
         )
 
         # club
-        em.add_field(name=player.club.name, value=player.club.role, inline=False)
+        player_club_name = player.club.name
+        player_club_role = player.club.role
+
+        if player_club_name == {}:
+            player_club_name = 'No Club'
+        if player_club_role == {}:
+            player_club_role = 'No Role'
+
+        em.add_field(name=player_club_name, value=player_club_role, inline=False)
 
         # fields
         em.add_field(name='Trophies', value="{} / {} PB".format(player.trophies, player.highestTrophies))
@@ -296,7 +303,15 @@ class BrawlStarsOfficial:
         )
 
         # club
-        em.add_field(name=player.club.name, value=player.club.tag, inline=False)
+        player_club_name = player.club.name
+        player_club_tag = player.club.tag
+
+        if not player_club_name:
+            player_club_name = 'Not in club'
+        if not player_club_tag:
+            player_club_tag = 'N/A'
+
+        em.add_field(name=player_club_name, value=player_club_tag, inline=False)
 
         # fields
         em.add_field(
