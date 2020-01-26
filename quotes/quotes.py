@@ -24,20 +24,18 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import os
 from collections import defaultdict
 
-import os
-from discord.ext import commands
-
-from cogs.utils import checks
 from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "quotes")
 JSON = os.path.join(PATH, "settings.json")
 
 BOTCOMMANDER_ROLES = ["Bot Commander", "MOD", "AlphaFamilyLead"]
-MEMBER_ROLES = ["Member", "BS-Member"]
+MEMBER_ROLES = ["Member", "BS-Member", "Guest"]
 
 
 def nested_dict():
