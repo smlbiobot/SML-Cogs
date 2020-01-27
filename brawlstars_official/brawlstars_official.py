@@ -356,7 +356,6 @@ class BrawlStarsOfficial:
         o = []
         for b in brawlers or []:
             emoji_name = b.name.lower().replace(' ', '').replace('-', '').replace('.', '')
-            print(emoji_name)
             emoji = self.get_emoji(emoji_name)
             o.append(
                 '{emoji} `{trophies: >3} / {pb: >3} Lvl {level: >2}`\u2800  {name}'.format(
