@@ -227,7 +227,7 @@ class BrawlStars:
 
     def get_emoji(self, name):
         for emoji in self.bot.get_all_emojis():
-            if emoji.name == str(str(name).replace('-', '')):
+            if emoji.name == str(str(name).replace('-', '').replace('.', '')):
                 return '<:{}:{}>'.format(emoji.name, emoji.id)
         return ''
 
@@ -266,7 +266,7 @@ class BrawlStars:
 
         for b in player.brawlers or []:
             em.add_field(
-                name="{} {}".format(self.get_emoji(b.name.lower().replace(' ', '')), b.name),
+                name="{} {}".format(self.get_emoji(b.name.lower().replace(' ', '').replace('-', '')), b.name),
                 value="{} / {} Lvl {}".format(b.trophies, b.highestTrophies, b.power)
             )
 
@@ -309,7 +309,7 @@ class BrawlStars:
         for b in player.brawlers or []:
             o.append(
                 '{emoji} `{trophies: >3} / {pb: >3} Lvl {level: >2}\u2800` {name}'.format(
-                    emoji=self.get_emoji(b.name.lower().replace(' ', '')),
+                    emoji=self.get_emoji(b.name.lower().replace(' ', '').replace('-', '')),
                     trophies=b.trophies,
                     pb=b.highestTrophies,
                     level=b.power,
