@@ -267,16 +267,24 @@ class Deck:
 
     async def decklink_to_cards(self, url):
         """Convert decklink to cards."""
-        m = re.search('(http|ftp|https)://link.clashroyale.com/deck/..\?deck=[\d\;]+', url)
-        if not m:
-            return None
-        url = m.group()
-        decklinks = re.findall('2\d{7}', url)
-        card_keys = []
-        for decklink in decklinks:
-            card_key = await self.card_decklink_to_key(decklink)
-            if card_key is not None:
-                card_keys.append(card_key)
+        card_keys = None
+        # search for Clash Royale decks
+        m_crlink = re.search('(http|ftp|https)://link.clashroyale.com/deck/..\?deck=[\d\;]+', url)
+
+        # search for royaleapi deck stats link
+        m_rapilink = re.search('(https|http)://royaleapi.com/decks/stats/([a-z,-]+)', url)
+        if m_crlink:
+            url = m_crlink.group()
+            decklinks = re.findall('2\d{7}', url)
+            card_keys = []
+            for decklink in decklinks:
+                card_key = await self.card_decklink_to_key(decklink)
+                if card_key is not None:
+                    card_keys.append(card_key)
+        elif m_rapilink:
+            s = m_rapilink.group(2)
+            card_keys = s.split(',')
+
         return card_keys
 
     @deck.command(name="getlink", aliases=['gl'], pass_context=True, no_pm=True)
