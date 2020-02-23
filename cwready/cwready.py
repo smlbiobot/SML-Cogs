@@ -101,7 +101,7 @@ class CWReady:
             if not os.path.exists(CONFIG_YAML):
                 return {}
             with open(CONFIG_YAML) as f:
-                self._config = yaml.load(f)
+                self._config = yaml.load(f, Loader=yaml.FullLoader)
         return self._config
 
     @property
@@ -176,28 +176,49 @@ class CWReady:
 
     async def send_cwr_req_results_channel(self, channel, data):
         """Send CWR requirement results."""
+        # test challenge wins
+        if await self.test_challenge_wins(data):
+            await self.bot.send_message(
+                channel,
+                ":white_check_mark: Challenge Wins"
+            )
+        else:
+            await self.bot.send_message(
+                channel,
+                ":x: Challenge Wins"
+            )
+
+        # test clan requirements
         try:
             clans = await self.test_cwr_requirements(data)
         except MinChallengeWinFailed:
-            await self.bot.send_message(
-                channel,
-                "User does not meet requirements for any of our clans. "
-                "Minimum challenge wins lower than 12."
-            )
-            return
+            pass
         else:
             if len(clans) == 0:
                 await self.bot.send_message(
                     channel,
-                    "User’s card levels do not meet requirements for any of our clans."
+                    ":x: CWR"
                 )
             else:
                 await self.bot.send_message(
                     channel,
-                    "Qualified clans by CWR: {}. {}".format(
+                    ":white_check_mark: CWR: {}".format(
                         ", ".join([clan.get('name') for clan in clans]),
-                        self.config.get('addendum', '')
+                        # self.config.get('addendum', '')
                     ))
+        # test trophy requirements
+        clans = await self.test_trophy_req(data)
+        if len(clans) == 0:
+            await self.bot.send_message(
+                channel,
+                ":x: Trophies"
+            )
+        else:
+            await self.bot.send_message(
+                channel,
+                ":white_check_mark: Trophies: {}".format(
+                    ", ".join(clans)
+                ))
 
     async def fetch_json(self, url, headers=None, error_dict=None):
         conn = aiohttp.TCPConnector(
@@ -277,13 +298,71 @@ class CWReady:
 
         return req
 
+    async def fetch_trophy_requirements(self, tags):
+        data_list = await self.fetch_clans(tags)
+        req = []
+        for clan in data_list:
+            desc = clan.get('description', '')
+            match = re.search('[\d,O]{4,}', desc)
+            pb_match = re.search('PB', desc)
+            psf_match = re.search('PSF', desc)
+            name = clan.get('name')
+            if match is not None:
+                trophies = match.group(0)
+                trophies = trophies.replace(',', '')
+                trophies = trophies.replace('O', '0')
+            else:
+                trophies = clan.get('requiredTrophies')
+            trophy_type = 'current'
+            if pb_match is not None:
+                trophy_type = 'pb'
+            if psf_match is not None:
+                trophy_type = 'psf'
+            try:
+                trophies = int(trophies)
+            except ValueError:
+                trophies = 0
+            req.append(
+                dict(
+                    name=name,
+                    trophies=trophies,
+                    trophy_type=trophy_type
+                )
+            )
+        return req
+
+
+    async def test_challenge_wins(self, cwr_data):
+        """Test if cwr data meets minimum required."""
+        return cwr_data.get('challenge_max_wins', 0) >= self.config.get('min_challenge_wins', 0)
+
+    async def test_trophy_req(self, cwr_data):
+        """Test if user meets trophy requirements"""
+        qual = []
+        tags = [clan.get('tag') for clan in self.config.get('clans', [])]
+        reqs = await self.fetch_trophy_requirements(tags)
+        trophies = cwr_data.get('trophies')
+        trophies_best = cwr_data.get('trophies_best')
+        for req in reqs:
+            req_trophy_type = req.get('trophy_type')
+            req_trophies = req.get('trophies', 0)
+            req_clan = req.get('name')
+            if req_trophy_type == 'current':
+                if trophies >= req_trophies:
+                    qual.append(req_clan)
+            elif req_trophy_type in ['pb', 'psf']:
+                if trophies_best >= req_trophies:
+                    qual.append(req_clan)
+        return qual
+
+
     async def test_cwr_requirements(self, cwr_data):
         """Find which clan candidate meets requirements for."""
         qual = []
 
         # test minimum challenge wins
-        if cwr_data.get('challenge_max_wins', 0) < self.config.get('min_challenge_wins', 0):
-            raise MinChallengeWinFailed
+        # if cwr_data.get('challenge_max_wins', 0) < self.config.get('min_challenge_wins', 0):
+        #     raise MinChallengeWinFailed
 
         tags = [clan.get('tag') for clan in self.config.get('clans', [])]
         reqs = await self.fetch_cwr_requirements(tags)
