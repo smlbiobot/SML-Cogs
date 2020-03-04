@@ -28,6 +28,7 @@ import io
 import json
 import os
 from collections import defaultdict
+from random import sample
 
 import discord
 from cogs.utils import checks
@@ -188,6 +189,20 @@ class SML:
         else:
             await self.bot.say("No members found with those roles")
 
+    async def _get_reacted_users(self, reaction):
+        reaction_users = []
+        after = None
+        count = 100
+        while True:
+            reacted = await self.bot.get_reaction_users(reaction, limit=count, after=after)
+            reaction_users.extend(reacted)
+            after = reacted[-1]
+            if len(reacted) != count:
+                break
+            import asyncio
+            await  asyncio.sleep(0)
+        return reaction_users
+
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, aliases=['gtr'])
     async def giveaway_tourney_roles(self, ctx):
@@ -226,7 +241,7 @@ class SML:
 
             pekka_reaction = reaction
 
-        reaction_users = await self.bot.get_reaction_users(pekka_reaction)
+        reaction_users = await self._get_reacted_users(pekka_reaction)
 
         giveaway_role = discord.utils.get(server.roles, name='Emote.Giveaway')
 
@@ -243,13 +258,67 @@ class SML:
             if member and giveaway_role not in member.roles:
                 members.append(member)
 
+        await self.bot.say("Total reacted members: {}".format(len(user_ids)))
         await self.bot.say("Total members without role: {}".format(len(members)))
 
         for member in members:
             await self.bot.add_roles(member, giveaway_role)
             await self.bot.say("Add Giveaway role to {}".format(member.mention))
 
+        remove_members = []
+        for member in server.members:
+            if giveaway_role in member.roles:
+                if member.id not in user_ids:
+                    remove_members.append(member)
+
+        await self.bot.say("People who should be removed count: {}".format(len(remove_members)))
+
+        for member in remove_members:
+            await self.bot.remove_roles(member, giveaway_role)
+            await self.bot.say("Remove Giveaway role from {}".format(member.mention))
+
         await self.bot.say("task completed")
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True, aliases=['gvr'])
+    async def giveaway_raffles(self, ctx, channel: discord.Channel, message_id, count=1):
+        """
+        Run a giveaway raffle against a message ID in channel.
+        :param ctx:
+        :param message_id:
+        :param pick:
+        :return:
+        """
+        message = await self.bot.get_message(channel, message_id)
+
+        pekka_reaction = None
+        for reaction in message.reactions:
+            if reaction.custom_emoji:
+                # <:emoji_name:emoji_id>
+                emoji = '<:{}:{}>'.format(
+                    reaction.emoji.name,
+                    reaction.emoji.id)
+            else:
+                emoji = reaction.emoji
+
+            if emoji != '<:pekka:683662006917922850>':
+                continue
+
+            pekka_reaction = reaction
+
+        reaction_users = await self._get_reacted_users(pekka_reaction)
+
+        picks = sample(reaction_users, count)
+
+        o = [
+            "Congratulations to ",
+            " ".join([m.mention for m in picks]),
+            "! You have won the giveaway raffle! ",
+            "Please provide your player tags to SML. "
+            "Emotes will be delivered in 48 hours."
+        ]
+
+        await self.bot.say(" ".join(o))
 
 
 def check_folder():
