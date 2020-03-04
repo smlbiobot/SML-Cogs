@@ -938,7 +938,7 @@ class Deck:
                     pass
 
     async def post_deck(self, channel=None, title=None, description=None, timestamp=None, card_keys=None,
-                        deck_name=None, deck_author=None, color=None, player_tag=None):
+                        deck_name=None, deck_author=None, color=None, player_tag=None, link=None):
         """Post a deck to destination channel.
 
         If image server is set, post as an embed.
@@ -958,11 +958,15 @@ class Deck:
                                                           deck_author or self.bot.name)
 
                 img_url = img_msg.attachments[0].get('url')
+                if link is not None:
+                    url = link
+                else:
+                    url = await self.decklink_url(card_keys)
                 em = discord.Embed(
                     title=title or "Deck",
                     description=description,
                     color=color or discord.Color.blue(),
-                    url=await self.decklink_url(card_keys),
+                    url=url,
                     timestamp=timestamp or dt.datetime.utcnow(),
                 )
 
@@ -970,7 +974,7 @@ class Deck:
                     "[Deck Stats]({})".format(
                         'https://royaleapi.com/decks/stats/{}'.format(','.join(card_keys))
                     ),
-                    "[Copy Deck]({})".format(
+                    "[Copy]({})".format(
                         await self.decklink_url(card_keys)
                     ),
                     "[War]({})".format(

@@ -45,8 +45,6 @@ DELAY = dt.timedelta(minutes=5).total_seconds()
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-# DELAY = dt.timedelta(seconds=1).total_seconds()
-
 
 def nested_dict():
     """Recursively nested defaultdict."""
@@ -213,6 +211,10 @@ class RACFDecks:
                 color = discord.Color.gold()
 
             try:
+                if cc:
+                    link = 'https://royaleapi.com/decks/winner/cc'
+                else:
+                    link = 'https://royaleapi.com/decks/winner/gc'
                 await deck_cog.post_deck(
                     channel=channel,
                     title="12-win {} deck".format('CC' if cc else 'GC'),
@@ -222,6 +224,7 @@ class RACFDecks:
                     timestamp=dt.datetime.utcfromtimestamp(ts / 1000),
                     color=color,
                     player_tag=player_tag,
+                    link=link
                 )
             except discord.DiscordException as e:
                 print(e)
