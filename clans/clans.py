@@ -59,7 +59,7 @@ CLAN_WARS_CACHE = os.path.join(PATH, "clan_wars_cache.json")
 
 EMOJI_CW_TROPHY = '<:cwtrophy:450878327880941589>'
 
-TASK_INTERVAL = 57
+TASK_INTERVAL = 57 * 5
 
 
 def nested_dict():
