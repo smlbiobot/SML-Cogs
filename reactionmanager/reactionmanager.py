@@ -24,16 +24,16 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 """
 
+import os
 from collections import defaultdict
 
 import discord
-import os
-from __main__ import send_cmd_help
-from discord.ext import commands
-
 from cogs.utils import checks
-from cogs.utils.chat_formatting import pagify, bold, escape_mass_mentions
+from cogs.utils.chat_formatting import bold
+from cogs.utils.chat_formatting import escape_mass_mentions
+from cogs.utils.chat_formatting import pagify
 from cogs.utils.dataIO import dataIO
+from discord.ext import commands
 
 PATH = os.path.join("data", "reactionmanager")
 JSON = os.path.join(PATH, "settings.json")
@@ -55,7 +55,7 @@ class ReactionManager:
     async def reactionmanager(self, ctx):
         """Reaction Manager."""
         if ctx.invoked_subcommand is None:
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
 
     @reactionmanager.command(name='add', pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_messages=True)
@@ -71,7 +71,7 @@ class ReactionManager:
         channel = ctx.message.channel
 
         if not len(args):
-            await send_cmd_help(ctx)
+            await self.bot.send_cmd_help(ctx)
             return
 
         has_message_id = args[0].isdigit()
@@ -136,7 +136,7 @@ class ReactionManager:
 
     @reactionmanager.command(name="get", pass_context=True, no_pm=True)
     @checks.mod_or_permissions(manage_messages=True)
-    async def rm_get(self, ctx, channel: discord.Channel, message_id, *, args):
+    async def rm_get(self, ctx, channel: discord.Channel, message_id, *, args=None):
         """Display list of reactions added by users.
 
         Options:
@@ -148,12 +148,21 @@ class ReactionManager:
             await self.bot.say("Cannot find that message id.")
             return
 
-        output_id = '-id' in args
+        output_id = False
+        id_only = False
+        if args:
+            output_id = '-id' in args
+            id_only = '--idonly' in args
 
         out = await self.get_reactions(message, exclude_self=True, output_id=output_id)
 
-        for page in pagify('\n'.join(out), shorten_by=24):
-            await self.bot.say(page)
+        # with open('/Users/sml/Desktop/emote_out.txt', 'w') as f:
+        #     f.write('\n'.join(out))
+
+        for page in pagify('\n'.join(out), shorten_by=100):
+            # print(page)
+            if page:
+                await self.bot.say(page)
 
     @reactionmanager.command(name="getserver", pass_context=True, no_pm=True)
     @checks.is_owner()
