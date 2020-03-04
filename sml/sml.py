@@ -167,6 +167,7 @@ class SML:
             def rel_date(time):
                 days = (now - time).days
                 return days
+
             out = "\n".join([
                 "`{:3d}` **{}** {} days".format(index, m, rel_date(m.joined_at))
                 for index, m in
@@ -186,6 +187,69 @@ class SML:
             await self.bot.say(embed=em)
         else:
             await self.bot.say("No members found with those roles")
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True, aliases=['gtr'])
+    async def giveaway_tourney_roles(self, ctx):
+        """
+        Check reactions added to specific message
+        add role to people who reacted
+        :return:
+        """
+        server = ctx.message.server
+        channel = None
+        for c in server.channels:
+            if c.name == 'self-roles':
+                channel = c
+
+        if channel is None:
+            return
+
+        message = await self.bot.get_message(
+            channel,
+            683662858306715675
+        )
+
+        # <:pekka:683662006917922850>
+        pekka_reaction = None
+        for reaction in message.reactions:
+            if reaction.custom_emoji:
+                # <:emoji_name:emoji_id>
+                emoji = '<:{}:{}>'.format(
+                    reaction.emoji.name,
+                    reaction.emoji.id)
+            else:
+                emoji = reaction.emoji
+
+            if emoji != '<:pekka:683662006917922850>':
+                continue
+
+            pekka_reaction = reaction
+
+        reaction_users = await self.bot.get_reaction_users(pekka_reaction)
+
+        giveaway_role = discord.utils.get(server.roles, name='Emote.Giveaway')
+
+        valid_users = []
+        for u in reaction_users:
+            if u == self.bot.user:
+                continue
+            valid_users.append(u)
+
+        user_ids = [u.id for u in valid_users]
+        members = []
+        for uid in user_ids:
+            member = server.get_member(uid)
+            if member and giveaway_role not in member.roles:
+                members.append(member)
+
+        await self.bot.say("Total members without role: {}".format(len(members)))
+
+        for member in members:
+            await self.bot.add_roles(member, giveaway_role)
+            await self.bot.say("Add Giveaway role to {}".format(member.mention))
+
+        await self.bot.say("task completed")
 
 
 def check_folder():
