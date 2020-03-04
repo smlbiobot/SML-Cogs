@@ -156,13 +156,16 @@ class ReactionManager:
 
         out = await self.get_reactions(message, exclude_self=True, output_id=output_id)
 
-        # with open('/Users/sml/Desktop/emote_out.txt', 'w') as f:
-        #     f.write('\n'.join(out))
+        with open('/Users/sml/Desktop/emote_out.txt', 'w') as f:
+            f.write('\n'.join(out))
 
-        for page in pagify('\n'.join(out), shorten_by=100):
-            # print(page)
-            if page:
-                await self.bot.say(page)
+        import textwrap
+        for o in out:
+            lines = textwrap.wrap(o, 500, break_long_words=False)
+            for line in lines:
+                if line:
+                    await self.bot.say(line)
+
 
     @reactionmanager.command(name="getserver", pass_context=True, no_pm=True)
     @checks.is_owner()
@@ -180,6 +183,20 @@ class ReactionManager:
 
         for page in pagify('\n'.join(out), shorten_by=24):
             await self.bot.say(page)
+
+    async def _get_reacted_users(self, reaction):
+        reaction_users = []
+        after = None
+        count = 100
+        while True:
+            reacted = await self.bot.get_reaction_users(reaction, limit=count, after=after)
+            reaction_users.extend(reacted)
+            after = reacted[-1]
+            if len(reacted) != count:
+                break
+            import asyncio
+            await  asyncio.sleep(0)
+        return reaction_users
 
     async def get_reactions(self, message, exclude_self=True, output_id=False):
         title = message.channel.name
@@ -205,7 +222,7 @@ class ReactionManager:
             else:
                 emoji = reaction.emoji
 
-            reaction_users = await self.bot.get_reaction_users(reaction)
+            reaction_users = await self._get_reacted_users(reaction)
             valid_users = []
             for u in reaction_users:
                 if exclude_self and u == self.bot.user:
@@ -238,7 +255,7 @@ class ReactionManager:
             ratio = count / total_count
             users_str = v['users_str']
             users_ids = v['users_ids']
-            value = '{}: **{}** ({:.2%}): {}'.format(emoji, count, ratio, users_str)
+            value = '{} : **{}** ({:.2%}): {}'.format(emoji, count, ratio, users_str)
             if output_id:
                 value += '| {}'.format(users_ids)
             out.append(value)
