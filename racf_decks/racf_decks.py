@@ -40,7 +40,7 @@ import logging
 PATH = os.path.join("data", "racf_decks")
 JSON = os.path.join(PATH, "settings.json")
 
-DELAY = dt.timedelta(minutes=5).total_seconds()
+DELAY = int(dt.timedelta(minutes=5).total_seconds() * 0.97)
 # DELAY = dt.timedelta(minutes=1).total_seconds()
 DEBUG = False
 
