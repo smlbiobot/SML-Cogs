@@ -41,8 +41,9 @@ PATH = os.path.join("data", "racf_decks")
 JSON = os.path.join(PATH, "settings.json")
 
 DELAY = int(dt.timedelta(minutes=5).total_seconds() * 0.97)
-# DELAY = dt.timedelta(minutes=1).total_seconds()
+# DELAY = 5
 DEBUG = False
+# DEBUG = True
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -50,6 +51,8 @@ logger = logging.getLogger(__name__)
 
 def debug(*args):
     if DEBUG:
+        # s = " ".join(args)
+        # logger.info(s)
         print(*args)
 
 def nested_dict():
@@ -299,6 +302,7 @@ class RACFDecks:
 
 
                     # await asyncio.sleep(3)
+                    debug("RACF DECKS: sleep: ", DELAY)
                     await asyncio.sleep(DELAY)
         except asyncio.CancelledError:
             pass
