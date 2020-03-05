@@ -1816,7 +1816,6 @@ class CRProfile:
                     inline=False
                 )
 
-        print(len(em.fields))
         if len(em.fields) == 0:
             em.add_field(
                 name="No tradable cards",
@@ -1857,7 +1856,8 @@ class CRProfile:
 
     async def on_message(self, msg):
         """Do transforms."""
-        await self.transform_friendlink(msg)
+        if self.bot.user.name != 'R2.Dev':
+            await self.transform_friendlink(msg)
 
     async def transform_friendlink(self, msg):
         """Convert friend invite links to embeds.
