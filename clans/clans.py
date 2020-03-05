@@ -179,15 +179,20 @@ class Clans:
 
     async def auto_tasks(self):
         try:
-            while True:
-                if self == self.bot.get_cog("Clans"):
-                    loop = asyncio.get_event_loop()
-                    loop.create_task(
-                        self.post_auto_clans()
-                    )
-                    loop.create_task(
-                        self.post_clanwars()
-                    )
+            if self == self.bot.get_cog("Clans"):
+                while True:
+                    tasks = [
+                        self.post_auto_clans(),
+                        self.post_clanwars(),
+                    ]
+                    await asyncio.gather(*tasks, return_exceptions=True)
+                    # loop = asyncio.get_event_loop()
+                    # loop.create_task(
+                    #     self.post_auto_clans()
+                    # )
+                    # loop.create_task(
+                    #     self.post_clanwars()
+                    # )
 
                     await asyncio.sleep(TASK_INTERVAL)
         except asyncio.CancelledError:
