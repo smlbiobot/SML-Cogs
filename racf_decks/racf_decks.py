@@ -41,10 +41,16 @@ PATH = os.path.join("data", "racf_decks")
 JSON = os.path.join(PATH, "settings.json")
 
 DELAY = dt.timedelta(minutes=5).total_seconds()
+# DELAY = dt.timedelta(minutes=1).total_seconds()
+DEBUG = False
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
+def debug(*args):
+    if DEBUG:
+        print(*args)
 
 def nested_dict():
     """Recursively nested defaultdict."""
@@ -244,35 +250,53 @@ class RACFDecks:
         try:
             if self == self.bot.get_cog("RACFDecks"):
                 while True:
+                    debug("RACF DECKS: update decks")
+
                     server = None
                     server_id = self.settings.get("server_id")
+
+                    debug("RACF DECKS: update decks server_id:", server_id)
+
                     if server_id:
                         server = self.bot.get_server(server_id)
 
+                    debug("RACF DECKS: update decks server:", server)
                     if server:
                         try:
+                            tasks = []
                             family_auto = self.settings.get('family_auto')
                             family_channel_id = self.settings.get('family_channel_id')
                             if family_auto and family_channel_id:
                                 channel = discord.utils.get(server.channels, id=family_channel_id)
                                 if channel:
-                                    self.loop.create_task(
+                                    # self.loop.create_task(
+                                    #     self.post_decks(channel, fam=True, show_empty=False)
+                                    # )
+                                    # await self.post_decks(channel, fam=True, show_empty=False)
+                                    tasks.append(
                                         self.post_decks(channel, fam=True, show_empty=False)
                                     )
-                                    # await self.post_decks(channel, fam=True, show_empty=False)
 
                             gc_auto = self.settings.get('gc_auto')
                             gc_channel_id = self.settings.get('gc_channel_id')
                             if gc_auto and gc_channel_id:
                                 channel = discord.utils.get(server.channels, id=gc_channel_id)
                                 if channel:
-                                    self.loop.create_task(
+                                    # self.loop.create_task(
+                                    #     self.post_decks(channel, fam=False, show_empty=False)
+                                    # )
+                                    # await self.post_decks(channel, fam=False, show_empty=False)
+                                    tasks.append(
                                         self.post_decks(channel, fam=False, show_empty=False)
                                     )
-                                    # await self.post_decks(channel, fam=False, show_empty=False)
 
                         except discord.DiscordException as e:
                             print(e)
+                        else:
+                            debug("RACF DECKS: Task Length: {}".format(len(tasks)))
+                            await asyncio.gather(*tasks, return_exceptions=True)
+                            debug("RACF DECKS: Gather done")
+
 
                     # await asyncio.sleep(3)
                     await asyncio.sleep(DELAY)
