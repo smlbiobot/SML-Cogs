@@ -211,6 +211,7 @@ class SML:
         add role to people who reacted
         :return:
         """
+        await self.bot.send_typing(ctx.message.channel)
         server = ctx.message.server
         channel = None
         for c in server.channels:
@@ -280,7 +281,7 @@ class SML:
         await self.bot.say("task completed")
 
     @checks.mod_or_permissions()
-    @commands.command(pass_context=True, aliases=['gvr'])
+    @commands.command(pass_context=True, aliases=['gvr', 'raffles'])
     async def giveaway_raffles(self, ctx, channel: discord.Channel, message_id, count=1):
         """
         Run a giveaway raffle against a message ID in channel.
@@ -289,6 +290,7 @@ class SML:
         :param pick:
         :return:
         """
+        await self.bot.send_typing(ctx.message.channel)
         message = await self.bot.get_message(channel, message_id)
 
         pekka_reaction = None
@@ -314,7 +316,7 @@ class SML:
             "Congratulations to ",
             " ".join([m.mention for m in picks]),
             "! You have won the giveaway raffle! ",
-            "Please provide your player tags to SML. "
+            "We will contact you for your player tag. "
             "Emotes will be delivered in 48 hours."
         ]
 
