@@ -38,6 +38,16 @@ from discord.ext import commands
 PATH = os.path.join("data", "sml")
 JSON = os.path.join(PATH, "settings.json")
 
+RAFFLE_ANNOUNCE_TEST = """
+{role_mention} 
+
+:flag_us::flag_gb: Discord Emote Raffle! React with :pekka: for a chance to win the emote. {winners} winners in {minutes} minutes.
+:flag_jp: Discordでのエモート特別抽選！ 下のペッカエモートを押して当選を目指しましょう。時間は{minutes}分以内で{winners}人が当選します！
+:flag_cn: Discord的表情抽奖! 加 :pekka: 表情就有机会赢这个表情。{minutes}分钟后会抽{winners}个赢家。
+:flag_vn: Xổ số emote trên Discord! Thả biểu cảm :pekka: để có cơ hội dành được emote! Lấy {winners} người thắng cuộc sau {minutes} phút.
+بخت آزمایی ! {winners} برنده در {minutes} دقیقه. با :pekka: واکنش نشان دهید :flag_ir:
+"""
+
 
 def nested_dict():
     """Recursively nested defaultdict."""
@@ -203,19 +213,11 @@ class SML:
             await  asyncio.sleep(0)
         return reaction_users
 
-    @checks.mod_or_permissions()
-    @commands.command(pass_context=True, aliases=['gtr'])
-    async def giveaway_tourney_roles(self, ctx):
-        """
-        Check reactions added to specific message
-        add role to people who reacted
-        :return:
-        """
-        await self.bot.send_typing(ctx.message.channel)
+    async def ensure_role_for_reaction(self, ctx, channel_name=None, message_id=None, role_name=None):
         server = ctx.message.server
         channel = None
         for c in server.channels:
-            if c.name == 'self-roles':
+            if c.name == channel_name:
                 channel = c
 
         if channel is None:
@@ -223,7 +225,7 @@ class SML:
 
         message = await self.bot.get_message(
             channel,
-            683662858306715675
+            message_id
         )
 
         # <:pekka:683662006917922850>
@@ -244,7 +246,7 @@ class SML:
 
         reaction_users = await self._get_reacted_users(pekka_reaction)
 
-        giveaway_role = discord.utils.get(server.roles, name='Emote.Giveaway')
+        giveaway_role = discord.utils.get(server.roles, name=role_name)
 
         valid_users = []
         for u in reaction_users:
@@ -256,7 +258,7 @@ class SML:
         members = []
         for uid in user_ids:
             member = server.get_member(uid)
-            if member and giveaway_role not in member.roles:
+            if member and giveaway_role not in member.roles and not member.bot:
                 members.append(member)
 
         await self.bot.say("Total reacted members: {}".format(len(user_ids)))
@@ -270,7 +272,8 @@ class SML:
         for member in server.members:
             if giveaway_role in member.roles:
                 if member.id not in user_ids:
-                    remove_members.append(member)
+                    if not member.bot:
+                        remove_members.append(member)
 
         await self.bot.say("People who should be removed count: {}".format(len(remove_members)))
 
@@ -279,6 +282,28 @@ class SML:
             await self.bot.say("Remove Giveaway role from {}".format(member.mention))
 
         await self.bot.say("task completed")
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True, aliases=['gtr'])
+    async def giveaway_tourney_roles(self, ctx):
+        """
+        Check reactions added to specific message
+        add role to people who reacted
+        :return:
+        """
+        await self.bot.send_typing(ctx.message.channel)
+        await self.ensure_role_for_reaction(
+            ctx,
+            channel_name='self-roles',
+            message_id=683662858306715675,
+            role_name='Emote.Giveaway'
+        )
+        await self.ensure_role_for_reaction(
+            ctx,
+            channel_name='self-roles-2',
+            message_id=686171857350688831,
+            role_name='Emote.Giveaway.2'
+        )
 
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, aliases=['gvr', 'raffles'])
@@ -315,12 +340,26 @@ class SML:
         o = [
             "Congratulations to ",
             " ".join([m.mention for m in picks]),
+            " ({} / {})".format(count, len(reaction_users)),
             "! You have won the giveaway raffle! ",
-            "We will contact you for your player tag. "
-            "Emotes will be delivered in 48 hours."
+            "We will contact you for your player tag. ",
+            "Emotes will be delivered to your game account within 72 hours by Supercell. ",
         ]
 
-        await self.bot.say(" ".join(o))
+        await self.bot.say("".join(o))
+
+    @checks.mod_or_permissions()
+    @commands.command(pass_context=True, aliases=['araffles'])
+    async def announce_raffles(self, ctx, minutes=15, count=1):
+        """Announce raffles to channel"""
+        channel = ctx.message.channel
+        role = discord.utils.get(ctx.message.server.roles, name='Emote.Giveaway')
+        txt = RAFFLE_ANNOUNCE_TEST.format(
+            role_mention=role.mention,
+            minutes=minutes,
+            winners=count,
+        )
+        await self.bot.send_message(channel, txt)
 
 
 def check_folder():
