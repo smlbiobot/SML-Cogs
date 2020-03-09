@@ -272,7 +272,9 @@ class Deck:
         m_crlink = re.search('(http|ftp|https)://link.clashroyale.com/deck/..\?deck=[\d\;]+', url)
 
         # search for royaleapi deck stats link
-        m_rapilink = re.search('(https|http)://royaleapi.com/decks/stats/([a-z,-]+)', url)
+        m_rapilink = re.match('(https|http)://royaleapi.com/decks/stats/([a-z,-]+)/?', url)
+        m_rapilink_section = re.match('(https|http)://royaleapi.com/decks/stats/([a-z,-]+)/.+', url)
+
         if m_crlink:
             url = m_crlink.group()
             decklinks = re.findall('2\d{7}', url)
@@ -281,7 +283,7 @@ class Deck:
                 card_key = await self.card_decklink_to_key(decklink)
                 if card_key is not None:
                     card_keys.append(card_key)
-        elif m_rapilink:
+        elif m_rapilink and not m_rapilink_section:
             s = m_rapilink.group(2)
             card_keys = s.split(',')
 
