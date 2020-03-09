@@ -354,8 +354,9 @@ class SML:
         """Announce raffles to channel"""
         channel = ctx.message.channel
         role = discord.utils.get(ctx.message.server.roles, name='Emote.Giveaway')
+        role2 = discord.utils.get(ctx.message.server.roles, name='Emote.Giveaway.2')
         txt = RAFFLE_ANNOUNCE_TEST.format(
-            role_mention=role.mention,
+            role_mention=f"{role.mention} {role2.mention}",
             minutes=minutes,
             winners=count,
         )
