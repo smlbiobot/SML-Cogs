@@ -306,7 +306,7 @@ class SML:
         )
 
     @checks.mod_or_permissions()
-    @commands.command(pass_context=True, aliases=['gvr', 'raffles'])
+    @commands.command(pass_context=True, aliases=['gvr', 'raffles', 'raf'])
     async def giveaway_raffles(self, ctx, channel: discord.Channel, message_id, count=1):
         """
         Run a giveaway raffle against a message ID in channel.

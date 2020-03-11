@@ -1594,6 +1594,27 @@ class CRProfile:
                 message=e.message
             ))
 
+    @crprofile.command(name="minitag", pass_context=True, no_pm=True)
+    async def crprofile_mini(self, ctx, tag):
+        """Player profile
+
+        if member is not entered, retrieve own profile
+        """
+        await self.bot.type()
+        sctag = SCTag(tag)
+
+        if not sctag.valid:
+            await self.bot.say(sctag.invalid_error_msg)
+            return
+
+        try:
+            await self.display_profile(ctx, tag, sections=['overview'])
+        except APIError as e:
+            await self.bot.say("API Error {status} {message}".format(
+                status=e.status,
+                message=e.message
+            ))
+
     async def display_profile(self, ctx, tag, **kwargs):
         """Display profile."""
         sctag = SCTag(tag)
