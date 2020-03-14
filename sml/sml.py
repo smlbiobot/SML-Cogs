@@ -336,13 +336,16 @@ class SML:
         reaction_users = await self._get_reacted_users(pekka_reaction)
 
         picks = sample(reaction_users, count)
+        server = ctx.message.server
+        support_channel = discord.utils.get(server.channels, name='support')
 
         o = [
             "Congratulations to ",
             " ".join([m.mention for m in picks]),
             " ({} / {})".format(count, len(reaction_users)),
             "! You have won the giveaway raffle! ",
-            "We will contact you for your player tag. ",
+            "Please provide your `player name` and `player tag` in {}. ".format(support_channel.mention),
+            "You must claim your prizes within 1 hour or we will pick other winners. "
             "Emotes will be delivered to your game account within 72 hours by Supercell. ",
         ]
 
