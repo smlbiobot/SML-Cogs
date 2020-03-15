@@ -30,6 +30,7 @@ import os
 from collections import defaultdict
 from random import sample
 
+import aiohttp
 import discord
 from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
@@ -62,6 +63,34 @@ class SML:
         self.bot = bot
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
+
+    @checks.is_owner()
+    @commands.group(pass_context=True)
+    async def smlset(self, ctx):
+        """SML Settings"""
+        if ctx.invoked_subcommand is None:
+            await self.bot.send_cmd_help(ctx)
+
+    @smlset.command(name="verified_endpoint", pass_context=True)
+    async def smlset_verified_endpoint(self, ctx, url):
+        """Set verified endpoint"""
+        self.settings["verified_player_endpoint"] = url
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Endpoint saved")
+        await self.bot.delete_message(ctx.message)
+
+    async def discord_id_to_player_tag(self, discord_id):
+        url = self.settings.get('verified_player_endpoint')
+        url += "&discord_id={}".format(discord_id)
+        async with aiohttp.ClientSession() as session:
+            async with session.get(url) as resp:
+                data = await resp.json()
+        results = data.get('results', [])
+        if results:
+            return results[0]
+        return None
+
+
 
     @checks.is_owner()
     @commands.group(pass_context=True)
@@ -307,7 +336,7 @@ class SML:
 
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, aliases=['gvr', 'raffles', 'raf'])
-    async def giveaway_raffles(self, ctx, channel: discord.Channel, message_id, count=1):
+    async def giveaway_raffles(self, ctx, channel: discord.Channel, message_id, count=1, verified=0):
         """
         Run a giveaway raffle against a message ID in channel.
         :param ctx:
@@ -317,6 +346,7 @@ class SML:
         """
         await self.bot.send_typing(ctx.message.channel)
         message = await self.bot.get_message(channel, message_id)
+        server = ctx.message.server
 
         pekka_reaction = None
         for reaction in message.reactions:
@@ -334,20 +364,63 @@ class SML:
             pekka_reaction = reaction
 
         reaction_users = await self._get_reacted_users(pekka_reaction)
+        await self.bot.say("Reacted users: {}".format(len(reaction_users)))
 
-        picks = sample(reaction_users, count)
-        server = ctx.message.server
+        # draw from verified users only
+        users = []
+        if verified == 1:
+            url = self.settings.get("verified_player_endpoint")
+            if not url:
+                await self.bot.say("You must set the verified player endpoint to get player tags from verified players")
+                return
+
+            verified_role = discord.utils.get(server.roles, name='Verified')
+            users = [server.get_member(user.id) for user in reaction_users]
+            users = [user for user in users if verified_role in user.roles]
+            users = [user for user in users if user]
+
+            await self.bot.say("Reacted users with verified role: {}".format(len(users)))
+            if len(users) < count:
+                await self.bot.say("Not enough users left")
+                return
+
+        else:
+            users = reaction_users
+
+        picks = sample(users, count)
+
         support_channel = discord.utils.get(server.channels, name='support')
 
-        o = [
-            "Congratulations to ",
-            " ".join([m.mention for m in picks]),
-            " ({} / {})".format(count, len(reaction_users)),
-            "! You have won the giveaway raffle! ",
-            "Please provide your `player name` and `player tag` in {}. ".format(support_channel.mention),
-            "You must claim your prizes within 1 hour or we will pick other winners. "
-            "Emotes will be delivered to your game account within 72 hours by Supercell. ",
-        ]
+        if verified == 1:
+            tasks = [
+                self.discord_id_to_player_tag(m.id) for m in picks
+            ]
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            mentions = []
+            for result, user in zip(results, picks):
+                mentions.append(
+                    "{} `#{}`".format(user.mention, result.get('player_tag'))
+                )
+
+            o = [
+                "Congratulations to ",
+                " ".join(mentions),
+                " ({} / {})".format(count, len(reaction_users)),
+                "! You have won the giveaway raffle! ",
+                "If you want to gift the emote to someone else, please mention in {}.".format(support_channel),
+                "Emotes will be delivered to your game account within 72 hours by Supercell. ",
+            ]
+        else:
+
+            o = [
+                "Congratulations to ",
+                " ".join([m.mention for m in picks]),
+                " ({} / {})".format(count, len(reaction_users)),
+                "! You have won the giveaway raffle! ",
+                "Please provide your `player name` and `player tag` in {}. ".format(support_channel.mention),
+                "You must claim your prizes within 1 hour or we will pick other winners. "
+                "Emotes will be delivered to your game account within 72 hours by Supercell. ",
+            ]
 
         await self.bot.say("".join(o))
 
