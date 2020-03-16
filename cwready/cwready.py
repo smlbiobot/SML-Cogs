@@ -94,6 +94,13 @@ class CWReady:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
         self._config = None
+        self.session = aiohttp.ClientSession()
+
+    def __unload(self):
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            self.session.close()
+        )
 
     @property
     def config(self):
@@ -173,9 +180,8 @@ class CWReady:
         verify_url = self.settings.get('verify_url')
         if tag is None and verify_url:
             url = verify_url + "&discord_id=" + member.id
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as resp:
-                    data = await resp.json()
+            async with self.session.get(url) as resp:
+                data = await resp.json()
             results = data.get('results', [])
             if results:
                 tag = results[0].get('player_tag')
@@ -246,16 +252,15 @@ class CWReady:
             verify_ssl=False,
         )
         data = dict()
-        async with aiohttp.ClientSession(connector=conn) as session:
-            async with session.get(url, headers=headers) as resp:
-                if resp.status == 200:
-                    data = await resp.json()
-                elif error_dict and resp.status in error_dict.keys():
-                    for k, v in error_dict.items():
-                        if resp.status == k:
-                            raise v()
-                else:
-                    raise UnknownServerError()
+        async with self.session.get(url, headers=headers) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+            elif error_dict and resp.status in error_dict.keys():
+                for k, v in error_dict.items():
+                    if resp.status == k:
+                        raise v()
+            else:
+                raise UnknownServerError()
 
         return data
 
@@ -283,8 +288,8 @@ class CWReady:
             verify_ssl=False,
         )
 
-        async with aiohttp.ClientSession(connector=conn) as session:
-            data_list = await asyncio.gather(*[self.fetch_clan(tag, session) for tag in tags])
+
+        data_list = await asyncio.gather(*[self.fetch_clan(tag, self.session) for tag in tags])
 
         return data_list
 
@@ -565,10 +570,9 @@ class CWReady:
         attach = ctx.message.attachments[0]
         url = attach["url"]
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                with open(CONFIG_YAML, "wb") as f:
-                    f.write(await resp.read())
+        async with self.session.get(url) as resp:
+            with open(CONFIG_YAML, "wb") as f:
+                f.write(await resp.read())
 
         await self.bot.say(
             "Attachment received and saved as {}".format(CONFIG_YAML))

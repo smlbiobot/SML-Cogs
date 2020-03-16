@@ -989,12 +989,13 @@ class Settings:
         "players": {}
     }
 
-    def __init__(self, bot, filepath):
+    def __init__(self, bot, filepath, session=None):
         """Init."""
         self.bot = bot
         self.filepath = filepath
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(filepath))
+        self.session = session
 
     def init_server(self, server):
         """Initialized server settings.
@@ -1099,18 +1100,17 @@ class Settings:
         )
 
         try:
-            async with aiohttp.ClientSession(connector=conn) as session:
-                for url in [info_url, chest_url]:
-                    async with session.get(url, headers=headers) as resp:
-                        if resp.status != 200:
-                            error = True
-                            data = await resp.json()
-                            raise APIError(status=resp.status, message=data.get('message'), reason=data.get('reason'))
-                        else:
-                            if url == info_url:
-                                data['info'] = await resp.json()
-                            elif url == chest_url:
-                                data['chests'] = await resp.json()
+            for url in [info_url, chest_url]:
+                async with self.session.get(url, headers=headers) as resp:
+                    if resp.status != 200:
+                        error = True
+                        data = await resp.json()
+                        raise APIError(status=resp.status, message=data.get('message'), reason=data.get('reason'))
+                    else:
+                        if url == info_url:
+                            data['info'] = await resp.json()
+                        elif url == chest_url:
+                            data['chests'] = await resp.json()
 
         except json.decoder.JSONDecodeError:
             raise APIError()
@@ -1174,9 +1174,8 @@ class Settings:
         # if verified url is set, try to get from server
         if self.verify_url:
             url = self.verify_url + "&discord_id=" + member.id
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as resp:
-                    data = await resp.json()
+            async with self.session.get(url) as resp:
+                data = await resp.json()
             results = data.get('results', [])
             if results:
                 return results[0].get('player_tag')
@@ -1309,8 +1308,15 @@ class CRProfile:
     def __init__(self, bot):
         """Init."""
         self.bot = bot
-        self.model = Settings(bot, JSON)
         self.bot_emoji = BotEmoji(bot)
+        self.session = aiohttp.ClientSession()
+        self.model = Settings(bot, JSON, session=self.session)
+
+    def __unload(self):
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            self.session.close()
+        )
 
     async def player_data(self, tag):
         """Return CRPlayerModel by tag."""
