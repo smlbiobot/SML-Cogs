@@ -108,13 +108,22 @@ class CWReady:
     def bot_auth(self):
         return self.settings.get('bot_auth', '')
 
-    @checks.admin()
+    @checks.is_owner()
     @commands.command(pass_context=True)
     async def cwrauth(self, ctx, auth):
         """Set CWR Bot authentication token."""
         self.settings['bot_auth'] = auth
         dataIO.save_json(JSON, self.settings)
         await self.bot.say("Bot Authentication saved.")
+        await self.bot.delete_message(ctx.message)
+
+    @checks.is_owner()
+    @commands.command(pass_context=True)
+    async def cwrverifyurl(self, ctx, url):
+        """Set CWR player verification url."""
+        self.settings['verify_url'] = url
+        dataIO.save_json(JSON, self.settings)
+        await self.bot.say("Verify URL saved.")
         await self.bot.delete_message(ctx.message)
 
     @commands.command(pass_context=True, no_pm=True, aliases=['cwrt'])
@@ -159,6 +168,17 @@ class CWReady:
         for k, v in players.items():
             if v.get('user_id') == member.id:
                 tag = v.get('tag')
+
+        # try to get tag from verification URL
+        verify_url = self.settings.get('verify_url')
+        if tag is None and verify_url:
+            url = verify_url + "&discord_id=" + member.id
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    data = await resp.json()
+            results = data.get('results', [])
+            if results:
+                tag = results[0].get('player_tag')
 
         if tag is None:
             await self.bot.say(
