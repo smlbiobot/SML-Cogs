@@ -1160,8 +1160,9 @@ class Settings:
         """Cached clan data file path"""
         return os.path.join(PATH_PLAYERS, '{}.json'.format(tag))
 
-    def member2tag(self, server, member):
+    async def member2tag(self, server, member):
         """Return player tag from member."""
+        # first try to get from settings
         try:
             players = self.settings["servers"][server.id]["players"]
             for member_id, player_tag in players.items():
@@ -1169,6 +1170,16 @@ class Settings:
                     return player_tag
         except KeyError:
             pass
+
+        # if verified url is set, try to get from server
+        if self.verify_url:
+            url = self.verify_url + "&discord_id=" + member.id
+            async with aiohttp.ClientSession() as session:
+                async with session.get(url) as resp:
+                    data = await resp.json()
+            results = data.get('results', [])
+            if results:
+                return results[0].get('player_tag')
         return None
 
     def emoji(self, name=None, key=None):
@@ -1241,6 +1252,16 @@ class Settings:
         self.save()
 
     @property
+    def verify_url(self):
+        return self.settings.get('verify_url')
+
+    @verify_url.setter
+    def verify_url(self, value):
+        """Verification endpoint."""
+        self.settings['verify_url'] = value
+        self.save()
+
+    @property
     def official_auth(self):
         """Authentication token"""
         return self.settings.get("official_auth")
@@ -1297,11 +1318,18 @@ class CRProfile:
         return data
 
     @commands.group(pass_context=True, no_pm=True)
-    @checks.serverowner_or_permissions()
+    @checks.is_owner()
     async def crprofileset(self, ctx):
         """Clash Royale profile API."""
         if ctx.invoked_subcommand is None:
             await self.bot.send_cmd_help(ctx)
+
+    @crprofileset.command(name="verify_url", pass_context=True)
+    async def crprofileset_verify_url(self, ctx, url):
+        """Set player verification endpoint"""
+        self.model.verify_url = url
+        await self.bot.say("Verification URL updated.")
+        await self.bot.delete_message(ctx.message)
 
     @crprofileset.command(name="auth", pass_context=True)
     async def crprofileset_auth(self, ctx, token):
@@ -1445,7 +1473,7 @@ class CRProfile:
         author = ctx.message.author
         if member is None:
             member = author
-        tag = self.model.member2tag(server, member)
+        tag = await self.model.member2tag(server, member)
         if tag is None:
             await self.bot.say("Cannot find associated player tag.")
             return
@@ -1479,7 +1507,7 @@ class CRProfile:
         if member is None:
             member = author
 
-        tag = self.model.member2tag(server, member)
+        tag = await self.model.member2tag(server, member)
 
         if tag is None:
             await self.bot.say(
