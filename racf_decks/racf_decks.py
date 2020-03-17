@@ -60,12 +60,7 @@ def nested_dict():
     return defaultdict(nested_dict)
 
 
-async def fetch_decks(time=None, fam=True, auth=None, cc=False):
-    conn = aiohttp.TCPConnector(
-        family=socket.AF_INET,
-        verify_ssl=False,
-    )
-
+async def fetch_decks(time=None, fam=True, auth=None, cc=False, session=None):
     if fam:
         if cc:
             url = 'https://royaleapi.com/bot/cc/fam?auth={}'.format(auth)
@@ -79,10 +74,9 @@ async def fetch_decks(time=None, fam=True, auth=None, cc=False):
 
     data = None
 
-    async with aiohttp.ClientSession(connector=conn) as session:
-        async with session.get(url) as resp:
-            if resp.status == 200:
-                data = await resp.json()
+    async with session.get(url) as resp:
+        if resp.status == 200:
+            data = await resp.json()
 
     if data is None:
         return []
@@ -125,13 +119,26 @@ class RACFDecks:
 
         self.loop = asyncio.get_event_loop()
         self.task = self.loop.create_task(self.update_decks())
+        conn = aiohttp.TCPConnector(
+            family=socket.AF_INET,
+            verify_ssl=False,
+        )
+        self.session = aiohttp.ClientSession(connector=conn)
 
     def __unload(self):
-        """Remove task when unloaded."""
+        if self.session:
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(
+                self.shutdown()
+            )
+
+    async def shutdown(self):
         try:
             self.task.cancel()
         except Exception:
             pass
+        await self.session.close()
+        await asyncio.sleep(5)
 
     @checks.mod_or_permissions()
     @commands.command(no_pm=True, pass_context=True)
@@ -191,11 +198,11 @@ class RACFDecks:
         else:
             time = self.settings.get('gc_timestamp')
 
-        gc_decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'])
+        gc_decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'], session=self.session)
 
         cc_decks = []
         if fam:
-            cc_decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'], cc=True)
+            cc_decks = await fetch_decks(time=time, fam=fam, auth=self.settings['auth'], cc=True, session=self.session)
 
         decks = gc_decks + cc_decks
 

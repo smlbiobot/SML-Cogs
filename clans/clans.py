@@ -31,6 +31,7 @@ import json
 import os
 import re
 from collections import defaultdict
+import socket
 
 import aiohttp
 import arrow
@@ -170,12 +171,40 @@ class Clans:
         loop = asyncio.get_event_loop()
         self.task = loop.create_task(self.auto_tasks())
 
+
+        self._session = None
+
+    @property
+    def session(self):
+        if self._session is None:
+            conn = aiohttp.TCPConnector(
+                family=socket.AF_INET,
+                verify_ssl=False,
+            )
+            self._session = aiohttp.ClientSession(
+                connector=conn,
+                loop=self.bot.loop
+            )
+        return self._session
+    
+    @property
+    def session_headers(self):
+        return {'Authorization': 'Bearer {}'.format(self.auth)}
+
     def __unload(self):
-        """Remove task when unloaded."""
+        if self.session:
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(
+                self.shutdown()
+            )
+
+    async def shutdown(self):
         try:
             self.task.cancel()
         except Exception:
             pass
+        await self.session.close()
+        await asyncio.sleep(5)
 
     async def auto_tasks(self):
         try:
@@ -234,10 +263,9 @@ class Clans:
         attach = ctx.message.attachments[0]
         url = attach["url"]
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                with open(CONFIG_YAML, "wb") as f:
-                    f.write(await resp.read())
+        async with self.session.get(url) as resp:
+            with open(CONFIG_YAML, "wb") as f:
+                f.write(await resp.read())
 
         await self.bot.say(
             "Attachment received and saved as {}".format(CONFIG_YAML))
@@ -254,6 +282,7 @@ class Clans:
         attach = ctx.message.attachments[0]
         url = attach["url"]
 
+        # don’t use self.session here as auth is not required
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as resp:
                 with open(AUTH_YAML, "wb") as f:
@@ -275,13 +304,16 @@ class Clans:
     @property
     def auth(self):
         if self._auth is None:
-            if os.path.exists(AUTH_YAML):
-                with open(AUTH_YAML) as f:
-                    config = yaml.safe_load(f)
-                    if self.api_provider == 'cr-api':
-                        self._auth = config.get('token')
-                    else:
-                        self._auth = config.get('token')
+            try:
+                if os.path.exists(AUTH_YAML):
+                    with open(AUTH_YAML) as f:
+                        config = yaml.safe_load(f)
+                        if self.api_provider == 'cr-api':
+                            self._auth = config.get('token')
+                        else:
+                            self._auth = config.get('token')
+            except AttributeError:
+                pass
         return self._auth
 
     @property
@@ -299,9 +331,8 @@ class Clans:
             else:
                 url = 'http://api.royaleapi.com/clan/{}'.format(tag)
                 headers = {'auth': self.auth}
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, headers=headers, timeout=30) as resp:
-                    data = await resp.json()
+            async with self.session.get(url, headers=headers, timeout=30) as resp:
+                data = await resp.json()
         except json.decoder.JSONDecodeError:
             raise APIError('json.decoder.JSONDecodeError')
         except asyncio.TimeoutError:
@@ -318,16 +349,14 @@ class Clans:
                 urls = ['https://api.clashroyale.com/v1/clans/%23{}'.format(tag) for tag in tags]
                 headers = {'Authorization': 'Bearer {}'.format(self.auth)}
                 data = []
-                async with aiohttp.ClientSession() as session:
-                    for url in urls:
-                        async with session.get(url, headers=headers, timeout=30) as resp:
-                            data.append(await resp.json())
+                for url in urls:
+                    async with self.session.get(url, headers=headers, timeout=30) as resp:
+                        data.append(await resp.json())
             else:
                 url = 'http://api.royaleapi.com/clan/{}'.format(",".join(tags))
                 headers = {'auth': self.auth}
-                async with aiohttp.ClientSession() as session:
-                    async with session.get(url, headers=headers, timeout=30) as resp:
-                        data = await resp.json()
+                async with self.session.get(url, headers=headers, timeout=30) as resp:
+                    data = await resp.json()
         except json.decoder.JSONDecodeError:
             raise APIError('json.decoder.JSONDecodeError')
         except asyncio.TimeoutError:
@@ -980,19 +1009,16 @@ class Clans:
         war_url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}/currentwar'
         info_url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}'
 
-        clans = []
-        headers = {'Authorization': 'Bearer {}'.format(self.auth)}
-
         urls = []
         for tag in clan_tags:
             url = war_url_fmt.format(tag=tag)
             urls.append(url)
 
-        async with aiohttp.ClientSession(loop=self.bot.loop, headers=headers) as session:
-            clans = await asyncio.gather(
-                *[self.bot.loop.create_task(
-                    self.fetch(session, url)
-                ) for url in urls])
+
+        clans = await asyncio.gather(
+            *[self.bot.loop.create_task(
+                self.fetch(self.session, url)
+            ) for url in urls])
 
         if clans:
             dataIO.save_json(CLAN_WARS_CACHE, clans)
