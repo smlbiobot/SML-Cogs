@@ -129,35 +129,30 @@ def random_discord_color():
     return discord.Color(value=color)
 
 
-async def api_fetch(url=None, auth=None):
+async def api_fetch(url=None, auth=None, session=None):
     """Fetch from BS API"""
-    conn = aiohttp.TCPConnector(
-        family=socket.AF_INET,
-        verify_ssl=False,
-    )
     try:
-        async with aiohttp.ClientSession(connector=conn) as session:
-            async with session.get(url, headers=dict(Authorization=auth), timeout=10) as resp:
+        async with session.get(url, headers=dict(Authorization=auth), timeout=10) as resp:
 
-                if str(resp.status).startswith('4'):
-                    raise APIRequestError()
+            if str(resp.status).startswith('4'):
+                raise APIRequestError()
 
-                if str(resp.status).startswith('5'):
-                    raise APIServerError()
+            if str(resp.status).startswith('5'):
+                raise APIServerError()
 
-                data = await resp.json()
+            data = await resp.json()
     except asyncio.TimeoutError:
         raise APITimeoutError()
 
     return data
 
 
-async def api_fetch_player(tag=None, auth=None, **kwargs):
+async def api_fetch_player(tag=None, auth=None, session=None, **kwargs):
     """Fetch player"""
     url = 'https://api.starlist.pro/v1/player?tag={}'.format(clean_tag(tag))
     fn = os.path.join(CACHE_PLAYER_PATH, "{}.json".format(tag))
     try:
-        data = await api_fetch(url=url, auth=auth)
+        data = await api_fetch(url=url, auth=auth, session=session)
     except APIServerError:
         if os.path.exists(fn):
             async with aiofiles.open(fn, mode='r') as f:
@@ -171,12 +166,12 @@ async def api_fetch_player(tag=None, auth=None, **kwargs):
     return BSPlayer(data)
 
 
-async def api_fetch_club(tag=None, auth=None, **kwargs):
+async def api_fetch_club(tag=None, auth=None, session=None, **kwargs):
     """Fetch player"""
     url = 'https://api.starlist.pro/v1/club?tag={}'.format(clean_tag(tag))
     fn = os.path.join(CACHE_CLUB_PATH, "{}.json".format(tag))
     try:
-        data = await api_fetch(url=url, auth=auth)
+        data = await api_fetch(url=url, auth=auth, session=session)
     except APIServerError:
         if os.path.exists(fn):
             async with aiofiles.open(fn, mode='r') as f:
@@ -220,6 +215,17 @@ class BrawlStars:
         self.settings = nested_dict()
         self.settings.update(dataIO.load_json(JSON))
         self._club_config = None
+        conn = aiohttp.TCPConnector(
+            family=socket.AF_INET,
+            verify_ssl=False,
+        )
+        self.session = aiohttp.ClientSession(connector=conn)
+
+    def __unload(self):
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            self.session.close()
+        )
 
     def _save_settings(self):
         dataIO.save_json(JSON, self.settings)
@@ -425,9 +431,9 @@ class BrawlStars:
         data = dict()
         auth = self.settings.get('brawlapi_token')
         if section == 'player':
-            data = await api_fetch_player(auth=auth, **kwargs)
+            data = await api_fetch_player(auth=auth, session=self.session, **kwargs)
         if section == 'club':
-            data = await api_fetch_club(auth=auth, **kwargs)
+            data = await api_fetch_club(auth=auth, session=self.session, **kwargs)
         return data
 
     @commands.group(pass_context=True, no_pm=True)
@@ -469,10 +475,9 @@ class BrawlStars:
         attach = ctx.message.attachments[0]
         url = attach["url"]
 
-        async with aiohttp.ClientSession() as session:
-            async with session.get(url) as resp:
-                with open(BAND_CONFIG_YML, "wb") as f:
-                    f.write(await resp.read())
+        async with self.session.get(url) as resp:
+            with open(BAND_CONFIG_YML, "wb") as f:
+                f.write(await resp.read())
 
         await self.bot.say(
             "Attachment received and saved as {}".format(BAND_CONFIG_YML))
@@ -524,7 +529,7 @@ class BrawlStars:
             return
 
         try:
-            player = await self._api_fetch(section='player', tag=tag)
+            player = await self._api_fetch(section='player', tag=tag, session=self.session)
         except APIError:
             await self.send_error_message(ctx)
         else:
@@ -539,7 +544,7 @@ class BrawlStars:
         """Profile by player tag."""
         tag = clean_tag(tag)
         try:
-            player = await self._api_fetch(section='player', tag=tag)
+            player = await self._api_fetch(section='player', tag=tag, session=self.session)
         except APIError:
             await self.send_error_message(ctx)
         else:
@@ -566,7 +571,7 @@ class BrawlStars:
         await self.bot.say("Associated {tag} with {member}".format(tag=tag, member=member))
 
         try:
-            player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'))
+            player = await api_fetch_player(tag=tag, auth=self.settings.get('brawlapi_token'), session=self.session)
         except APIError:
             await self.send_error_message(ctx)
             return
@@ -653,7 +658,7 @@ class BrawlStars:
                     club_tags.append(b.tag)
 
         tasks = [
-            self._api_fetch(section='club', tag=tag)
+            self._api_fetch(section='club', tag=tag, session=self.session)
             for tag in club_tags
         ]
 
@@ -719,7 +724,7 @@ class BrawlStars:
         """Club by tag"""
         tag = clean_tag(tag)
         try:
-            r = await api_fetch_club(tag=tag, auth=self.settings.get('brawlapi_token'))
+            r = await api_fetch_club(tag=tag, auth=self.settings.get('brawlapi_token'), session=self.session)
             club = BSClub(r)
             await self._club_info(ctx, club)
         except APIError:

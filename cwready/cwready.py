@@ -97,10 +97,15 @@ class CWReady:
         self.session = aiohttp.ClientSession()
 
     def __unload(self):
-        loop = asyncio.get_event_loop()
-        loop.create_task(
-            self.session.close()
-        )
+        if self.session:
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(
+                self.shutdown()
+            )
+
+    async def shutdown(self):
+        await self.session.close()
+        await asyncio.sleep(5)
 
     @property
     def config(self):

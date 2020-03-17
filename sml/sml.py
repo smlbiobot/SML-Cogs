@@ -90,8 +90,6 @@ class SML:
             return results[0]
         return None
 
-
-
     @checks.is_owner()
     @commands.group(pass_context=True)
     async def sml(self, ctx):
