@@ -405,7 +405,7 @@ class SML:
                 " ".join(mentions),
                 " ({} / {})".format(count, len(reaction_users)),
                 "! You have won the giveaway raffle! ",
-                "If you want to gift the emote to someone else, please mention in {}.".format(support_channel),
+                "If you want to gift the emote to someone else, please mention in {}. ".format(support_channel.mention),
                 "Emotes will be delivered to your game account within 72 hours by Supercell. ",
             ]
         else:
