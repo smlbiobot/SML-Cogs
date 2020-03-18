@@ -46,8 +46,8 @@ RAFFLE_ANNOUNCE_TEST = """
 :flag_jp: Discordでのエモート特別抽選！ 下のペッカエモートを押して当選を目指しましょう。時間は{minutes}分以内で{winners}人が当選します！
 :flag_cn: Discord的表情抽奖! 加 :pekka: 表情就有机会赢这个表情。{minutes}分钟后会抽{winners}个赢家。
 :flag_vn: Xổ số emote trên Discord! Thả biểu cảm :pekka: để có cơ hội dành được emote! Lấy {winners} người thắng cuộc sau {minutes} phút.
-بخت آزمایی ! {winners} برنده در {minutes} دقیقه. با :pekka: واکنش نشان دهید :flag_ir:
 :flag_es: Sorteo de emote en discord! Reacciona con :pekka: para tener una oportunidad de ganar el emote! {winners} ganadores en {minutes} minutos
+بخت آزمایی ! {winners} برنده در {minutes} دقیقه. با :pekka: واکنش نشان دهید :flag_ir:
 """
 
 
