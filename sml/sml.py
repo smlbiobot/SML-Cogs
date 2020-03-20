@@ -398,7 +398,7 @@ class SML:
             mentions = []
             for result, user in zip(results, picks):
                 mentions.append(
-                    "{} `#{}`".format(user.mention, result.get('player_tag'))
+                    "{} `#{} {}`".format(user.mention, result.get('player_tag'), user)
                 )
 
             o = [
