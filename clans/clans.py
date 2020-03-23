@@ -1169,8 +1169,6 @@ class Clans:
 
     async def on_message(self, msg):
         """Auto expand clan invite.
-
-
         """
         s = msg.content
         m = re.search(
@@ -1205,6 +1203,7 @@ class Clans:
                 "[War]({war_link})".format(war_link=war_link),
                 "[Analytics]({analytics_link})".format(analytics_link=analytics_link),
             ]),
+            "Posted by {}".format(msg.author.mention)
         ])
 
         em = discord.Embed(
