@@ -1960,11 +1960,13 @@ class CRProfile:
         else:
             clan = "Not in clan"
 
+        author = "Posted by {}".format(msg.author.mention)
+
         em = discord.Embed(
             title="Friend Request - Clash Royale",
-            description="**{name}** #{tag}\n{clan}\n{trophies}\n{misc}\n{challenge}\n{links}".format(
+            description="**{name}** #{tag}\n{clan}\n{trophies}\n{misc}\n{challenge}\n{links}\n{author}".format(
                 name=p.name, tag=p.tag, links=links, misc=misc, trophies=trophies, clan=clan,
-                challenge=challenge
+                challenge=challenge, author=author
             ),
             url=url,
             color=discord.Color.blue()
