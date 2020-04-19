@@ -996,9 +996,11 @@ class Clans:
 
         self.task = self.bot.loop.create_task(self.update_cw_message(message, count_down=count_down))
 
-    async def fetch(self, session, url):
-        async with session.get(url) as response:
+    async def fetch(self, session, url, headers=None):
+        async with session.get(url, headers=headers) as response:
             if response.status != 200:
+                # print(url)
+                # print(await response.json())
                 response.raise_for_status()
             return await response.json()
 
@@ -1014,10 +1016,10 @@ class Clans:
             url = war_url_fmt.format(tag=tag)
             urls.append(url)
 
-
+        headers = {'Authorization': 'Bearer {}'.format(self.auth)}
         clans = await asyncio.gather(
             *[self.bot.loop.create_task(
-                self.fetch(self.session, url)
+                self.fetch(self.session, url, headers=headers)
             ) for url in urls])
 
         if clans:
