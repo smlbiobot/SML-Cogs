@@ -302,7 +302,7 @@ async def check_manage_roles(ctx, bot):
     server = ctx.message.server
     author = ctx.message.author
     channel = ctx.message.channel
-    # For 100T server, only allow command to run if user has the "Bot Comamnder" role
+    # For RoyaleAPI server, only allow command to run if user has the "Bot Comamnder" role
     if server.id == FAMILY_SERVER_ID:
         bc_role = discord.utils.get(server.roles, name="Bot Commander")
         if bc_role not in author.roles:
@@ -1621,6 +1621,21 @@ class RACF:
         role_names = ['{}Recruit'.format(clan) for clan in clans]
         removed = await self.remove_roles(server, member, role_names)
         await self.bot.say("Removed {} from {}".format(", ".join(removed), member))
+
+    @commands.command(pass_context=True, no_pm=True)
+    async def removeallrecruits(self, ctx):
+        """Remove all recruits"""
+        verified = await check_manage_roles(ctx, self.bot)
+        if not verified:
+            await self.bot.say("You don’t have permission to run this command.")
+            return
+        server = ctx.message.server
+        role = discord.utils.get(server.roles, name="Recruit")
+        # find all members with recruit
+        for member in server.members:
+            if role in member.roles:
+                await self.remove_roles(server, member, ["Recruit"])
+        await self.bot.say("Task completed.")
 
     @commands.command(pass_context=True, no_pm=True)
     async def reject(self, ctx, member: discord.Member, *, message=None):
