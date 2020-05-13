@@ -894,6 +894,20 @@ class MemberManagement:
 
         await self.bot.say("Task completed.")
 
+    @checks.mod_or_permissions(manage_roles=True)
+    @commands.command(no_pm=True, pass_context=True)
+    async def searchmembers(self, ctx, *, query):
+        server = ctx.message.server
+        ret = []
+        for m in server.members:
+            if query in m.display_name.lower():
+                ret.append(m)
+
+        await self.bot.say("Found {} members".format(len(ret)))
+        await self.bot.say("Showing first {}…".format(min(10, len(ret))))
+        await self.bot.say("\n".join(["**{0.display_name}** {0} ({0.id})".format(m) for m in ret]))
+
+
 
 def check_folder():
     """Check folder."""
