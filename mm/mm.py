@@ -894,7 +894,7 @@ class MemberManagement:
 
         await self.bot.say("Task completed.")
 
-    @checks.mod_or_permissions(manage_roles=True)
+
     @commands.command(no_pm=True, pass_context=True)
     async def searchmembers(self, ctx, *, query):
         server = ctx.message.server
