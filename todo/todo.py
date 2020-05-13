@@ -87,21 +87,36 @@ class ToDoCog:
         )
         message = await self.bot.send_message(channel, embed=em)
         await self.bot.add_reaction(message, "✅")
+        await self.bot.add_reaction(message, "❌")
+        await self.bot.add_reaction(message, "🦋")
 
     async def on_reaction_add(self, reaction, user):
+
         message = reaction.message
+        if message.author.id != self.bot.user.id:
+            # print("message is not self")
+            return
+
         if message.channel.id != self.settings.get('task_channel_id'):
+            # print("message is not task channel")
             return
 
         if user.bot:
+            # print("user is bot")
             return
 
-        if reaction.emoji != "✅":
+        if reaction.emoji not in ["✅", "❌", "🦋"]:
+            # print("reactio emoji wrong")
             return
 
         em = message.embeds[0]
         new_embed = discord.Embed.from_data(em)
-        new_embed.color = discord.Color.green()
+        if reaction.emoji == '✅':
+            new_embed.color = discord.Color.green()
+        elif reaction.emoji == '❌':
+            new_embed.color = discord.Color.red()
+        elif reaction.emoji == '🦋':
+            new_embed.color = discord.Color.blue()
 
         await self.bot.edit_message(
             message, embed=new_embed
