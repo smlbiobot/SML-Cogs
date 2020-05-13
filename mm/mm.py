@@ -903,9 +903,10 @@ class MemberManagement:
             if query in m.display_name.lower():
                 ret.append(m)
 
+        limit = 10
         await self.bot.say("Found {} members".format(len(ret)))
-        await self.bot.say("Showing first {}…".format(min(10, len(ret))))
-        await self.bot.say("\n".join(["**{0.display_name}** {0} ({0.id})".format(m) for m in ret]))
+        await self.bot.say("Showing first {}…".format(min(limit, len(ret))))
+        await self.bot.say("\n".join(["**{0.display_name}** {0} ({0.id})".format(m) for m in ret[:limit]]))
 
 
 
