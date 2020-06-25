@@ -31,6 +31,8 @@ from cogs.utils import checks
 from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import Context
+import asyncio
+from functools import partial
 
 PATH = os.path.join("data", "nlp")
 JSON = os.path.join(PATH, "settings.json")
@@ -40,6 +42,12 @@ try:
     from textblob import TextBlob
 except ImportError:
     raise ImportError("Please install the textblob package from pip") from None
+
+try:
+    import googletrans
+    from googletrans import Translator
+except ImportError:
+    raise ImportError("Please install the googletrans package from pip") from None
 
 LANG = OrderedDict([
     ("af", "Afrikaans"),
@@ -90,6 +98,115 @@ LANG = OrderedDict([
     ("vi", "Vietnamese")
 ])
 
+LANGUAGES = {
+    'af': 'afrikaans',
+    'sq': 'albanian',
+    'am': 'amharic',
+    'ar': 'arabic',
+    'hy': 'armenian',
+    'az': 'azerbaijani',
+    'eu': 'basque',
+    'be': 'belarusian',
+    'bn': 'bengali',
+    'bs': 'bosnian',
+    'bg': 'bulgarian',
+    'ca': 'catalan',
+    'ceb': 'cebuano',
+    'ny': 'chichewa',
+    'zh-cn': 'chinese (simplified)',
+    'zh-tw': 'chinese (traditional)',
+    'co': 'corsican',
+    'hr': 'croatian',
+    'cs': 'czech',
+    'da': 'danish',
+    'nl': 'dutch',
+    'en': 'english',
+    'eo': 'esperanto',
+    'et': 'estonian',
+    'tl': 'filipino',
+    'fi': 'finnish',
+    'fr': 'french',
+    'fy': 'frisian',
+    'gl': 'galician',
+    'ka': 'georgian',
+    'de': 'german',
+    'el': 'greek',
+    'gu': 'gujarati',
+    'ht': 'haitian creole',
+    'ha': 'hausa',
+    'haw': 'hawaiian',
+    'iw': 'hebrew',
+    'hi': 'hindi',
+    'hmn': 'hmong',
+    'hu': 'hungarian',
+    'is': 'icelandic',
+    'ig': 'igbo',
+    'id': 'indonesian',
+    'ga': 'irish',
+    'it': 'italian',
+    'ja': 'japanese',
+    'jw': 'javanese',
+    'kn': 'kannada',
+    'kk': 'kazakh',
+    'km': 'khmer',
+    'ko': 'korean',
+    'ku': 'kurdish (kurmanji)',
+    'ky': 'kyrgyz',
+    'lo': 'lao',
+    'la': 'latin',
+    'lv': 'latvian',
+    'lt': 'lithuanian',
+    'lb': 'luxembourgish',
+    'mk': 'macedonian',
+    'mg': 'malagasy',
+    'ms': 'malay',
+    'ml': 'malayalam',
+    'mt': 'maltese',
+    'mi': 'maori',
+    'mr': 'marathi',
+    'mn': 'mongolian',
+    'my': 'myanmar (burmese)',
+    'ne': 'nepali',
+    'no': 'norwegian',
+    'ps': 'pashto',
+    'fa': 'persian',
+    'pl': 'polish',
+    'pt': 'portuguese',
+    'pa': 'punjabi',
+    'ro': 'romanian',
+    'ru': 'russian',
+    'sm': 'samoan',
+    'gd': 'scots gaelic',
+    'sr': 'serbian',
+    'st': 'sesotho',
+    'sn': 'shona',
+    'sd': 'sindhi',
+    'si': 'sinhala',
+    'sk': 'slovak',
+    'sl': 'slovenian',
+    'so': 'somali',
+    'es': 'spanish',
+    'su': 'sundanese',
+    'sw': 'swahili',
+    'sv': 'swedish',
+    'tg': 'tajik',
+    'ta': 'tamil',
+    'te': 'telugu',
+    'th': 'thai',
+    'tr': 'turkish',
+    'uk': 'ukrainian',
+    'ur': 'urdu',
+    'uz': 'uzbek',
+    'vi': 'vietnamese',
+    'cy': 'welsh',
+    'xh': 'xhosa',
+    'yi': 'yiddish',
+    'yo': 'yoruba',
+    'zu': 'zulu',
+    'fil': 'Filipino',
+    'he': 'Hebrew'
+}
+
 
 class NLP:
     """Natural Launguage Processing.
@@ -97,7 +214,23 @@ class NLP:
 
     def __init__(self, bot):
         self.bot = bot
+        self.translator = Translator()
         self.settings = dataIO.load_json(JSON)
+
+    async def _translate(self, text, dest='en'):
+        def do_translate(text, dest=dest):
+            r = self.translator.translate(text, dest=dest)
+            return r.text
+        loop = asyncio.get_event_loop()
+        r = await loop.run_in_executor(
+            None,
+            partial(
+                do_translate,
+                text,
+                dest=dest
+            )
+        )
+        return r
 
     @commands.command(pass_context=True)
     async def translate(self, ctx: Context, to_lang: str, *, text: str):
@@ -110,14 +243,18 @@ class NLP:
         !translatelang
         will list all the supported languages
         """
-        blob = TextBlob(text)
-        out = blob.translate(to=to_lang)
+        out = await self._translate(text, dest=to_lang)
         await self.bot.say(out)
+
+        # blob = TextBlob(text)
+        # out = blob.translate(to=to_lang)
+        # await self.bot.say(out)
 
     @commands.command(pass_context=True)
     async def translatelang(self, ctx: Context):
         """List the langauge code supported by translation."""
-        out = ["**{}**: {}".format(k, v) for k, v in LANG.items()]
+        # out = ["**{}**: {}".format(k, v) for k, v in LANG.items()]
+        out = ["**{}**: {}".format(k, v) for k, v in LANGUAGES.items()]
         await self.bot.say(", ".join(out))
 
     @commands.command(pass_context=True)
@@ -237,13 +374,17 @@ class NLP:
                 for language in self.settings[server.id]["LANGUAGE"]:
                     if language != detected_lang:
                         try:
-                            translated_msg = blob.translate(to=language)
+                            translated_msg = await self._translate(msg.content, dest=language)
+                            # translated_msg = blob.translate(to=language)
                             out.append(
                                 "`{}` {}".format(
                                     language, translated_msg))
-                        except (textblob.exceptions.NotTranslated,
-                                textblob.exceptions.TranslatorError):
-                            pass
+                        except Exception as e:
+                            print(e)
+
+                        # except (textblob.exceptions.NotTranslated,
+                        #         textblob.exceptions.TranslatorError):
+                        #     pass
                 if len(out):
                     out.insert(0,
                                "{}\n`{}` {}".format(
@@ -288,13 +429,16 @@ class NLP:
         for language in settings.get("languages"):
             if language != detected_lang:
                 try:
-                    translated_msg = blob.translate(to=language)
+                    # translated_msg = blob.translate(to=language)
+                    translated_msg = await self._translate(msg.content, dest=language)
                     out.append(
                         "`{}` {}".format(
                             language, translated_msg))
-                except (textblob.exceptions.NotTranslated,
-                        textblob.exceptions.TranslatorError):
-                    pass
+                # except (textblob.exceptions.NotTranslated,
+                #         textblob.exceptions.TranslatorError):
+                #     pass
+                except Exception as e:
+                    print(e)
             if len(out):
                 to_channel = self.bot.get_channel(settings.get("to_channel_id"))
                 out.insert(0,
