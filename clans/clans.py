@@ -212,7 +212,7 @@ class Clans:
                 while True:
                     tasks = [
                         self.post_auto_clans(),
-                        self.post_clanwars(),
+                        # self.post_clanwars(),
                     ]
                     await asyncio.gather(*tasks, return_exceptions=True)
                     # loop = asyncio.get_event_loop()
