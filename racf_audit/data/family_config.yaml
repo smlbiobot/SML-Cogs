@@ -42,6 +42,11 @@ clans:
 #    role_name: Hotel
 #    type: Member
 #    filters: [hotel]
+  - name: RoyaleAPI Ice
+    tag: L82YL088
+    role_name: Ice
+    type: Member
+    filters: [ice, i]
   - name: RoyaleAPI One
     tag: Y802UPG9
     role_name: One

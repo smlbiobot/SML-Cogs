@@ -52,6 +52,7 @@ from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from tabulate import tabulate
 
+
 PATH = os.path.join("data", "racf_audit")
 JSON = os.path.join(PATH, "settings.json")
 
