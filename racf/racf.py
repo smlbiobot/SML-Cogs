@@ -111,6 +111,12 @@ CLAN_PERMISSION = {
         'assign_role': True,
         'member': True
     },
+    'L82YL088': {
+        'tag': 'L82YL088',
+        'role': 'Ice',
+        'assign_role': True,
+        'member': True
+    },
     '9LPVG9UC': {
         'tag': '9LPVG9UC',
         'role': 'Zen',
