@@ -141,6 +141,7 @@ class ReactionManager:
 
         Options:
         -id output ids
+
         """
         message = await self.bot.get_message(channel, message_id)
 
@@ -156,8 +157,12 @@ class ReactionManager:
 
         out = await self.get_reactions(message, exclude_self=True, output_id=output_id)
 
-        with open('/Users/sml/Desktop/emote_out.txt', 'w') as f:
-            f.write('\n'.join(out))
+        try:
+            with open('/Users/sml/Desktop/emote_out.txt', 'w') as f:
+                f.write('\n'.join(out))
+        except:
+            # if on server, can’t write out
+            pass
 
         import textwrap
         for o in out:
