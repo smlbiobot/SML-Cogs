@@ -64,7 +64,7 @@ SML_SERVER_ID = '275395656955330560'
 
 MEMBER_ROLE_NAMES = [
     'Member',
-    'Touney',
+    'Tourney',
     'Practice',
     'CW',
     'Diary',
@@ -76,6 +76,7 @@ MEMBER_ROLE_NAMES = [
     'Fox',
     'Golf',
     'Hotel',
+    'Ice',
     'One',
     'Trade',
     'Zen',
