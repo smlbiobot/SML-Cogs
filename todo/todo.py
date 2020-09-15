@@ -93,6 +93,7 @@ class ToDoCog:
     async def on_reaction_add(self, reaction, user):
 
         message = reaction.message
+
         if message.author.id != self.bot.user.id:
             # print("message is not self")
             return
