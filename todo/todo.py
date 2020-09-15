@@ -118,8 +118,19 @@ class ToDoCog:
         elif reaction.emoji == '🦋':
             new_embed.color = discord.Color.blue()
 
+        channel = message.channel
+
         await self.bot.edit_message(
             message, embed=new_embed
+        )
+
+        em = discord.Embed(
+            title='✅ ' + new_embed.title,
+            color=discord.Color.green()
+        )
+        await self.bot.send_message(
+            channel,
+            embed=em
         )
 
 
