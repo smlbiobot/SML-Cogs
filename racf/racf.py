@@ -1372,7 +1372,7 @@ class RACF:
         await self.bot.delete_message(message)
         await self.bot.say(msg)
 
-    @checks.serverowner_or_permissions()
+    @checks.mod_or_permissions()
     @commands.command(pass_context=True, no_pm=True)
     async def sayc(self, ctx, channel: discord.Channel, *, msg):
         """Have bot say stuff in channel. Remove command after run."""
