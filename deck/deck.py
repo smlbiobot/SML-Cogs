@@ -119,9 +119,12 @@ class Deck:
     async def cards_json(self):
         url = CARDS_JSON_URL
         if self._cards_json is None:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url) as response:
-                    self._cards_json = await response.json()
+            import json
+            with open(CARDS_JSON_PATH) as f:
+                self._cards_json = json.load(f)
+            # async with aiohttp.ClientSession() as session:
+            #     async with session.get(url) as response:
+            #         self._cards_json = await response.json()
         return self._cards_json
 
     @commands.group(pass_context=True, no_pm=True)
