@@ -143,7 +143,7 @@ CLAN_PERMISSION = {
     },
     '9R8G9290': {
         'tag': '9R8G9290',
-        'role': 'Mini',
+        'role': 'OG',
         'assign_role': True,
         'member': True
     },
