@@ -81,6 +81,7 @@ MEMBER_ROLE_NAMES = [
     'Trade',
     'Zen',
     'Mini',
+    'OG',
 ]
 
 

@@ -106,7 +106,7 @@ clans:
 #    filters: [z]
   - name: RoyaleAPI
     tag: 9R8G9290
-    role_name: Mini
+    role_name: OG
     type: Member
     filters: [m, mini, og]
 
