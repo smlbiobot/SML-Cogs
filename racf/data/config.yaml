@@ -2,7 +2,7 @@ url:
   rules: https://www.reddit.com/r/CRRedditAlpha/comments/584ba2/reddit_alpha_clan_family_rules/
   roles: https://www.reddit.com/r/CRRedditAlpha/wiki/roles
   discord: https://discord.royaleapi.com
-  docs: http://fam.royaleapi.com
+  docs: http://ddocs.royaleapi.com
 
 roles:
   restricted:
@@ -106,7 +106,7 @@ messages:
     you may use this Discord invite: <http://discord.io/apifam>
 
 
-    Additional help and information: http://fam.royaleapi.com/
+    Additional help and information: http://ddocs.royaleapi.com/
 
 
     Thanks + enjoy!
@@ -114,7 +114,7 @@ messages:
     Welcome to the **RoyaleAPI Clan Family** Discord server.
 
 
-    Please check out http://fam.royaleapi.com/ for an overview of our family rules,
+    Please check out http://ddocs.royaleapi.com/ for an overview of our family rules,
     together with help documentation on a plethora of bot commands for you to use and enjoy.
 
 
@@ -125,7 +125,7 @@ messages:
     That’s all this means. Don’t touch a damn thing. We’re serious.
 
 
-    Please consult http://fam.royaleapi.com/#/racf/roles
+    Please consult https://ddocs.royaleapi.com/elders
     to learn what to do, and if you eventually rise to the role of Co-Leader
     where we care about you because you’re doing important things.
   elder_refresh: >
@@ -137,7 +137,7 @@ messages:
     That’s all this means. Don’t touch a damn thing. We’re serious.
 
 
-    Please consult http://fam.royaleapi.com/#/racf/roles
+    Please consult https://ddocs.royaleapi.com/elders
     to learn what to do, and if you eventually rise to the role of Co-Leader
     where we care about you because you’re doing important things.
   reject: >
