@@ -43,6 +43,7 @@ from cogs.utils.dataIO import dataIO
 from discord.ext import commands
 from discord.ext.commands import Context
 
+
 logger = logging.getLogger(__name__)
 
 CHANGECLAN_ROLES = ["Leader", "Co-Leader", "Elder", "High Elder", "Member"]
