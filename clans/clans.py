@@ -877,11 +877,13 @@ class Clans:
         import datetime as dt  # somehow dt not registered from global import
         config = self.clans_config
         legend = ("\n"
-                  "{rank} "
-                  "{trophies}").format(
+                  "{fame} "
+                  "{repair} "
+                  "{rank}").format(
 
-            rank=emoji_value('crown', 'Rank', inline=False, truncate=False),
-            trophies=emoji_value('cwtrophy', 'CW Trophies', inline=False, truncate=False)
+            fame=emoji_value('cwfame', 'Fame', inline=False, truncate=False),
+            repair=emoji_value('cwrepair', 'Repair', inline=False, truncate=False),
+            rank=emoji_value('crown', 'Rank', inline=False, truncate=False)
         )
         em = discord.Embed(
             title=config.name,
@@ -906,8 +908,9 @@ class Clans:
             value = row.format(
                 fame=emoji_value('cwfame', clan.fame, 5),
                 repair=emoji_value('cwrepair', clan.repair_points, 5),
-                clan_score=emoji_value('cwtrophy', clan.clan_score, 5),
                 rank=emoji_value('crown', clan.rank, 1),
+                # clan_score=emoji_value('cwtrophy', clan.clan_score, 5),
+                clan_score='',
             )
             em.add_field(name=clan_name, value=value, inline=False)
 
