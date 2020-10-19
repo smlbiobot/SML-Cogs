@@ -30,8 +30,8 @@ import datetime as dt
 import json
 import os
 import re
-from collections import defaultdict
 import socket
+from collections import defaultdict
 
 import aiohttp
 import arrow
@@ -61,6 +61,7 @@ CLAN_WARS_CACHE = os.path.join(PATH, "clan_wars_cache.json")
 EMOJI_CW_TROPHY = '<:cwtrophy:450878327880941589>'
 
 TASK_INTERVAL = 57 * 5
+# TASK_INTERVAL = 10
 
 
 def nested_dict():
@@ -124,6 +125,8 @@ def emoji_value(emoji, value, pad=5, inline=True, truncate=True):
         'trophy': ':trophy:',
         'laddertrophy': '<:laddertrophy:337975460451319819>',
         'cwtrophy': '<:cwtrophy:450878327880941589>',
+        'cwrepair': '<:cwrepair:767840797101785088>',
+        'cwfame': '<:cwfame:767840709554077747>',
     }
     value = str(value)
 
@@ -170,8 +173,6 @@ class Clans:
         # add auto tasks
         loop = asyncio.get_event_loop()
         self.task = loop.create_task(self.auto_tasks())
-
-
         self._session = None
 
     @property
@@ -186,17 +187,26 @@ class Clans:
                 loop=self.bot.loop
             )
         return self._session
-    
+
     @property
     def session_headers(self):
         return {'Authorization': 'Bearer {}'.format(self.auth)}
 
     def __unload(self):
-        if self.session:
+        try:
+            self.task.cancel()
             loop = asyncio.get_event_loop()
-            loop.run_until_complete(
-                self.shutdown()
+            loop.create_task(
+                self.session.close()
             )
+        except Exception as e:
+            pass
+
+        # if self.session:
+        #     loop = asyncio.get_event_loop()
+        #     loop.run_until_complete(
+        #         self.shutdown()
+        #     )
 
     async def shutdown(self):
         try:
@@ -212,9 +222,10 @@ class Clans:
                 while True:
                     tasks = [
                         self.post_auto_clans(),
-                        # self.post_clanwars(),
+                        self.post_clanwars(),
                     ]
                     await asyncio.gather(*tasks, return_exceptions=True)
+
                     # loop = asyncio.get_event_loop()
                     # loop.create_task(
                     #     self.post_auto_clans()
@@ -349,9 +360,21 @@ class Clans:
                 urls = ['https://api.clashroyale.com/v1/clans/%23{}'.format(tag) for tag in tags]
                 headers = {'Authorization': 'Bearer {}'.format(self.auth)}
                 data = []
-                for url in urls:
+                async def fetch(url):
                     async with self.session.get(url, headers=headers, timeout=30) as resp:
-                        data.append(await resp.json())
+                        d = await resp.json()
+                    return d
+
+                results = await asyncio.gather(
+                    *[fetch(url) for url in urls],
+                    return_exceptions=True
+                )
+                for r in results:
+                    if isinstance(r, Exception):
+                        data.append({})
+                    else:
+                        data.append(r)
+
             else:
                 url = 'http://api.royaleapi.com/clan/{}'.format(",".join(tags))
                 headers = {'auth': self.auth}
@@ -401,7 +424,7 @@ class Clans:
         tag = None
         for clan in config.get('clans', []):
             # search to see if params match abbreviations
-             if params.lower() in clan.get('abbreviations', []):
+            if params.lower() in clan.get('abbreviations', []):
                 tag = clan.get('tag')
                 break
 
@@ -431,7 +454,6 @@ class Clans:
             description="\n".join(desc),
         )
         await self.bot.send_message(ctx.message.channel, embed=em)
-
 
     @checks.mod_or_permissions()
     @commands.command(pass_context=True, no_pm=True, aliases=['auto_clans', 'autoclans'])
@@ -853,16 +875,12 @@ class Clans:
         This allows us to update status easily by supplying new data.
         """
         import datetime as dt  # somehow dt not registered from global import
-
         config = self.clans_config
-        legend = ("\n{wins} "
-                  "{crowns} "
-                  "{battles_played}"
+        legend = ("\n"
+                  "{rank} "
                   "{trophies}").format(
 
-            wins=emoji_value('win', 'Wins', inline=False, truncate=False),
-            crowns=emoji_value('crown', 'Crowns', inline=False, truncate=False),
-            battles_played=emoji_value('battle', 'Battles Played', inline=False, truncate=False),
+            rank=emoji_value('crown', 'Rank', inline=False, truncate=False),
             trophies=emoji_value('cwtrophy', 'CW Trophies', inline=False, truncate=False)
         )
         em = discord.Embed(
@@ -875,69 +893,28 @@ class Clans:
             timestamp=dt.datetime.utcnow()
         )
 
-        # clan list
-        STATES = {
-            'collectionDay': 'Coll',
-            'warDay': 'War',
-            'notInWar': 'Not in War',
-            'matchMaking': 'Matchmaking',
-        }
+        row = (
+            "{fame} "
+            "{repair} "
+            "{rank} "
+            "{clan_score} "
+        )
 
         for c, cf in zip(clans, config.clans):
             clan = Box(c, default_box=True)
-            state = clan.state
-            timespan = None
-            wins = clan.clan.wins
-            crowns = clan.clan.crowns
-            battles_played = clan.clan.battlesPlayed
-
-            if state == 'collectionDay':
-                end_time = clan.get('collectionEndTime')
-            elif state == 'warDay':
-                end_time = clan.get('warEndTime')
-            else:
-                end_time = None
-
-            if end_time is not None:
-                dt = arrow.get(end_time, 'YYYYMMDDTHHmmss.SSS').datetime
-                now = arrow.utcnow().datetime
-                span = dt - now
-                hours, remainder = divmod(span.total_seconds(), 3600)
-                minutes, seconds = divmod(remainder, 60)
-                timespan = '{: 2}h{: 2}m{: 2}s'.format(int(hours), int(minutes), int(seconds))
-
-            # clan_name = clan.clan.name
             clan_name = cf.name
-            clan_score = clan.clan.clanScore
-            state = clan.get('state', 'ERR')
-
-            if state in ['collectionDay', 'warDay']:
-                value = (
-                        wrap_inline("{state: <4} {timespan: >11.11}") +
-                        "\n{wins} "
-                        "{crowns} "
-                        "{battles_played}"
-                        "{trophies}"
-                ).format(
-                    state=STATES.get(state, 'ERR'),
-                    timespan=timespan or '',
-                    wins=emoji_value('win', wins, 2),
-                    crowns=emoji_value('crown', crowns, 2),
-                    battles_played=emoji_value('battle', battles_played, 3),
-                    trophies=emoji_value('cwtrophy', clan_score, 5)
-                )
-
-            else:
-                value = wrap_inline(STATES.get(state, 'ERR'))
-
+            value = row.format(
+                fame=emoji_value('cwfame', clan.fame, 5),
+                repair=emoji_value('cwrepair', clan.repair_points, 5),
+                clan_score=emoji_value('cwtrophy', clan.clan_score, 5),
+                rank=emoji_value('crown', clan.rank, 1),
+            )
             em.add_field(name=clan_name, value=value, inline=False)
 
-        # Badge
         badge_url = config.badge_url
 
         if badge_url is not None:
             em.set_footer(icon_url=badge_url, text=config.name)
-
         return em
 
     @property
@@ -1005,25 +982,83 @@ class Clans:
             return await response.json()
 
     async def get_clanwars(self):
-        # official
+        # from site
         config = self.clans_config
         clan_tags = [c.tag for c in config.clans if not c.hide]
-        war_url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}/currentwar'
-        info_url_fmt = 'https://api.clashroyale.com/v1/clans/%23{tag}'
 
-        urls = []
-        for tag in clan_tags:
-            url = war_url_fmt.format(tag=tag)
-            urls.append(url)
+        def rr_url(tag):
+            return 'https://api.clashroyale.com/v1/clans/%23{}/currentriverrace'.format(tag)
 
-        headers = {'Authorization': 'Bearer {}'.format(self.auth)}
-        clans = await asyncio.gather(
-            *[self.bot.loop.create_task(
-                self.fetch(self.session, url, headers=headers)
-            ) for url in urls])
+        def clan_url(tag):
+            return 'https://api.clashroyale.com/v1/clans/%23{}'.format(tag)
+
+        async def fetch(url):
+            headers = {'Authorization': 'Bearer {}'.format(self.auth)}
+            async with self.session.get(url, headers=headers) as resp:
+                data = await resp.json()
+            return data
+
+        urls = [rr_url(tag) for tag in clan_tags]
+        results = await asyncio.gather(
+            *[fetch(url) for url in urls],
+            return_exceptions=True
+        )
+
+        river_races = dict()
+
+        for r, clan_tag in zip(results, clan_tags):
+            if isinstance(r, Exception):
+                continue
+
+            river_races[clan_tag] = r
+
+        # river race clan tags - fetch from clan
+        clan_scores = dict()
+        if river_races:
+            urls = [clan_url(tag) for tag in clan_tags]
+            clans_results = await asyncio.gather(
+                *[fetch(url) for url in urls],
+                return_exceptions=True
+            )
+
+            for r, clan_tag in zip(clans_results, clan_tags):
+                if isinstance(r, Exception):
+                    clan_scores[clan_tag] = None
+                elif isinstance(r, dict):
+                    clan_scores[clan_tag] = r.get('clanWarTrophies')
+                else:
+                    clan_scores[clan_tag] = None
+
+        # add rank and clan score
+        clans = []
+        for clan_tag in clan_tags:
+            rr = river_races.get(clan_tag, {})
+            clan = dict(
+                clan_tag=clan_tag,
+                state=rr.get('state'),
+                clan=rr.get('clan'),
+                clan_score=0,
+                fame=0,
+                repair_points=0,
+                rank=0,
+            )
+            if rr and rr.get('state') == 'full':
+                clan['clan_score'] = clan_scores.get(clan_tag, 0)
+                rr_clans = rr.get('clans', [])
+                sorted_clans = sorted(rr_clans, key=lambda x: x.get('fame', 0), reverse=True)
+                for rank, c in enumerate(sorted_clans, 1):
+                    if c.get('tag', '')[1:] == clan_tag:
+                        clan.update(
+                            rank=rank,
+                            fame=c.get('fame', 0),
+                            repair_points=c.get('repairPoints', 0),
+                        )
+
+            clans.append(clan)
 
         if clans:
             dataIO.save_json(CLAN_WARS_CACHE, clans)
+
         return clans
 
     @commands.group(pass_context=True, aliases=['cw'])
@@ -1125,18 +1160,18 @@ class Clans:
 
         await self.bot.say("Auto clan wars update stopped.")
 
-    # async def post_clanwars_task(self):
-    #     """Task: post embed to channel."""
-    #     try:
-    #         while True:
-    #             if self == self.bot.get_cog("Clans"):
-    #                 try:
-    #                     await self.post_clanwars()
-    #                 except DiscordException as e:
-    #                     pass
-    #                 await asyncio.sleep(TASK_INTERVAL)
-    #     except asyncio.CancelledError:
-    #         pass
+    async def post_clanwars_task(self):
+        """Task: post embed to channel."""
+        try:
+            while True:
+                if self == self.bot.get_cog("Clans"):
+                    try:
+                        await self.post_clanwars()
+                    except DiscordException as e:
+                        pass
+                    await asyncio.sleep(TASK_INTERVAL)
+        except asyncio.CancelledError:
+            pass
 
     async def post_clanwars(self):
         """Post embbed to channel."""
