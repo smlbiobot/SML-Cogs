@@ -711,6 +711,9 @@ class MemberManagement:
         out = []
         for c in text_channels:
             channel_perm = c.permissions_for(member)
+            # display channel if has read perms
+            if not getattr(channel_perm, 'read_messages'):
+                continue
             perms = [t for t in perm_tests.keys() if getattr(channel_perm, t)]
             if len(perms):
                 out.append("{channel} {perms}".format(channel=c.mention, perms=', '.join(perm_tests[t] for t in perms)))
