@@ -692,16 +692,20 @@ class MemberManagement:
         voice_channels = sorted(voice_channels, key=lambda c: c.position)
 
         perm_tests = {
-            'read_messages': 'read msg',
-            'read_message_history': 'read history',
-            'send_messages': 'send msg',
-            'manage_messages': 'manage msg',
             'add_reactions': 'react',
-            'kick_members': 'kick',
             'ban_members': 'ban',
+            'kick_members': 'kick',
             'manage_channels': 'manage_channels',
+            'manage_emojis': 'manage_emojis',
+            'manage_messages': 'manage_messages',
+            'manage_nicknames': 'manage_nicknames',
+            'manage_roles': 'manage_roles',
             'manage_server': 'manage_server',
-
+            'mention_everyone': 'mention_everyone',
+            'read_message_history': 'msg_read_history',
+            'read_messages': 'msg_read',
+            'send_messages': 'msg_send',
+            'view_audit_logs': 'view_audit_logs',
         }
 
         out = []
