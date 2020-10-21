@@ -61,6 +61,8 @@ CLAN_WARS_CACHE = os.path.join(PATH, "clan_wars_cache.json")
 EMOJI_CW_TROPHY = '<:cwtrophy:450878327880941589>'
 
 TASK_INTERVAL = 57 * 5
+
+
 # TASK_INTERVAL = 10
 
 
@@ -360,6 +362,7 @@ class Clans:
                 urls = ['https://api.clashroyale.com/v1/clans/%23{}'.format(tag) for tag in tags]
                 headers = {'Authorization': 'Bearer {}'.format(self.auth)}
                 data = []
+
                 async def fetch(url):
                     async with self.session.get(url, headers=headers, timeout=30) as resp:
                         d = await resp.json()
@@ -1032,6 +1035,11 @@ class Clans:
                 else:
                     clan_scores[clan_tag] = None
 
+        def sort_rr_clans(clan):
+            finish_time = clan.get('finishTime', '99999999T000000.000Z')
+            fame = clan.get('fame', 0)
+            return finish_time, -fame
+
         # add rank and clan score
         clans = []
         for clan_tag in clan_tags:
@@ -1048,8 +1056,8 @@ class Clans:
             if rr and rr.get('state') == 'full':
                 clan['clan_score'] = clan_scores.get(clan_tag, 0)
                 rr_clans = rr.get('clans', [])
-                sorted_clans = sorted(rr_clans, key=lambda x: x.get('fame', 0), reverse=True)
-                for rank, c in enumerate(sorted_clans, 1):
+                sorted_rr_clans = sorted(rr_clans, key=sort_rr_clans)
+                for rank, c in enumerate(sorted_rr_clans, 1):
                     if c.get('tag', '')[1:] == clan_tag:
                         clan.update(
                             rank=rank,
