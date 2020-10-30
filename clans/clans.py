@@ -909,7 +909,7 @@ class Clans:
             clan = Box(c, default_box=True)
             clan_name = cf.name
             value = row.format(
-                fame=emoji_value('cwfame', clan.fame, 5),
+                fame=emoji_value('cwfame', clan.fame, 6),
                 repair=emoji_value('cwrepair', clan.repair_points, 5),
                 rank=emoji_value('crown', clan.rank, 1),
                 # clan_score=emoji_value('cwtrophy', clan.clan_score, 5),
