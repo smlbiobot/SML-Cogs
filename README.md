@@ -6,9 +6,9 @@ While some of these cogs can theoretically be used for any Discord server, many 
 
 If you would like to see most of these in action, you can join the RACF Discord server with this invite code: [http://discord.royaleapi.com](http://discord.royaleapi.com)
 
-You are welcome to log any issues in the Issues tab, or try to find me on either the RoyaleAPI Discord server or my own Discord server at [http://discord.me/sml](http://discord.me/sml)
+You are welcome to log any issues in the Issues tab, or try to find me on either the RoyaleAPI Discord server or my own Discord server at https://discord.smluniverse.com
 
-There are no extensive documentation on these cogs. However, usage for many of these commands can be found on the documentation site for the RoyaleAPI server, since these cogs were mostly written for it: http://fam.royaleapi.com
+There are no extensive documentation on these cogs. However, usage for many of these commands can be found on the documentation site for the RoyaleAPI server, since these cogs were mostly written for it: http://ddocs.royaleapi.com
 
 # Table of Contents
 
@@ -25,7 +25,7 @@ To install a cog on your bot instance:
 
 ### 1. Add the repo
 
-`[p]cog repo add SML-Cogs http://github.com/smlbiobot/SML-Cogs`
+`[p]cog repo add SML-Cogs http://github.com/smlbiobot/SML-Cogs
 
 `[p]` stands for server prefix. So if you use `!` as to run bot commands, you would instead type:
 
