@@ -223,7 +223,7 @@ class Clans:
             if self == self.bot.get_cog("Clans"):
                 while True:
                     tasks = [
-                        self.post_auto_clans(),
+                        # self.post_auto_clans(),
                         self.post_clanwars(),
                     ]
                     await asyncio.gather(*tasks, return_exceptions=True)
