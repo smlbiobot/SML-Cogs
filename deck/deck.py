@@ -52,6 +52,7 @@ PAGINATION_TIMEOUT = 20.0
 HELP_URL = "https://github.com/smlbiobot/SML-Cogs/wiki/Deck#usage"
 CARDS_JSON_URL = "https://royaleapi.github.io/cr-api-data/json/cards.json"
 
+
 numbs = {
     "next": "➡",
     "back": "⬅",
