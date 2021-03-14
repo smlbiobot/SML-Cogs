@@ -273,20 +273,25 @@ class Deck:
         """Convert decklink to cards."""
         card_keys = None
         # search for Clash Royale decks
-        m_crlink = re.search('(http|ftp|https)://link.clashroyale.com/deck/..\?deck=[\d\;]+', url)
+        # https://link.clashroyale.com/deck/en?deck=26000015;28000015;26000027;26000085;27000012;26000023;28000007;28000012&id=2R900UR
+        m_crlink = re.search('(http|ftp|https)://link.clashroyale.com/deck/..\?deck=([\d\;]+)', url)
 
         # search for royaleapi deck stats link
         m_rapilink = re.match('(https|http)://royaleapi.com/decks/stats/([a-z,-]+)/?', url)
         m_rapilink_section = re.match('(https|http)://royaleapi.com/decks/stats/([a-z,-]+)/.+', url)
 
         if m_crlink:
-            url = m_crlink.group()
-            decklinks = re.findall('2\d{7}', url)
-            card_keys = []
-            for decklink in decklinks:
-                card_key = await self.card_decklink_to_key(decklink)
-                if card_key is not None:
-                    card_keys.append(card_key)
+            try:
+                url = m_crlink.group(2)
+                decklinks = re.findall('2\d{7}', url)
+                card_keys = []
+                for decklink in decklinks:
+                    card_key = await self.card_decklink_to_key(decklink)
+                    if card_key is not None:
+                        card_keys.append(card_key)
+            except IndexError:
+                # no such group, ignore
+                pass
         elif m_rapilink and not m_rapilink_section:
             s = m_rapilink.group(2)
             card_keys = s.split(',')
