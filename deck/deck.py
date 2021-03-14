@@ -274,6 +274,8 @@ class Deck:
         card_keys = None
         # search for Clash Royale decks
         # https://link.clashroyale.com/deck/en?deck=26000015;28000015;26000027;26000085;27000012;26000023;28000007;28000012&id=2R900UR
+        from urllib.parse import unquote
+        url = unquote(url)
         m_crlink = re.search('(http|ftp|https)://link.clashroyale.com/deck/..\?deck=([\d\;]+)', url)
 
         # search for royaleapi deck stats link
