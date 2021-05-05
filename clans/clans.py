@@ -1236,6 +1236,11 @@ class Clans:
         war_link = "https://royaleapi.com/clan/{tag}/war".format(tag=tag)
         analytics_link = "https://royaleapi.com/clan/{tag}/war/analytics".format(tag=tag)
 
+        # don’t post clan invite links that are not from RoyaleAPI on RoyaleAPI Server
+        if int(msg.server.id) in [528327242875535372]:
+            if not clan.name.lower().starstwith('royaleapi'):
+                return
+
         title = "Clan Invitation - Clash Royale"
         description = "\n".join([
             "**{name}** #{tag}".format(name=clan.name, tag=tag),
